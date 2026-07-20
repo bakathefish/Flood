@@ -1,0 +1,9 @@
+node_modules/
+.claude-crawl/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.tif
+ee-key.json
+data/gfm/
+.env
