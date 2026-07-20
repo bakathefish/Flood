@@ -1,0 +1,26 @@
+name: sailaab-monitor
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q          # never publish from a red tree
+      - run: python pipeline/live_monitor.py
+        env:
+          EE_SA_KEY: ${{ secrets.EE_SA_KEY }}
+      - name: commit state
+        run: |
+          git config user.name "sailaab-monitor"
+          git config user.email "monitor@users.noreply.github.com"
+          git add monitor/
+          git diff --cached --quiet || git commit -m "monitor: update latest.json"
+          git push
