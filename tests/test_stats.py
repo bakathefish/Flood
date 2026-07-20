@@ -51,3 +51,19 @@ def test_flooded_fraction_errors_on_unknown_district():
     areas = pd.DataFrame({"district": ["Gurdaspur"], "area_ha": [356_900.0]})
     with pytest.raises(ValueError, match="Firozpur"):
         flooded_fraction(df, areas)
+
+
+from sailaab.stats import crop_value_at_risk
+
+
+def test_crop_value_at_risk_order_of_magnitude():
+    # 150,000 ha * 6.5 t/ha * ₹23,200/t ≈ ₹2.26e10 (₹2,262 crore)
+    v = crop_value_at_risk(ha=150_000)
+    assert v == pytest.approx(150_000 * 6.5 * 23_200)
+
+
+def test_crop_value_custom_yield():
+    assert (
+        crop_value_at_risk(ha=100, yield_t_per_ha=5, price_per_t=20_000)
+        == 100 * 5 * 20_000
+    )

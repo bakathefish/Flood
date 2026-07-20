@@ -23,3 +23,17 @@ def flooded_fraction(df: pd.DataFrame, district_areas: pd.DataFrame) -> pd.DataF
     out = df.merge(district_areas, on="district", how="left")
     out["flooded_fraction"] = out["flooded_ha"] / out["area_ha"]
     return out
+
+
+PADDY_YIELD_T_PER_HA = 6.5  # Punjab avg (cite in DATA-SOURCES)
+PADDY_MSP_PER_T = 23_200  # ≈ MSP 2025 grade-A ₹2,320/quintal
+
+
+def crop_value_at_risk(
+    ha: float,
+    yield_t_per_ha: float = PADDY_YIELD_T_PER_HA,
+    price_per_t: float = PADDY_MSP_PER_T,
+) -> float:
+    """Order-of-magnitude value of flooded paddy. Clearly an estimate —
+    label it as such everywhere it is displayed."""
+    return ha * yield_t_per_ha * price_per_t
