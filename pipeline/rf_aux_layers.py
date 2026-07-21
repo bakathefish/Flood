@@ -38,6 +38,18 @@ GFM_DIR = Path("data/gfm")
 DEM_TIME_BUDGET_S = 45 * 60
 RES = 90.0
 
+# Same anti-hang HTTP knobs as pipeline.rf_build_features: GDAL's default cURL
+# timeout is unbounded, and dead Azure connections otherwise hang reads forever.
+lta.GDAL_ENV = dict(
+    lta.GDAL_ENV,
+    GDAL_HTTP_TIMEOUT="240",
+    GDAL_HTTP_CONNECTTIMEOUT="30",
+    GDAL_HTTP_LOW_SPEED_LIMIT="10240",
+    GDAL_HTTP_LOW_SPEED_TIME="60",
+    GDAL_HTTP_MAX_RETRY="2",
+    GDAL_HTTP_RETRY_DELAY="3",
+)
+
 
 def _client():
     return pystac_client.Client.open(STAC_URL, modifier=pc.sign_inplace)

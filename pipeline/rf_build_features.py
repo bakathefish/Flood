@@ -51,12 +51,45 @@ RASTER_DIR = Path("data/rasters")
 # (tried 12) saturate the home link / trip anonymous throttling and stall the run.
 lta.MAX_WORKERS = 8
 
+# Cap per-request HTTP time. GDAL's default cURL timeout is unbounded, so a dead
+# Azure connection hangs its worker forever (observed: reads "taking" 900-1200 s
+# were dead sockets; the whole pool stalled >15 min with zero completions). With a
+# timeout the read aborts, `read_asset` re-signs the href and retries on a fresh
+# connection. LOW_SPEED knobs kill connections that stall below 10 KB/s for 60 s.
+lta.GDAL_ENV = dict(
+    lta.GDAL_ENV,
+    GDAL_HTTP_TIMEOUT="240",
+    GDAL_HTTP_CONNECTTIMEOUT="30",
+    GDAL_HTTP_LOW_SPEED_LIMIT="10240",
+    GDAL_HTTP_LOW_SPEED_TIME="60",
+    GDAL_HTTP_MAX_RETRY="2",
+    GDAL_HTTP_RETRY_DELAY="3",
+)
+
+# Under heavy anonymous throttling the binding cost is the number of COG reads.
+# A median composite needs only a handful of passes, so the pre-flood window is
+# subsampled to at most PRE_PER_ORBIT scenes *per relative orbit* (stratified so
+# every descending swath 34/107/136 stays covered statewide). All flood-window
+# scenes are kept — that window is scarce (10) and carries the signal.
+PRE_PER_ORBIT = 5
+
 
 def _by_state(items):
     out = {}
     for it in items:
         st = it.properties.get("sat:orbit_state")
         out.setdefault(st, []).append(it)
+    return out
+
+
+def _subsample_by_relorbit(items, k):
+    """Keep at most ``k`` scenes per relative orbit (stratified swath coverage)."""
+    by_rel = {}
+    for it in items:
+        by_rel.setdefault(it.properties.get("sat:relative_orbit"), []).append(it)
+    out = []
+    for rel, group in sorted(by_rel.items(), key=lambda kv: str(kv[0])):
+        out.extend(group[:k])
     return out
 
 
@@ -114,12 +147,24 @@ def build():
         {k: len(v) for k, v in flood_by.items()},
         flush=True,
     )
-    pre_sel = pre_by[ORBIT_STATE]
+    pre_full = pre_by[ORBIT_STATE]
+    pre_sel = _subsample_by_relorbit(pre_full, PRE_PER_ORBIT)
     flood_sel = flood_by[ORBIT_STATE]
+
+    def _relcounts(items):
+        c = {}
+        for it in items:
+            r = it.properties.get("sat:relative_orbit")
+            c[r] = c.get(r, 0) + 1
+        return c
+
     print(
-        f"  using {ORBIT_STATE}: pre {len(pre_sel)} / flood {len(flood_sel)} scenes",
+        f"  using {ORBIT_STATE}: pre {len(pre_sel)}/{len(pre_full)} "
+        f"(<= {PRE_PER_ORBIT}/rel-orbit) / flood {len(flood_sel)} scenes",
         flush=True,
     )
+    print(f"  pre rel-orbits : {_relcounts(pre_sel)}", flush=True)
+    print(f"  flood rel-orbits: {_relcounts(flood_sel)}", flush=True)
 
     transform, width, height = target_grid(bbox, RES)
     px_area = RES * RES
