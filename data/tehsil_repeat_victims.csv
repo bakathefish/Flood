@@ -1,0 +1,92 @@
+tehsil,district,seasons_gt1pct,seasons_gt2pct,max_season_fraction,mean_annual_flooded_ha
+Khadur Sahib,Tarn Taran,6,5,0.07924,1085.96
+Sultanpur Lodhi,Kapurthala,5,5,0.155264,1737.6
+Moonak,Sangrur,4,4,0.289547,1420.08
+Patti,Tarn Taran,4,4,0.078222,777.28
+Firozpur,Firozpur,4,2,0.053018,1598.64
+Shahkot,Jalandhar,3,3,0.088891,985.55
+Dharamkot,Moga,3,3,0.035046,494.31
+Zira,Firozpur,3,2,0.039219,768.1
+Patran,Patiala,3,1,0.13936,816.21
+Fazilka,Firozpur,2,2,0.067793,1111.48
+Kapurthala,Kapurthala,2,2,0.042408,570.75
+Budhlada,Mansa,2,2,0.025792,364.94
+Bhulath,Kapurthala,2,2,0.082395,286.37
+Dudhan Sadhan,Patiala,2,1,0.23565,551.81
+Rajpura,Patiala,2,1,0.027714,388.36
+Nabha,Patiala,2,1,0.030041,281.33
+Phagwara,Kapurthala,2,1,0.047667,189.5
+Tarn Taran,Tarn Taran,2,0,0.016897,452.79
+Jagraon,Ludhiana,2,0,0.014387,303.91
+Dasua,Hoshiarpur,2,0,0.016711,236.58
+Jalalabad,Firozpur,2,0,0.014481,178.5
+Ajnala,Amritsar,1,1,0.081418,918.41
+Dera Baba Nanak,Gurdaspur,1,1,0.279302,740.58
+Dinanagar,Gurdaspur,1,1,0.171984,690.48
+Pathankot,Gurdaspur,1,1,0.030759,477.92
+Patiala,Patiala,1,1,0.03961,394.69
+Samrala,Ludhiana,1,1,0.05402,328.26
+Gurdaspur,Gurdaspur,1,1,0.030723,232.4
+Nakodar,Jalandhar,1,1,0.044392,226.61
+Ludhiana (East),Ludhiana,1,1,0.020275,224.08
+Kalanaur,Gurdaspur,1,1,0.096423,220.13
+Nawanshahr,Nawanshahr,1,1,0.028153,202.81
+Lehra,Sangrur,1,1,0.031712,164.66
+Jalandhar-I,Jalandhar,1,1,0.029751,140.09
+Rup Nagar,Rupnagar,1,1,0.034582,129.24
+Dera Bassi,Sahibzada Ajit Singh Nagar,1,1,0.025336,125.91
+Amloh,Fatehgarh Sahib,1,1,0.03199,98.35
+Chamkaur Sahib,Rupnagar,1,1,0.039515,94.81
+Malout,Muktsar,1,0,0.014432,208.45
+Batala,Gurdaspur,1,0,0.011096,200.02
+Sardulgarh,Mansa,1,0,0.011855,141.2
+Mansa,Mansa,1,0,0.012633,138.73
+Baba Bakala,Amritsar,1,0,0.011204,117.08
+Tapa,Barnala,1,0,0.013958,115.87
+Dhuri,Sangrur,1,0,0.013204,111.15
+Balachaur,Nawanshahr,1,0,0.018793,97.64
+Sunam,Sangrur,1,0,0.014163,93.86
+Sangrur,Sangrur,1,0,0.015801,88.18
+Anandpur Sahib,Rupnagar,1,0,0.013265,86.34
+Rampura Phul,Bathinda,1,0,0.011454,85.06
+Fatehgarh Sahib,Fatehgarh Sahib,1,0,0.012976,75.59
+Maur,Bathinda,1,0,0.010143,69.42
+Samana,Patiala,1,0,0.011036,67.06
+Payal,Ludhiana,1,0,0.012639,63.17
+Dhar Kalan,Gurdaspur,1,0,0.010935,48.97
+Khanna,Ludhiana,1,0,0.01575,43.97
+Abohar,Firozpur,0,0,0.006662,152.6
+Muktsar,Muktsar,0,0,0.007176,127.53
+Bhikhiwind,Tarn Taran,0,0,0.008829,116.81
+Bathinda,Bathinda,0,0,0.00596,115.92
+Phillaur,Jalandhar,0,0,0.006212,115.3
+Gidderbaha,Muktsar,0,0,0.006784,107.02
+Ludhiana (West),Ludhiana,0,0,0.006485,86.81
+Barnala,Barnala,0,0,0.008058,86.8
+Guruharsahai,Firozpur,0,0,0.00974,85.34
+Nihal Singhwala,Moga,0,0,0.006713,64.85
+Mukerian,Hoshiarpur,0,0,0.007765,53.94
+Bhawanigarh,Sangrur,0,0,0.007847,53.07
+Talwandi Sabo,Bathinda,0,0,0.007131,52.67
+Malerkotla,Sangrur,0,0,0.007994,51.69
+Moga,Moga,0,0,0.003342,43.94
+Bagha Purana,Moga,0,0,0.004301,43.08
+Raikot,Ludhiana,0,0,0.005369,41.84
+Jalandhar-II,Jalandhar,0,0,0.007025,39.83
+Faridkot,Faridkot,0,0,0.001796,38.63
+Banga,Nawanshahr,0,0,0.008367,35.19
+Jaitu,Faridkot,0,0,0.005836,26.62
+Dirba,Sangrur,0,0,0.00519,20.43
+Kotakpura,Faridkot,0,0,0.002232,17.98
+Bassi Pathana,Fatehgarh Sahib,0,0,0.003089,13.24
+Garhshankar,Hoshiarpur,0,0,0.000836,12.61
+Khamanon,Fatehgarh Sahib,0,0,0.003186,10.6
+Hoshiarpur,Hoshiarpur,0,0,0.000592,8.65
+Kharar,Sahibzada Ajit Singh Nagar,0,0,0.000682,7.58
+Ahmedgarh,Sangrur,0,0,0.002971,7.54
+Nangal,Rupnagar,0,0,0.002521,5.18
+Majitha,Amritsar,0,0,0.000905,4.35
+Amritsar-II,Amritsar,0,0,0.000297,3.82
+Morinda,Rupnagar,0,0,0.001284,3.55
+Sas Nagar (Mohali),Sahibzada Ajit Singh Nagar,0,0,0.001596,3.37
+Amritsar-I,Amritsar,0,0,0.000297,0.72
