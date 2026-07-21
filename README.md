@@ -4,7 +4,7 @@
 
 **Live:** https://bakathefish.github.io/Flood/ — interactive district map (2025 flood / decade frequency / forecast risk layers, click for per-district stats), before/after SAR swipe, live monitor readout. Monitor auto-runs every 6 h on CI, no keys — see `monitor/latest.json`
 
-*11 monsoons · 467 flood days · 105,183 ha mapped (2025) · 20 districts · 3 languages · 2 space agencies · 0 logins required.*
+*11 monsoons · 467 flood days · 105,183 ha mapped (2025) · 91 tehsils scored · ρ=0.72 vs the government girdawari · 3 languages · 0 logins required.*
 
 In August–September 2025 Punjab suffered its worst flood since 1988 — all 23 districts affected, ~3.55 lakh people, 1.48–1.75 lakh ha of crops. The satellite maps that could have guided relief existed, but locked in PDFs. Sailaab rebuilds that capability in the open: reproducible code, open data, public outputs.
 
