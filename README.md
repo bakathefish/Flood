@@ -57,6 +57,7 @@ Training labels are bootstrapped from method agreement and labeled as such. Both
 - **Forecaster:** XGBoost on the pipeline's own 2,420 SAR-derived labels; leave-one-year-out ROC-AUC 0.946 (leakage-checked). Trained on 2015–2024 only, it flagged **all five** 2025 flood districts (Kapurthala #1) with ~10 days of lead on the dam-release peak. SHAP: antecedent flooding, flood-history prior, Bhakra storage.
 - **Tehsil-level relief targeting:** 91 tehsils scored; named repeat-victims list (Khadur Sahib 6/11 seasons, Sultanpur Lodhi 5/11) — `data/tehsil_repeat_victims.csv`.
 - **Population exposure:** 0.76–1.78 lakh people inside the mapped 2025 water (GHSL, conservation-checked) vs 3.55 lakh officially affected — relationship explained in the notes.
+- **Ground-truth agreement:** satellite damage ranking vs the Revenue Dept's Special Girdawari table: **ρ = 0.72** (all 20 districts), 5 of top-6 identical. ₹ VaR v2 rebuilt on DES district paddy yields (₹523 crore). Submergence-duration atlas: 51,202 ha ≥7 days; duration-weighted damage ₹351 crore. 65-year rain-trend analysis (pre-registered Mann-Kendall): loading largely stationary; upstream extreme-wet-day frequency rising (p=0.017).
 - **Live monitor + nowcast:** secretless GitHub Action, every 6 h — latest pass, district km², trilingual alerts, and (from Jul 25) live district flood-risk probabilities from the forecaster.
 
 Festival packaging: `docs/SYNOPSIS.md`, `docs/VIDEO-SCRIPT.md`.

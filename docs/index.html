@@ -330,7 +330,7 @@ footer .cr{max-width:60ch}
         <div class="scoreboard">
           <div class="hd">Trained on 2015–2024 only → asked about <b>2025</b> · peak P(flood event) per district</div>
           <div id="sb-rows"></div>
-          <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Full table: <code>data/forecaster_2025_hindcast.csv</code>.</div>
+          <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Our satellite damage ranking also matches the government's ground survey: <b style="color:var(--water)">ρ = 0.72</b> vs the Special Girdawari district table. Full tables: <code>data/forecaster_2025_hindcast.csv</code>, <code>data/official_relief_2025.csv</code>.</div>
         </div>
         <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window — before the Aug 26–27 dam releases — four of the five eventual flood districts were already in the model's statewide top-5. SHAP attribution: antecedent flooding, flood-history prior, and <b>Bhakra reservoir storage</b>.</div>
       </div>
@@ -515,15 +515,22 @@ const csv = async url => {
   const FLOODED_2025 = new Set(['Kapurthala','Firozpur','Tarn Taran','Gurdaspur','Amritsar']);
 
   const jget = url => fetch(url + '?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
-  const [stats, freq, hind, gj, live, nc] = await Promise.all([
+  const cget = url => csv(url).catch(() => []);
+  const [stats, freq, hind, gj, live, nc, offi] = await Promise.all([
     csv(RAW + 'data/district_flood_stats_2025.csv'),
     csv(RAW + 'data/flood_frequency_districts_late_season.csv'),
     csv(RAW + 'data/forecaster_2025_hindcast.csv'),
     fetch(RAW + 'data/punjab_districts.geojson').then(r => r.json()),
     jget(RAW + 'monitor/latest.json'),
-    jget(RAW + 'monitor/nowcast.json')
+    jget(RAW + 'monitor/nowcast.json'),
+    cget(RAW + 'data/official_relief_2025.csv')
   ]);
-  const S = {}, F = {}, R = {}, N = {}, NC = {};
+  const S = {}, F = {}, R = {}, N = {}, NC = {}, O = {};
+  const VMERGE = {'Fazilka':'Firozpur','Pathankot':'Gurdaspur','Malerkotla':'Sangrur','Tarn-Taran':'Tarn Taran'};
+  offi.filter(d => d.metric === 'crop_damage_ha').forEach(d => {
+    const n = VMERGE[d.district] || d.district;
+    O[n] = (O[n] || 0) + (+d.value || 0);
+  });
   stats.forEach(d => S[d.district] = d);
   freq.forEach(d => F[d.district] = d);
   hind.forEach(d => { const p = +d.p_event; if (!(d.district in R) || p > R[d.district]) R[d.district] = p; });
@@ -582,7 +589,8 @@ const csv = async url => {
       <div class="stat-row"><span>${L[5]}</span><b>${(+q.mean_annual_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
       <div class="stat-row"><span>${L[6]}</span><b class="hi">${(R[n]||0).toFixed(2)}</b></div>
       <div class="stat-row"><span>${L[7]}</span><b>${NC[n] ? (+NC[n].observed_km2).toFixed(1) + ' km² (' + (100*(+NC[n].observed_fraction_window||0)).toFixed(2) + '%)' : (N[n] ? (+N[n].flooded_km2).toFixed(1) + ' km²' : '—')}</b></div>
-      <div class="stat-row"><span>${L[8]}</span><b class="hi">${NC[n] ? (NC[n].p_event == null ? 'live from ' + (nc?.activates||'Jul 25') : 'P = ' + (+NC[n].p_event).toFixed(2)) : '—'}</b></div>`;
+      <div class="stat-row"><span>${L[8]}</span><b class="hi">${NC[n] ? (NC[n].p_event == null ? 'live from ' + (nc?.activates||'Jul 25') : 'P = ' + (+NC[n].p_event).toFixed(2)) : '—'}</b></div>
+      <div class="stat-row"><span>Official girdawari dmg.</span><b>${O[n] ? O[n].toLocaleString() + ' ha' : 'not in official list'}</b></div>`;
   };
   window.__repanel = () => { if (lastF) panel(lastF); };
   const geo = L.geoJSON(gj, {
