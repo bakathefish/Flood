@@ -55,7 +55,9 @@ Training labels are bootstrapped from method agreement and labeled as such. Both
 - **Crop impact:** 36,195 ha of cropland flooded in the peak-window snapshot ≈ **₹546 crore** paddy value at risk (order-of-magnitude, MSP-based; official cumulative-season figure is 1.48–1.75 lakh ha — divergence explained in the method notes).
 - **Decade atlas:** Punjab's first public flood-frequency map (2015–2025); 2025 confirmed the worst season of the decade on both raw and calibrated metrics; "repeat victims" district table included. The June–July paddy-transplant contamination in SAR flood products is documented and calibrated out.
 - **Forecaster:** XGBoost on the pipeline's own 2,420 SAR-derived labels; leave-one-year-out ROC-AUC 0.946 (leakage-checked). Trained on 2015–2024 only, it flagged **all five** 2025 flood districts (Kapurthala #1) with ~10 days of lead on the dam-release peak. SHAP: antecedent flooding, flood-history prior, Bhakra storage.
-- **Live monitor:** secretless GitHub Action, every 6 h — latest pass, district km², trilingual alerts.
+- **Tehsil-level relief targeting:** 91 tehsils scored; named repeat-victims list (Khadur Sahib 6/11 seasons, Sultanpur Lodhi 5/11) — `data/tehsil_repeat_victims.csv`.
+- **Population exposure:** 0.76–1.78 lakh people inside the mapped 2025 water (GHSL, conservation-checked) vs 3.55 lakh officially affected — relationship explained in the notes.
+- **Live monitor + nowcast:** secretless GitHub Action, every 6 h — latest pass, district km², trilingual alerts, and (from Jul 25) live district flood-risk probabilities from the forecaster.
 
 Festival packaging: `docs/SYNOPSIS.md`, `docs/VIDEO-SCRIPT.md`.
 

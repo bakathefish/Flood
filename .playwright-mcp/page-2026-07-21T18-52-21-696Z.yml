@@ -1,0 +1,229 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: SAILAAB.
+      - generic [ref=e5]: 30.9010° N · 75.8573° E — PUNJAB, IN
+      - navigation [ref=e6]:
+        - link "Atlas" [ref=e7] [cursor=pointer]:
+          - /url: "#atlas"
+        - link "Districts" [ref=e8] [cursor=pointer]:
+          - /url: "#districts"
+        - link "Forecast" [ref=e9] [cursor=pointer]:
+          - /url: "#forecast"
+        - link "System" [ref=e10] [cursor=pointer]:
+          - /url: "#system"
+        - link "Repository" [ref=e11] [cursor=pointer]:
+          - /url: https://github.com/bakathefish/Flood
+  - main [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]: Open flood intelligence · live this monsoon
+      - heading [level=1] [ref=e15]:
+        - text: The flood maps Punjab never had.
+        - emphasis [ref=e16]: Open. Validated. Running.
+      - generic [ref=e17]: ਸੈਲਾਬ — ਪੰਜਾਬ ਦੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਪ੍ਰਣਾਲੀ
+      - paragraph [ref=e18]:
+        - text: In August 2025 Punjab suffered its
+        - strong [ref=e19]: worst flood since 1988
+        - text: "— all 23 districts, ~3.55 lakh people, 1.7 lakh hectares of crops. The satellite maps that could have guided relief existed, but locked in PDFs. Sailaab rebuilds the capability in the open:"
+        - strong [ref=e20]: SAR flood mapping, a decade hazard atlas, damage analytics, a district flood forecaster, and a live monitor
+        - text: — every line of code and every number public.
+      - generic [ref=e21]:
+        - link "Explore your district" [ref=e22] [cursor=pointer]:
+          - /url: "#districts"
+        - link "Source & method" [ref=e23] [cursor=pointer]:
+          - /url: https://github.com/bakathefish/Flood
+    - generic [ref=e28]:
+      - generic [ref=e29]: Live monitor — auto-runs every 6 h, no keys, no accounts
+      - generic [ref=e31]: "Last satellite pass: 2026-07-20 · coverage 87% · flooded: 2.4 km² · all districts below the 25 km² alert floor"
+      - generic [ref=e32]: "Riverine traces: Firozpur 1.6 km² · Tarn Taran 0.5 km² · Kapurthala 0.2 km² · Gurdaspur 0.1 km² · Live model risk activates 2026-07-25"
+      - generic [ref=e33]: Sentinel-1 → change detection → district km² → trilingual alerts (ਪੰਜਾਬੀ · हिन्दी · EN), committed to the public repo by CI.
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]: "11"
+        - text: monsoons mapped
+      - generic [ref=e37]:
+        - generic [ref=e38]: "467"
+        - text: flood days processed
+      - generic [ref=e39]:
+        - generic [ref=e40]: 105,183
+        - text: ha flooded, 2025 (SAR)
+      - generic [ref=e41]:
+        - generic [ref=e42]: ₹546 cr
+        - text: crop value at risk
+      - generic [ref=e43]:
+        - generic [ref=e44]: "3"
+        - text: alert languages
+      - generic [ref=e45]:
+        - generic [ref=e46]: "2"
+        - text: space agencies validated against
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e49]: "01"
+        - heading "The Atlas" [level=2] [ref=e50]
+      - generic [ref=e52]:
+        - figure "2025 flood extent — machine-learned from Sentinel-1 Random Forest on SAR features, labels bootstrapped from method agreement, honest spatial cross-validation across river basins. Firozpur 14,096 ha · Gurdaspur 8,099 · Kapurthala 6,597." [ref=e53]:
+          - generic [ref=e54]: 2025 · Random Forest
+          - img "RF flood map of Punjab 2025" [ref=e55]
+          - generic [ref=e56]:
+            - generic [ref=e57]: 2025 flood extent — machine-learned from Sentinel-1
+            - text: Random Forest on SAR features, labels bootstrapped from method agreement, honest spatial cross-validation across river basins. Firozpur 14,096 ha · Gurdaspur 8,099 · Kapurthala 6,597.
+        - 'figure "Decade flood-frequency atlas Punjab''s first public flood-recurrence map: every monsoon 2015–2025. The Sutlej, Beas, Ravi and Ghaggar corridors light up; Kapurthala flooded in 5 of 11 seasons." [ref=e58]':
+          - generic [ref=e59]: 2015–2025 · First of its kind
+          - img "Decade flood frequency map" [ref=e168]
+          - generic [ref=e60]:
+            - generic [ref=e61]: Decade flood-frequency atlas
+            - text: "Punjab's first public flood-recurrence map: every monsoon 2015–2025. The Sutlej, Beas, Ravi and Ghaggar corridors light up; Kapurthala flooded in 5 of 11 seasons."
+        - figure "Why it flooded 10× rainfall spike over near-full reservoirs → forced releases (Ranjit Sagar 1.73 lakh cusecs, Aug 27) → inundation. Built from IMD grids + CWC/BBMB records — including the reporting gap." [ref=e62]:
+          - generic [ref=e63]: Causality
+          - 'img "Causal chart: rain, dams, releases" [ref=e169]'
+          - generic [ref=e64]:
+            - generic [ref=e65]: Why it flooded
+            - text: 10× rainfall spike over near-full reservoirs → forced releases (Ranjit Sagar 1.73 lakh cusecs, Aug 27) → inundation. Built from IMD grids + CWC/BBMB records — including the reporting gap.
+        - figure "Three methods, one flood Physics-threshold change detection vs Random Forest vs Copernicus Global Flood Monitoring — agreement maps, confusion matrices, and every divergence explained in the method paper." [ref=e66]:
+          - generic [ref=e67]: Validation
+          - img "Three-method comparison" [ref=e68]
+          - generic [ref=e69]:
+            - generic [ref=e70]: Three methods, one flood
+            - text: Physics-threshold change detection vs Random Forest vs Copernicus Global Flood Monitoring — agreement maps, confusion matrices, and every divergence explained in the method paper.
+      - generic [ref=e71]:
+        - img "During the flood — Sentinel-1 radar, Aug 25–Sep 6 2025"
+        - generic [ref=e72]:
+          - img "Before the flood — Sentinel-1 radar, Jul 1–Aug 10 2025"
+        - generic: ◂ ▸
+        - generic [ref=e73]: Before · Jul 2025
+        - generic [ref=e74]: Flood · Aug–Sep 2025
+        - slider "Before/after comparison slider" [ref=e75]: "50"
+      - generic [ref=e76]: Drag the divider — the same radar view of Punjab before and during the flood. Dark = smooth water surface. The Ravi, Beas and Sutlej corridors turn black as the water spreads.
+    - generic [ref=e77]:
+      - generic [ref=e78]:
+        - generic [ref=e79]: "02"
+        - heading "The Districts" [level=2] [ref=e80]
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - button "Now · observed" [active] [ref=e85] [cursor=pointer]
+            - button "Now · model risk" [ref=e87] [cursor=pointer]
+            - button "2025 flood (ha)" [ref=e90] [cursor=pointer]
+            - button "Decade frequency" [ref=e92] [cursor=pointer]
+            - button "Hindcast risk '25" [ref=e94] [cursor=pointer]
+            - generic [ref=e96]: model risk goes live 2026-07-25 (post-transplant season)
+          - generic [ref=e97]:
+            - generic [ref=e190]:
+              - button "Zoom in" [ref=e191] [cursor=pointer]: +
+              - button "Zoom out" [ref=e192] [cursor=pointer]: −
+            - generic [ref=e99]:
+              - generic [ref=e256]: observed flooded %, last pass
+              - generic [ref=e263]:
+                - generic [ref=e264]: "0"
+                - generic [ref=e265]: "0.05"
+        - complementary [ref=e100]:
+          - heading "Click a district" [level=3] [ref=e101]
+          - generic [ref=e102]: 20 districts · Census-2011 boundaries
+          - generic [ref=e103]:
+            - generic [ref=e104]:
+              - generic [ref=e105]: Layers
+              - generic [ref=e106]: 2025 flood · frequency · risk
+            - generic [ref=e107]:
+              - generic [ref=e108]: Source
+              - generic [ref=e109]: committed CSVs in the repo
+            - generic [ref=e110]:
+              - generic [ref=e111]: Interaction
+              - generic [ref=e112]: hover = tooltip · click = this panel
+          - generic [ref=e113]:
+            - text: "Every number here is reproducible:"
+            - code [ref=e114]: data/district_flood_stats_2025.csv
+            - text: ","
+            - code [ref=e115]: data/flood_frequency_districts_late_season.csv
+            - text: ","
+            - code [ref=e116]: data/forecaster_2025_hindcast.csv
+            - text: .
+    - generic [ref=e117]:
+      - generic [ref=e118]:
+        - generic [ref=e119]: "03"
+        - heading "The Forecast — 2025, held out" [level=2] [ref=e120]
+      - generic [ref=e122]:
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]: Trained on 2015–2024 only → asked about 2025 · peak P(flood event) per district
+            - generic [ref=e203]:
+              - generic [ref=e204]:
+                - generic [ref=e205]: "#1"
+                - generic [ref=e206]: Kapurthala
+                - generic [ref=e209]: "0.91"
+                - generic [ref=e210]: ✓ flooded
+              - generic [ref=e211]:
+                - generic [ref=e212]: "#2"
+                - generic [ref=e213]: Firozpur
+                - generic [ref=e216]: "0.79"
+                - generic [ref=e217]: ✓ flooded
+              - generic [ref=e218]:
+                - generic [ref=e219]: "#3"
+                - generic [ref=e220]: Tarn Taran
+                - generic [ref=e223]: "0.77"
+                - generic [ref=e224]: ✓ flooded
+              - generic [ref=e225]:
+                - generic [ref=e226]: "#4"
+                - generic [ref=e227]: Jalandhar
+                - generic [ref=e230]: "0.27"
+              - generic [ref=e231]:
+                - generic [ref=e232]: "#5"
+                - generic [ref=e233]: Gurdaspur
+                - generic [ref=e236]: "0.17"
+                - generic [ref=e237]: ✓ flooded
+              - generic [ref=e238]:
+                - generic [ref=e239]: "#6"
+                - generic [ref=e240]: Amritsar
+                - generic [ref=e243]: "0.11"
+                - generic [ref=e244]: ✓ flooded
+            - generic [ref=e126]:
+              - text: "✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Full table:"
+              - code [ref=e127]: data/forecaster_2025_hindcast.csv
+              - text: .
+          - generic [ref=e128]: "~10 days of lead: by the Aug 14–24 window — before the Aug 26–27 dam releases — four of the five eventual flood districts were already in the model's statewide top-5. SHAP attribution: antecedent flooding, flood-history prior, and Bhakra reservoir storage."
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - button "ਪੰਜਾਬੀ" [ref=e132] [cursor=pointer]
+              - button "हिन्दी" [ref=e133] [cursor=pointer]
+              - button "English" [ref=e134] [cursor=pointer]
+            - generic [ref=e135]:
+              - generic [ref=e136]: "ਹੜ੍ਹ ਚੇਤਾਵਨੀ: Firozpur ਜ਼ਿਲ੍ਹੇ ਵਿੱਚ ~141.0 ਵਰਗ ਕਿਲੋਮੀਟਰ ਖੇਤਰ ਪਾਣੀ ਹੇਠ ਹੈ (ਸੈਟੇਲਾਈਟ ਦੁਆਰਾ ਪਛਾਣਿਆ)। ਰੁਝਾਨ: ਵਧ ਰਿਹਾ। ਹੈਲਪਲਾਈਨ: 1070"
+              - generic [ref=e137]:
+                - text: Demo render at 2025 flood scale. Live alerts appear in
+                - code [ref=e138]: monitor/latest.json
+                - text: whenever a district crosses the 25 km² floor — generated by the same tested code.
+          - figure "Why the model says what it says SHAP attributions — wet ground, flood history, and a full Bhakra dam are the signature it learned." [ref=e139]:
+            - generic [ref=e140]: Explainability
+            - img "SHAP feature attribution" [ref=e245]
+            - generic [ref=e141]:
+              - generic [ref=e142]: Why the model says what it says
+              - text: SHAP attributions — wet ground, flood history, and a full Bhakra dam are the signature it learned.
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - generic [ref=e145]: "04"
+        - heading "The System" [level=2] [ref=e146]
+      - generic [ref=e148]:
+        - generic [ref=e149]:
+          - heading "Five modules, one pipeline" [level=3] [ref=e150]
+          - list [ref=e151]:
+            - listitem [ref=e152]: — Atlas — Sentinel-1 change detection + Random Forest, per-district statistics
+            - listitem [ref=e153]: — Decade hazard — 11 monsoons → recurrence zones → "repeat victims" table
+            - listitem [ref=e154]: — Impact — crop-flooded hectares, ₹546 crore value-at-risk, the dam-release causal chain
+            - listitem [ref=e155]: — Forecaster — XGBoost district risk model trained on the pipeline's own decade of SAR-derived labels
+            - listitem [ref=e156]: — Live monitor — every new satellite pass → district damage → trilingual alerts, automatically
+          - paragraph [ref=e157]: "Built entirely on open, login-free data: Copernicus Sentinel-1, Copernicus GFM, IMD rainfall, CWC reservoir records, ISRO NDEM validation. Anyone can reproduce every number."
+        - generic [ref=e158]:
+          - heading "Engineering honesty" [level=3] [ref=e159]
+          - paragraph [ref=e160]: Every satellite step is gated by a pre-declared checkpoint — the expected number is written down before the run, then the actual, then PASS or FAIL. The log ships in the repo, failures included.
+          - generic [ref=e161]: Training labels are bootstrapped from method agreement and labeled as such. Both spatial folds are reported. The June "floods" that turned out to be rice transplanting? Documented, calibrated, published.
+          - paragraph [ref=e162]:
+            - text: 168 automated tests. MIT-licensed code, CC-BY data products. Method paper, data-source registry and verification log live in the
+            - link "repository docs" [ref=e163] [cursor=pointer]:
+              - /url: https://github.com/bakathefish/Flood/tree/master/docs
+            - text: .
+  - contentinfo [ref=e164]:
+    - generic [ref=e165]: SAILAAB · built by a Punjab student during the 2026 monsoon · India AI Impact Festival 2026 · Code MIT · Maps & tables CC-BY-4.0 · Contains modified Copernicus Sentinel & EMS-GFM data
+    - generic [ref=e166]:
+      - text: github.com/
+      - link "bakathefish/Flood" [ref=e167] [cursor=pointer]:
+        - /url: https://github.com/bakathefish/Flood

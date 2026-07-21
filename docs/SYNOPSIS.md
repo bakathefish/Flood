@@ -24,6 +24,8 @@ A five-module open pipeline that turns free satellite radar into decision-grade 
 | **Forecaster** | XGBoost district flood-risk model trained on the pipeline's own decade of SAR-derived labels — SHAP-explained |
 | **Live Monitor** | Every new Sentinel-1 pass → district flood km² → Punjabi/Hindi/English alerts, automatically, every 6 hours |
 
+The analysis goes below district level: **91 tehsils are individually scored**, producing a named "repeat victims" list — Khadur Sahib (Tarn Taran) flooded in 6 of the last 11 monsoons, Sultanpur Lodhi (Kapurthala) in 5, Moonak (Sangrur) and Patti (Tarn Taran) in 4 — the exact administrative units where girdawari verification and pre-positioning should start. Population exposure adds the human denominator: **0.76–1.78 lakh people lived inside the mapped water** (GHSL 2025), consistent with — and explaining — the official 3.55 lakh "affected" figure (flooded land is overwhelmingly low-density cropland: 146–206 people/km² vs Punjab's ~550 mean).
+
 **Everything is login-free and reproducible.** During the build we proved a fully account-free acquisition path: anonymous Planetary Computer STAC for Sentinel-1, the keyless GloFAS WMS for Copernicus Global Flood Monitoring layers, IMD gridded rainfall, and CWC reservoir records. Anyone — a district collector, a journalist, a student — can re-run every number with zero accounts.
 
 ## 3. The AI (and why it is honest)
