@@ -127,3 +127,95 @@ python -m pytest tests/test_headroom.py -q
 <!-- after the code above computes them. Nothing below this line  -->
 <!-- was written before the numbers existed.                      -->
 <!-- ============================================================ -->
+
+## Actuals (computed by `pipeline/make_headroom.py`)
+
+### Coverage behind the decade-median curve (2015–2024, storage-days per day-of-season)
+
+| Dam | `n_years` per day (min–max, median) | On 2025-08-25 | Note |
+|---|---|---|---|
+| Bhakra | 6–10 (median 9) | 8 | good |
+| Pong | **4–9 (median 7)** | **6** | 2021–24 monsoons sparse — deficits low-confidence |
+| Ranjit Sagar | 8–10 (median 10) | 9 | best coverage; but Aug 2025 is a **hypsometric** estimate |
+
+### Headroom deficit on 2025-08-25 (eve of the Aug 26–27 surge)
+
+`deficit = 2025 storage − 2015–24 raw daily median`; positive = **less** headroom
+than the decade-median practice. Full daily Aug 1–25 series in
+`data/headroom_2025.csv` (with per-row `basis`).
+
+| Dam | 2025 storage | Decade median | **Deficit (BCM)** | **Deficit (pts)** | vs IQR | Aug 1–25 mean | `basis` @ 25 Aug |
+|---|---|---|---|---|---|---|---|
+| **Pong** | 6.04 BCM (98%) | 5.03 BCM (82%) | **+1.01** | **+16.4** | **above p75** | +1.57 BCM / +25 pts | `interp_frl` |
+| **Ranjit Sagar** | 2.21 BCM (94%) | 1.76 BCM (75%) | **+0.45** | **+19.1** | **above p75** | +0.25 BCM / +11 pts | `interp_hyps` |
+| **Bhakra** | 5.20 BCM (83%) | 4.98 BCM (80%) | **+0.22** | **+3.5** | within IQR | +0.39 BCM / +6 pts | `interp` |
+
+Bhakra ran a real lead in **early/mid-August** (peak **+0.76 BCM / +12 pts** on
+Aug 12) but its decade-median fills steeply through late August and had caught up
+by the 25th — hence the small surge-eve deficit.
+
+### Buffer arithmetic (Aug 26–27 release surge)
+
+`inflow ≈ Δstorage + outflow`; at/near FRL the dam spills so `Δstorage ≈ 0` and
+the documented **peak release** is used as the surge proxy.
+`absorbable_days = deficit_bcm ÷ (peak_cusecs × 2.446575e-6 BCM/day)`.
+
+| Dam | Deficit (BCM) | Peak release | = BCM/day | **Buffer (days)** |
+|---|---|---|---|---|
+| Pong | +1.01 | ~100,000 cusecs | 0.245 | **~4.1 d** |
+| Ranjit Sagar | +0.45 | 173,000 cusecs (27 Aug) | 0.423 | **~1.1 d** |
+| Bhakra | +0.22 | ~85,000 cusecs | 0.208 | **~1.0 d** |
+
+Total surge-eve pre-positioning deficit across the three dams ≈ **+1.68 BCM**.
+Basin-scale Sutlej cumulative release ≈ 2.6 lakh (260,000) cusecs is context only.
+
+## Verdict (against the pre-declared bins)
+
+- **Pong — HOLDS (strong).** +1.01 BCM / +16 pts, **outside its normal IQR** all
+  August. The clearest management component of the three. *Caveat: thin priors
+  (`n_years` 4–9); the magnitude, not the sign, is uncertain.*
+- **Ranjit Sagar — HOLDS.** +0.45 BCM / +19 pts, **outside its IQR**. Small dam,
+  so the percentage-point gap is large while the BCM is modest. *Caveat: 2025
+  August storage is a hypsometric estimate from the dam's own level↔storage
+  rating (BBMB reported levels only); by Aug 27 its level (527.13 m) sat at the
+  top of the 2015–24 observed range.*
+- **Bhakra — NEGLIGIBLE at the surge date.** +0.22 BCM / +3.5 pts, **within its
+  IQR** — 2025 tracked the decade median by Aug 25. This is exactly the
+  pre-declared "weakens" outcome, reported as such. (A real early/mid-August lead
+  existed but had closed by the surge.)
+
+**Net: the headroom argument is supported for Pong and Ranjit Sagar and does not
+hold for Bhakra on the surge date — a partial, honestly-mixed result, not a clean
+three-for-three.** No dam was *emptier* than its decade median (no full
+reversal). The pre-positioning deficit is **real but second-order**: even the
+largest (Pong) equals only ~4 days of peak release, against a multi-week +10σ
+rain pulse that remains the primary cause.
+
+### One-sentence honest headline (for the synopsis)
+
+> Two of the three BBMB dams — **Pong (+1.0 BCM, +16 pts) and Ranjit Sagar
+> (+0.45 BCM, +19 pts)** — met the Aug 26–27 surge holding **more water than their
+> own decade-median practice** and thus that much *less* pre-positioned flood
+> headroom (Bhakra was near its median), a gap equal to only ~1–4 days of each
+> dam's peak release — **real but second-order to the record +10σ rain that caused
+> the flood.**
+
+### Robustness
+
+Deficits are computed against the **raw** per-day median (as pre-declared). A
+7-day centred smoothing of the climatological median (to damp sparse-year
+sampling noise) shifts the Aug-25 deficits by ≤0.04 BCM for Bhakra/Ranjit Sagar
+and +0.31 BCM for Pong — **changing no verdict bin**. The figure draws the
+smoothed median (bold) over the raw IQR band; the CSV holds raw daily values.
+
+### Honesty ledger / limits
+
+- **Pong Aug 1–7** rows are interpolated across the 29-day Jul-11→Aug-8 reporting
+  gap (`basis = interp_wide`) and are the least reliable; the Aug-25 headline sits
+  on the tight Aug-18→26 bracket and does not depend on them.
+- **Ranjit Sagar** August storage is hypsometric, not directly reported
+  (`basis = interp_hyps` / `hypsometric`).
+- Precision post-11-Jul is capped by the cited supplement points (framing rule e).
+- This is arithmetic on storage curves, **not** a routing/hydraulic model; the
+  buffer-days figure answers "how long would the extra empty space have lasted at
+  peak throughput," never "the flood would have been prevented" (framing rule a).
