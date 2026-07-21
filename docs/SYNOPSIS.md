@@ -60,7 +60,7 @@ The live monitor is not a plan — it executed during this build. On a GitHub CI
 
 ## 8. Roadmap
 
-Multi-state scale-out (the pipeline is a bbox + district file), village-circle girdawari integration with Revenue Dept, Bhashini voice alerts, deeper models (U-Net benchmark on Sen1Floods11 chips) as data grows, and official partnerships — the atlas has been shared with PSDMA and the worst-hit District Collectors.
+Multi-state scale-out (the pipeline is a bbox + district file), village-circle girdawari integration with Revenue Dept, Bhashini voice alerts, deeper models (U-Net benchmark on Sen1Floods11 chips) as data grows, and official partnerships — outreach to PSDMA and the worst-hit District Collectors is prepared for dispatch with this submission.
 
 ## 9. Open source
 
