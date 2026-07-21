@@ -473,7 +473,7 @@ const csv = async url => {
   const val = (name, layer) =>
     layer === 'flood' ? +(S[name]?.rf_flooded_ha || 0)
     : layer === 'freq' ? +(F[name]?.seasons_with_fraction_gt1pct || 0)
-    : layer === 'now' ? +(N[name]?.flooded_fraction || 0)
+    : layer === 'now' ? +((NC[name]?.observed_fraction_window ?? N[name]?.flooded_fraction) || 0)
     : layer === 'nowrisk' ? (NC[name]?.p_event ?? null)
     : (R[name] || 0);
   const colorOf = (v, layer) => {
@@ -514,7 +514,7 @@ const csv = async url => {
       <div class="stat-row"><span>Seasons >1% flooded ('15–'25)</span><b>${q.seasons_with_fraction_gt1pct||0} of 11</b></div>
       <div class="stat-row"><span>Mean annual flooded</span><b>${(+q.mean_annual_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
       <div class="stat-row"><span>2025 hindcast peak P</span><b class="hi">${(R[n]||0).toFixed(2)}</b></div>
-      <div class="stat-row"><span>Now — last pass</span><b>${N[n] ? (+N[n].flooded_km2).toFixed(1) + ' km² (' + (100*(+N[n].flooded_fraction||0)).toFixed(2) + '%)' : '—'}</b></div>
+      <div class="stat-row"><span>Now — this window (obs.)</span><b>${NC[n] ? (+NC[n].observed_km2).toFixed(1) + ' km² (' + (100*(+NC[n].observed_fraction_window||0)).toFixed(2) + '%)' : (N[n] ? (+N[n].flooded_km2).toFixed(1) + ' km²' : '—')}</b></div>
       <div class="stat-row"><span>Now — model risk</span><b class="hi">${NC[n] ? (NC[n].p_event == null ? 'live from ' + (nc?.activates||'Jul 25') : 'P = ' + (+NC[n].p_event).toFixed(2)) : '—'}</b></div>`;
   };
   const geo = L.geoJSON(gj, {
