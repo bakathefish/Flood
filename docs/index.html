@@ -38,8 +38,17 @@ header{padding:26px 0 0}
 .brand{font-family:var(--disp);font-weight:800;font-size:20px;letter-spacing:.5px}
 .brand .tld{color:var(--water)}
 .coords{color:var(--paper-faint);font-size:12px;letter-spacing:.08em}
-nav{display:flex;gap:18px;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;flex-wrap:wrap}
+nav{display:flex;gap:18px;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;flex-wrap:wrap;align-items:center}
 nav a{border-bottom:none;color:var(--paper-dim)} nav a:hover{color:var(--water)}
+.lang-sw{display:flex;border:1px solid var(--line2)}
+.lang-sw button{background:none;border:none;border-right:1px solid var(--line2);color:var(--paper-dim);
+  font-family:var(--mono);font-size:11.5px;padding:5px 10px;cursor:pointer}
+.lang-sw button:last-child{border-right:none}
+.lang-sw button.active{color:#062020;background:var(--water)}
+html[data-lang="pa"] h1, html[data-lang="pa"] .sec-head h2, html[data-lang="pa"] .dpanel h3{font-family:'Noto Sans Gurmukhi',var(--disp)}
+html[data-lang="hi"] h1, html[data-lang="hi"] .sec-head h2, html[data-lang="hi"] .dpanel h3{font-family:'Noto Sans Devanagari',var(--disp)}
+.tech-note{display:none;font-size:11px;color:var(--paper-faint);letter-spacing:.05em;margin-top:6px}
+html[data-lang="pa"] .tech-note, html[data-lang="hi"] .tech-note{display:block}
 
 .hero{padding:84px 0 30px;position:relative}
 .kicker{color:var(--amber);font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:22px;
@@ -203,21 +212,22 @@ footer .cr{max-width:60ch}
     <div class="brand">SAILAAB<span class="tld">.</span></div>
     <div class="coords">30.9010° N · 75.8573° E — PUNJAB, IN</div>
     <nav>
-      <a href="#atlas">Atlas</a><a href="#districts">Districts</a><a href="#forecast">Forecast</a>
-      <a href="#system">System</a><a href="https://github.com/bakathefish/Flood">Repository</a>
+      <a href="#atlas" data-i="nav_atlas">Atlas</a><a href="#districts" data-i="nav_dist">Districts</a><a href="#forecast" data-i="nav_fc">Forecast</a>
+      <a href="https://github.com/bakathefish/Flood" data-i="nav_repo">Repository</a>
+      <span class="lang-sw" id="lang-sw"><button data-lang="en" class="active">EN</button><button data-lang="pa">ਪੰ</button><button data-lang="hi">हि</button></span>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
   <div class="hero">
-    <div class="kicker rv d1">Open flood intelligence · live this monsoon</div>
-    <h1 class="rv d2">The flood maps Punjab never had.<br><em>Open. Validated. Running.</em></h1>
+    <div class="kicker rv d1" data-i="kicker">Open flood intelligence · live this monsoon</div>
+    <h1 class="rv d2" data-i="h1" data-html="1">The flood maps Punjab never had.<br><em>Open. Validated. Running.</em></h1>
     <div class="gurmukhi rv d3">ਸੈਲਾਬ — ਪੰਜਾਬ ਦੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਪ੍ਰਣਾਲੀ</div>
-    <p class="lede rv d3">In August 2025 Punjab suffered its <strong>worst flood since 1988</strong> — all 23 districts, ~3.55 lakh people, 1.7 lakh hectares of crops. The satellite maps that could have guided relief existed, but locked in PDFs. Sailaab rebuilds the capability in the open: <strong>SAR flood mapping, a decade hazard atlas, damage analytics, a district flood forecaster, and a live monitor</strong> — every line of code and every number public.</p>
+    <p class="lede rv d3" data-i="lede" data-html="1">In August 2025 Punjab suffered its <strong>worst flood since 1988</strong> — all 23 districts, ~3.55 lakh people, 1.7 lakh hectares of crops. The satellite maps that could have guided relief existed, but locked in PDFs. Sailaab rebuilds the capability in the open: <strong>SAR flood mapping, a decade hazard atlas, damage analytics, a district flood forecaster, and a live monitor</strong> — every line of code and every number public.</p>
     <div class="cta-row rv d4">
-      <a class="btn primary" href="#districts">Explore your district</a>
-      <a class="btn" href="https://github.com/bakathefish/Flood">Source & method</a>
+      <a class="btn primary" href="#districts" data-i="cta1">Explore your district</a>
+      <a class="btn" href="https://github.com/bakathefish/Flood" data-i="cta2">Source & method</a>
     </div>
   </div>
 
@@ -227,7 +237,7 @@ footer .cr{max-width:60ch}
       <span class="dot" style="top:62%;left:38%;animation-delay:1.4s"></span>
     </div>
     <div class="live-body">
-      <div class="live-head"><span class="pulse"></span> Live monitor — auto-runs every 6 h, no keys, no accounts</div>
+      <div class="live-head"><span class="pulse"></span> <span data-i="livehead">Live monitor — auto-runs every 6 h, no keys, no accounts</span></div>
       <div id="live-line">querying last satellite pass…</div>
       <div id="live-districts"></div>
       <div class="live-note">Sentinel-1 → change detection → district km² → trilingual alerts (ਪੰਜਾਬੀ · हिन्दी · EN), committed to the public repo by CI.</div>
@@ -235,16 +245,16 @@ footer .cr{max-width:60ch}
   </div>
 
   <div class="numbers">
-    <div class="num"><b>11</b><span>monsoons mapped</span></div>
-    <div class="num"><b>467</b><span>flood days processed</span></div>
-    <div class="num"><b>105,183</b><span>ha flooded, 2025 (SAR)</span></div>
-    <div class="num"><b>₹546 cr</b><span>crop value at risk</span></div>
-    <div class="num"><b>3</b><span>alert languages</span></div>
-    <div class="num"><b>2</b><span>space agencies validated against</span></div>
+    <div class="num"><b>11</b><span data-i="n1">monsoons mapped</span></div>
+    <div class="num"><b>467</b><span data-i="n2">flood days processed</span></div>
+    <div class="num"><b>105,183</b><span data-i="n3">ha flooded, 2025 (SAR)</span></div>
+    <div class="num"><b>₹546 cr</b><span data-i="n4">crop value at risk</span></div>
+    <div class="num"><b>3</b><span data-i="n5">alert languages</span></div>
+    <div class="num"><b>2</b><span data-i="n6">space agencies validated against</span></div>
   </div>
 
   <section id="atlas">
-    <div class="sec-head"><span class="no">01</span><h2>The Atlas</h2><div class="rule"></div></div>
+    <div class="sec-head"><span class="no">01</span><h2 data-i="s1">The Atlas</h2><div class="rule"></div></div>
     <div class="gallery">
       <figure class="panel p-a">
         <span class="tag">2025 · Random Forest</span>
@@ -276,24 +286,24 @@ footer .cr{max-width:60ch}
       <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/swipe_flood.jpg" alt="During the flood — Sentinel-1 radar, Aug 25–Sep 6 2025">
       <div class="top"><img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/swipe_pre.jpg" alt="Before the flood — Sentinel-1 radar, Jul 1–Aug 10 2025"></div>
       <div class="handle" id="swipe-handle"></div>
-      <span class="lbl l">Before · Jul 2025</span><span class="lbl r">Flood · Aug–Sep 2025</span>
+      <span class="lbl l" data-i="sw1">Before · Jul 2025</span><span class="lbl r" data-i="sw2">Flood · Aug–Sep 2025</span>
       <input type="range" min="0" max="100" value="50" aria-label="Before/after comparison slider">
     </div>
-    <div class="swipe-cap">Drag the divider — the same radar view of Punjab before and during the flood. Dark = smooth water surface. The Ravi, Beas and Sutlej corridors turn black as the water spreads.</div>
+    <div class="swipe-cap" data-i="swcap">Drag the divider — the same radar view of Punjab before and during the flood. Dark = smooth water surface. The Ravi, Beas and Sutlej corridors turn black as the water spreads.</div>
   </section>
 
   <section id="districts">
-    <div class="sec-head"><span class="no">02</span><h2>The Districts</h2><div class="rule"></div></div>
+    <div class="sec-head"><span class="no">02</span><h2 data-i="s2">The Districts</h2><div class="rule"></div></div>
     <div class="map-shell">
       <div style="display:flex;flex-direction:column">
         <div class="layer-row" id="layer-row">
-          <button class="chip" data-layer="now"><span class="now-dot"></span>Now · observed</button>
-          <button class="chip" data-layer="nowrisk"><span class="now-dot" style="background:var(--risk);box-shadow:0 0 6px var(--risk)"></span>Now · model risk</button>
+          <button class="chip" data-layer="now"><span class="now-dot"></span><span data-i="c1">Now · observed</span></button>
+          <button class="chip" data-layer="nowrisk"><span class="now-dot" style="background:var(--risk);box-shadow:0 0 6px var(--risk)"></span><span data-i="c2">Now · model risk</span></button>
           <span class="chip-divider"></span>
-          <button class="chip active" data-layer="flood"><span class="sw" style="background:#63e6d5"></span>2025 flood (ha)</button>
-          <button class="chip" data-layer="freq"><span class="sw" style="background:#ffb454"></span>Decade frequency</button>
-          <button class="chip" data-layer="risk"><span class="sw" style="background:#f487e8"></span>Hindcast risk '25</button>
-          <span class="nowcast-badge" id="nowcast-badge"></span>
+          <button class="chip active" data-layer="flood"><span class="sw" style="background:#63e6d5"></span><span data-i="c3">2025 flood (ha)</span></button>
+          <button class="chip" data-layer="freq"><span class="sw" style="background:#ffb454"></span><span data-i="c4">Decade frequency</span></button>
+          <button class="chip" data-layer="risk"><span class="sw" style="background:#f487e8"></span><span data-i="c5">Hindcast risk '25</span></button>
+          <span class="nowcast-badge" id="nowcast-badge"></span><span class="tech-note" data-i="technote"></span>
         </div>
         <div class="map-left">
           <div id="dmap"></div>
@@ -301,7 +311,7 @@ footer .cr{max-width:60ch}
         </div>
       </div>
       <aside class="dpanel" id="dpanel">
-        <h3 id="dp-name">Click a district</h3>
+        <h3 id="dp-name" data-i="dp0">Click a district</h3>
         <div class="fold" id="dp-fold">20 districts · Census-2011 boundaries</div>
         <div id="dp-rows">
           <div class="stat-row"><span>Layers</span><b>2025 flood · frequency · risk</b></div>
@@ -314,7 +324,7 @@ footer .cr{max-width:60ch}
   </section>
 
   <section id="forecast">
-    <div class="sec-head"><span class="no">03</span><h2>The Forecast — 2025, held out</h2><div class="rule"></div></div>
+    <div class="sec-head"><span class="no">03</span><h2 data-i="s3">The Forecast — 2025, held out</h2><div class="rule"></div></div>
     <div class="fc-grid">
       <div>
         <div class="scoreboard">
@@ -346,7 +356,7 @@ footer .cr{max-width:60ch}
   </section>
 
   <section id="system">
-    <div class="sec-head"><span class="no">04</span><h2>The System</h2><div class="rule"></div></div>
+    <div class="sec-head"><span class="no">04</span><h2 data-i="s4">The System</h2><div class="rule"></div></div>
     <div class="cols">
       <div>
         <h3>Five modules, one pipeline</h3>
@@ -429,6 +439,61 @@ const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
   });
 })();
 
+/* ---------- i18n ---------- */
+const I18N = {
+ pa: {
+  nav_atlas:'ਐਟਲਸ', nav_dist:'ਜ਼ਿਲ੍ਹੇ', nav_fc:'ਭਵਿੱਖਬਾਣੀ', nav_repo:'ਰਿਪੋਜ਼ਟਰੀ',
+  kicker:'ਖੁੱਲ੍ਹੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਜਾਣਕਾਰੀ · ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ',
+  h1:'ਉਹ ਹੜ੍ਹ ਨਕਸ਼ੇ ਜੋ ਪੰਜਾਬ ਕੋਲ ਕਦੇ ਨਹੀਂ ਸਨ।<br><em>ਖੁੱਲ੍ਹੇ। ਪਰਖੇ ਹੋਏ। ਚੱਲ ਰਹੇ।</em>',
+  lede:'ਅਗਸਤ 2025 ਵਿੱਚ ਪੰਜਾਬ ਨੇ <strong>1988 ਤੋਂ ਬਾਅਦ ਦਾ ਸਭ ਤੋਂ ਭਿਆਨਕ ਹੜ੍ਹ</strong> ਝੱਲਿਆ — ਸਾਰੇ 23 ਜ਼ਿਲ੍ਹੇ, ~3.55 ਲੱਖ ਲੋਕ, 1.7 ਲੱਖ ਹੈਕਟੇਅਰ ਫ਼ਸਲਾਂ। ਜੋ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ੇ ਰਾਹਤ ਦਾ ਰਾਹ ਦਿਖਾ ਸਕਦੇ ਸਨ, ਉਹ PDF ਵਿੱਚ ਬੰਦ ਪਏ ਸਨ। ਸੈਲਾਬ ਇਹ ਸਮਰੱਥਾ ਖੁੱਲ੍ਹੇ ਵਿੱਚ ਮੁੜ ਉਸਾਰਦਾ ਹੈ: <strong>SAR ਹੜ੍ਹ ਨਕਸ਼ੇ, ਦਹਾਕੇ ਦਾ ਖ਼ਤਰਾ ਐਟਲਸ, ਨੁਕਸਾਨ ਵਿਸ਼ਲੇਸ਼ਣ, ਜ਼ਿਲ੍ਹਾ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਲਾਈਵ ਮਾਨੀਟਰ</strong> — ਹਰ ਲਾਈਨ ਕੋਡ, ਹਰ ਅੰਕੜਾ ਜਨਤਕ।',
+  cta1:'ਆਪਣਾ ਜ਼ਿਲ੍ਹਾ ਵੇਖੋ', cta2:'ਸਰੋਤ ਅਤੇ ਵਿਧੀ',
+  livehead:'ਲਾਈਵ ਮਾਨੀਟਰ — ਹਰ 6 ਘੰਟੇ ਆਪਣੇ ਆਪ, ਬਿਨਾਂ ਕੁੰਜੀ, ਬਿਨਾਂ ਖਾਤੇ',
+  n1:'ਮੈਪ ਕੀਤੇ ਮਾਨਸੂਨ', n2:'ਪ੍ਰੋਸੈਸ ਕੀਤੇ ਹੜ੍ਹ ਦਿਨ', n3:'ਹੈਕਟੇਅਰ ਡੁੱਬੇ, 2025 (SAR)', n4:'ਫ਼ਸਲ ਮੁੱਲ ਜੋਖਮ ਵਿੱਚ', n5:'ਚੇਤਾਵਨੀ ਭਾਸ਼ਾਵਾਂ', n6:'ਪੁਲਾੜ ਏਜੰਸੀਆਂ ਨਾਲ ਪਰਖ',
+  s1:'ਐਟਲਸ', s2:'ਜ਼ਿਲ੍ਹੇ', s3:'ਭਵਿੱਖਬਾਣੀ — 2025 ਹੋਲਡ-ਆਊਟ', s4:'ਸਿਸਟਮ',
+  c1:'ਹੁਣ · ਵੇਖਿਆ', c2:'ਹੁਣ · ਮਾਡਲ ਜੋਖਮ', c3:'2025 ਹੜ੍ਹ (ਹੈਕ.)', c4:'ਦਹਾਕਾ ਬਾਰੰਬਾਰਤਾ', c5:"ਹਿੰਡਕਾਸਟ ਜੋਖਮ '25",
+  dp0:'ਕੋਈ ਜ਼ਿਲ੍ਹਾ ਚੁਣੋ', sw1:'ਪਹਿਲਾਂ · ਜੁਲਾਈ 2025', sw2:'ਹੜ੍ਹ · ਅਗ–ਸਤੰ 2025',
+  swcap:'ਵੰਡ-ਰੇਖਾ ਖਿੱਚੋ — ਹੜ੍ਹ ਤੋਂ ਪਹਿਲਾਂ ਅਤੇ ਦੌਰਾਨ ਪੰਜਾਬ ਦੀ ਉਹੀ ਰਾਡਾਰ ਤਸਵੀਰ। ਗੂੜ੍ਹਾ = ਸ਼ਾਂਤ ਪਾਣੀ ਦੀ ਸਤ੍ਹਾ। ਰਾਵੀ, ਬਿਆਸ ਅਤੇ ਸਤਲੁਜ ਦੇ ਕੰਢੇ ਪਾਣੀ ਫੈਲਣ ਨਾਲ ਕਾਲੇ ਹੋ ਜਾਂਦੇ ਹਨ।',
+  technote:'ਤਕਨੀਕੀ ਵੇਰਵੇ ਅਤੇ ਨਕਸ਼ਾ-ਵਿਆਖਿਆ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਹਨ',
+  lbl:['2025 ਡੁੱਬਿਆ (RF)','2025 ਡੁੱਬਿਆ (Tier-A)','ਡੁੱਬੀ ਫ਼ਸਲੀ ਜ਼ਮੀਨ','ਝੋਨੇ ਦਾ ਮੁੱਲ ਜੋਖਮ ਵਿੱਚ',"ਮੌਸਮ >1% ਡੁੱਬੇ ('15–'25)",'ਔਸਤ ਸਾਲਾਨਾ ਡੁੱਬਿਆ','2025 ਹਿੰਡਕਾਸਟ P','ਹੁਣ — ਇਹ ਵਿੰਡੋ (ਵੇਖਿਆ)','ਹੁਣ — ਮਾਡਲ ਜੋਖਮ']
+ },
+ hi: {
+  nav_atlas:'एटलस', nav_dist:'जिले', nav_fc:'पूर्वानुमान', nav_repo:'रिपॉज़िटरी',
+  kicker:'खुली बाढ़ इंटेलिजेंस · इस मानसून लाइव',
+  h1:'वे बाढ़ नक्शे जो पंजाब के पास कभी नहीं थे।<br><em>खुले। प्रमाणित। चालू।</em>',
+  lede:'अगस्त 2025 में पंजाब ने <strong>1988 के बाद की सबसे भीषण बाढ़</strong> झेली — सभी 23 जिले, ~3.55 लाख लोग, 1.7 लाख हेक्टेयर फ़सलें। जो सैटेलाइट नक्शे राहत की राह दिखा सकते थे, वे PDF में बंद थे। सैलाब यह क्षमता खुले में फिर से बनाता है: <strong>SAR बाढ़ मानचित्रण, दशक का जोखिम एटलस, क्षति विश्लेषण, जिला बाढ़ पूर्वानुमान और लाइव मॉनिटर</strong> — हर लाइन कोड, हर आँकड़ा सार्वजनिक।',
+  cta1:'अपना जिला देखें', cta2:'स्रोत और विधि',
+  livehead:'लाइव मॉनिटर — हर 6 घंटे स्वतः, बिना कुंजी, बिना खाते',
+  n1:'मैप किए मानसून', n2:'प्रोसेस किए बाढ़ दिन', n3:'हेक्टेयर जलमग्न, 2025 (SAR)', n4:'फ़सल मूल्य जोखिम में', n5:'चेतावनी भाषाएँ', n6:'अंतरिक्ष एजेंसियों से प्रमाणित',
+  s1:'एटलस', s2:'जिले', s3:'पूर्वानुमान — 2025 होल्ड-आउट', s4:'सिस्टम',
+  c1:'अभी · देखा गया', c2:'अभी · मॉडल जोखिम', c3:'2025 बाढ़ (हे.)', c4:'दशक आवृत्ति', c5:"हिंडकास्ट जोखिम '25",
+  dp0:'कोई जिला चुनें', sw1:'पहले · जुलाई 2025', sw2:'बाढ़ · अग–सितं 2025',
+  swcap:'विभाजक खींचें — बाढ़ से पहले और दौरान पंजाब की वही रडार तस्वीर। गहरा = शांत जल सतह। रावी, ब्यास और सतलुज के किनारे पानी फैलने से काले हो जाते हैं।',
+  technote:'तकनीकी विवरण और मानचित्र-व्याख्या अंग्रेज़ी में हैं',
+  lbl:['2025 जलमग्न (RF)','2025 जलमग्न (Tier-A)','जलमग्न फ़सली भूमि','धान मूल्य जोखिम में',"मौसम >1% जलमग्न ('15–'25)",'औसत वार्षिक जलमग्न','2025 हिंडकास्ट P','अभी — यह विंडो (देखा)','अभी — मॉडल जोखिम']
+ }
+};
+const EN_CACHE = {};
+window.LBL = ['2025 flooded (RF)','2025 flooded (Tier-A)','Cropland flooded','Paddy value at risk',"Seasons >1% flooded ('15–'25)",'Mean annual flooded','2025 hindcast peak P','Now — this window (obs.)','Now — model risk'];
+const EN_LBL = window.LBL.slice();
+function applyLang(l){
+  document.documentElement.setAttribute('data-lang', l);
+  document.documentElement.lang = l === 'en' ? 'en' : l;
+  document.querySelectorAll('[data-i]').forEach(el => {
+    const k = el.dataset.i, html = el.dataset.html === '1';
+    if (!(k in EN_CACHE)) EN_CACHE[k] = html ? el.innerHTML : el.textContent;
+    const v = l === 'en' ? EN_CACHE[k] : (I18N[l][k] ?? EN_CACHE[k]);
+    if (html) el.innerHTML = v; else el.textContent = v;
+  });
+  window.LBL = l === 'en' ? EN_LBL.slice() : (I18N[l].lbl || EN_LBL.slice());
+  document.querySelectorAll('#lang-sw button').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  try { localStorage.setItem('sailaab-lang', l); } catch(_){}
+  if (window.__repanel) window.__repanel();
+}
+document.getElementById('lang-sw').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (b) applyLang(b.dataset.lang);
+});
+try { const saved = localStorage.getItem('sailaab-lang'); if (saved && saved !== 'en') applyLang(saved); } catch(_){}
+
 /* ---------- CSV helper ---------- */
 const csv = async url => {
   const t = await (await fetch(url)).text();
@@ -501,22 +566,25 @@ const csv = async url => {
     fillColor: colorOf(val(f.properties.district, layer), layer),
     fillOpacity: .92, color: '#28394a', weight: 1
   });
+  let lastF = null;
   const panel = f => {
-    const n = f.properties.district, s = S[n] || {}, q = F[n] || {};
+    lastF = f;
+    const n = f.properties.district, s = S[n] || {}, q = F[n] || {}, L = window.LBL;
     document.getElementById('dp-name').textContent = n;
     document.getElementById('dp-fold').textContent =
       FLOODED_2025.has(n) ? 'FLOODED IN 2025 · ' + (R[n]>=0.3?'model flagged it in advance':'') : 'outside the 2025 flood core';
     document.getElementById('dp-rows').innerHTML = `
-      <div class="stat-row"><span>2025 flooded (RF)</span><b class="hi">${(+s.rf_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
-      <div class="stat-row"><span>2025 flooded (Tier-A)</span><b>${(+s.tierA_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
-      <div class="stat-row"><span>Cropland flooded</span><b>${(+s.crop_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
-      <div class="stat-row"><span>Paddy value at risk</span><b>₹ ${((+s.crop_var_inr||0)/1e7).toFixed(1)} crore</b></div>
-      <div class="stat-row"><span>Seasons >1% flooded ('15–'25)</span><b>${q.seasons_with_fraction_gt1pct||0} of 11</b></div>
-      <div class="stat-row"><span>Mean annual flooded</span><b>${(+q.mean_annual_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
-      <div class="stat-row"><span>2025 hindcast peak P</span><b class="hi">${(R[n]||0).toFixed(2)}</b></div>
-      <div class="stat-row"><span>Now — this window (obs.)</span><b>${NC[n] ? (+NC[n].observed_km2).toFixed(1) + ' km² (' + (100*(+NC[n].observed_fraction_window||0)).toFixed(2) + '%)' : (N[n] ? (+N[n].flooded_km2).toFixed(1) + ' km²' : '—')}</b></div>
-      <div class="stat-row"><span>Now — model risk</span><b class="hi">${NC[n] ? (NC[n].p_event == null ? 'live from ' + (nc?.activates||'Jul 25') : 'P = ' + (+NC[n].p_event).toFixed(2)) : '—'}</b></div>`;
+      <div class="stat-row"><span>${L[0]}</span><b class="hi">${(+s.rf_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
+      <div class="stat-row"><span>${L[1]}</span><b>${(+s.tierA_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
+      <div class="stat-row"><span>${L[2]}</span><b>${(+s.crop_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
+      <div class="stat-row"><span>${L[3]}</span><b>₹ ${((+s.crop_var_inr||0)/1e7).toFixed(1)} crore</b></div>
+      <div class="stat-row"><span>${L[4]}</span><b>${q.seasons_with_fraction_gt1pct||0} / 11</b></div>
+      <div class="stat-row"><span>${L[5]}</span><b>${(+q.mean_annual_flooded_ha||0).toLocaleString(undefined,{maximumFractionDigits:0})} ha</b></div>
+      <div class="stat-row"><span>${L[6]}</span><b class="hi">${(R[n]||0).toFixed(2)}</b></div>
+      <div class="stat-row"><span>${L[7]}</span><b>${NC[n] ? (+NC[n].observed_km2).toFixed(1) + ' km² (' + (100*(+NC[n].observed_fraction_window||0)).toFixed(2) + '%)' : (N[n] ? (+N[n].flooded_km2).toFixed(1) + ' km²' : '—')}</b></div>
+      <div class="stat-row"><span>${L[8]}</span><b class="hi">${NC[n] ? (NC[n].p_event == null ? 'live from ' + (nc?.activates||'Jul 25') : 'P = ' + (+NC[n].p_event).toFixed(2)) : '—'}</b></div>`;
   };
+  window.__repanel = () => { if (lastF) panel(lastF); };
   const geo = L.geoJSON(gj, {
     style: styleOf,
     onEachFeature: (f, l) => {
