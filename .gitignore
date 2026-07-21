@@ -4,6 +4,11 @@ __pycache__/
 .pytest_cache/
 *.pyc
 *.tif
+*.grd
+*.nc
 ee-key.json
 data/gfm/
+data/ndem/
+data/ems/
+data/rasters/
 .env
