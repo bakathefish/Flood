@@ -5,23 +5,24 @@ on:
   workflow_dispatch: {}
 permissions:
   contents: write
+concurrency:
+  group: monitor
+  cancel-in-progress: false
 jobs:
   monitor:
-    if: ${{ vars.MONITOR_ENABLED == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - run: pip install -r requirements.txt
       - run: python -m pytest -q          # never publish from a red tree
-      - run: python pipeline/live_monitor.py
-        env:
-          EE_SA_KEY: ${{ secrets.EE_SA_KEY }}
+      - run: python -m pipeline.live_monitor   # secretless: anonymous Planetary Computer STAC
       - name: commit state
         run: |
-          git config user.name "sailaab-monitor"
-          git config user.email "monitor@users.noreply.github.com"
+          git config user.name "bakathefish"
+          git config user.email "bakathefish@gmail.com"
           git add monitor/
-          git diff --cached --quiet || git commit -m "monitor: update latest.json"
+          git diff --cached --quiet || git commit -m "monitor: update latest flood pass"
           git push

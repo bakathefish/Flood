@@ -14,3 +14,7 @@ data/ndem/
 data/ems/
 data/rasters/
 .env
+
+# the secretless monitor's pre-built reference composite is committed on purpose
+# (the GitHub Action has no baseline fetch); override the *.tif ignore for it only
+!monitor/reference_vv_150m.tif
