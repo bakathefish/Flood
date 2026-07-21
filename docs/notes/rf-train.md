@@ -69,4 +69,146 @@ PASS/FAIL verdicts are appended afterwards and never edited to fit.
 
 Bands **a–d** are PASS/FAIL gates; band **e** is a documented characterisation.
 
-<!-- ACTUALS / VERDICTS / FOLD METRICS / DISTRICT TABLE / CITATIONS / DEPS appended below after the runs. -->
+## ACTUALS vs pre-declared bands (runs of 2026-07-21, appended after the fact)
+
+| # | Band (declared) | Actual | Verdict |
+|---|---|---|---|
+| **a** | Tier-A statewide > 61,499 ha | **105,183.4 ha** (bbox-wide, valid fraction 0.641 → **1.000**, stripe hole filled) | **PASS** |
+| **b** | per-fold OA 0.90–0.99, F1 0.80–0.99 | Fold A OA **1.000** / F1 **1.000**; Fold B OA **0.9991** / F1 **0.9993** | **FAIL — exceeded on the high side** (see analysis) |
+| **c** | RF within ±40 % of Tier-A | RF 52,223 ha vs Tier-A 33,938 ha (in-district): **+53.9 %** | **FAIL** (see analysis) |
+| **d** | top-6 RF districts ⊇ ≥3 of {Gurdaspur, Amritsar, Firozpur, Kapurthala} | top-6 = Firozpur, Gurdaspur, Kapurthala, Tarn Taran, Amritsar, Jalandhar → **4 of 4** | **PASS** |
+| **e** | crop-flooded vs official 148k–175k ha (characterise) | **36,195 ha** ≈ 21–24 % of the official band | characterised below |
+
+Bands are recorded as declared — the two out-of-band results are reported as
+failures of the *band*, with the physics spelled out, not retro-fitted.
+
+### Band (b) analysis — why the CV came out *too* clean
+
+Both folds exceeded the 0.99 cap. The agreement strata turn out to be almost
+perfectly separable in feature space: the positive class is definitionally
+inside `dVV < −3 ∧ VV_flood < −15` (Tier-A) *and* GFM-confirmed, while
+negatives are outside both, so a forest recovers a threshold-like rule that
+transfers across basins essentially without error (fold A: 0 errors in 2,893
+held-out points; fold B: 3 errors in 3,397). The pre-declared caveat — high
+numbers expected, absolute OA/F1 are **not** evidence of real-world per-pixel
+accuracy — is thus empirically confirmed in its strongest form. What the CV
+*does* establish is that the learned rule is **basin-independent** (no
+Ravi/Beas-specific memorisation). The honest counterweight is the independent
+random-point check below (RF vs GFM on fresh, non-strata points: F1 0.394),
+which shows exactly how far RF and an independent product diverge outside the
+easy strata. Verdict recorded as FAIL because the band said 0.99 max; the
+lesson is that the band itself was mis-calibrated for definitionally-separable
+labels, and any future re-run should either add label noise / disagreement
+pixels or widen the cap with this justification.
+
+### Band (c) analysis — RF +53.9 % vs Tier-A
+
+RF (52,223 ha in-district) sits **between** its two label parents: Tier-A
+(33,938 ha, strict single-geometry change detection) and the GFM union
+(86,071 ha in-district, any-of-6-days peak capture). Trained on their
+agreement, the forest generalises the "flooded" concept to pixels where VH and
+VV evidence resembles the agreed flood class even though the strict Tier-A
+ΔVV/absolute-VV pair narrowly missed them — VH_flood carries 29 % of the
+importance, so this is mostly VH-informed fill along the same corridors (see
+3-panel quicklook; the RF map adds no spurious off-corridor mass). +53.9 % is
+outside the declared ±40 %; recorded as FAIL. Physically the result is
+consistent: RF ⊂ envelope(Tier-A, GFM), and the district ranking (band d) is
+unchanged.
+
+### Band (e) characterisation — crop-flooded vs official
+
+RF ∧ WorldCover-cropland = **36,195 ha** statewide, 21–24 % of the official
+148k–175k ha crop-damage band. Expected divergence, three stacked reasons:
+(1) **snapshot vs season** — our flood window is a single 2025-08-25..09-06
+composite; the official figure accumulates damage over the whole monsoon,
+including waters that receded before our window and later September spills;
+(2) **recession bias** — the descending flood passes cluster ~1–2 weeks after
+the Aug 26–27 peak (GFM's Aug 27 single day alone maps 2,039 km² of water,
+2.4× our composite's flood class), and a median composite further suppresses
+transient water; (3) **standing water vs damage** — official crop loss counts
+fields ruined by inundation *or* waterlogging/sand casting, not just pixels
+still under open water on the pass date. The two numbers measure different
+physical quantities; ours is the instantaneous open-water floor.
+
+## Fold metrics (sailaab.validation.binary_metrics)
+
+| Fold | Train → Test | n_train | n_test | OA | F1 | IoU | TP/FP/FN/TN |
+|---|---|---|---|---|---|---|---|
+| A | Ravi/Beas → Sutlej | 3,397 | 2,893 | 1.0000 | 1.0000 | 1.0000 | 1493/0/0/1400 |
+| B | Sutlej → Ravi/Beas | 2,893 | 3,397 | 0.9991 | 0.9993 | 0.9986 | 2197/3/0/1197 |
+
+Training table: 8,000 points (4,000/class), 3,397 Ravi/Beas + 2,893 Sutlej +
+1,710 outside the two folds (used only in the final fit), committed as
+`data/rf_training_points_2025.csv`. Final model: 200 trees, sklearn 1.8.0
+defaults, features `VV_flood, VH_flood, dVV, dVH, slope`; importances
+VV_flood 0.401, VH_flood 0.291, dVV 0.213, dVH 0.095, slope 0.0002 (slope is
+carried but near-irrelevant on the Punjab plains at 90 m). Model saved to
+`data/models/rf_2025.joblib` (55 KB — tiny because the strata are separable and
+trees terminate shallow; committed, far under the 20 MB cap).
+
+## Independent check — fresh random points, RF vs GFM union
+
+5,000 random in-district points excluding all training indices:
+
+| | GFM flood | GFM dry |
+|---|---|---|
+| **RF flood** | 28 | 27 |
+| **RF dry** | 59 | 4,886 |
+
+OA 0.983, F1 0.394, IoU 0.246. The disagreement is dominated by GFM-only flood
+(59) — peak-day water our recession-biased composite never saw — plus 27
+RF-only pixels (VH-informed fill). On a ~1 %-prevalence problem this is the
+honest scale of divergence between two independent flood products; it is the
+number that keeps band (b)'s 0.999s in perspective.
+
+## Headline district table (top 8 of `data/district_flood_stats_2025.csv`)
+
+| District | Tier-A ha | RF ha | crop-flooded ha | RF fraction |
+|---|---|---|---|---|
+| Firozpur | 10,997 | 14,096 | 11,967 | 2.71 % |
+| Gurdaspur | 4,163 | 8,099 | 3,669 | 2.24 % |
+| Kapurthala | 4,690 | 6,597 | 5,542 | 3.97 % |
+| Tarn Taran | 4,546 | 6,355 | 4,726 | 2.66 % |
+| Amritsar | 3,311 | 4,594 | 3,719 | 1.73 % |
+| Jalandhar | 3,047 | 4,130 | 2,902 | 1.59 % |
+| Moga | 1,860 | 2,269 | 1,725 | 0.97 % |
+| Ludhiana | 712 | 1,621 | 439 | 0.45 % |
+
+Statewide (in-district): Tier-A 33,938 ha, RF 52,223 ha, GFM 86,071 ha,
+crop-flooded 36,195 ha. (Bbox-wide Tier-A is 105,183 ha — the rectangle
+includes heavily-flooded Pakistani Punjab and Himachal margins outside the 20
+district polygons.)
+
+## Runtimes and transfer (2026-07-21)
+
+| Stage | Wall time | Notes |
+|---|---|---|
+| GFM WMS fetch (10 days + refwater) | ~9 min | keyless GloFAS WMS, one 502 retried |
+| S1 feature build (final run) | 4,819 s (80 min) | 25 scenes × VV+VH = 50 COG reads @ 90 m, 8 workers |
+| two aborted S1 attempts | ~35 min | 12-worker stall; then dead-connection stall → HTTP-timeout fix |
+| DEM slope + WorldCover + GFM warp | ~3.5 min | 16 GLO-30 + 4 WC tiles, overview reads |
+| RF train + predict + stats + quicklooks | 29 s | 8k points; 12.7 M-pixel statewide predict |
+
+Anti-hang fix that made the S1 run complete: GDAL's default cURL timeout is
+unbounded, so dead Azure connections hung workers forever (observed 900–1,200 s
+"reads", pool stalls >15 min). `pipeline/rf_build_features.py` and
+`pipeline/rf_aux_layers.py` now set `GDAL_HTTP_TIMEOUT=240`,
+`GDAL_HTTP_CONNECTTIMEOUT=30`, `GDAL_HTTP_LOW_SPEED_LIMIT/TIME=10240/60`,
+`GDAL_HTTP_MAX_RETRY=2` on top of the SAS re-sign retry. The pre-flood window
+is subsampled to ≤5 scenes per relative orbit (15 of 35; all three descending
+swaths kept) — a median composite gains almost nothing from the extra 20
+scenes and the read count is the binding cost under anonymous throttling.
+New downloads this stage ≈ 1.1–1.3 GB, within the 3 GB budget.
+
+## Dataset citations (accessed 2026-07-21)
+
+| Dataset | Source | License / credit |
+|---|---|---|
+| ESA WorldCover 2021 v200 (class 40 = cropland) | Microsoft Planetary Computer, collection `esa-worldcover` (anonymous STAC) | **CC-BY 4.0** — © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by the WorldCover consortium |
+| Copernicus DEM GLO-30 | Microsoft Planetary Computer, collection `cop-dem-glo-30` (anonymous STAC) | © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved |
+| Sentinel-1 RTC (VV+VH features) | Planetary Computer `sentinel-1-rtc` | as recorded in `docs/notes/pc-sar.md` |
+| GFM observed flood extent / reference water | keyless GloFAS WMS | as recorded in `docs/notes/gfm-wms.md` |
+
+New Python packages: **none** beyond those already recorded in
+`docs/notes/pc-sar.md` — scikit-learn 1.8.0, joblib 1.5.3, pandas were already
+in the environment and in use elsewhere in the repo (`sailaab/model.py`).
