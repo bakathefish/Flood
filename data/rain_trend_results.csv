@@ -1,0 +1,7 @@
+index,box,n,r1,sen_slope_per_decade,mk_p_raw,mk_p,prewhitened,verdict
+R95cnt,upstream,65,0.224,0.556,0.0174,0.0174,False,significant increasing trend
+R95cnt,punjab,65,0.031,0.0,0.7963,0.7963,False,no significant trend
+RX5day,upstream,65,0.048,-0.771,0.6961,0.6961,False,no significant trend
+RX5day,punjab,65,-0.068,-2.983,0.1654,0.1654,False,no significant trend
+PRCPTOT,upstream,65,0.056,1.839,0.8429,0.8429,False,no significant trend
+PRCPTOT,punjab,65,-0.123,-8.29,0.3163,0.3163,False,no significant trend
