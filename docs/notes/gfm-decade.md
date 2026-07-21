@@ -72,5 +72,6 @@ season-union km² comes from `aggregate` at the end):
 | season | flood-active days | max single day (km²) | note |
 |---|---|---|---|
 | 2015 | 17 | 2015-07-10 (502) | genuine mid-July event; daily sum 1,289 km² |
+| 2016 | 25 | 2016-07-09 (757) | NOT quiet — early-July signal; daily sum 3,888 km² (C4 quiet-year candidate will be re-identified from unions) |
 
 _remaining seasons + union km² + checkpoint verdicts pending aggregate run._
