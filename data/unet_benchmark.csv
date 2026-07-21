@@ -1,0 +1,4 @@
+method,statewide_flooded_ha,px_vs_gfm_precision,px_vs_gfm_recall,px_vs_gfm_iou,px_vs_gfm_f1,notes
+threshold_tierA,33938.2,0.7809,0.3079,0.2834,0.4417,UN-SPIDER dVV<-3dB & VV<-15dB change-detection; flood-change (excludes permanent water)
+random_forest,52223.1,0.6157,0.3736,0.303,0.465,"RF on VV/VH/dVV/dVH(+slope), Tier-A/GFM agreement labels; flood-change"
+unet_sen1floods11,36062.8,0.5708,0.2392,0.2027,0.3371,small U-Net trained on 10m Sen1Floods11 hand-labeled water (test IoU 0.635); labels open-water (incl. permanent); applied across 10m->90m domain gap
