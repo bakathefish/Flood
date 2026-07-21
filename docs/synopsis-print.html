@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sailaab — Synopsis</title>
+<style>
+@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:500;src:url('fonts/BricolageGrotesque-500-latin.woff2') format('woff2');}
+@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:700;src:url('fonts/BricolageGrotesque-700-latin.woff2') format('woff2');}
+@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:800;src:url('fonts/BricolageGrotesque-800-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;src:url('fonts/IBMPlexMono-400-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;src:url('fonts/IBMPlexMono-500-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;src:url('fonts/IBMPlexMono-600-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;src:url('fonts/IBMPlexSans-400-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;src:url('fonts/IBMPlexSans-500-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;src:url('fonts/IBMPlexSans-600-latin.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Gurmukhi';font-style:normal;font-weight:500;src:url('fonts/NotoSansGurmukhi-500-gurmukhi.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans Gurmukhi';font-style:normal;font-weight:500;src:url('fonts/NotoSansGurmukhi-500-latin.woff2') format('woff2');}
+</style>
+<style>
+@page{size:A4;margin:16mm 15mm 17mm}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--ink:#101820;--dim:#4b5a63;--faint:#8a969c;--water:#0e8f84;--amber:#b26a00;--risk:#a13d8f;--line:#d8d4c8;--wash:#f4f2ea}
+body{font-family:'IBM Plex Sans',sans-serif;font-size:9.6pt;line-height:1.5;color:var(--ink)}
+.mono{font-family:'IBM Plex Mono',monospace}
+h1,h2,h3{font-family:'Bricolage Grotesque',serif}
+.pagebreak{break-before:page}
+.avoid{break-inside:avoid}
+
+/* masthead */
+.masthead{border-bottom:2.5px solid var(--ink);padding-bottom:8px;margin-bottom:10px}
+.masthead .kick{font-family:'IBM Plex Mono';font-size:7.5pt;letter-spacing:.22em;text-transform:uppercase;color:var(--water);margin-bottom:4px}
+h1{font-size:27pt;font-weight:800;letter-spacing:-.5px;line-height:1.02}
+.masthead .sub{font-size:10.5pt;color:var(--dim);margin-top:4px}
+.masthead .gurmukhi{font-family:'Noto Sans Gurmukhi';color:var(--faint);font-size:9.5pt;margin-top:2px}
+.meta{display:flex;justify-content:space-between;font-family:'IBM Plex Mono';font-size:7.3pt;color:var(--faint);margin-top:6px}
+
+/* numbers band */
+.band{display:grid;grid-template-columns:repeat(6,1fr);border:1.2px solid var(--ink);margin:8px 0 12px;break-inside:avoid}
+.band div{padding:6px 7px;border-right:1px solid var(--line)}
+.band div:last-child{border-right:none}
+.band b{display:block;font-family:'Bricolage Grotesque';font-size:12.5pt;font-weight:800;color:var(--amber)}
+.band span{font-size:6.4pt;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+
+h2{font-size:13pt;font-weight:700;margin:13px 0 5px;display:flex;align-items:baseline;gap:8px}
+h2 .no{font-family:'IBM Plex Mono';font-size:8pt;color:var(--water)}
+p{margin:0 0 6px;text-align:justify}
+strong{font-weight:600}
+ul{margin:0 0 6px 14px}
+li{margin-bottom:2.5px}
+table{width:100%;border-collapse:collapse;font-size:8.6pt;margin:5px 0 8px;break-inside:avoid}
+th{font-family:'IBM Plex Mono';font-size:7.2pt;letter-spacing:.06em;text-transform:uppercase;text-align:left;color:var(--dim);border-bottom:1.2px solid var(--ink);padding:3px 6px 3px 0}
+td{border-bottom:.6px solid var(--line);padding:3.5px 6px 3.5px 0;vertical-align:top}
+td b{color:var(--ink)}
+
+figure{break-inside:avoid;margin:7px 0 9px;border:1px solid var(--line);background:var(--wash)}
+figure img{width:100%;display:block}
+figcaption{font-size:7.6pt;color:var(--dim);padding:5px 8px;border-top:1px solid var(--line)}
+figcaption b{color:var(--ink)}
+.fig2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.callout{border-left:3px solid var(--water);background:var(--wash);padding:7px 10px;margin:7px 0;break-inside:avoid;font-size:9.2pt}
+.callout.risk{border-left-color:var(--risk)}
+.callout.amber{border-left-color:var(--amber)}
+.footer-note{font-family:'IBM Plex Mono';font-size:7.2pt;color:var(--faint);border-top:1px solid var(--line);padding-top:5px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="kick">India AI Impact Festival 2026 · AI Impact Creators (Student) · Synopsis</div>
+  <h1>SAILAAB — Punjab Flood Intelligence</h1>
+  <div class="sub">Open SAR flood mapping · decade hazard atlas · impact analytics · district flood forecasting · live monitoring</div>
+  <div class="gurmukhi">ਸੈਲਾਬ — ਪੰਜਾਬ ਦੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਪ੍ਰਣਾਲੀ</div>
+  <div class="meta"><span>LIVE: bakathefish.github.io/Flood</span><span>CODE + DATA: github.com/bakathefish/Flood</span><span>MIT + CC-BY-4.0</span></div>
+</div>
+
+<div class="band">
+  <div><b>11</b><span>monsoons mapped</span></div>
+  <div><b>467</b><span>flood days processed</span></div>
+  <div><b>105,183</b><span>ha flooded 2025 (Tier-A)</span></div>
+  <div><b>91</b><span>tehsils scored</span></div>
+  <div><b>ρ=0.72</b><span>vs govt girdawari</span></div>
+  <div><b>0</b><span>logins required</span></div>
+</div>
+
+<h2><span class="no">01</span>The problem</h2>
+<p>In August–September 2025, Punjab suffered its worst flood since 1988: all 23 districts affected, ~3.55 lakh people, 1.48–1.75 lakh hectares of crops destroyed. Three failures made it worse than it had to be. <strong>Maps existed but were locked</strong> — ISRO's NDEM produced excellent flood maps as static PDFs: one snapshot at a time, not analyzable, not open. <strong>Nobody knew the recurrence</strong> — Punjab has no public flood-frequency atlas (NRSC published them for Assam and Bihar); villages that flooded four times in a decade were treated as first-time surprises. <strong>Relief ran on foot</strong> — girdawari compensation required weeks of manual crop surveys while satellite data that could target it sat unused.</p>
+
+<h2><span class="no">02</span>What Sailaab is</h2>
+<p>A five-module open pipeline that turns free satellite radar into decision-grade flood intelligence — built by a Punjab student during the 2026 monsoon, <strong>running live today</strong> (the monitor executes on public CI every 6 hours with zero accounts or keys; jurors can watch it commit).</p>
+<table>
+<tr><th style="width:22%">Module</th><th>What it produces</th></tr>
+<tr><td><b>2025 Flood Atlas</b></td><td>Sentinel-1 SAR flood extent (physics baseline + Random Forest), per-district and per-tehsil statistics</td></tr>
+<tr><td><b>Decade Hazard Atlas</b></td><td>Every monsoon 2015–2025 mapped identically → Punjab's first public flood-frequency map + named "repeat victims" tehsil list</td></tr>
+<tr><td><b>Impact Engine</b></td><td>Crop damage (₹351–523 crore band), population exposure, submergence-duration atlas, the rain×dams×releases causal chart</td></tr>
+<tr><td><b>Forecaster</b></td><td>XGBoost district flood-risk model trained on the pipeline's own decade of SAR-derived labels — SHAP-explained, conformal-bounded</td></tr>
+<tr><td><b>Live Monitor</b></td><td>Every new Sentinel-1 pass → district flood km² → ਪੰਜਾਬੀ / हिन्दी / English alerts, automatically</td></tr>
+</table>
+<p><strong>91 tehsils are individually scored</strong>, giving relief a named list: Khadur Sahib (Tarn Taran) flooded in 6 of the last 11 monsoons, Sultanpur Lodhi (Kapurthala) in 5, Moonak (Sangrur) and Patti (Tarn Taran) in 4 — the exact administrative units where girdawari verification and pre-positioning should start. Population exposure adds the human denominator: <strong>0.76–1.78 lakh people lived inside the mapped water</strong> (GHSL 2025) — consistent with, and explaining, the official 3.55 lakh "affected": flooded land is overwhelmingly low-density cropland (146–206 people/km² vs Punjab's ~550 mean). Everything is <strong>login-free and reproducible</strong>: anonymous Planetary Computer STAC for Sentinel-1, keyless Copernicus-GFM WMS, IMD rainfall, CWC reservoir records. A district collector, a journalist, or a student can re-run every number with zero accounts.</p>
+
+
+
+<div class="pagebreak"></div>
+<h2><span class="no">03</span>The AI — and why it is honest</h2>
+<p><strong>Random Forest flood classifier.</strong> Features: VV/VH backscatter, pre/post change, terrain. Labels: bootstrapped from <em>agreement</em> between our physics-threshold map and Copernicus GFM — no hand digitization, stated as such. Validation is <strong>spatial cross-validation across river basins</strong> (train Ravi–Beas districts → test Sutlej districts, and swap). We report the trap honestly: agreement-strata points are near-separable (fold F1 ≈ 1.0), so we publish the independent fresh-point comparison (OA 0.983 vs GFM) and the three-method envelope (Tier-A 34k &lt; RF 52k &lt; GFM 86k ha in-district). A small U-Net trained on the Sen1Floods11 hand-labeled benchmark (test IoU 0.63) completes a <strong>three-method benchmark table</strong> — where the target-domain RF wins and the imported deep model's resolution gap is quantified, not hidden.</p>
+<p><strong>The self-labeling loop.</strong> Nobody hands you 11 years of Punjab flood labels — the mapping engine manufactured its own: 1,177 day-slots probed, 467 flood-active days rasterized, 2,420 district-window training rows. In doing so we caught and published a trap that would silently poison any naive attempt: <strong>June–July "floods" in Punjab are largely rice transplanting</strong> — deliberately flooded paddies inflating apparent flood area ~20×. All forecaster training excludes the transplant windows; calibrated late-season products ship alongside raw ones.</p>
+<p><strong>XGBoost district forecaster.</strong> Unit: district × 10-day window. Predictors: IMD rainfall (local + Himalayan upstream, lagged), reservoir storage and its rate of change, antecedent flooding, decade-frequency prior. Gradient boosting, not deep learning — the sample-efficient, interpretable right tool for 2.5k tabular rows with 27 events. Leave-one-year-out ROC-AUC <strong>0.946</strong> (PR-AUC 15× base rate), leakage-checked with fold-safe priors; split-conformal intervals published, including their honest failure on the +10σ 2025 event (non-exchangeability, quantified). A pre-registered ERA5 sub-daily-intensity challenger <em>lost</em> to this model and the negative result is documented — the discipline is the point.</p>
+<div class="callout risk"><strong>The headline result.</strong> Trained only on 2015–2024 and shown 2025's predictors, the model flagged all five districts our SAR atlas ranked most-flooded — a ranking independently corroborated by the government's ground girdawari (ρ = 0.72 all districts / 0.56 named) — Kapurthala #1 statewide (P = 0.72 in the pre-declared flood windows; two districts clear P ≥ 0.5; Amritsar is a rank-5 flag at low probability, stated rather than rounded up). The forecasting claim is the <strong>pre-crest lead: four of five flagged by Aug 14–24, ~10 days before the Aug 26–27 dam-release peak</strong>. We state the critique before a reviewer can: SHAP's top drivers are antecedent flooding and flood history — persistence-aware by design; the pre-crest lead, not post-event probabilities, is the forecast skill. Bhakra storage is driver #3: a full dam is part of the signature it learned — precisely 2025's mechanism.</div>
+<p><strong>Vs Google Flood Hub:</strong> Flood Hub forecasts river stages on ungauged-basin technology; it under-models dam-<em>regulated</em> rivers and outputs no district crop risk. Sailaab is regulation-aware and impact-native. Complementary, not competing.</p>
+
+<div class="fig2 avoid">
+<figure><img src="../atlas/causal_2025.png" alt="Causal chart"><figcaption><b>Why it flooded:</b> ~10× rain spike (26 Aug) over near-full reservoirs → forced releases (Ranjit Sagar 1.73 lakh cusecs, 27 Aug) → inundation. IMD grids + CWC/BBMB records, including the reporting gap.</figcaption></figure>
+<figure><img src="../atlas/forecaster_shap.png" alt="SHAP"><figcaption><b>Why the model says what it says:</b> SHAP attribution — wet ground, flood history, and a full Bhakra dam are the signature it learned.</figcaption></figure>
+</div>
+
+<h2><span class="no">04</span>Validated three independent ways — failures kept</h2>
+<p>Every satellite step is gated by a <strong>pre-declared checkpoint</strong>: the expected numeric band is written into the verification log <em>before</em> the run, then the actual, then PASS/FAIL — and the log ships in the repo with its failures intact (e.g., the NRSC Sangrur-2023 anchor fails on its exact date because no satellite pass existed that day; the same event registers at 33,771 ha in adjacent windows). Validation is triangulated:</p>
+<ul>
+<li><strong>Copernicus GFM</strong> (quantitative): fresh-point confusion matrices; RF sits inside its Tier-A/GFM parent envelope on both precision and recall.</li>
+<li><strong>Sentinel-2 optical truth points</strong> (independent physics — breaks SAR-chain circularity): 237 photo-interpreted NDWI points confirm <strong>81.7% of RF flood pixels</strong> as standing water two weeks post-peak (pre-declared gate ≥60%); all pre-declared precision/recall orderings confirmed.</li>
+<li><strong>ISRO NDEM sheets</strong> (visual): approximate-extent cross-check, stated as such — no pixel agreement claimed.</li>
+</ul>
+<div class="callout"><strong>The ground survey agrees.</strong> Against the Revenue Department's Special Girdawari district table (13 Sep 2025), our satellite ranking scores Spearman <strong>ρ = 0.72</strong> across all 20 districts (0.56 over the 16 named), with 5 of the top-6 districts identical; divergences concentrate in the Ghaggar basin, outside our SAR windows, and are documented. ₹ value-at-risk was rebuilt on the government's own DES district paddy yields (<strong>₹523 crore</strong>, within 4% of the independent estimate); the per-pixel <strong>submergence-duration atlas</strong> — 51,202 ha under water ≥7 days — refines damage to a duration-weighted <strong>₹351 crore</strong>. Independent context: IMD's own grids put Aug 20–Sep 5 2025 rainfall at +9.7σ (rank 1 of 11 years), and a pre-registered 65-year Mann-Kendall analysis shows the loading largely stationary except a significantly rising frequency of extreme-wet days upstream (p=0.017) — 2025 was a compound timing event, not merely a rainfall record.</div>
+
+<div class="fig2 avoid">
+<figure><img src="../atlas/official_vs_sailaab.png" alt="Official vs satellite"><figcaption><b>Satellite vs ground survey:</b> district ranks vs the Special Girdawari table.</figcaption></figure>
+<figure><img src="../atlas/frequency_2015_2025_late_season.png" alt="Frequency atlas"><figcaption><b>Punjab's first public flood-frequency atlas</b> (2015–2025, transplant-calibrated).</figcaption></figure>
+</div>
+<figure class="avoid"><img src="../atlas/ndem_vs_sailaab.png" alt="NDEM vs Sailaab">
+<figcaption><b>Same flood, two access models:</b> ISRO NDEM's locked PDF sheet (left) vs Sailaab's open, interactive, reproducible map (right). NDEM sheets validated our extent visually; full georeferencing is on the roadmap. Map excerpt: NDEM/NRSC/ISRO.</figcaption></figure>
+
+<div class="pagebreak"></div>
+<h2><span class="no">05</span>Running right now</h2>
+<p>The live monitor is not a plan — it executes on GitHub's public runners every 6 hours with <strong>zero secrets</strong>: it detects each new Sentinel-1 pass over Punjab, computes district flood areas, renders trilingual alerts, and commits the state publicly. The public app is interactive: an every-district map with five switchable layers (live observed, live model risk, 2025 flood, decade frequency, hindcast risk), click-through district panels (flooded ha, crop loss, ₹ at risk, recurrence, hindcast P, official girdawari figure), a before/after satellite swipe, a <strong>"replay 2025" scrubber</strong> that shows model risk rising before the water arrives, and a full ਪੰਜਾਬੀ/हिन्दी interface toggle. From <strong>25 July 2026</strong> — inside judging week — the forecaster also publishes live current-window district probabilities on every CI cycle (it activates only in its trained post-transplant domain; the countdown is shown honestly until then).</p>
+
+<h2><span class="no">06</span>Impact, users, SDGs</h2>
+<ul>
+<li><strong>SDMA / district EOCs:</strong> recurrence zones + live district km² for pre-positioning and evacuation priority.</li>
+<li><strong>Revenue Dept / girdawari:</strong> flood-extent ∩ cropland per tehsil turns weeks of manual survey into verification; 20 print-ready district flood briefs ship in the repo.</li>
+<li><strong>Insurers (PMFBY), banks, farmers:</strong> independent reproducible loss extents; vernacular alerts; every map open.</li>
+<li><strong>Worked example (one click in the app):</strong> Sultanpur Lodhi tehsil, Kapurthala — its district flagged #1 by the model in the Aug 14–24 window; 4,733 ha flooded (4,028 ha cropland); flooded in 5 of the last 11 monsoons. Its girdawari list and a ਪੰਜਾਬੀ alert are one click — the relief workflow, demonstrated on real 2025 data. Outreach to PSDMA and the worst-hit District Collectors is drafted for dispatch with this submission.</li>
+<li><strong>SDGs:</strong> 2 (crop-loss quantification), 11 (resilient communities), 13 (climate adaptation).</li>
+</ul>
+
+<h2><span class="no">07</span>Originality</h2>
+<p>(1) First open ML-ready flood mapping of Indian-Punjab 2025 (the published RF precedent covered the Pakistani side); (2) <strong>Punjab's first public flood-frequency atlas</strong> and first submergence-duration atlas; (3) a self-labeling SAR→ML loop that manufactures its own decade of training data — with the rice-transplant contamination discovery published; (4) a dam-regulation-aware district forecaster with a demonstrated ~10-day pre-crest lead, girdawari-corroborated; (5) an end-to-end account-free architecture — reproducibility as a design principle. The negative results (a challenger model that lost; conformal intervals failing on the record event; a U-Net losing to the target-domain RF) are published with the same prominence as the wins.</p>
+
+<h2><span class="no">08</span>Roadmap & openness</h2>
+<p>Multi-state scale-out (the pipeline is a bounding box + district file), village-circle girdawari integration, Bhashini voice alerts, GPU-scale models via the IndiaAI Compute programme, EOS-04 Indian-SAR cross-validation via NRSC Bhoonidhi, and official partnerships. Code MIT; maps and tables CC-BY-4.0; <strong>314 automated tests</strong>; the method paper, data-source registry (every dataset: URL, license, access date) and the full verification log live in the repository.</p>
+
+<div class="footer-note">11 monsoons · 467 flood days · 105,183 ha mapped · 91 tehsils scored · ρ=0.72 vs the government girdawari · 3 languages · 0 logins required — github.com/bakathefish/Flood · bakathefish.github.io/Flood · Contains modified Copernicus Sentinel & EMS-GFM data · Format note: reflowed to the portal's exact synopsis spec on submission.</div>
+
+</body>
+</html>
