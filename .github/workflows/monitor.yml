@@ -19,6 +19,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m pytest -q          # never publish from a red tree
       - run: python -m pipeline.live_monitor   # secretless: anonymous Planetary Computer STAC
+      - run: python -m pipeline.nowcast        # live forecaster nowcast -> monitor/nowcast.json (never fails the job)
       - name: commit state
         run: |
           git config user.name "bakathefish"
