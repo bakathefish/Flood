@@ -143,8 +143,15 @@ def read_asset(href, transform, width, height, retries=2):
             arr[~np.isfinite(arr)] = np.nan
             arr[arr <= 0] = np.nan  # non-positive linear power is nodata
             return arr
-        except Exception as err:  # transient HTTP/GDAL errors
+        except Exception as err:  # transient HTTP/GDAL errors, or expired SAS
             last_err = err
+            # Anonymous SAS tokens live ~45-60 min; on long runs hrefs signed at
+            # search time expire mid-composite (GDAL then reports "not recognized
+            # as being in a supported file format"). Re-sign before retrying.
+            try:
+                href = pc.sign(href.split("?", 1)[0])
+            except Exception:
+                pass  # keep the old href; the plain retry may still succeed
             time.sleep(2 * (attempt + 1))
     print(f"  WARN dropping scene after {retries + 1} attempts: {last_err}")
     return np.full((height, width), np.nan)
