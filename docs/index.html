@@ -247,7 +247,7 @@ footer .cr{max-width:60ch}
     <div class="kicker rv d1" data-i="kicker">Open flood intelligence · live this monsoon</div>
     <h1 class="rv d2" data-i="h1" data-html="1">The flood maps Punjab never had.<br><em>Open. Validated. Running.</em></h1>
     <div class="gurmukhi rv d3">ਸੈਲਾਬ — ਪੰਜਾਬ ਦੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਪ੍ਰਣਾਲੀ</div>
-    <p class="lede rv d3" data-i="lede" data-html="1">In August 2025 Punjab suffered its <strong>worst flood since 1988</strong> — all 23 districts, ~3.55 lakh people, 1.7 lakh hectares of crops. The satellite maps that could have guided relief existed, but locked in PDFs. Sailaab rebuilds the capability in the open: <strong>SAR flood mapping, a decade hazard atlas, damage analytics, a district flood forecaster, and a live monitor</strong> — every line of code and every number public.</p>
+    <p class="lede rv d3" data-i="lede" data-html="1">In August 2025 Punjab suffered its <strong>worst flood since 1988</strong> — all 23 districts, ~3.55 lakh people, 1.48–1.75 lakh hectares of crops (official range). The satellite maps that could have guided relief existed, but locked in PDFs. Sailaab rebuilds the capability in the open: <strong>SAR flood mapping, a decade hazard atlas, damage analytics, a district flood forecaster, and a live monitor</strong> — every line of code and every number public.</p>
     <div class="cta-row rv d4">
       <a class="btn primary" href="#districts" data-i="cta1">Explore your district</a>
       <a class="btn" href="https://github.com/bakathefish/Flood" data-i="cta2">Source & method</a>
@@ -270,10 +270,10 @@ footer .cr{max-width:60ch}
   <div class="numbers">
     <div class="num"><b>11</b><span data-i="n1">monsoons mapped</span></div>
     <div class="num"><b>467</b><span data-i="n2">flood days processed</span></div>
-    <div class="num"><b>105,183</b><span data-i="n3">ha flooded, 2025 (SAR)</span></div>
-    <div class="num"><b>₹546 cr</b><span data-i="n4">crop value at risk</span></div>
+    <div class="num"><b>105,183</b><span data-i="n3">ha flooded, 2025 (SAR Tier-A)</span></div>
+    <div class="num"><b>₹351–523 cr</b><span data-i="n4">crop damage (duration-wtd → at-risk)</span></div>
     <div class="num"><b>3</b><span data-i="n5">alert languages</span></div>
-    <div class="num"><b>2</b><span data-i="n6">space agencies validated against</span></div>
+    <div class="num"><b>3</b><span data-i="n6">independent validations (GFM · S2 · girdawari)</span></div>
   </div>
 
   <section id="atlas">
@@ -283,7 +283,7 @@ footer .cr{max-width:60ch}
         <span class="tag">2025 · Random Forest</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/rf_flood_2025.png" alt="RF flood map of Punjab 2025" loading="lazy">
         <figcaption><b>2025 flood extent — machine-learned from Sentinel-1</b>
-        Random Forest on SAR features, labels bootstrapped from method agreement, honest spatial cross-validation across river basins. Firozpur 14,096 ha · Gurdaspur 8,099 · Kapurthala 6,597.</figcaption>
+        Random Forest on SAR features (~52k ha in-district; the 105k ha headline is the wider Tier-A extent — both published), labels bootstrapped from method agreement, honest spatial cross-validation across river basins. Firozpur 14,096 ha · Gurdaspur 8,099 · Kapurthala 6,597.</figcaption>
       </figure>
       <figure class="panel p-b">
         <span class="tag">2015–2025 · First of its kind</span>
@@ -341,7 +341,7 @@ footer .cr{max-width:60ch}
           <div class="stat-row"><span>Source</span><b>committed CSVs in the repo</b></div>
           <div class="stat-row"><span>Interaction</span><b>hover = tooltip · click = this panel</b></div>
         </div>
-        <div class="hint">Every number here is reproducible: <code>data/district_flood_stats_2025.csv</code>, <code>data/flood_frequency_districts_late_season.csv</code>, <code>data/forecaster_2025_hindcast.csv</code>.</div>
+        <div class="hint">20 districts (Census-2011 vintage: Fazilka, Pathankot &amp; Malerkotla fold into their parent districts — all 23 modern districts covered). Every number here is reproducible: <code>data/district_flood_stats_2025.csv</code>, <code>data/flood_frequency_districts_late_season.csv</code>, <code>data/forecaster_2025_hindcast.csv</code>.</div>
       </aside>
     </div>
   </section>
@@ -351,9 +351,9 @@ footer .cr{max-width:60ch}
     <div class="fc-grid">
       <div>
         <div class="scoreboard">
-          <div class="hd">Trained on 2015–2024 only → asked about <b>2025</b> · peak P(flood event) per district</div>
+          <div class="hd">Trained on 2015–2024 only → asked about <b>2025</b> · peak P in the pre-declared Aug 14–Sep 12 flood windows</div>
           <div id="sb-rows"></div>
-          <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Our satellite damage ranking also matches the government's ground survey: <b style="color:var(--water)">ρ = 0.72</b> vs the Special Girdawari district table. Full tables: <code>data/forecaster_2025_hindcast.csv</code>, <code>data/official_relief_2025.csv</code>.</div>
+          <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Our satellite damage ranking also matches the government's ground survey: Spearman <b style="color:var(--water)">ρ = 0.72</b> across all 20 districts (0.56 over the 16 officially named) vs the Special Girdawari table. Full tables: <code>data/forecaster_2025_hindcast.csv</code>, <code>data/official_relief_2025.csv</code>.</div>
         </div>
         <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window — before the Aug 26–27 dam releases — four of the five eventual flood districts were already in the model's statewide top-5. SHAP attribution: antecedent flooding, flood-history prior, and <b>Bhakra reservoir storage</b>.</div>
 
@@ -409,7 +409,7 @@ footer .cr{max-width:60ch}
         <h3>Engineering honesty</h3>
         <p>Every satellite step is gated by a pre-declared checkpoint — the expected number is written down <i>before</i> the run, then the actual, then PASS or FAIL. The log ships in the repo, failures included.</p>
         <div class="honesty">Training labels are bootstrapped from method agreement and labeled as such. Both spatial folds are reported. The June "floods" that turned out to be rice transplanting? Documented, calibrated, published.</div>
-        <p style="margin-top:14px">168 automated tests. MIT-licensed code, CC-BY data products.
+        <p style="margin-top:14px">314 automated tests. MIT-licensed code, CC-BY data products.
         Method paper, data-source registry and verification log live in the <a href="https://github.com/bakathefish/Flood/tree/master/docs">repository docs</a>.</p>
       </div>
     </div>
@@ -435,7 +435,7 @@ const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
     const r = await fetch(RAW + 'monitor/latest.json?t=' + Date.now());
     const j = await r.json();
     const flagged = j.flagged || [];
-    line.innerHTML = `Last satellite pass: <b>${j.latest_pass}</b> · coverage ${Math.round((j.coverage_fraction||0)*100)}% · flooded: <b>${(+j.total_flooded_km2).toLocaleString()} km²</b> · ${flagged.length ? `<span style="color:var(--alert)">${flagged.length} district(s) above the ${j.alert_floor_km2} km² alert floor</span>` : `all districts below the ${j.alert_floor_km2} km² alert floor`}`;
+    line.innerHTML = `Last satellite pass: <b>${j.latest_pass}</b> · coverage ${Math.round((j.coverage_fraction||0)*100)}% · flooded: <b>${(+j.total_flooded_km2).toLocaleString()} km²</b> · ${flagged.length ? `<span style="color:var(--alert)">${flagged.length} district(s) above the ${j.alert_floor_km2} km² alert floor</span>` : `all districts below the ${j.alert_floor_km2} km² alert floor — a quiet window (this same feed read 2,039 km² on 27 Aug 2025)`}`;
     const top = (j.districts || []).filter(d => d.flooded_km2 > 0).slice(0,4)
       .map(d => `${d.district} ${d.flooded_km2.toFixed(1)} km²`).join(' · ');
     if (top) dist.textContent = 'Riverine traces: ' + top;
@@ -481,35 +481,35 @@ const I18N = {
   nav_atlas:'ਐਟਲਸ', nav_dist:'ਜ਼ਿਲ੍ਹੇ', nav_fc:'ਭਵਿੱਖਬਾਣੀ', nav_repo:'ਰਿਪੋਜ਼ਟਰੀ',
   kicker:'ਖੁੱਲ੍ਹੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਜਾਣਕਾਰੀ · ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ',
   h1:'ਉਹ ਹੜ੍ਹ ਨਕਸ਼ੇ ਜੋ ਪੰਜਾਬ ਕੋਲ ਕਦੇ ਨਹੀਂ ਸਨ।<br><em>ਖੁੱਲ੍ਹੇ। ਪਰਖੇ ਹੋਏ। ਚੱਲ ਰਹੇ।</em>',
-  lede:'ਅਗਸਤ 2025 ਵਿੱਚ ਪੰਜਾਬ ਨੇ <strong>1988 ਤੋਂ ਬਾਅਦ ਦਾ ਸਭ ਤੋਂ ਭਿਆਨਕ ਹੜ੍ਹ</strong> ਝੱਲਿਆ — ਸਾਰੇ 23 ਜ਼ਿਲ੍ਹੇ, ~3.55 ਲੱਖ ਲੋਕ, 1.7 ਲੱਖ ਹੈਕਟੇਅਰ ਫ਼ਸਲਾਂ। ਜੋ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ੇ ਰਾਹਤ ਦਾ ਰਾਹ ਦਿਖਾ ਸਕਦੇ ਸਨ, ਉਹ PDF ਵਿੱਚ ਬੰਦ ਪਏ ਸਨ। ਸੈਲਾਬ ਇਹ ਸਮਰੱਥਾ ਖੁੱਲ੍ਹੇ ਵਿੱਚ ਮੁੜ ਉਸਾਰਦਾ ਹੈ: <strong>SAR ਹੜ੍ਹ ਨਕਸ਼ੇ, ਦਹਾਕੇ ਦਾ ਖ਼ਤਰਾ ਐਟਲਸ, ਨੁਕਸਾਨ ਵਿਸ਼ਲੇਸ਼ਣ, ਜ਼ਿਲ੍ਹਾ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਲਾਈਵ ਮਾਨੀਟਰ</strong> — ਹਰ ਲਾਈਨ ਕੋਡ, ਹਰ ਅੰਕੜਾ ਜਨਤਕ।',
+  lede:'ਅਗਸਤ 2025 ਵਿੱਚ ਪੰਜਾਬ ਨੇ <strong>1988 ਤੋਂ ਬਾਅਦ ਦਾ ਸਭ ਤੋਂ ਭਿਆਨਕ ਹੜ੍ਹ</strong> ਝੱਲਿਆ — ਸਾਰੇ 23 ਜ਼ਿਲ੍ਹੇ, ~3.55 ਲੱਖ ਲੋਕ, 1.48–1.75 ਲੱਖ ਹੈਕਟੇਅਰ ਫ਼ਸਲਾਂ। ਜੋ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ੇ ਰਾਹਤ ਦਾ ਰਾਹ ਦਿਖਾ ਸਕਦੇ ਸਨ, ਉਹ PDF ਵਿੱਚ ਬੰਦ ਪਏ ਸਨ। ਸੈਲਾਬ ਇਹ ਸਮਰੱਥਾ ਖੁੱਲ੍ਹੇ ਵਿੱਚ ਮੁੜ ਉਸਾਰਦਾ ਹੈ: <strong>SAR ਹੜ੍ਹ ਨਕਸ਼ੇ, ਦਹਾਕੇ ਦਾ ਖ਼ਤਰਾ ਐਟਲਸ, ਨੁਕਸਾਨ ਵਿਸ਼ਲੇਸ਼ਣ, ਜ਼ਿਲ੍ਹਾ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਲਾਈਵ ਮਾਨੀਟਰ</strong> — ਹਰ ਲਾਈਨ ਕੋਡ, ਹਰ ਅੰਕੜਾ ਜਨਤਕ।',
   cta1:'ਆਪਣਾ ਜ਼ਿਲ੍ਹਾ ਵੇਖੋ', cta2:'ਸਰੋਤ ਅਤੇ ਵਿਧੀ',
   livehead:'ਲਾਈਵ ਮਾਨੀਟਰ — ਹਰ 6 ਘੰਟੇ ਆਪਣੇ ਆਪ, ਬਿਨਾਂ ਕੁੰਜੀ, ਬਿਨਾਂ ਖਾਤੇ',
-  n1:'ਮੈਪ ਕੀਤੇ ਮਾਨਸੂਨ', n2:'ਪ੍ਰੋਸੈਸ ਕੀਤੇ ਹੜ੍ਹ ਦਿਨ', n3:'ਹੈਕਟੇਅਰ ਡੁੱਬੇ, 2025 (SAR)', n4:'ਫ਼ਸਲ ਮੁੱਲ ਜੋਖਮ ਵਿੱਚ', n5:'ਚੇਤਾਵਨੀ ਭਾਸ਼ਾਵਾਂ', n6:'ਪੁਲਾੜ ਏਜੰਸੀਆਂ ਨਾਲ ਪਰਖ',
+  n1:'ਮੈਪ ਕੀਤੇ ਮਾਨਸੂਨ', n2:'ਪ੍ਰੋਸੈਸ ਕੀਤੇ ਹੜ੍ਹ ਦਿਨ', n3:'ਹੈਕਟੇਅਰ ਡੁੱਬੇ, 2025 (SAR Tier-A)', n4:'ਫ਼ਸਲ ਨੁਕਸਾਨ (ਅਨੁਮਾਨ ਬੈਂਡ)', n5:'ਚੇਤਾਵਨੀ ਭਾਸ਼ਾਵਾਂ', n6:'ਸੁਤੰਤਰ ਪਰਖਾਂ (GFM·S2·ਗਿਰਦਾਵਰੀ)',
   s1:'ਐਟਲਸ', s2:'ਜ਼ਿਲ੍ਹੇ', s3:'ਭਵਿੱਖਬਾਣੀ — 2025 ਹੋਲਡ-ਆਊਟ', s4:'ਸਿਸਟਮ',
   c1:'ਹੁਣ · ਵੇਖਿਆ', c2:'ਹੁਣ · ਮਾਡਲ ਜੋਖਮ', c3:'2025 ਹੜ੍ਹ (ਹੈਕ.)', c4:'ਦਹਾਕਾ ਬਾਰੰਬਾਰਤਾ', c5:"ਹਿੰਡਕਾਸਟ ਜੋਖਮ '25",
   dp0:'ਕੋਈ ਜ਼ਿਲ੍ਹਾ ਚੁਣੋ', sw1:'ਪਹਿਲਾਂ · ਜੁਲਾਈ 2025', sw2:'ਹੜ੍ਹ · ਅਗ–ਸਤੰ 2025',
   swcap:'ਵੰਡ-ਰੇਖਾ ਖਿੱਚੋ — ਹੜ੍ਹ ਤੋਂ ਪਹਿਲਾਂ ਅਤੇ ਦੌਰਾਨ ਪੰਜਾਬ ਦੀ ਉਹੀ ਰਾਡਾਰ ਤਸਵੀਰ। ਗੂੜ੍ਹਾ = ਸ਼ਾਂਤ ਪਾਣੀ ਦੀ ਸਤ੍ਹਾ। ਰਾਵੀ, ਬਿਆਸ ਅਤੇ ਸਤਲੁਜ ਦੇ ਕੰਢੇ ਪਾਣੀ ਫੈਲਣ ਨਾਲ ਕਾਲੇ ਹੋ ਜਾਂਦੇ ਹਨ।',
   technote:'ਤਕਨੀਕੀ ਵੇਰਵੇ ਅਤੇ ਨਕਸ਼ਾ-ਵਿਆਖਿਆ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਹਨ',
-  lbl:['2025 ਡੁੱਬਿਆ (RF)','2025 ਡੁੱਬਿਆ (Tier-A)','ਡੁੱਬੀ ਫ਼ਸਲੀ ਜ਼ਮੀਨ','ਝੋਨੇ ਦਾ ਮੁੱਲ ਜੋਖਮ ਵਿੱਚ',"ਮੌਸਮ >1% ਡੁੱਬੇ ('15–'25)",'ਔਸਤ ਸਾਲਾਨਾ ਡੁੱਬਿਆ','2025 ਹਿੰਡਕਾਸਟ P','ਹੁਣ — ਇਹ ਵਿੰਡੋ (ਵੇਖਿਆ)','ਹੁਣ — ਮਾਡਲ ਜੋਖਮ']
+  lbl:['2025 ਡੁੱਬਿਆ (RF)','2025 ਡੁੱਬਿਆ (Tier-A)','ਡੁੱਬੀ ਫ਼ਸਲੀ ਜ਼ਮੀਨ','ਝੋਨੇ ਦਾ ਮੁੱਲ ਜੋਖਮ ਵਿੱਚ',"ਮੌਸਮ >1% ਡੁੱਬੇ ('15–'25)",'ਔਸਤ ਸਾਲਾਨਾ ਡੁੱਬਿਆ','ਹਿੰਡਕਾਸਟ P (ਹੜ੍ਹ ਵਿੰਡੋ)','ਹੁਣ — ਇਹ ਵਿੰਡੋ (ਵੇਖਿਆ)','ਹੁਣ — ਮਾਡਲ ਜੋਖਮ']
  },
  hi: {
   nav_atlas:'एटलस', nav_dist:'जिले', nav_fc:'पूर्वानुमान', nav_repo:'रिपॉज़िटरी',
   kicker:'खुली बाढ़ इंटेलिजेंस · इस मानसून लाइव',
   h1:'वे बाढ़ नक्शे जो पंजाब के पास कभी नहीं थे।<br><em>खुले। प्रमाणित। चालू।</em>',
-  lede:'अगस्त 2025 में पंजाब ने <strong>1988 के बाद की सबसे भीषण बाढ़</strong> झेली — सभी 23 जिले, ~3.55 लाख लोग, 1.7 लाख हेक्टेयर फ़सलें। जो सैटेलाइट नक्शे राहत की राह दिखा सकते थे, वे PDF में बंद थे। सैलाब यह क्षमता खुले में फिर से बनाता है: <strong>SAR बाढ़ मानचित्रण, दशक का जोखिम एटलस, क्षति विश्लेषण, जिला बाढ़ पूर्वानुमान और लाइव मॉनिटर</strong> — हर लाइन कोड, हर आँकड़ा सार्वजनिक।',
+  lede:'अगस्त 2025 में पंजाब ने <strong>1988 के बाद की सबसे भीषण बाढ़</strong> झेली — सभी 23 जिले, ~3.55 लाख लोग, 1.48–1.75 लाख हेक्टेयर फ़सलें। जो सैटेलाइट नक्शे राहत की राह दिखा सकते थे, वे PDF में बंद थे। सैलाब यह क्षमता खुले में फिर से बनाता है: <strong>SAR बाढ़ मानचित्रण, दशक का जोखिम एटलस, क्षति विश्लेषण, जिला बाढ़ पूर्वानुमान और लाइव मॉनिटर</strong> — हर लाइन कोड, हर आँकड़ा सार्वजनिक।',
   cta1:'अपना जिला देखें', cta2:'स्रोत और विधि',
   livehead:'लाइव मॉनिटर — हर 6 घंटे स्वतः, बिना कुंजी, बिना खाते',
-  n1:'मैप किए मानसून', n2:'प्रोसेस किए बाढ़ दिन', n3:'हेक्टेयर जलमग्न, 2025 (SAR)', n4:'फ़सल मूल्य जोखिम में', n5:'चेतावनी भाषाएँ', n6:'अंतरिक्ष एजेंसियों से प्रमाणित',
+  n1:'मैप किए मानसून', n2:'प्रोसेस किए बाढ़ दिन', n3:'हेक्टेयर जलमग्न, 2025 (SAR Tier-A)', n4:'फ़सल क्षति (अनुमान बैंड)', n5:'चेतावनी भाषाएँ', n6:'स्वतंत्र प्रमाणन (GFM·S2·गिरदावरी)',
   s1:'एटलस', s2:'जिले', s3:'पूर्वानुमान — 2025 होल्ड-आउट', s4:'सिस्टम',
   c1:'अभी · देखा गया', c2:'अभी · मॉडल जोखिम', c3:'2025 बाढ़ (हे.)', c4:'दशक आवृत्ति', c5:"हिंडकास्ट जोखिम '25",
   dp0:'कोई जिला चुनें', sw1:'पहले · जुलाई 2025', sw2:'बाढ़ · अग–सितं 2025',
   swcap:'विभाजक खींचें — बाढ़ से पहले और दौरान पंजाब की वही रडार तस्वीर। गहरा = शांत जल सतह। रावी, ब्यास और सतलुज के किनारे पानी फैलने से काले हो जाते हैं।',
   technote:'तकनीकी विवरण और मानचित्र-व्याख्या अंग्रेज़ी में हैं',
-  lbl:['2025 जलमग्न (RF)','2025 जलमग्न (Tier-A)','जलमग्न फ़सली भूमि','धान मूल्य जोखिम में',"मौसम >1% जलमग्न ('15–'25)",'औसत वार्षिक जलमग्न','2025 हिंडकास्ट P','अभी — यह विंडो (देखा)','अभी — मॉडल जोखिम']
+  lbl:['2025 जलमग्न (RF)','2025 जलमग्न (Tier-A)','जलमग्न फ़सली भूमि','धान मूल्य जोखिम में',"मौसम >1% जलमग्न ('15–'25)",'औसत वार्षिक जलमग्न','हिंडकास्ट P (बाढ़ विंडो)','अभी — यह विंडो (देखा)','अभी — मॉडल जोखिम']
  }
 };
 const EN_CACHE = {};
-window.LBL = ['2025 flooded (RF)','2025 flooded (Tier-A)','Cropland flooded','Paddy value at risk',"Seasons >1% flooded ('15–'25)",'Mean annual flooded','2025 hindcast peak P','Now — this window (obs.)','Now — model risk'];
+window.LBL = ['2025 flooded (RF)','2025 flooded (Tier-A)','Cropland flooded','Paddy value at risk',"Seasons >1% flooded ('15–'25)",'Mean annual flooded','Hindcast P (flood windows)','Now — this window (obs.)','Now — model risk'];
 const EN_LBL = window.LBL.slice();
 function applyLang(l){
   document.documentElement.setAttribute('data-lang', l);
@@ -546,7 +546,7 @@ const csv = async url => {
     nowrisk:{cols:['#361a3a','#632c68','#95429a','#c75fc4','#f487e8'], stops:[0,.02,.1,.3,.6], unit:'P(flood event), current window (live)', fmt:v=>v==null?'activates Jul 25':'P = '+(+v).toFixed(2)},
     flood: {cols:['#123036','#155a5c','#1f8a84','#35b5a9','#63e6d5'], stops:[0,500,1500,4000,8000], unit:'ha flooded (RF, 2025)', fmt:v=>Math.round(v).toLocaleString()+' ha'},
     freq:  {cols:['#33230f','#5c3c12','#8f5c1a','#c98a2e','#ffb454'], stops:[0,1,2,3,4], unit:'seasons >1% flooded, 2015–25', fmt:v=>v+' of 11 seasons'},
-    risk:  {cols:['#361a3a','#632c68','#95429a','#c75fc4','#f487e8'], stops:[0,.02,.1,.3,.6], unit:'peak P(flood event), 2025 hindcast', fmt:v=>'P = '+(+v).toFixed(2)}
+    risk:  {cols:['#361a3a','#632c68','#95429a','#c75fc4','#f487e8'], stops:[0,.02,.1,.3,.6], unit:'P(flood event), Aug 14–Sep 12 flood windows (hindcast)', fmt:v=>'P = '+(+v).toFixed(2)}
   };
   const FLOODED_2025 = new Set(['Kapurthala','Firozpur','Tarn Taran','Gurdaspur','Amritsar']);
 
@@ -569,7 +569,8 @@ const csv = async url => {
   });
   stats.forEach(d => S[d.district] = d);
   freq.forEach(d => F[d.district] = d);
-  hind.forEach(d => { const p = +d.p_event; if (!(d.district in R) || p > R[d.district]) R[d.district] = p; });
+  const TARGET_W = ['2025-08-14','2025-08-24','2025-09-03'];
+  hind.filter(d => TARGET_W.includes(d.window_start)).forEach(d => { const p = +d.p_event; if (!(d.district in R) || p > R[d.district]) R[d.district] = p; });
   (live?.districts || []).forEach(d => N[d.district] = d);
   (nc?.districts || []).forEach(d => NC[d.district] = d);
 
