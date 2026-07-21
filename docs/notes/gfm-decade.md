@@ -90,5 +90,6 @@ season-union km² comes from `aggregate` at the end):
 | 2018 | 43 | 2018-07-02 (1,535) | early-July max again (paddy window); Sep-2018 known event should appear in late windows; daily sum 9,541 km². Fetch restarted mid-2018 as detached PID 34384 (wrapper killed); resume clean. |
 | 2019 | 46 | 2019-06-19 (911) | Sutlej-breach days present: Aug-18 215 km², Aug-23 169 km² (C3 window signal); daily sum 6,064 km² |
 | 2020 | 46 | 2020-06-25 (1,868) | late-June max (paddy window); daily sum 7,207 km² |
+| 2021 | 47 | 2021-06-21 (1,569) | late-June max (paddy window); daily sum 7,999 km² |
 
 _remaining seasons + union km² + checkpoint verdicts pending aggregate run._
