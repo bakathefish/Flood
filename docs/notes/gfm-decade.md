@@ -66,4 +66,11 @@ masks land in `data/gfm/<YEAR>/`; reference water in `data/gfm/gfm_punjab_refwat
 (2025-08-27 = 2,039 km²; 2023-08-22 = 619 km²). Per-season actuals + checkpoint verdicts are
 appended below by `aggregate` once the pull completes.
 
-_actuals pending aggregate run._
+Per-season fetch checkpoints (active days = days the flood layer carried observed flood;
+season-union km² comes from `aggregate` at the end):
+
+| season | flood-active days | max single day (km²) | note |
+|---|---|---|---|
+| 2015 | 17 | 2015-07-10 (502) | genuine mid-July event; daily sum 1,289 km² |
+
+_remaining seasons + union km² + checkpoint verdicts pending aggregate run._
