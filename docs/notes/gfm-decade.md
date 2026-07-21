@@ -73,5 +73,6 @@ season-union km² comes from `aggregate` at the end):
 |---|---|---|---|
 | 2015 | 17 | 2015-07-10 (502) | genuine mid-July event; daily sum 1,289 km² |
 | 2016 | 25 | 2016-07-09 (757) | NOT quiet — early-July signal; daily sum 3,888 km² (C4 quiet-year candidate will be re-identified from unions) |
+| 2017 | 46 | 2017-06-30 (4,815) | ANOMALY FLAG: max day >2x the 2025 peak day; daily sum 14,501 km². Late-June timing suggests possible S1 paddy-transplant confusion (fields deliberately inundated) in the GFM archive — quicklook comparison scheduled post-fetch. |
 
 _remaining seasons + union km² + checkpoint verdicts pending aggregate run._
