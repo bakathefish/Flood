@@ -99,4 +99,83 @@ season-union km² comes from `aggregate` at the end):
 Fetch COMPLETE 2026-07-21: 1,177/1,177 day-slots probed, 467 flood-active days -> 467 per-day
 tifs; tif counts match active-day counts for every season.
 
+## ACTUALS (aggregate run 2026-07-21)
+
+Per-season **union** (any covered day, minus reference water), full season and calibrated
+late-season (days >= Jul 25, past paddy transplant):
+
+| season | active days | full-season union km² | late-season (≥Jul 25) days | late-season union km² |
+|---|---|---|---|---|
+| 2015 | 17 | 1,127.6 | 11 | 278.1 |
+| 2016 | 25 | 2,901.9 | 18 | 1,209.4 |
+| 2017 | 46 | 10,240.6 | 28 | 465.0 |
+| 2018 | 43 | 6,755.8 | 25 | 225.0 |
+| 2019 | 46 | 4,589.4 | 31 | 1,046.4 |
+| 2020 | 46 | 5,194.0 | 28 | 267.2 |
+| 2021 | 47 | 5,794.3 | 27 | 567.1 |
+| 2022 | 47 | 9,182.1 | 29 | 446.3 |
+| 2023 | 49 | 10,787.7 | 30 | 1,848.5 |
+| 2024 | 47 | 3,651.4 | 30 | 464.3 |
+| **2025** | **53** | **16,108.0 (#1)** | **33** | **3,306.3 (#1)** |
+
+**Paddy-transplant signal, quantified** (statewide flooded-ha per window, mean across the 11
+years): Jun-15 window 150,848 ha; Jun-25 172,684; Jul-05 78,774; Jul-15 38,441 — then a ~20x
+collapse once transplanting ends: Jul-25 8,997; Aug-04 4,705; Aug-14 9,366; Aug-24 8,974;
+Sep-03 7,589; Sep-13 3,042; Sep-23 1,820. The four Jun-15..Jul-15 windows are dominated by
+agronomic inundation in every year; the seven Jul-25+ windows carry the flood climatology.
+Hence the committed late-season companions (`*_late_season.*`).
+
+## CHECKPOINT VERDICTS (against the pre-declared bands)
+
+- **C1 — 2025 statewide max: PASS.** 2025 union = 16,108.0 km² = decade max (2nd: 2023 at
+  10,787.7) and ≥ 2,500 ✓. Robust to the paddy caveat: 2025 is also #1 on the late-season
+  union (3,306.3 vs 2023's 1,848.5). The pre-declared *expected band* (≈2,700–2,900 km²) was
+  wrong — it was scaled from the 10-day event union and ignored the paddy component of a
+  full-season union; the declared PASS criterion (max AND ≥2,500) is met.
+
+- **C2 — 2023 Sangrur NRSC anchor: FAIL.** Covering window [2023-08-14, 2023-08-24) Sangrur
+  flooded_ha = **1,551 ha** vs NRSC 7,121 ha; declared band [3,560, 10,682] -> outside (21.8 %
+  of anchor). Mechanism (per-day trace): the anchor date **2023-08-18 has no GFM/S1
+  acquisition** (probe = 0); the adjacent passes Aug-17/Aug-19 covered only ~50/8 km² of the
+  bbox, and the window's one large acquisition (Aug-22, 619 km² statewide) was a **western
+  swath over the Sutlej belt** (Firozpur/Kapurthala/Tarn Taran) that does not image Sangrur.
+  The pipeline demonstrably captures the same 2023 Ghaggar disaster when S1 looks at it:
+  Sangrur **33,771 ha** in [06-25,07-05), 14,971 ha in [07-15,07-25), 11,706 ha in
+  [07-25,08-04); Patiala 64,374 ha in [07-05,07-15). Verdict: master-plan gate FAIL as
+  declared, root-caused to S1 revisit/swath geometry on the anchor date, not to the decode or
+  aggregation (which reproduce documented values exactly elsewhere).
+
+- **C3 — 2019 Sutlej breach: PARTIAL.** Signal condition PASS: in the breach window
+  [2019-08-14, 2019-08-24), Jalandhar 4,358 ha (fraction 0.0167 = **35x** its decade-median
+  window fraction 0.00048) and Kapurthala 3,633 ha (0.0218 = **19x** median 0.00115) — a
+  clear, correctly-located, correctly-timed detection. Rank sub-clause FAIL: 2019's season
+  union ranks #8/11 on the (paddy-dominated) full-season metric and #4/11 late-season, not
+  top-3 as pre-declared.
+
+- **C4 — quiet baseline year: PARTIAL.** On raw full-season unions no year sits below the
+  pre-declared 400 km² (minimum: 2015 at 1,127.6) — the threshold ignored the paddy floor ->
+  FAIL as literally declared. On the calibrated late-season metric the quiet years are
+  unambiguous: 2018 = 225.0, 2020 = 267.2, 2015 = 278.1 km² (all < 400, bottom-3), and the
+  max/min season ratio is 14.7x (3,306.3 / 225.0). The named candidate (2016) was wrong —
+  2016 is #3 late-season (1,209.4 km², a genuine Aug-2016 river signal).
+
+- **C5 — frequency raster sanity: PASS.** Counts ∈ [0, 11], max = 11 >= 3 ✓. The RAW
+  repeat-victims top-5 (Sangrur, Firozpur, Tarn Taran, Barnala, Faridkot) is
+  paddy-contaminated (Barnala/Faridkot have no river). The **late-season** top-8 is entirely
+  river-corridor/Ghaggar: Kapurthala (5 of 11 seasons > 1 %, 3 > 2 %), Firozpur, Tarn Taran,
+  Gurdaspur, Patiala, Sangrur, Jalandhar, Amritsar — the recurrence concentrates in the
+  Ravi/Beas/Sutlej/Ghaggar belts as required.
+
+**2025 spot-check** (forecaster table): windows [08-24,09-03) + [09-03,09-13) carry
+Gurdaspur 20,680 ha (5.7 %), Firozpur 12,443/15,170 ha, Kapurthala 5,424/8,554 ha (5.1 %),
+Amritsar, Tarn Taran, Jalandhar — the documented Ravi/Beas/Sutlej pattern of
+`docs/notes/gfm-wms.md`.
+
+Products committed: `data/gfm_district_window_fractions_2015_2025.csv` (2,420 rows =
+11 y x 11 w x 20 districts), `data/flood_frequency_districts.csv`,
+`data/flood_frequency_districts_late_season.csv`, `atlas/frequency_2015_2025.png`,
+`atlas/frequency_2015_2025_late_season.png`. Not committed (gitignored):
+`data/rasters/flood_frequency_2015_2025{,_late_season}.tif`, 467 per-day tifs under
+`data/gfm/<year>/`, `data/gfm/_decade_progress.csv` (resume state).
+
 _remaining seasons + union km² + checkpoint verdicts pending aggregate run._

@@ -75,6 +75,15 @@ FREQUENCY_TIF = RASTER_DIR / "flood_frequency_2015_2025.tif"
 FREQUENCY_PNG = Path("atlas/frequency_2015_2025.png")
 REPEAT_VICTIMS_CSV = Path("data/flood_frequency_districts.csv")
 
+# Calibrated late-season companion products (paddy-transplant signal excluded).
+# Punjab transplants rice into deliberately inundated fields ~Jun 15 - mid Jul;
+# S1/GFM sees those as flood (docs/notes/gfm-decade.md). Days >= Jul 25 are past
+# transplant, so this variant isolates the river/breach flood climatology.
+LATE_SEASON_MD = "07-25"
+LATE_FREQUENCY_TIF = RASTER_DIR / "flood_frequency_2015_2025_late_season.tif"
+LATE_FREQUENCY_PNG = Path("atlas/frequency_2015_2025_late_season.png")
+LATE_REPEAT_VICTIMS_CSV = Path("data/flood_frequency_districts_late_season.csv")
+
 PROBE_SIZE = 1024  # single-tile flood-probe resolution over the whole bbox
 
 
@@ -354,7 +363,18 @@ def aggregate():
 
     # --- repeat-victims table ---
     summary = summarize_repeat_victims(per_season)
-    with open(REPEAT_VICTIMS_CSV, "w", newline="") as fh:
+    _write_repeat_victims(REPEAT_VICTIMS_CSV, summary, names)
+
+    # --- atlas quicklook PNG ---
+    size = _render_frequency_png(freq, labels, bounds, len(years))
+    print(f"wrote {FREQUENCY_PNG} ({size / 1024:.0f} KB)")
+
+    _report(season_union_km2, window_rows, summary, names)
+
+
+def _write_repeat_victims(path, summary, names):
+    """Write a repeat-victims CSV (sorted by seasons >2 % then mean annual ha)."""
+    with open(path, "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(
             [
@@ -382,13 +402,82 @@ def aggregate():
                     round(s["mean_annual_flooded_ha"], 2),
                 ]
             )
-    print(f"wrote {REPEAT_VICTIMS_CSV}")
+    print(f"wrote {path}")
 
-    # --- atlas quicklook PNG ---
-    size = _render_frequency_png(freq, labels, bounds, len(years))
-    print(f"wrote {FREQUENCY_PNG} ({size / 1024:.0f} KB)")
 
-    _report(season_union_km2, window_rows, summary, names)
+def late():
+    """Calibrated late-season variant: per-season unions of days >= Jul 25 only
+    (past paddy transplant), same grid/refwater/districts as ``aggregate``.
+    Writes the late-season frequency raster + quicklook + repeat-victims CSV."""
+    bounds = bbox_3857()
+    ncols, nrows = grid_shape(bounds)
+    if not REFWATER_TIF.exists():
+        sys.exit(f"missing {REFWATER_TIF}; run `fetch` first")
+    refwater = _read_mask(REFWATER_TIF)
+    labels, names = _district_labels(bounds, nrows, ncols)
+    n_labels = len(names)
+    row_ha = _row_ha(bounds, nrows, ncols)
+    district_ha = _district_ha_from_mask(
+        np.ones((nrows, ncols), bool), labels, row_ha, n_labels
+    )
+
+    season_masks = []
+    per_season = {name: [] for name in names}
+    union_km2 = {}
+    for year in config.YEARS:
+        cutoff = f"{year}{LATE_SEASON_MD.replace('-', '')}"
+        u = np.zeros((nrows, ncols), bool)
+        year_dir = GFM_DIR / str(year)
+        n_days = 0
+        for tif in (
+            sorted(year_dir.glob("gfm_punjab_*.tif")) if year_dir.exists() else []
+        ):
+            day8 = tif.stem.split("_")[-1]
+            if day8 >= cutoff:
+                u |= _read_mask(tif)
+                n_days += 1
+        u &= ~refwater
+        season_masks.append(u)
+        union_km2[year] = web_mercator_area_km2(u, bounds)
+        ha = _district_ha_from_mask(u, labels, row_ha, n_labels)
+        for li, name in enumerate(names, start=1):
+            d_ha = district_ha[li]
+            per_season[name].append(
+                {
+                    "flooded_ha": float(ha[li]),
+                    "fraction": (float(ha[li]) / d_ha) if d_ha > 0 else 0.0,
+                }
+            )
+        print(
+            f"[{year}] late-season days {n_days:3d}  union {union_km2[year]:8.1f} km2"
+        )
+
+    freq = frequency_count(season_masks).astype(np.uint8)
+    RASTER_DIR.mkdir(parents=True, exist_ok=True)
+    write_mask_tif(LATE_FREQUENCY_TIF, freq, bounds)
+    print(f"wrote {LATE_FREQUENCY_TIF} (max count {int(freq.max())})")
+
+    summary = summarize_repeat_victims(per_season)
+    _write_repeat_victims(LATE_REPEAT_VICTIMS_CSV, summary, names)
+
+    size = _render_frequency_png(
+        freq,
+        labels,
+        bounds,
+        len(config.YEARS),
+        out_path=LATE_FREQUENCY_PNG,
+        subtitle=(
+            f"Late monsoon (Jul 25 - Sep 30) only - paddy-transplant signal excluded\n"
+            "Copernicus GFM observed flood extent, ~100 m"
+        ),
+    )
+    print(f"wrote {LATE_FREQUENCY_PNG} ({size / 1024:.0f} KB)")
+
+    print("\nlate-season union ranking:")
+    for rank, (yr, km2) in enumerate(
+        sorted(union_km2.items(), key=lambda kv: -kv[1]), 1
+    ):
+        print(f"  #{rank:2d} {yr}: {km2:8.1f} km2")
 
 
 def _maxpool(a, factor):
@@ -401,7 +490,9 @@ def _maxpool(a, factor):
     return a.reshape(h // factor, factor, w // factor, factor).max(axis=(1, 3))
 
 
-def _render_frequency_png(freq, labels, bounds, n_years, max_width=1600):
+def _render_frequency_png(
+    freq, labels, bounds, n_years, max_width=1600, out_path=None, subtitle=None
+):
     """Discrete recurrence choropleth with legend and district outlines."""
     import matplotlib
 
@@ -441,9 +532,9 @@ def _render_frequency_png(freq, labels, bounds, n_years, max_width=1600):
         ex = minx + (xs + 0.5) * (maxx - minx) / edges.shape[1]
         ey = maxy - (ys + 0.5) * (maxy - miny) / edges.shape[0]
         ax.scatter(ex, ey, s=0.15, c="#333333", marker=".", linewidths=0)
+    sub = subtitle or "Copernicus GFM observed flood extent, ~100 m"
     ax.set_title(
-        f"Punjab monsoon flood recurrence 2015-2025 ({n_years} seasons)\n"
-        "Copernicus GFM observed flood extent, ~100 m",
+        f"Punjab monsoon flood recurrence 2015-2025 ({n_years} seasons)\n{sub}",
         fontsize=11,
     )
     ax.set_xlabel("EPSG:3857 easting (m)")
@@ -459,11 +550,12 @@ def _render_frequency_png(freq, labels, bounds, n_years, max_width=1600):
         title_fontsize=9,
         framealpha=0.9,
     )
-    FREQUENCY_PNG.parent.mkdir(parents=True, exist_ok=True)
+    target = out_path or FREQUENCY_PNG
+    target.parent.mkdir(parents=True, exist_ok=True)
     fig.tight_layout()
-    fig.savefig(FREQUENCY_PNG, bbox_inches="tight", pil_kwargs={"optimize": True})
+    fig.savefig(target, bbox_inches="tight", pil_kwargs={"optimize": True})
     plt.close(fig)
-    return FREQUENCY_PNG.stat().st_size
+    return target.stat().st_size
 
 
 def _report(season_union_km2, window_rows, summary, names):
@@ -528,6 +620,7 @@ def main():
     pf = sub.add_parser("fetch", help="Phase A: pull per-day flood tifs")
     pf.add_argument("years", nargs="*", type=int, help="years (default all 2015-2025)")
     sub.add_parser("aggregate", help="Phase B: build products from tifs")
+    sub.add_parser("late", help="calibrated late-season (>= Jul 25) products")
     args = ap.parse_args()
 
     if args.cmd == "fetch":
@@ -535,6 +628,8 @@ def main():
         fetch(years)
     elif args.cmd == "aggregate":
         aggregate()
+    elif args.cmd == "late":
+        late()
 
 
 if __name__ == "__main__":
