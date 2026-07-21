@@ -1,0 +1,54 @@
+district,metric,value,unit,date,attributed_to,source_url
+Gurdaspur,crop_damage_ha,40169,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Amritsar,crop_damage_ha,27154,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Fazilka,crop_damage_ha,25182,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Patiala,crop_damage_ha,17690,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Kapurthala,crop_damage_ha,17574,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Firozpur,crop_damage_ha,17257,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian (as Ferozepur)",https://www.babushahi.com/full-news.php?id=210671
+Tarn Taran,crop_damage_ha,12828,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Mansa,crop_damage_ha,12207.38,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Hoshiarpur,crop_damage_ha,8322,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Sangrur,crop_damage_ha,6560,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Jalandhar,crop_damage_ha,4800,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Pathankot,crop_damage_ha,2442,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Moga,crop_damage_ha,2240,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Sahibzada Ajit Singh Nagar,crop_damage_ha,2000,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian (as SAS Nagar)",https://www.babushahi.com/full-news.php?id=210671
+Rupnagar,crop_damage_ha,1135,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Bathinda,crop_damage_ha,586.79,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Ludhiana,crop_damage_ha,189,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Nawanshahr,crop_damage_ha,188,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian (as SBS Nagar)",https://www.babushahi.com/full-news.php?id=210671
+Gurdaspur,people_affected,145000,persons,2025-09-08,"Sphere India SitRep-03 (media/Red Cross); corroborated newsonair.gov.in",https://www.sphereindia.org.in/sites/default/files/2025-09/SitRep_03-_Punjab_Flood_08-09-2025.pdf
+Amritsar,people_affected,136000,persons,2025-09-08,Sphere India SitRep-03 (media/Red Cross),https://www.sphereindia.org.in/sites/default/files/2025-09/SitRep_03-_Punjab_Flood_08-09-2025.pdf
+Firozpur,people_affected,38000,persons,2025-09-08,Sphere India SitRep-03 (media/Red Cross) (as Ferozepur),https://www.sphereindia.org.in/sites/default/files/2025-09/SitRep_03-_Punjab_Flood_08-09-2025.pdf
+Fazilka,people_affected,25000,persons,2025-09-08,Sphere India SitRep-03 (media/Red Cross),https://www.sphereindia.org.in/sites/default/files/2025-09/SitRep_03-_Punjab_Flood_08-09-2025.pdf
+Gurdaspur,villages_affected,329,villages,2025-09-08,Sphere India SitRep-03; corroborated newsonair.gov.in,https://www.newsonair.gov.in/punjab-flood-over-3-5-lakh-people-affected-crops-damaged-in-1-48-lakh-hectares
+Amritsar,patwaris_deployed,196,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Barnala,patwaris_deployed,115,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Bathinda,patwaris_deployed,21,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Faridkot,patwaris_deployed,15,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Fazilka,patwaris_deployed,110,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Firozpur,patwaris_deployed,113,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian (as Ferozepur)",https://www.babushahi.com/full-news.php?id=210671
+Gurdaspur,patwaris_deployed,343,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Hoshiarpur,patwaris_deployed,291,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Jalandhar,patwaris_deployed,84,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Kapurthala,patwaris_deployed,149,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Ludhiana,patwaris_deployed,60,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Malerkotla,patwaris_deployed,7,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Mansa,patwaris_deployed,95,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Moga,patwaris_deployed,29,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Pathankot,patwaris_deployed,88,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Patiala,patwaris_deployed,141,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Rupnagar,patwaris_deployed,92,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Sangrur,patwaris_deployed,107,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+Sahibzada Ajit Singh Nagar,patwaris_deployed,15,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian (as SAS Nagar)",https://www.babushahi.com/full-news.php?id=210671
+Muktsar,patwaris_deployed,25,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian (as Sri Muktsar Sahib)",https://www.babushahi.com/full-news.php?id=210671
+Tarn Taran,patwaris_deployed,71,patwaris,2025-09-13,"Special Girdawari deployment, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+STATEWIDE,crop_damage_ha,198525,ha,2025-09-13,"Special Girdawari report, Revenue Minister Hardeep Singh Mundian",https://www.babushahi.com/full-news.php?id=210671
+STATEWIDE,deaths,55,persons,2025-09-12,State toll as reported,https://www.ndtv.com/india-news/punjab-floods-death-count-rises-to-55-over-100-relief-camps-operational-9261429
+STATEWIDE,villages_affected,2050,villages,2025-09-08,Sphere India SitRep-03,https://www.sphereindia.org.in/sites/default/files/2025-09/SitRep_03-_Punjab_Flood_08-09-2025.pdf
+STATEWIDE,people_affected,350000,persons,2025-09-08,Sphere India SitRep-03; corroborated newsonair.gov.in,https://www.newsonair.gov.in/punjab-flood-over-3-5-lakh-people-affected-crops-damaged-in-1-48-lakh-hectares
+STATEWIDE,people_displaced,387898,persons,2025-09-08,Sphere India SitRep-03,https://www.sphereindia.org.in/sites/default/files/2025-09/SitRep_03-_Punjab_Flood_08-09-2025.pdf
+STATEWIDE,state_relief_released_inr,710000000,INR,2025-09-04,"Punjab govt (Rs 35.50 cr all districts + Rs 35.50 cr to 12 worst-hit)",https://www.punjabnewsexpress.com/punjab/news/punjab-govt-releases-rs71-crore-for-flood-reliefand-rehabiliation-as-immediate-measure-296757
+STATEWIDE,central_assistance_inr,16000000000,INR,2025-09-09,"PM announcement, PIB PRID 2164996",https://ddnews.gov.in/en/pm-modi-announces-financial-assistance-of-rs-1600-crore-for-flood-hit-punjab/
+STATEWIDE,estimated_total_loss_inr,140000000000,INR,2025-09-08,"Punjab interim loss report (Rs 14,000 crore), via Sphere India SitRep-03",https://www.sphereindia.org.in/sites/default/files/2025-09/SitRep_03-_Punjab_Flood_08-09-2025.pdf
+STATEWIDE,compensation_rate_full_loss,20000,INR_per_acre,2025-09-25,"CM Bhagwant Mann (Rs 6800 Centre + Rs 13200 state top-up for 75-100% loss)",https://theprint.in/india/punjab-government-announces-rs-20000-compensation-per-acre-of-farm-land-affected-by-floods/2738749/
