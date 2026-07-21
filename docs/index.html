@@ -176,6 +176,29 @@ section{padding:8px 0 64px}
 .lead-call{border:1px solid var(--line2);border-left:2px solid var(--risk);background:var(--ink2);padding:18px;font-size:14px;color:var(--paper-dim);margin-top:22px}
 .lead-call b{color:var(--paper)}
 
+/* ------- replay scrubber ------- */
+.replay{border:1px solid var(--line2);background:var(--ink2);margin-top:22px}
+.replay .rp-head{padding:14px 16px;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.rp-window{color:var(--amber);font-family:var(--mono)}
+.rp-body{padding:18px 16px 8px}
+.rp-timeline{position:relative;margin:0 6px 18px}
+.rp-timeline input{width:100%;accent-color:var(--amber)}
+.rp-marks{position:relative;height:16px;font-size:9.5px;color:var(--paper-faint)}
+.rp-marks span{position:absolute;transform:translateX(-50%)}
+.rp-marks .ev{color:var(--alert)}
+.rp-row{display:grid;grid-template-columns:120px 1fr 54px;align-items:center;gap:10px;padding:5px 0;font-size:12.5px}
+.rp-row .nm{color:var(--paper-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-bars{display:flex;flex-direction:column;gap:3px}
+.rp-bar{position:relative;height:7px;background:var(--line);border-radius:2px;overflow:hidden}
+.rp-bar i{position:absolute;inset:0;right:auto;border-radius:2px;transition:width .25s}
+.rp-bar.risk i{background:var(--risk)}
+.rp-bar.obs i{background:var(--water)}
+.rp-val{font-family:var(--mono);font-size:11px;color:var(--paper-faint);text-align:right}
+.rp-caption{padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--paper)}
+.rp-caption b{color:var(--risk)}
+.rp-legend{display:flex;gap:16px;font-size:10.5px;color:var(--paper-faint);padding:0 16px 12px}
+.rp-legend i{display:inline-block;width:10px;height:7px;border-radius:2px;margin-right:5px}
+
 /* ------- alerts demo ------- */
 .phone{border:1px solid var(--line2);background:var(--ink2);padding:0}
 .tabs{display:flex;border-bottom:1px solid var(--line)}
@@ -333,6 +356,19 @@ footer .cr{max-width:60ch}
           <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Our satellite damage ranking also matches the government's ground survey: <b style="color:var(--water)">ρ = 0.72</b> vs the Special Girdawari district table. Full tables: <code>data/forecaster_2025_hindcast.csv</code>, <code>data/official_relief_2025.csv</code>.</div>
         </div>
         <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window — before the Aug 26–27 dam releases — four of the five eventual flood districts were already in the model's statewide top-5. SHAP attribution: antecedent flooding, flood-history prior, and <b>Bhakra reservoir storage</b>.</div>
+
+        <div class="replay" id="replay">
+          <div class="rp-head"><span>Replay 2025 — risk before water</span><span class="rp-window" id="rp-window"></span></div>
+          <div class="rp-body">
+            <div class="rp-timeline">
+              <input type="range" id="rp-slider" min="0" max="6" value="0" aria-label="2025 window scrubber">
+              <div class="rp-marks" id="rp-marks"></div>
+            </div>
+            <div id="rp-rows"></div>
+          </div>
+          <div class="rp-legend"><span><i style="background:var(--risk)"></i>model risk P(event), predicted with 2015–2024 training only</span><span><i style="background:var(--water)"></i>observed flooded fraction (satellite)</span></div>
+          <div class="rp-caption" id="rp-caption"></div>
+        </div>
       </div>
       <div>
         <div class="phone">
@@ -554,6 +590,54 @@ const csv = async url => {
     let i = 0; stops.forEach((s, k) => { if (v >= s && (layer !== 'flood' || v > 0 || k === 0)) i = k; });
     return cols[i];
   };
+
+  // ------- replay scrubber -------
+  (() => {
+    const windows = [...new Set(hind.map(d => d.window_start))].sort();
+    if (!windows.length) return;
+    const byW = {};
+    hind.forEach(d => { (byW[d.window_start] = byW[d.window_start] || {})[d.district] =
+      { p: +d.p_event || 0, obs: +d.flooded_fraction || 0 }; });
+    const DISTS = ['Kapurthala','Firozpur','Tarn Taran','Gurdaspur','Amritsar','Jalandhar'];
+    const obsMax = Math.max(...hind.map(d => +d.flooded_fraction || 0)) || 1;
+    const slider = document.getElementById('rp-slider');
+    slider.max = windows.length - 1;
+    const marks = document.getElementById('rp-marks');
+    const relIdx = windows.findIndex(w => w >= '2025-08-24');
+    marks.innerHTML = windows.map((w, i) =>
+      `<span style="left:${(i/(windows.length-1))*100}%">${w.slice(5).replace('-','/')}</span>`).join('') +
+      (relIdx > 0 ? `<span class="ev" style="left:${((relIdx-0.5)/(windows.length-1))*100}%;top:0">▼ dam release</span>` : '');
+    const rows = document.getElementById('rp-rows');
+    rows.innerHTML = DISTS.map(d => `
+      <div class="rp-row"><span class="nm">${d}</span>
+        <span class="rp-bars">
+          <span class="rp-bar risk"><i id="rp-r-${d.replace(/ /g,'_')}"></i></span>
+          <span class="rp-bar obs"><i id="rp-o-${d.replace(/ /g,'_')}"></i></span>
+        </span>
+        <span class="rp-val" id="rp-v-${d.replace(/ /g,'_')}"></span>
+      </div>`).join('');
+    const render = i => {
+      const w = windows[i], m = byW[w] || {};
+      const end = new Date(new Date(w) - -9*864e5).toISOString().slice(0,10);
+      document.getElementById('rp-window').textContent = `${w} → ${end}`;
+      let flagged = 0, wet = 0;
+      DISTS.forEach(d => {
+        const v = m[d] || {p:0, obs:0}; const id = d.replace(/ /g,'_');
+        document.getElementById('rp-r-'+id).style.width = Math.round(v.p*100) + '%';
+        document.getElementById('rp-o-'+id).style.width = Math.round((v.obs/obsMax)*100) + '%';
+        document.getElementById('rp-v-'+id).textContent = 'P ' + v.p.toFixed(2);
+        if (v.p >= 0.3) flagged++; if (v.obs > 0.02) wet++;
+      });
+      const cap = document.getElementById('rp-caption');
+      if (w < '2025-08-24' && flagged && !wet)
+        cap.innerHTML = `<b>${flagged} district(s) already flagged</b> — the water has not arrived yet. The dam releases come Aug 26–27.`;
+      else if (wet)
+        cap.innerHTML = `The water is here: ${wet} district(s) above the event threshold. The model flagged them in advance.`;
+      else cap.innerHTML = 'Early season — risk building as ground saturates and reservoirs fill.';
+    };
+    slider.addEventListener('input', () => render(+slider.value));
+    render(0);
+  })();
 
   // scoreboard (top 6 by hindcast P)
   const sb = document.getElementById('sb-rows');
