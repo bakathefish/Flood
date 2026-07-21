@@ -91,5 +91,12 @@ season-union km² comes from `aggregate` at the end):
 | 2019 | 46 | 2019-06-19 (911) | Sutlej-breach days present: Aug-18 215 km², Aug-23 169 km² (C3 window signal); daily sum 6,064 km² |
 | 2020 | 46 | 2020-06-25 (1,868) | late-June max (paddy window); daily sum 7,207 km² |
 | 2021 | 47 | 2021-06-21 (1,569) | late-June max (paddy window); daily sum 7,999 km² |
+| 2022 | 47 | 2022-06-20 (1,718) | late-June max; daily sum 13,216 km² |
+| 2023 | 49 | 2023-07-09 (2,795) | Jul-9 max is the REAL Jul-2023 Sutlej/Ghaggar event (coincides with paddy tail); daily sum 20,449 km² |
+| 2024 | 47 | 2024-06-21 (1,304) | late-June max; daily sum 5,109 km² |
+| 2025 | 53 | 2025-06-16 (2,703) | most active days of the decade; daily sum 27,281 km²; Aug-27 flood day = 2,039 km² |
+
+Fetch COMPLETE 2026-07-21: 1,177/1,177 day-slots probed, 467 flood-active days -> 467 per-day
+tifs; tif counts match active-day counts for every season.
 
 _remaining seasons + union km² + checkpoint verdicts pending aggregate run._
