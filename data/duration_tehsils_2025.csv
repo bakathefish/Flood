@@ -1,0 +1,92 @@
+tehsil,district,flooded_ha,ha_1_2d,ha_3_6d,ha_7_13d,ha_14plus_d,mean_duration_days,max_duration_days
+Ajnala,Amritsar,8512.1,6817.4,1425.8,253.8,15.1,2.09,17
+Dera Baba Nanak,Gurdaspur,7725.9,6725.0,634.2,364.6,2.2,1.67,15
+Firozpur,Firozpur,6653.4,2185.9,2371.1,1184.1,912.4,6.46,17
+Dinanagar,Gurdaspur,6212.3,5733.3,383.6,76.0,19.4,1.35,20
+Sultanpur Lodhi,Kapurthala,4708.6,1398.1,1522.8,1158.7,628.9,6.59,21
+Fazilka,Firozpur,3960.0,1047.1,711.1,1165.9,1035.9,8.19,21
+Khadur Sahib,Tarn Taran,3181.6,616.1,437.3,914.3,1213.9,10.12,21
+Shahkot,Jalandhar,3102.9,2017.5,541.1,347.0,197.4,3.89,21
+Kapurthala,Kapurthala,2927.8,1563.2,418.3,466.2,480.1,5.43,21
+Zira,Firozpur,2762.0,1137.2,723.8,545.7,355.3,6.1,17
+Patti,Tarn Taran,2502.6,730.3,518.0,665.3,589.1,7.97,17
+Gurdaspur,Gurdaspur,2243.8,2123.5,56.9,43.2,20.2,1.43,21
+Kalanaur,Gurdaspur,2144.4,1823.4,231.3,84.0,5.7,1.65,18
+Pathankot,Gurdaspur,2055.0,1375.9,383.5,236.8,58.7,3.03,21
+Nakodar,Jalandhar,1980.4,1860.8,53.5,41.1,25.0,1.84,21
+Dharamkot,Moga,1924.3,1148.6,518.8,199.6,57.3,3.66,21
+Budhlada,Mansa,1841.2,1790.1,50.4,0.8,0.0,1.22,8
+Bhulath,Kapurthala,1661.2,1105.2,248.7,195.0,112.3,3.66,21
+Tarn Taran,Tarn Taran,1469.4,479.8,232.6,468.9,288.1,7.39,17
+Phagwara,Kapurthala,1425.2,1235.5,173.7,15.3,0.7,1.69,17
+Rajpura,Patiala,1386.7,1374.8,11.9,0.0,0.0,1.24,5
+Dasua,Hoshiarpur,1325.1,877.2,220.0,157.7,70.2,3.51,21
+Jalandhar-I,Jalandhar,1275.2,1180.3,76.7,12.4,5.8,1.84,21
+Lehra,Sangrur,1191.6,1145.1,34.6,11.3,0.8,1.24,14
+Jagraon,Ludhiana,1100.8,745.0,144.1,119.8,91.9,3.96,21
+Batala,Gurdaspur,1071.2,545.2,186.9,190.5,148.5,5.36,21
+Dera Bassi,Sahibzada Ajit Singh Nagar,1003.3,999.6,3.7,0.0,0.0,1.06,4
+Moonak,Sangrur,815.1,652.6,97.1,61.0,4.5,2.17,18
+Mansa,Mansa,733.0,733.0,0.0,0.0,0.0,1.04,2
+Jalalabad,Firozpur,701.5,274.1,168.2,149.6,109.6,6.19,21
+Dhuri,Sangrur,635.0,629.0,4.5,1.5,0.0,1.27,8
+Baba Bakala,Amritsar,581.5,248.3,90.0,98.0,145.2,7.08,21
+Tapa,Barnala,551.6,546.4,3.0,2.2,0.0,1.06,9
+Sunam,Sangrur,496.6,495.1,1.5,0.0,0.0,1.04,3
+Mukerian,Hoshiarpur,470.3,329.3,79.8,55.4,5.8,2.81,20
+Sangrur,Sangrur,462.2,458.5,1.5,2.2,0.0,1.13,8
+Phillaur,Jalandhar,425.7,257.5,57.3,47.8,63.2,5.27,25
+Nawanshahr,Nawanshahr,420.2,161.6,133.0,125.6,0.0,4.86,12
+Ludhiana (East),Ludhiana,415.1,194.0,149.9,71.3,0.0,3.79,12
+Rampura Phul,Bathinda,412.3,408.5,3.0,0.7,0.0,1.06,7
+Patran,Patiala,355.9,298.8,41.3,14.3,1.5,1.92,15
+Dudhan Sadhan,Patiala,339.6,333.6,6.0,0.0,0.0,1.3,4
+Jalandhar-II,Jalandhar,339.1,328.8,8.7,1.5,0.0,1.4,13
+Barnala,Barnala,314.6,311.6,2.2,0.7,0.0,1.1,7
+Ludhiana (West),Ludhiana,309.4,133.8,51.4,72.0,52.2,6.62,25
+Dhar Kalan,Gurdaspur,280.1,68.4,129.0,82.7,0.0,4.61,8
+Maur,Bathinda,275.9,275.9,0.0,0.0,0.0,1.0,2
+Bhikhiwind,Tarn Taran,272.7,266.1,5.1,1.5,0.0,1.15,12
+Bathinda,Bathinda,270.9,256.0,6.7,8.2,0.0,1.39,13
+Guruharsahai,Firozpur,268.2,132.3,83.5,28.8,23.7,4.73,17
+Abohar,Firozpur,236.6,122.0,47.9,42.7,24.0,5.06,17
+Banga,Nawanshahr,220.6,213.3,7.3,0.0,0.0,1.46,4
+Samrala,Ludhiana,216.8,100.0,52.2,64.6,0.0,4.35,12
+Anandpur Sahib,Rupnagar,186.7,158.2,26.3,2.2,0.0,1.58,7
+Rup Nagar,Rupnagar,184.9,175.4,9.5,0.0,0.0,1.19,6
+Samana,Patiala,169.2,169.2,0.0,0.0,0.0,1.56,2
+Nihal Singhwala,Moga,162.3,157.1,4.4,0.7,0.0,1.29,8
+Sardulgarh,Mansa,126.7,108.6,13.6,4.5,0.0,1.76,10
+Bagha Purana,Moga,114.1,114.1,0.0,0.0,0.0,1.0,1
+Malout,Muktsar,100.1,85.8,6.7,7.5,0.0,2.09,13
+Raikot,Ludhiana,98.4,98.4,0.0,0.0,0.0,1.08,2
+Dirba,Sangrur,96.6,96.6,0.0,0.0,0.0,1.02,2
+Malerkotla,Sangrur,94.3,93.5,0.7,0.0,0.0,1.22,4
+Balachaur,Nawanshahr,93.3,58.8,29.4,5.1,0.0,2.64,11
+Muktsar,Muktsar,85.3,58.6,14.8,9.6,2.2,3.08,17
+Patiala,Patiala,80.0,80.0,0.0,0.0,0.0,1.36,2
+Moga,Moga,78.2,73.1,0.7,4.4,0.0,1.53,7
+Gidderbaha,Muktsar,66.3,66.3,0.0,0.0,0.0,1.11,2
+Bhawanigarh,Sangrur,61.9,61.9,0.0,0.0,0.0,1.19,2
+Chamkaur Sahib,Rupnagar,61.8,38.3,21.3,2.2,0.0,2.51,7
+Talwandi Sabo,Bathinda,60.0,60.0,0.0,0.0,0.0,1.06,2
+Hoshiarpur,Hoshiarpur,52.4,47.3,3.6,1.5,0.0,1.65,9
+Garhshankar,Hoshiarpur,49.6,38.7,8.8,2.2,0.0,1.97,9
+Nangal,Rupnagar,32.9,32.9,0.0,0.0,0.0,1.07,2
+Sas Nagar (Mohali),Sahibzada Ajit Singh Nagar,28.9,28.9,0.0,0.0,0.0,1.0,1
+Nabha,Patiala,26.8,26.8,0.0,0.0,0.0,1.06,2
+Ahmedgarh,Sangrur,26.7,26.7,0.0,0.0,0.0,1.03,2
+Kharar,Sahibzada Ajit Singh Nagar,23.6,17.7,4.4,1.5,0.0,2.12,8
+Faridkot,Faridkot,22.9,17.7,3.0,2.2,0.0,2.48,12
+Payal,Ludhiana,22.9,22.9,0.0,0.0,0.0,1.39,2
+Kotakpura,Faridkot,16.3,16.3,0.0,0.0,0.0,1.05,2
+Majitha,Amritsar,16.0,11.6,0.7,3.6,0.0,3.32,13
+Amritsar-II,Amritsar,8.7,8.7,0.0,0.0,0.0,1.0,1
+Jaitu,Faridkot,7.4,7.4,0.0,0.0,0.0,1.0,1
+Amritsar-I,Amritsar,5.8,5.8,0.0,0.0,0.0,1.0,1
+Fatehgarh Sahib,Fatehgarh Sahib,5.2,0.7,4.4,0.0,0.0,3.29,5
+Amloh,Fatehgarh Sahib,3.7,2.2,1.5,0.0,0.0,2.0,3
+Morinda,Rupnagar,1.5,1.5,0.0,0.0,0.0,1.0,1
+Khanna,Ludhiana,0.7,0.7,0.0,0.0,0.0,1.0,1
+Bassi Pathana,Fatehgarh Sahib,0.0,0.0,0.0,0.0,0.0,0.0,0
+Khamanon,Fatehgarh Sahib,0.0,0.0,0.0,0.0,0.0,0.0,0
