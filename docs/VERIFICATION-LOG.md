@@ -10,3 +10,15 @@ Pre-declarations for agent-run stages live in the corresponding `docs/notes/*.md
 | 2026-07-21 | GFM 2025 union (Aug 27–Sep 5, minus permanent water) | 500–6,000 km² band; river-corridor pattern | 2,768 km² (2.74% of bbox); hugs Ravi/Beas/Sutlej belts, converges at Harike; 6 coverage days of 10 | PASS |
 | 2026-07-21 | Local Tier-A, Kapurthala 60 m (asc/27) | Flooded fraction 2–20% of bbox | 6,162.8 ha = 1.51% of bbox (1.70% of valid); coherent Beas/Sutlej-belt pattern | PASS (low-end; only asc flood pass is Sep 3 recession — noted) |
 | 2026-07-21 | Local Tier-A, statewide 90 m (desc) | Coherent statewide mask | 61,499 ha FLOOR — central-stripe hole from SAS-token expiry (2 scenes dropped); fix committed; full rerun in RF stage | PARTIAL (rerun pre-declared in notes/rf-train.md) |
+| 2026-07-21 | Local Tier-A statewide rerun (SAS fix) | > 61,499 ha floor, hole filled | 105,183 ha, valid fraction 0.641 → 1.000 | PASS |
+| 2026-07-21 | RF spatial folds (bands in notes/rf-train.md, pre-declared) | OA 0.90–0.99 / F1 0.80–0.99 | A: 1.000/1.000 · B: 0.9991/0.9993 | FAIL (high side — agreement strata are separable by construction; counterweight fresh-point RF-vs-GFM F1 0.394 recorded) |
+| 2026-07-21 | RF vs Tier-A statewide area | ±40% | +53.9% (envelope holds: Tier-A 34k < RF 52k < GFM 86k in-district) | FAIL (explained) |
+| 2026-07-21 | RF top-6 districts | ≥3 of Gurdaspur/Amritsar/Firozpur/Kapurthala | all 4 present | PASS |
+| 2026-07-21 | Crop-flooded vs official band | characterize vs 148–175k ha | 36,195 ha snapshot (21–24% of cumulative-season official) — snapshot vs season + recession bias documented | CHARACTERIZED |
+| 2026-07-21 | Decade C1: 2025 = max season | rank 1/11 both metrics | 16,108 km² raw / 3,306 late-season — rank 1 on both | PASS |
+| 2026-07-21 | Decade C2: Sangrur 2023 NRSC anchor (7,121 ha ±50%) | in band on anchor window | 1,551 ha — NO S1/GFM pass existed on 2023-08-18; event registers in adjacent windows (Sangrur 33,771 ha, Patiala 64,374 ha) | FAIL (root-caused; Jul-2023 signal condition PASS) |
+| 2026-07-21 | Decade C3: 2019 breach signal | Jalandhar/Kapurthala flagged in Aug windows | 35× / 19× decade-median window fractions | PARTIAL (signal PASS, season-rank sub-clause FAIL) |
+| 2026-07-21 | Forecaster signal (pre-declared in notes/forecaster.md) | usable LOYO signal above base rate | pooled ROC-AUC 0.946, PR-AUC 0.269 (15× base rate), Spearman 0.522, leakage-checked | PASS |
+| 2026-07-21 | Forecaster 2025 holdout | flag real flood districts in Aug 22–Sep 6 windows | 5/5 flagged, Kapurthala #1 (P 0.721); 4/5 in top-5 by the Aug 14–24 window (~10 days lead) | STRONG PASS |
+| 2026-07-21 | Forecaster SHAP expectation | upstream rain + reservoir storage in top features | bhakra_storage #3; top rain feature is LOCAL punjab_mm_lag2 #4 (upstream at #7–8) | PARTIAL (reported verbatim) |
+| 2026-07-21 | Monitor CI (secretless) | green run + watermark idempotence | run 29852314680 green on GitHub runner; second run "no new scenes" in 3.9 s | PASS |
