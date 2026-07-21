@@ -89,5 +89,6 @@ season-union km² comes from `aggregate` at the end):
 | 2017 | 46 | 2017-06-30 (4,815) | ANOMALY FLAG: max day >2x the 2025 peak day; daily sum 14,501 km². Late-June timing suggests possible S1 paddy-transplant confusion (fields deliberately inundated) in the GFM archive — quicklook comparison scheduled post-fetch. |
 | 2018 | 43 | 2018-07-02 (1,535) | early-July max again (paddy window); Sep-2018 known event should appear in late windows; daily sum 9,541 km². Fetch restarted mid-2018 as detached PID 34384 (wrapper killed); resume clean. |
 | 2019 | 46 | 2019-06-19 (911) | Sutlej-breach days present: Aug-18 215 km², Aug-23 169 km² (C3 window signal); daily sum 6,064 km² |
+| 2020 | 46 | 2020-06-25 (1,868) | late-June max (paddy window); daily sum 7,207 km² |
 
 _remaining seasons + union km² + checkpoint verdicts pending aggregate run._
