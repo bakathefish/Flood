@@ -17,6 +17,8 @@ is BCM (billion m3) throughout. Features are storage-based, so the level unit
 mix does not affect them.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -113,3 +115,34 @@ def load_frames(paths) -> pd.DataFrame:
     frames = [pd.read_csv(p) for p in paths]
     combined = pd.concat(frames, ignore_index=True)
     return normalize(combined)
+
+
+DEFAULT_SOURCES = (
+    "data/reservoirs_2015_2025.csv",
+    "data/reservoirs_2025_flood_supplement.csv",
+)
+
+
+def build_windows(
+    sources=DEFAULT_SOURCES,
+    years=None,
+    out="data/reservoir_windows.csv",
+    round_bcm=4,
+):
+    """Load the committed reservoir CSV(s), build monsoon-window storage
+    features for ``years`` (default ``sailaab.config.YEARS``), round, and write
+    ``out``. Thin I/O convenience over ``load_frames`` + ``window_features``."""
+    from sailaab import config
+
+    paths = [Path(p) for p in sources if Path(p).exists()]
+    feats = window_features(load_frames(paths), years or config.YEARS)
+    for col in ("mean_storage", "delta_storage"):
+        feats[col] = feats[col].round(round_bcm)
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
+    feats.to_csv(out, index=False)
+    return feats
+
+
+if __name__ == "__main__":
+    result = build_windows()
+    print(f"wrote {len(result)} window-rows -> data/reservoir_windows.csv")
