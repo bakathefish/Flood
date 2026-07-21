@@ -25,6 +25,19 @@ nearest-fallback), while `2025-08-27` returns flood. Therefore each day is gated
 probe is non-empty. "Coverage" is reported as **flood-active days per season** (days the flood
 layer carried observed flood), which is what the products actually use.
 
+## Paddy-transplant signature (identified mid-run, 2026-07-21)
+
+The 2017-06-30 "flood" (4,815 km²) blankets **Moga (984 km² ≈ 44 % of the district), Bathinda
+(no river), Sangrur, Ludhiana** — the central paddy belt, not river corridors — while true events
+(2023-08-22, 2015-07-10) hug the Sutlej/Ghaggar corridors. Punjab transplants rice into
+deliberately inundated fields ~mid-June to mid-July; S1 sees those as water, and the GFM archive
+carries them as observed flood in at least the early (pre-operational-era) years. Mitigation
+decided mid-run: deliver the products exactly as specified (full-season unions), but (a) the
+per-window forecaster table separates the Jun-15..Jul-15 windows where the artifact lives, and
+(b) post-fetch the run log records a per-window cross-year comparison plus, if C1 fails on raw
+unions, a parallel "core flood season" (post-Jul-15) union ranking as the calibrated comparison.
+Late-August checkpoint anchors (C2, C3) are unaffected by the artifact.
+
 ## PRE-DECLARED checkpoints (written BEFORE the pull; verification discipline)
 
 Expected bands, to be confirmed against actuals after the run. A checkpoint FAILS if the actual
