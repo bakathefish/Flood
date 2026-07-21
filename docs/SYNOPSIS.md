@@ -44,6 +44,8 @@ Every satellite step is gated by a **pre-declared checkpoint**: the expected num
 
 ## 5. Running right now
 
+The public app (bakathefish.github.io/Flood) is interactive: an every-district map with three switchable layers (2025 flood extent, decade flood frequency, 2025 forecast risk), click-through per-district panels (flooded hectares, crop loss, ₹ value-at-risk, recurrence, hindcast probability), a before/after satellite swipe of the flood, and the live monitor feed — every figure loading from version-controlled CSVs anyone can audit.
+
 The live monitor is not a plan — it executed during this build. On a GitHub CI runner with **zero secrets and zero accounts**, it detected the most recent Sentinel-1 pass over Punjab (20 July 2026), computed district flood areas (a quiet 2.4 km² day, honestly reported as such), and committed the state — as it now does automatically every six hours, generating alerts in ਪੰਜਾਬੀ, हिन्दी and English whenever any district crosses the alert floor. The landing page reads this feed live.
 
 ## 6. Impact, users, SDGs

@@ -2,7 +2,7 @@
 
 **Open SAR-based flood mapping, decade hazard atlas, impact analytics, and district flood forecasting for Punjab, India.**
 
-**Live:** https://bakathefish.github.io/Flood/ · monitor auto-runs every 6 h on CI, no keys — see `monitor/latest.json`
+**Live:** https://bakathefish.github.io/Flood/ — interactive district map (2025 flood / decade frequency / forecast risk layers, click for per-district stats), before/after SAR swipe, live monitor readout. Monitor auto-runs every 6 h on CI, no keys — see `monitor/latest.json`
 
 *11 monsoons · 467 flood days · 105,183 ha mapped (2025) · 20 districts · 3 languages · 2 space agencies · 0 logins required.*
 
