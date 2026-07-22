@@ -33,6 +33,7 @@ font; if it is unavailable the brief falls back to English-only and prints a not
 
 Inputs (all committed, repo-relative)
     data/district_flood_stats_2025.csv
+    data/district_var_v2.csv           (VaR v2, DES district yields — display value)
     data/flood_frequency_districts_late_season.csv
     data/forecaster_2025_hindcast.csv
     data/tehsil_flood_stats_2025.csv
@@ -233,6 +234,12 @@ def load_tables() -> dict:
         canonical_name(r["district"]): r
         for r in _read_csv(DATA / "district_flood_stats_2025.csv")
     }
+    # VaR v2 (DES district yields) supersedes the flat-yield v1 for display;
+    # district_flood_stats_2025.csv itself stays untouched (docs/notes/gov-data.md)
+    for r in _read_csv(DATA / "district_var_v2.csv"):
+        d = canonical_name(r["district"])
+        if d in dist:
+            dist[d]["crop_var_inr"] = r["crop_var_inr_v2"]
     freq = {
         canonical_name(r["district"]): r
         for r in _read_csv(DATA / "flood_frequency_districts_late_season.csv")
@@ -758,7 +765,7 @@ def build_brief(name: str, tables: dict, geom: dict, guru_fp) -> plt.Figure:
         "₹" + _crore(_fnum(d["crop_var_inr"])),
         "cr",
         AMBER,
-        sub="paddy MSP, order-of-mag",
+        sub="paddy MSP × DES yields",
     )
     _tile(
         fig,
@@ -946,7 +953,7 @@ def build_brief(name: str, tables: dict, geom: dict, guru_fp) -> plt.Figure:
         0.055,
         0.030,
         f"Open data: {REPO} · validated vs Copernicus GFM & "
-        "ISRO NDEM. Crop value order-of-magnitude (paddy MSP).",
+        "ISRO NDEM. Crop value order-of-magnitude (paddy MSP × DES district yields).",
         fontsize=6.6,
         color=SUBINK,
         family="DejaVu Sans",
