@@ -6,10 +6,11 @@ India AI Impact Festival 2026 · AI Impact Creators (student) · https://bakathe
 
 ## 1. The problem
 
-In August–September 2025, Punjab suffered its worst flood since 1988: all 23 districts affected, ~3.55 lakh people, 1.48–1.75 lakh hectares of crops destroyed, dozens of lives lost. Three failures made it worse than it had to be:
+In August–September 2025, Punjab suffered its worst flood since 1988: all 23 districts affected, ~3.55 lakh people, 1.48–1.75 lakh hectares of crops destroyed, dozens of lives lost. Four failures made it worse than it had to be:
 
+- **Nobody was forecasting.** In the Central Water Commission's own state-wise table, Punjab has **zero flood-forecasting stations** — absent from a 226-station national network (Haryana has 1, J&K 3; the single site CWC ever added on the Ravi is defunct — SANDRP 2019/2023; `docs/notes/cwc-gap.md`, `atlas/cwc_station_gap.png`). Punjab's rivers sit outside India's flood-forecast network.
 - **Maps existed but were locked.** ISRO's NDEM produced excellent flood maps — as static PDFs, one snapshot at a time, not analyzable, not overlayable, not open.
-- **Nobody knew the recurrence.** Punjab has no public flood-frequency atlas (NRSC published them for Assam and Bihar). Villages that flooded four times in a decade were treated as first-time surprises.
+- **Nobody knew the recurrence.** Punjab has no public flood-frequency atlas (NRSC published them for Assam and Bihar). Villages that flooded four times in a decade were treated as first-time surprises. The public damage record itself is sparse milestones, not a series (`atlas/punjab_flood_history.png`).
 - **Relief ran on foot.** Compensation (girdawari) required weeks of manual crop surveys while satellite data that could target it sat unused.
 
 ## 2. What Sailaab is
@@ -36,9 +37,11 @@ The analysis goes below district level: **91 tehsils are individually scored**, 
 
 **XGBoost district forecaster (Wave 4).** Unit: district × 10-day monsoon window, 2015–2025. Predictors: IMD rainfall (local + Himalayan upstream, with lags), CWC/BBMB reservoir storage and its rate of change, antecedent flooding, decade-frequency prior. Gradient boosting, not deep learning — the sample-efficient, interpretable right tool for 2.5k tabular rows. Leave-one-year-out validation: pooled ROC-AUC **0.946**, PR-AUC 15× base rate, leakage-checked.
 
-**The headline result.** Trained only on 2015–2024 and shown 2025's predictors, the model flagged **all five districts our SAR atlas ranked most-flooded — a ranking independently corroborated by the government's ground girdawari (ρ = 0.72 all districts / 0.56 named)** — with Kapurthala #1 statewide (P = 0.72 in the pre-declared flood windows; two districts clear P ≥ 0.5, Amritsar is a rank-5 flag at low probability — stated, not rounded up). The forecasting claim is the **pre-crest lead**: four of the five were already in the statewide top-5 during the **Aug 14–24 window, ~10 days before the Aug 26–27 dam-release peak**, and the flags are unchanged under fold-safe priors (leakage-checked). We also state the critique before a reviewer can: SHAP's top drivers are antecedent flooding and flood history — the model is partly persistence-aware by design; the pre-crest lead, not the post-event probabilities, is the forecast skill. **Bhakra reservoir storage** is the #3 driver: a full dam is part of the signature it learned — precisely the mechanism 2025 followed.
+**The headline result.** Trained only on 2015–2024 and shown 2025's predictors, the model flagged **all five districts our SAR atlas ranked most-flooded — a ranking independently corroborated by the government's ground girdawari (ρ = 0.72 all districts / 0.56 named)** — with Kapurthala #1 statewide (P = 0.72 in the pre-declared flood windows; two districts clear P ≥ 0.5, Amritsar is a rank-5 flag at low probability — stated, not rounded up). The forecasting claim is the **pre-crest lead**: four of the five were already in the statewide top-5 during the **Aug 14–24 window, ~10 days before the Aug 26–27 dam-release peak**, and the flags are unchanged under fold-safe priors (leakage-checked).
 
-**Positioning vs Google Flood Hub:** Flood Hub forecasts river stages on ungauged-basin technology; it under-models dam-*regulated* rivers and does not output district crop risk. Sailaab is regulation-aware (reservoir features) and impact-native (predicts flooded fraction). Complementary, not competing.
+**The ablation we ran on ourselves (pre-declared, both expectations failed, shipped verbatim — `docs/notes/ablation.md`).** A reviewer would ask two things, so we asked first. *Does the dam signal carry skill?* SHAP ranks Bhakra storage #3 in attribution — but delete all six reservoir features and the 2025 hindcast is **unchanged** (5/5 flagged, Kapurthala #1, the same ~10-day lead) while pooled precision even improves: the dam signature is attribution, not load-bearing skill, and the dam story lives where the evidence supports it — the headroom analysis. The operational consequence is a feature: the BBMB dams stopped reporting centrally in July 2025, so the live 2026 nowcast must run reservoir-blind — the ablation proves that configuration loses nothing. *Does it beat naive persistence?* On pooled average precision, no — a yesterday's-flooding baseline scores 0.31 vs the model's 0.27, and we publish that. The model wins exactly where forecasting lives: ROC-AUC (0.946 vs 0.936) and the pre-crest window (4/5 vs 3/5 top-5 flags on Aug 14–24). A meteorology-only variant collapses (3/5, PR-AUC 0.11): **antecedent flooding is the load-bearing signal** — which is why the 6-hourly live monitor that measures it and the forecaster are one system, not two modules.
+
+**Positioning vs Google Flood Hub:** Flood Hub forecasts river stages on ungauged-basin technology; it under-models dam-*regulated* rivers and does not output district crop risk. Sailaab is impact-native (predicts flooded fraction, crops, ₹) and regulation-aware in its analytics (the dam-headroom quantification); by ablation its detection skill does not depend on the now-dark reservoir feed. Complementary, not competing.
 
 ## 4. Validated three independent ways — with the failures kept
 
@@ -65,7 +68,7 @@ The live monitor is not a plan — it executed during this build. On a GitHub CI
 
 ## 7. Originality
 
-(1) First open ML-ready flood mapping of Indian-Punjab 2025 (the published RF precedent covered the Pakistani side); (2) **Punjab's first public flood-frequency atlas**; (3) a self-labeling SAR→ML loop that manufactures its own decade of training data, with the paddy-transplant contamination discovery published; (4) a dam-regulation-aware district forecaster with ~10-day demonstrated lead on the 2025 disaster; (5) an end-to-end account-free architecture — reproducibility as a design principle, not a promise.
+(1) First open ML-ready flood mapping of Indian-Punjab 2025 (the published RF precedent covered the Pakistani side); (2) **Punjab's first public flood-frequency atlas**; (3) a self-labeling SAR→ML loop that manufactures its own decade of training data, with the paddy-transplant contamination discovery published; (4) a district forecaster with ~10-day demonstrated lead on the 2025 disaster — girdawari-corroborated and **ablation-stress-tested, with both failed expectations published**; (5) an end-to-end account-free architecture — reproducibility as a design principle, not a promise; (6) the quantified forecast gap: Punjab is absent from CWC's own flood-forecast station network — Sailaab is the district-level layer that gap leaves open.
 
 ## 8. Roadmap
 
@@ -73,6 +76,6 @@ Multi-state scale-out (the pipeline is a bbox + district file), village-circle g
 
 ## 9. Open source
 
-MIT (code) + CC-BY-4.0 (maps/tables). 314 automated tests. Method paper, data-source registry (every dataset: URL, license, access date), and the full verification log: **github.com/bakathefish/Flood** · live: **bakathefish.github.io/Flood**
+MIT (code) + CC-BY-4.0 (maps/tables). 386 automated tests. Method paper, data-source registry (every dataset: URL, license, access date), and the full verification log: **github.com/bakathefish/Flood** · live: **bakathefish.github.io/Flood**
 
-*11 monsoons · 467 flood days · 105,183 ha mapped · 91 tehsils scored · ρ=0.72 vs the government girdawari · 3 languages · 0 logins required.*
+*11 monsoons · 467 flood days · 105,183 ha mapped · 91 tehsils scored · ρ=0.72 vs the government girdawari · 3 languages · 0 CWC forecast stations in Punjab · 0 logins required.*
