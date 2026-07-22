@@ -60,7 +60,7 @@ The live monitor is not a plan — it executed during this build. On a GitHub CI
 ## 6. Impact, users, SDGs
 
 - **SDMA / district EOCs:** recurrence zones + live district km² for pre-positioning and evacuation priority.
-- **Revenue Dept / girdawari:** flood-extent ∩ cropland per village-circle turns weeks of manual crop-loss survey into a verification exercise (₹546 crore at risk quantified in hours, not weeks).
+- **Revenue Dept / girdawari:** flood-extent ∩ cropland per village-circle turns weeks of manual crop-loss survey into a verification exercise (the ₹523-crore at-risk quantification took hours, not weeks).
 - **Insurers (PMFBY) and banks:** independent, reproducible loss extents.
 - **Farmers and the public:** vernacular alerts; every map open.
 - **Worked example (one click in the app):** Sultanpur Lodhi tehsil, Kapurthala — its district flagged #1 by the model in the Aug 14–24 window; 4,733 ha flooded (4,028 ha cropland); it has flooded in 5 of the last 11 monsoons. Its girdawari verification list and a ਪੰਜਾਬੀ alert are one click — that is the relief workflow, demonstrated on real 2025 data. Outreach to PSDMA and the worst-hit District Collectors is drafted for dispatch with this submission.
