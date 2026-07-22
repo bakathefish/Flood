@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sailaab — Business Plan</title>
+<style>
+@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:500;src:url('fonts/BricolageGrotesque-500-latin.woff2') format('woff2');}
+@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:700;src:url('fonts/BricolageGrotesque-700-latin.woff2') format('woff2');}
+@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:800;src:url('fonts/BricolageGrotesque-800-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;src:url('fonts/IBMPlexMono-400-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;src:url('fonts/IBMPlexMono-500-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;src:url('fonts/IBMPlexSans-400-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;src:url('fonts/IBMPlexSans-500-latin.woff2') format('woff2');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;src:url('fonts/IBMPlexSans-600-latin.woff2') format('woff2');}
+</style>
+<style>
+@page{size:A4;margin:16mm 15mm 17mm}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--ink:#101820;--dim:#4b5a63;--faint:#8a969c;--water:#0e8f84;--amber:#b26a00;--risk:#a13d8f;--line:#d8d4c8;--wash:#f4f2ea}
+body{font-family:'IBM Plex Sans',sans-serif;font-size:9.8pt;line-height:1.52;color:var(--ink)}
+.mono{font-family:'IBM Plex Mono',monospace}
+h1,h2{font-family:'Bricolage Grotesque',serif}
+.avoid{break-inside:avoid}
+.masthead{border-bottom:2.5px solid var(--ink);padding-bottom:8px;margin-bottom:10px}
+.masthead .kick{font-family:'IBM Plex Mono';font-size:7.5pt;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+h1{font-size:24pt;font-weight:800;letter-spacing:-.4px;line-height:1.05}
+.masthead .sub{font-size:10.5pt;color:var(--dim);margin-top:4px}
+.meta{display:flex;justify-content:space-between;font-family:'IBM Plex Mono';font-size:7.3pt;color:var(--faint);margin-top:6px}
+h2{font-size:12.5pt;font-weight:700;margin:12px 0 5px;display:flex;align-items:baseline;gap:8px}
+h2 .no{font-family:'IBM Plex Mono';font-size:8pt;color:var(--amber)}
+p{margin:0 0 6px;text-align:justify}
+strong{font-weight:600}
+ul{margin:0 0 6px 14px}
+li{margin-bottom:2.5px}
+table{width:100%;border-collapse:collapse;font-size:8.8pt;margin:5px 0 8px;break-inside:avoid}
+th{font-family:'IBM Plex Mono';font-size:7.2pt;letter-spacing:.06em;text-transform:uppercase;text-align:left;color:var(--dim);border-bottom:1.2px solid var(--ink);padding:3px 6px 3px 0}
+td{border-bottom:.6px solid var(--line);padding:3.5px 6px 3.5px 0;vertical-align:top}
+td b{color:var(--ink)}
+.callout{border-left:3px solid var(--amber);background:var(--wash);padding:7px 10px;margin:7px 0;break-inside:avoid;font-size:9.4pt}
+.footer-note{font-family:'IBM Plex Mono';font-size:7.2pt;color:var(--faint);border-top:1px solid var(--line);padding-top:5px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="kick">India AI Impact Festival 2026 · Optional Business Plan · ISB Mentorship Track</div>
+  <h1>SAILAAB — Sustainability &amp; Deployment Plan</h1>
+  <div class="sub">The open core stays free forever. This plan is how it reaches the institutions that should run on it — and what funds the scale-out.</div>
+  <div class="meta"><span>LIVE: bakathefish.github.io/Flood</span><span>CODE + DATA: github.com/bakathefish/Flood</span><span>MIT + CC-BY-4.0</span></div>
+</div>
+
+<h2><span class="no">01</span>Product</h2>
+<p>A five-module open pipeline running live today on free public infrastructure with zero accounts: the 2025 flood atlas, a decade hazard atlas, an impact engine (₹351–523 crore damage band on government DES yields), a district forecaster with a demonstrated ~10-day pre-crest lead on the 2025 disaster, and a 6-hourly live monitor issuing ਪੰਜਾਬੀ / हिन्दी / English alerts. 386 automated tests; validated against Copernicus GFM, Sentinel-2 optical truth, ISRO NDEM sheets, and the government's own ground girdawari (Spearman ρ = 0.72).</p>
+
+<h2><span class="no">02</span>The problem, priced</h2>
+<ul>
+<li>The 2025 Punjab flood: <strong>₹14,000 crore</strong> interim state loss estimate; ₹1,600 crore central assistance; ₹71 crore immediate relief (official figures, committed in-repo).</li>
+<li>Punjab has <strong>zero CWC flood-forecast stations</strong> — absent from CWC's own state-wise table and current lists. There is no incumbent public district-forecast layer to displace; Sailaab fills an empty slot.</li>
+<li>Girdawari damage assessment deployed <strong>2,167 patwaris</strong> for weeks of manual survey; the satellite layer that could target it runs for ~₹0.</li>
+<li>PMFBY insurers and agricultural lenders lack an independent, reproducible flood-loss extent.</li>
+</ul>
+
+<h2><span class="no">03</span>Value proposition — and the AI component</h2>
+<p>For a district collector, four answers in one click: which tehsils flood repeatedly (a named list — Khadur Sahib 6 of 11 monsoons), what is flooding <em>now</em> (6-hourly satellite), what is likely <em>next window</em> (live forecaster probabilities), and what the damage is worth (₹ band on government yields). The AI is the pipeline itself: a Random Forest SAR classifier, a self-labeled decade of training data, and an XGBoost forecaster that is <strong>ablation-stress-tested and honest about persistence</strong> — auditable discipline is the differentiator for a government buyer.</p>
+
+<h2><span class="no">04</span>Sustainability model — three tiers</h2>
+<table>
+<tr><th style="width:19%">Tier</th><th style="width:27%">Who pays</th><th>What they get</th><th style="width:13%">Status</th></tr>
+<tr><td><b>Open core</b></td><td>nobody — free forever</td><td>everything public today: maps, forecasts, alerts, data, code</td><td>live</td></tr>
+<tr><td><b>Institutional instances</b></td><td>state SDMAs / Revenue Depts (MoU or procurement)</td><td>hosted multi-state instances, SLAs, village-circle girdawari-verification exports, training</td><td>pilot-ready</td></tr>
+<tr><td><b>Analytics services</b></td><td>PMFBY insurers, lenders, CSR / climate-resilience funds</td><td>independent loss-extent audits, recurrence underwriting layers</td><td>roadmap</td></tr>
+</table>
+<div class="callout"><strong>Unit economics, honestly stated.</strong> Core infrastructure cost today is <strong>₹0/month</strong> (public CI + open data). A per-state instance is priced against the avoided cost of manual survey targeting: even a 5% efficiency gain on one girdawari cycle (2,167 patwaris, weeks of work) dwarfs any realistic hosting fee. Scale compute rides the IndiaAI Compute subsidy lane (student/institution route documented in-repo). All pricing is an assumption to be tested in mentorship — the open core is not contingent on any of it.</div>
+
+<h2><span class="no">05</span>Roll-out</h2>
+<ul>
+<li><strong>Phase 0 — done:</strong> Punjab system live through monsoon 2026; the live forecaster activates 25 July, inside judging week; jurors can watch CI commit.</li>
+<li><strong>Phase 1 — this monsoon:</strong> PSDMA + worst-hit District Collector outreach (drafted, dispatches with this submission); operational feedback; EOS-04 Indian-SAR cross-validation via NRSC Bhoonidhi.</li>
+<li><strong>Phase 2 — two quarters:</strong> three-state expansion (the pipeline is a bounding box + district file; Assam and Bihar have NRSC frequency atlases but no live open district layer), Bhashini voice alerts, village-circle girdawari integration.</li>
+<li><strong>Phase 3:</strong> national coverage via IndiaAI / NRSC partnerships; formal engagement with CWC on the station-gap finding.</li>
+</ul>
+
+<h2><span class="no">06</span>Marketing &amp; distribution</h2>
+<p>The alerts are the distribution: vernacular, free, quotable. Twenty print-ready district flood briefs ship in-repo as the door-opener artifact for collectors. The dam-headroom and station-gap findings are press-grade stories that carry the system's name into policy rooms — the space SANDRP already covers editorially, now with reproducible numbers.</p>
+
+<h2><span class="no">07</span>Risks — with evidence</h2>
+<ul>
+<li><strong>Data feeds go dark.</strong> Happened: the BBMB dams stopped reporting centrally in July 2025. <em>Proven survivable by ablation</em> — detection skill does not depend on the reservoir feed.</li>
+<li><strong>Single-sensor reliance.</strong> Sentinel-1 today; EOS-04/Bhoonidhi second SAR source is the Phase-1 mitigation.</li>
+<li><strong>Adoption friction.</strong> The zero-login open core removes procurement as a precondition — institutions can adopt before they contract.</li>
+<li><strong>Founder concentration.</strong> Solo student builder — mitigated by design: 386 tests, a method paper, a data-source registry, and a full verification log make the system transferable. ISB mentorship asks: government procurement navigation, PPP structuring.</li>
+</ul>
+
+<h2><span class="no">08</span>Team</h2>
+<p>Solo student builder, Punjab — built during the 2026 monsoon. The repository is the CV.</p>
+
+<div class="footer-note">Open core free forever · MIT + CC-BY-4.0 · ₹0/month core infrastructure · 386 automated tests · github.com/bakathefish/Flood · bakathefish.github.io/Flood · Companion to the Sailaab synopsis; evaluated separately (ISB mentorship track).</div>
+
+</body>
+</html>
