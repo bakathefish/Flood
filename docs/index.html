@@ -247,7 +247,7 @@ footer .cr{max-width:60ch}
     <div class="kicker rv d1" data-i="kicker">Open flood intelligence · live this monsoon</div>
     <h1 class="rv d2" data-i="h1" data-html="1">The flood maps Punjab never had.<br><em>Open. Validated. Running.</em></h1>
     <div class="gurmukhi rv d3">ਸੈਲਾਬ — ਪੰਜਾਬ ਦੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਪ੍ਰਣਾਲੀ</div>
-    <p class="lede rv d3" data-i="lede" data-html="1">In August 2025 Punjab suffered its <strong>worst flood since 1988</strong> — all 23 districts, ~3.55 lakh people, 1.48–1.75 lakh hectares of crops (official range). The satellite maps that could have guided relief existed, but locked in PDFs. Sailaab rebuilds the capability in the open: <strong>SAR flood mapping, a decade hazard atlas, damage analytics, a district flood forecaster, and a live monitor</strong> — every line of code and every number public.</p>
+    <p class="lede rv d3" data-i="lede" data-html="1">In August 2025 Punjab suffered its <strong>worst flood since 1988</strong> — all 23 districts, ~3.55 lakh people, 1.48–1.75 lakh hectares of crops (official range). India's flood-forecast network had <strong>zero stations</strong> in the state; the satellite maps that could have guided relief existed, but locked in PDFs. Sailaab rebuilds the capability in the open: <strong>SAR flood mapping, a decade hazard atlas, damage analytics, a district flood forecaster, and a live monitor</strong> — every line of code and every number public.</p>
     <div class="cta-row rv d4">
       <a class="btn primary" href="#districts" data-i="cta1">Explore your district</a>
       <a class="btn" href="https://github.com/bakathefish/Flood" data-i="cta2">Source & method</a>
@@ -274,6 +274,7 @@ footer .cr{max-width:60ch}
     <div class="num"><b>₹351–523 cr</b><span data-i="n4">crop damage (duration-wtd → at-risk)</span></div>
     <div class="num"><b>3</b><span data-i="n5">alert languages</span></div>
     <div class="num"><b>3</b><span data-i="n6">independent validations (GFM · S2 · girdawari)</span></div>
+    <div class="num"><b>0</b><span data-i="n7">CWC flood-forecast stations in Punjab</span></div>
   </div>
 
   <section id="atlas">
@@ -355,7 +356,7 @@ footer .cr{max-width:60ch}
           <div id="sb-rows"></div>
           <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Our satellite damage ranking also matches the government's ground survey: Spearman <b style="color:var(--water)">ρ = 0.72</b> across all 20 districts (0.56 over the 16 officially named) vs the Special Girdawari table. Full tables: <code>data/forecaster_2025_hindcast.csv</code>, <code>data/official_relief_2025.csv</code>.</div>
         </div>
-        <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window — before the Aug 26–27 dam releases — four of the five eventual flood districts were already in the model's statewide top-5. SHAP attribution: antecedent flooding, flood-history prior, and <b>Bhakra reservoir storage</b>.</div>
+        <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window — before the Aug 26–27 dam releases — four of the five eventual flood districts were already in the model's statewide top-5. SHAP attribution: antecedent flooding and the flood-history prior dominate; Bhakra storage ranks #3 — <b>ablation-tested</b>: delete every dam feature and the 2025 flags don't move (<code>data/forecaster_ablation.csv</code>).</div>
 
         <div class="replay" id="replay">
           <div class="rp-head"><span>Replay 2025 — risk before water</span><span class="rp-window" id="rp-window"></span></div>
@@ -385,7 +386,7 @@ footer .cr{max-width:60ch}
         <figure class="panel" style="margin-top:22px">
           <span class="tag">Explainability</span>
           <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/forecaster_shap.png" alt="SHAP feature attribution" loading="lazy">
-          <figcaption><b>Why the model says what it says</b> SHAP attributions — wet ground, flood history, and a full Bhakra dam are the signature it learned.</figcaption>
+          <figcaption><b>Why the model says what it says</b> SHAP attributions — wet ground and flood history dominate; Bhakra storage ranks #3 in attribution. Ablation-tested: attribution, not load-bearing skill — the 2025 flags survive with all dam features deleted.</figcaption>
         </figure>
       </div>
     </div>
@@ -399,7 +400,7 @@ footer .cr{max-width:60ch}
         <ul>
           <li><b>Atlas</b> — Sentinel-1 change detection + Random Forest, per-district statistics</li>
           <li><b>Decade hazard</b> — 11 monsoons → recurrence zones → "repeat victims" table</li>
-          <li><b>Impact</b> — crop-flooded hectares, ₹546 crore value-at-risk, the dam-release causal chain</li>
+          <li><b>Impact</b> — crop-flooded hectares, the ₹351–523 crore damage band (duration-weighted → at-risk), the dam-release causal chain</li>
           <li><b>Forecaster</b> — XGBoost district risk model trained on the pipeline's own decade of SAR-derived labels</li>
           <li><b>Live monitor</b> — every new satellite pass → district damage → trilingual alerts, automatically</li>
         </ul>
@@ -408,10 +409,24 @@ footer .cr{max-width:60ch}
       <div>
         <h3>Engineering honesty</h3>
         <p>Every satellite step is gated by a pre-declared checkpoint — the expected number is written down <i>before</i> the run, then the actual, then PASS or FAIL. The log ships in the repo, failures included.</p>
-        <div class="honesty">Training labels are bootstrapped from method agreement and labeled as such. Both spatial folds are reported. The June "floods" that turned out to be rice transplanting? Documented, calibrated, published.</div>
-        <p style="margin-top:14px">314 automated tests. MIT-licensed code, CC-BY data products.
+        <div class="honesty">Training labels are bootstrapped from method agreement and labeled as such. Both spatial folds are reported. The June "floods" that turned out to be rice transplanting? Documented, calibrated, published. The ablation we ran on ourselves: delete the dam features — the 2025 flags don't move; a persistence baseline nearly matches pooled precision, and we published that too.</div>
+        <p style="margin-top:14px">386 automated tests. MIT-licensed code, CC-BY data products.
         Method paper, data-source registry and verification log live in the <a href="https://github.com/bakathefish/Flood/tree/master/docs">repository docs</a>.</p>
       </div>
+    </div>
+    <div class="cols" style="margin-top:34px">
+      <figure class="panel">
+        <span class="tag">The gap, quantified</span>
+        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/cwc_station_gap.png" alt="CWC flood-forecast stations by state — Punjab has zero" loading="lazy">
+        <figcaption><b>Punjab is not on the map of India's flood-forecast network</b>
+        CWC's own state-wise table: 226 stations across 22 states — Punjab, zero (and still absent from CWC's current lists). Sailaab is the district-level layer that gap leaves open. Source: data.gov.in, GODL.</figcaption>
+      </figure>
+      <figure class="panel">
+        <span class="tag">70-year context</span>
+        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/punjab_flood_history.png" alt="Punjab floods in 70-year context" loading="lazy">
+        <figcaption><b>2025 against the public record</b>
+        A placid 2016–21 baseline, then 1.985 lakh ha of girdawari crop damage and 55 lives in 2025 — the outlier the recurrence atlas said to prepare for. Sparse milestones, distinct metrics, no invented years.</figcaption>
+      </figure>
     </div>
   </section>
 </main>
@@ -481,10 +496,10 @@ const I18N = {
   nav_atlas:'ਐਟਲਸ', nav_dist:'ਜ਼ਿਲ੍ਹੇ', nav_fc:'ਭਵਿੱਖਬਾਣੀ', nav_repo:'ਰਿਪੋਜ਼ਟਰੀ',
   kicker:'ਖੁੱਲ੍ਹੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਜਾਣਕਾਰੀ · ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ',
   h1:'ਉਹ ਹੜ੍ਹ ਨਕਸ਼ੇ ਜੋ ਪੰਜਾਬ ਕੋਲ ਕਦੇ ਨਹੀਂ ਸਨ।<br><em>ਖੁੱਲ੍ਹੇ। ਪਰਖੇ ਹੋਏ। ਚੱਲ ਰਹੇ।</em>',
-  lede:'ਅਗਸਤ 2025 ਵਿੱਚ ਪੰਜਾਬ ਨੇ <strong>1988 ਤੋਂ ਬਾਅਦ ਦਾ ਸਭ ਤੋਂ ਭਿਆਨਕ ਹੜ੍ਹ</strong> ਝੱਲਿਆ — ਸਾਰੇ 23 ਜ਼ਿਲ੍ਹੇ, ~3.55 ਲੱਖ ਲੋਕ, 1.48–1.75 ਲੱਖ ਹੈਕਟੇਅਰ ਫ਼ਸਲਾਂ। ਜੋ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ੇ ਰਾਹਤ ਦਾ ਰਾਹ ਦਿਖਾ ਸਕਦੇ ਸਨ, ਉਹ PDF ਵਿੱਚ ਬੰਦ ਪਏ ਸਨ। ਸੈਲਾਬ ਇਹ ਸਮਰੱਥਾ ਖੁੱਲ੍ਹੇ ਵਿੱਚ ਮੁੜ ਉਸਾਰਦਾ ਹੈ: <strong>SAR ਹੜ੍ਹ ਨਕਸ਼ੇ, ਦਹਾਕੇ ਦਾ ਖ਼ਤਰਾ ਐਟਲਸ, ਨੁਕਸਾਨ ਵਿਸ਼ਲੇਸ਼ਣ, ਜ਼ਿਲ੍ਹਾ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਲਾਈਵ ਮਾਨੀਟਰ</strong> — ਹਰ ਲਾਈਨ ਕੋਡ, ਹਰ ਅੰਕੜਾ ਜਨਤਕ।',
+  lede:'ਅਗਸਤ 2025 ਵਿੱਚ ਪੰਜਾਬ ਨੇ <strong>1988 ਤੋਂ ਬਾਅਦ ਦਾ ਸਭ ਤੋਂ ਭਿਆਨਕ ਹੜ੍ਹ</strong> ਝੱਲਿਆ — ਸਾਰੇ 23 ਜ਼ਿਲ੍ਹੇ, ~3.55 ਲੱਖ ਲੋਕ, 1.48–1.75 ਲੱਖ ਹੈਕਟੇਅਰ ਫ਼ਸਲਾਂ। ਭਾਰਤ ਦੇ ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਨੈੱਟਵਰਕ ਵਿੱਚ ਸੂਬੇ ਦੇ <strong>ਜ਼ੀਰੋ ਸਟੇਸ਼ਨ</strong> ਸਨ; ਜੋ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ੇ ਰਾਹਤ ਦਾ ਰਾਹ ਦਿਖਾ ਸਕਦੇ ਸਨ, ਉਹ PDF ਵਿੱਚ ਬੰਦ ਪਏ ਸਨ। ਸੈਲਾਬ ਇਹ ਸਮਰੱਥਾ ਖੁੱਲ੍ਹੇ ਵਿੱਚ ਮੁੜ ਉਸਾਰਦਾ ਹੈ: <strong>SAR ਹੜ੍ਹ ਨਕਸ਼ੇ, ਦਹਾਕੇ ਦਾ ਖ਼ਤਰਾ ਐਟਲਸ, ਨੁਕਸਾਨ ਵਿਸ਼ਲੇਸ਼ਣ, ਜ਼ਿਲ੍ਹਾ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਲਾਈਵ ਮਾਨੀਟਰ</strong> — ਹਰ ਲਾਈਨ ਕੋਡ, ਹਰ ਅੰਕੜਾ ਜਨਤਕ।',
   cta1:'ਆਪਣਾ ਜ਼ਿਲ੍ਹਾ ਵੇਖੋ', cta2:'ਸਰੋਤ ਅਤੇ ਵਿਧੀ',
   livehead:'ਲਾਈਵ ਮਾਨੀਟਰ — ਹਰ 6 ਘੰਟੇ ਆਪਣੇ ਆਪ, ਬਿਨਾਂ ਕੁੰਜੀ, ਬਿਨਾਂ ਖਾਤੇ',
-  n1:'ਮੈਪ ਕੀਤੇ ਮਾਨਸੂਨ', n2:'ਪ੍ਰੋਸੈਸ ਕੀਤੇ ਹੜ੍ਹ ਦਿਨ', n3:'ਹੈਕਟੇਅਰ ਡੁੱਬੇ, 2025 (SAR Tier-A)', n4:'ਫ਼ਸਲ ਨੁਕਸਾਨ (ਅਨੁਮਾਨ ਬੈਂਡ)', n5:'ਚੇਤਾਵਨੀ ਭਾਸ਼ਾਵਾਂ', n6:'ਸੁਤੰਤਰ ਪਰਖਾਂ (GFM·S2·ਗਿਰਦਾਵਰੀ)',
+  n1:'ਮੈਪ ਕੀਤੇ ਮਾਨਸੂਨ', n2:'ਪ੍ਰੋਸੈਸ ਕੀਤੇ ਹੜ੍ਹ ਦਿਨ', n3:'ਹੈਕਟੇਅਰ ਡੁੱਬੇ, 2025 (SAR Tier-A)', n4:'ਫ਼ਸਲ ਨੁਕਸਾਨ (ਅਨੁਮਾਨ ਬੈਂਡ)', n5:'ਚੇਤਾਵਨੀ ਭਾਸ਼ਾਵਾਂ', n6:'ਸੁਤੰਤਰ ਪਰਖਾਂ (GFM·S2·ਗਿਰਦਾਵਰੀ)', n7:'ਪੰਜਾਬ ਵਿੱਚ CWC ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਸਟੇਸ਼ਨ',
   s1:'ਐਟਲਸ', s2:'ਜ਼ਿਲ੍ਹੇ', s3:'ਭਵਿੱਖਬਾਣੀ — 2025 ਹੋਲਡ-ਆਊਟ', s4:'ਸਿਸਟਮ',
   c1:'ਹੁਣ · ਵੇਖਿਆ', c2:'ਹੁਣ · ਮਾਡਲ ਜੋਖਮ', c3:'2025 ਹੜ੍ਹ (ਹੈਕ.)', c4:'ਦਹਾਕਾ ਬਾਰੰਬਾਰਤਾ', c5:"ਹਿੰਡਕਾਸਟ ਜੋਖਮ '25",
   dp0:'ਕੋਈ ਜ਼ਿਲ੍ਹਾ ਚੁਣੋ', sw1:'ਪਹਿਲਾਂ · ਜੁਲਾਈ 2025', sw2:'ਹੜ੍ਹ · ਅਗ–ਸਤੰ 2025',
@@ -496,10 +511,10 @@ const I18N = {
   nav_atlas:'एटलस', nav_dist:'जिले', nav_fc:'पूर्वानुमान', nav_repo:'रिपॉज़िटरी',
   kicker:'खुली बाढ़ इंटेलिजेंस · इस मानसून लाइव',
   h1:'वे बाढ़ नक्शे जो पंजाब के पास कभी नहीं थे।<br><em>खुले। प्रमाणित। चालू।</em>',
-  lede:'अगस्त 2025 में पंजाब ने <strong>1988 के बाद की सबसे भीषण बाढ़</strong> झेली — सभी 23 जिले, ~3.55 लाख लोग, 1.48–1.75 लाख हेक्टेयर फ़सलें। जो सैटेलाइट नक्शे राहत की राह दिखा सकते थे, वे PDF में बंद थे। सैलाब यह क्षमता खुले में फिर से बनाता है: <strong>SAR बाढ़ मानचित्रण, दशक का जोखिम एटलस, क्षति विश्लेषण, जिला बाढ़ पूर्वानुमान और लाइव मॉनिटर</strong> — हर लाइन कोड, हर आँकड़ा सार्वजनिक।',
+  lede:'अगस्त 2025 में पंजाब ने <strong>1988 के बाद की सबसे भीषण बाढ़</strong> झेली — सभी 23 जिले, ~3.55 लाख लोग, 1.48–1.75 लाख हेक्टेयर फ़सलें। भारत के बाढ़-पूर्वानुमान नेटवर्क में राज्य के <strong>शून्य स्टेशन</strong> थे; जो सैटेलाइट नक्शे राहत की राह दिखा सकते थे, वे PDF में बंद थे। सैलाब यह क्षमता खुले में फिर से बनाता है: <strong>SAR बाढ़ मानचित्रण, दशक का जोखिम एटलस, क्षति विश्लेषण, जिला बाढ़ पूर्वानुमान और लाइव मॉनिटर</strong> — हर लाइन कोड, हर आँकड़ा सार्वजनिक।',
   cta1:'अपना जिला देखें', cta2:'स्रोत और विधि',
   livehead:'लाइव मॉनिटर — हर 6 घंटे स्वतः, बिना कुंजी, बिना खाते',
-  n1:'मैप किए मानसून', n2:'प्रोसेस किए बाढ़ दिन', n3:'हेक्टेयर जलमग्न, 2025 (SAR Tier-A)', n4:'फ़सल क्षति (अनुमान बैंड)', n5:'चेतावनी भाषाएँ', n6:'स्वतंत्र प्रमाणन (GFM·S2·गिरदावरी)',
+  n1:'मैप किए मानसून', n2:'प्रोसेस किए बाढ़ दिन', n3:'हेक्टेयर जलमग्न, 2025 (SAR Tier-A)', n4:'फ़सल क्षति (अनुमान बैंड)', n5:'चेतावनी भाषाएँ', n6:'स्वतंत्र प्रमाणन (GFM·S2·गिरदावरी)', n7:'पंजाब में CWC बाढ़-पूर्वानुमान स्टेशन',
   s1:'एटलस', s2:'जिले', s3:'पूर्वानुमान — 2025 होल्ड-आउट', s4:'सिस्टम',
   c1:'अभी · देखा गया', c2:'अभी · मॉडल जोखिम', c3:'2025 बाढ़ (हे.)', c4:'दशक आवृत्ति', c5:"हिंडकास्ट जोखिम '25",
   dp0:'कोई जिला चुनें', sw1:'पहले · जुलाई 2025', sw2:'बाढ़ · अग–सितं 2025',
