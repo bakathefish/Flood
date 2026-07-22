@@ -51,4 +51,71 @@ record.
 
 ---
 
-(Actuals + red-team outcome appended below in a later commit.)
+## Actuals
+
+Committed record: `data/punjab_flood_damage_history.csv` — 21 rows, one per
+`(period, metric, value, unit, source_uuid)`. Units kept in their source form and
+normalised in code (`sailaab.history`): `Mha`/`lakh_ha`/`ha` → ha, `crore_inr`
+and `count` passthrough. Figure: `atlas/punjab_flood_history.png` (log-ha area
+panel + linear lives panel); byte-stable across two driver runs
+(md5 `de39867e439ea21eeab7ac9d2db2a333`). Unit/schema tests: 25/25 pass.
+
+Checkpoint (pre-declared → actual):
+
+| Quantity | Expected | Actual | Verdict |
+|---|---|---|---|
+| 1953–2010 Punjab max flooded area | 2.79 Mha | 2.79 Mha = 2,790,000 ha (loads, class `flooded_area`) | PASS |
+| 2016–18 flooded area | ≤ 0.023 Mha every year | 0.001 / 0.006 / 0.023 Mha (max 0.023) | PASS |
+| 2018-19→2021-22 lives lost | 35/20/16/9 | 35/20/16/9 (class `lives`) | PASS |
+| Consolidated CSV | one row per (period, metric, value, unit, source_uuid); ha / crore-INR / count | schema holds; all units in `{ha, lakh_ha, Mha, crore_inr, count}`; no negatives | PASS |
+
+2025 enters as **two separate points, never merged** — they are different metric
+classes: SAR single-pass **105,183 ha** (`area_affected`, class `flooded_area`;
+statewide Tier-A, `docs/VERIFICATION-LOG.md` 2026-07-21) and Special Girdawari
+cumulative **198,524 ha** (`crop_damage_area`; sum of the 18 district rows in
+`data/official_relief_2025.csv`, which round to the STATEWIDE reported 198,525 —
+the 1-ha gap is rounding; both = 1.985 lakh ha). Lives 2025 = **55** (STATEWIDE
+deaths, same file), the anchor for the lives contrast.
+
+Metric classes are disjoint and never conflated: `flooded_area`,
+`crop_damage_area`, `crop_damage_value` (crore INR), `lives`, `houses`.
+
+Deviations from the frame, and why:
+- **2021-22 crops = `NA`** in the source (resource 2c) → row omitted, no value
+  invented. So `crop_damage_area` has 2018-19/2019-20/2020-21 + the 2025 anchor.
+- **Houses** (229 / 2,618 / 837 / 8) are kept in the CSV for completeness but
+  **not plotted**: the repo has no 2025 houses figure to anchor the contrast, and
+  §1 rests on the area + lives story. Keeping them off-figure preserves the sparse
+  look; the numbers remain in the record.
+- The 2.79 Mha worst-year maximum is drawn as an **undated horizontal reference
+  band**, above 2025 — not a dated point (see red-team below).
+
+## Red-team: dating the 2.79 Mha
+
+**Outcome: undatable from a citable source → labelled "year not published in
+source". No year invented.**
+
+- **Source has no year.** The OGD resource "State/UTs-wise Maximum Area Affected
+  by Floods in any Year during 1953-2010" (uuid `c00fd02a-c30e-4953-bddb-a4cbacb78036`,
+  Rajya Sabha, published 2022-12-25) carries only three fields — `sl__no_`,
+  `state_ut`, `max__area_affected__million_ha_`. There is **no year column**; the
+  table reports the maximum over the window without saying which year produced it
+  (raw pull: scratchpad `datagovin/maxarea_punjab.json`). Accessed 2026-07-22.
+- **1988 (prior suspect) cannot be pinned to 2.79 Mha.** 1988 is widely cited as
+  Punjab's worst pre-2025 flood ("worst deluge since 1988"; *The Tribune*, "redux
+  of 1988/1993"), but the 1988 Punjab floods record gives **no area-affected
+  figure in hectares** — only 9,000 of 12,989 villages flooded, ~34 lakh people
+  affected, 634 mm Bhakra-area rain. The inundation figure sometimes cited for
+  1988 (~9,221 km² ≈ 0.92 Mha) is **far below** 2.79 Mha, which suggests the OGD
+  "area affected" is a broader administrative measure than satellite inundation.
+  No citable source ties the specific 2.79 Mha value to any year.
+- **Decision (per pre-declared rule):** the figure labels the row *"Punjab worst
+  flood year, 1953–2010: 2.79 Mha — year not published in source"* and places it
+  as an undated reference, off the time axis.
+
+Sources (accessed 2026-07-22):
+- data.gov.in resource `c00fd02a-c30e-4953-bddb-a4cbacb78036` (raw JSON — no year field)
+- https://en.wikipedia.org/wiki/1988_Punjab_floods (no area-affected figure)
+- https://en.wikipedia.org/wiki/2025_Punjab,_India_floods ("worst since 1988")
+- https://india.mongabay.com/2025/09/lives-homes-and-crops-lost-as-punjab-faces-the-worst-flood-in-decades/
+- https://www.indiastat.com/punjab-state/data/meteorological-data/floods-cyclonic-storms-and-landslides (year-wise series behind paywall; no public year-wise max surfaced)
