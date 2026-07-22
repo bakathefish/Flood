@@ -20,3 +20,5 @@ data/rasters/
 !monitor/reference_vv_150m.tif
 .playwright-mcp/
 /*.png
+data/eos04/*.tif
+data/eos04/*.zip
