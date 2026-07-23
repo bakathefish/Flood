@@ -190,29 +190,6 @@ section{padding:8px 0 64px}
 .lead-call{border:1px solid var(--line2);border-left:2px solid var(--risk);background:var(--ink2);padding:18px;font-size:14px;color:var(--paper-dim);margin-top:22px}
 .lead-call b{color:var(--paper)}
 
-/* ------- replay scrubber ------- */
-.replay{border:1px solid var(--line2);background:var(--ink2);margin-top:22px}
-.replay .rp-head{padding:14px 16px;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.rp-window{color:var(--amber);font-family:var(--mono)}
-.rp-body{padding:18px 16px 8px}
-.rp-timeline{position:relative;margin:0 6px 18px}
-.rp-timeline input{width:100%;accent-color:var(--amber)}
-.rp-marks{position:relative;height:16px;font-size:9.5px;color:var(--paper-faint)}
-.rp-marks span{position:absolute;transform:translateX(-50%)}
-.rp-marks .ev{color:var(--alert);top:-34px;font-size:9px}
-.rp-row{display:grid;grid-template-columns:120px 1fr 54px;align-items:center;gap:10px;padding:5px 0;font-size:12.5px}
-.rp-row .nm{color:var(--paper-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rp-bars{display:flex;flex-direction:column;gap:3px}
-.rp-bar{position:relative;height:7px;background:var(--line);border-radius:2px;overflow:hidden}
-.rp-bar i{position:absolute;inset:0;right:auto;border-radius:2px;transition:width .25s}
-.rp-bar.risk i{background:var(--risk)}
-.rp-bar.obs i{background:var(--water)}
-.rp-val{font-family:var(--mono);font-size:11px;color:var(--paper-faint);text-align:right}
-.rp-caption{padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--paper)}
-.rp-caption b{color:var(--risk)}
-.rp-legend{display:flex;gap:16px;font-size:10.5px;color:var(--paper-faint);padding:0 16px 12px}
-.rp-legend i{display:inline-block;width:10px;height:7px;border-radius:2px;margin-right:5px}
-
 /* ------- alerts demo ------- */
 .phone{border:1px solid var(--line2);background:var(--ink2);padding:0}
 .tabs{display:flex;border-bottom:1px solid var(--line)}
@@ -235,6 +212,12 @@ section{padding:8px 0 64px}
 .cols li{padding:7px 0 7px 20px;border-bottom:1px dashed var(--line);position:relative}
 .cols li::before{content:"—";position:absolute;left:0;color:var(--water-deep)}
 .honesty{border-left:2px solid var(--amber);padding:4px 0 4px 18px;margin-top:14px;color:var(--paper-dim);font-size:13px}
+
+/* section intro paragraph + shared spacing helpers */
+.sec-intro{max-width:72ch;color:var(--paper-dim);margin-bottom:22px}
+.map-col{display:flex;flex-direction:column}
+.mt34{margin-top:34px}
+.mt14{margin-top:14px}
 
 footer{border-top:1px solid var(--line);padding:34px 0 46px;display:flex;flex-wrap:wrap;gap:18px;
   justify-content:space-between;color:var(--paper-faint);font-size:12.5px}
@@ -302,7 +285,7 @@ footer .cr{max-width:60ch}
 
   <section id="now">
     <div class="sec-head"><span class="no">01</span><h2 data-i="s_now">Right now</h2><div class="rule"></div></div>
-    <p style="max-width:72ch;color:var(--paper-dim);margin-bottom:22px" data-i="nowintro">Sailaab is not an archive of 2025. It is watching this monsoon. Everything in this section renders from files the monitor committed within the last few hours, and it will look different tomorrow.</p>
+    <p class="sec-intro" data-i="nowintro">Sailaab is not an archive of 2025. It is watching this monsoon. Everything in this section renders from files the monitor committed within the last few hours, and it will look different tomorrow.</p>
     <div class="fc-grid">
       <div>
         <figure class="panel">
@@ -336,7 +319,7 @@ footer .cr{max-width:60ch}
       </div>
     </div>
     <div class="map-shell" style="margin-top:26px;grid-template-columns:1fr">
-      <div style="display:flex;flex-direction:column">
+      <div class="map-col">
         <div class="layer-row">
           <button class="chip" id="ex-prev" aria-label="previous day">◂ day</button>
           <input type="date" id="ex-date" class="chip" style="color:var(--paper)">
@@ -353,7 +336,7 @@ footer .cr{max-width:60ch}
 
   <section id="forecast">
     <div class="sec-head"><span class="no">02</span><h2 data-i="s3">The proof: 2025, held out</h2><div class="rule"></div></div>
-    <p style="max-width:72ch;color:var(--paper-dim);margin-bottom:22px" data-i="fcintro">The live board above runs the same model you see tested here. We trained it only on 2015 to 2024, then handed it 2025, the worst flood since 1988, and let the year grade it.</p>
+    <p class="sec-intro" data-i="fcintro">The live board above runs the same model you see tested here. We trained it only on 2015 to 2024, then handed it 2025, the worst flood since 1988, and let the year grade it.</p>
     <div class="fc-grid">
       <div>
         <div class="scoreboard">
@@ -362,8 +345,6 @@ footer .cr{max-width:60ch}
           <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Our satellite damage ranking also matches the government's ground survey: Spearman <b style="color:var(--water)">ρ = 0.72</b> across all 20 districts (0.56 over the 16 officially named) vs the Special Girdawari table. Full tables: <code>data/forecaster_2025_hindcast.csv</code>, <code>data/official_relief_2025.csv</code>.</div>
         </div>
         <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window, before the Aug 26–27 dam releases, four of the five eventual flood districts were already in the model's statewide top-5. SHAP says antecedent flooding and the flood-history prior dominate, with Bhakra storage at #3. We <b>ablation-tested</b> that: delete every dam feature and the 2025 flags don't move (<code>data/forecaster_ablation.csv</code>).</div>
-
-        
       </div>
       <div>
         <figure class="panel" style="margin-top:22px">
@@ -430,7 +411,7 @@ footer .cr{max-width:60ch}
   <section id="districts">
     <div class="sec-head"><span class="no">04</span><h2 data-i="s2">The Districts</h2><div class="rule"></div></div>
     <div class="map-shell">
-      <div style="display:flex;flex-direction:column">
+      <div class="map-col">
         <div class="layer-row" id="layer-row">
           <button class="chip" data-layer="now"><span class="now-dot"></span><span data-i="c1">Now · observed</span></button>
           <button class="chip" data-layer="nowrisk"><span class="now-dot" style="background:var(--risk);box-shadow:0 0 6px var(--risk)"></span><span data-i="c2">Now · model risk</span></button>
@@ -457,7 +438,7 @@ footer .cr{max-width:60ch}
         <div class="hint">20 districts (Census-2011 vintage: Fazilka, Pathankot &amp; Malerkotla fold into their parent districts, so all 23 modern districts are covered). Every number here is reproducible: <code>data/district_flood_stats_2025.csv</code>, <code>data/flood_frequency_districts_late_season.csv</code>, <code>data/forecaster_2025_hindcast.csv</code>.</div>
       </aside>
     </div>
-    <div class="cols" style="margin-top:34px">
+    <div class="cols mt34">
       <figure class="panel">
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/tehsil_repeat_victims.png" alt="Tehsil-level repeat flood victims, 2015–2025" loading="lazy">
         <figcaption><span class="tag">Below district level</span><b>The repeat victims, by name</b>
@@ -486,7 +467,7 @@ footer .cr{max-width:60ch}
         When the Revenue Department published its Special Girdawari table (13 Sep 2025), our satellite ranking matched it at Spearman <b>ρ = 0.72</b> across all 20 districts (0.56 over the 16 named), 5 of the top-6 identical. Divergences concentrate in the Ghaggar basin, outside our SAR windows, and are documented rather than hidden.</figcaption>
       </figure>
     </div>
-    <div class="cols" style="margin-top:34px">
+    <div class="cols mt34">
       <div>
         <h3>A different sensor says yes</h3>
         <p>237 photo-interpreted Sentinel-2 optical truth points (a different satellite with different physics, so no SAR-chain circularity) confirm <b style="color:var(--water)">81.7%</b> of RF flood pixels as standing water two weeks post-peak. The pre-declared gate was 60%. Every pre-declared precision and recall ordering across Tier-A, RF and GFM held.</p>
@@ -512,17 +493,17 @@ footer .cr{max-width:60ch}
           <li><b>Forecaster</b>: XGBoost district risk model trained on the pipeline's own decade of SAR-derived labels, SHAP-explained, ablation-stress-tested</li>
           <li><b>Live monitor</b>: every new satellite pass → district damage → trilingual alerts + live model risk (nowcast), automatically</li>
         </ul>
-        <p style="margin-top:14px">Built entirely on open, login-free data: Copernicus Sentinel-1, Copernicus GFM, IMD rainfall, CWC reservoir records, ISRO NDEM validation. <b>Anyone can reproduce every number.</b></p>
+        <p class="mt14">Built entirely on open, login-free data: Copernicus Sentinel-1, Copernicus GFM, IMD rainfall, CWC reservoir records, ISRO NDEM validation. <b>Anyone can reproduce every number.</b></p>
       </div>
       <div>
         <h3>Engineering honesty</h3>
         <p>Every satellite step is gated by a pre-declared checkpoint: the expected number is written down <i>before</i> the run, then the actual, then PASS or FAIL. The log ships in the repo, failures included.</p>
         <div class="honesty">Training labels are bootstrapped from method agreement and labeled as such. Both spatial folds are reported. The June "floods" that turned out to be rice transplanting are documented, calibrated and published. And we ran an ablation on ourselves: delete the dam features and the 2025 flags don't move, while a persistence baseline nearly matches pooled precision. We published that too.</div>
-        <p style="margin-top:14px">408 automated tests, written before the code they test. MIT-licensed code, CC-BY data products.
+        <p class="mt14">408 automated tests, written before the code they test. MIT-licensed code, CC-BY data products.
         Method paper, data-source registry and verification log live in the <a href="https://github.com/bakathefish/Flood/tree/master/docs">repository docs</a>.</p>
       </div>
     </div>
-    <div class="cols" style="margin-top:34px">
+    <div class="cols mt34">
       <figure class="panel">
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/cwc_station_gap.png" alt="CWC flood-forecast stations by state; Punjab has zero" loading="lazy">
         <figcaption><span class="tag">The gap, quantified</span><b>Punjab is not on the map of India's flood-forecast network</b>
@@ -534,7 +515,7 @@ footer .cr{max-width:60ch}
         A placid 2016–21 baseline, then 1.985 lakh ha of girdawari crop damage and 55 lives in 2025, the outlier the recurrence atlas said to prepare for. Sparse milestones, distinct metrics, no invented years.</figcaption>
       </figure>
     </div>
-    <div class="cols" style="margin-top:34px">
+    <div class="cols mt34">
       <figure class="panel">
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/rain_trend.png" alt="65-year monsoon rainfall trend analysis, Punjab and upstream boxes" loading="lazy">
         <figcaption><span class="tag">Is it getting worse?</span><b>65 years of monsoon loading, tested honestly</b>
@@ -550,7 +531,7 @@ footer .cr{max-width:60ch}
           <li><a href="https://github.com/bakathefish/Flood/blob/master/docs/DATA-SOURCES.md"><b>Data-source registry</b></a>: every dataset with URL, license and access date</li>
           <li><a href="https://github.com/bakathefish/Flood/blob/master/docs/VERIFICATION-LOG.md"><b>Verification log</b></a>: pre-declared bands, actuals, PASS/FAIL, failures included</li>
         </ul>
-        <p style="margin-top:14px">Roadmap: multi-state scale-out (the pipeline is a bounding box + district file away from any state), village-circle girdawari integration, Bhashini voice alerts, and an EOS-04 (ISRO radar) cross-validation with its protocol and acceptance bands already pre-declared in the repo.</p>
+        <p class="mt14">Roadmap: multi-state scale-out (the pipeline is a bounding box + district file away from any state), village-circle girdawari integration, Bhashini voice alerts, and an EOS-04 (ISRO radar) cross-validation with its protocol and acceptance bands already pre-declared in the repo.</p>
       </div>
     </div>
   </section>
