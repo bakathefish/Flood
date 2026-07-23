@@ -19,7 +19,10 @@ data/rasters/
 # (the GitHub Action has no baseline fetch); override the *.tif ignore for it only
 !monitor/reference_vv_150m.tif
 .playwright-mcp/
+# root-level debug screenshots (playwright and manual captures)
 /*.png
+/*.jpg
+/*.jpeg
 data/eos04/*.tif
 data/eos04/*.zip
 private/
