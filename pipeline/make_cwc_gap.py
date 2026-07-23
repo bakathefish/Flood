@@ -110,8 +110,9 @@ def build_figure(states_ranked, tot):
         xy=(0, punjab_y), xytext=(6.2, punjab_y + 1.15),
         fontsize=9.6, color=PUNJAB, va="center", ha="left", weight="bold",
         path_effects=_HALO,
-        arrowprops=dict(arrowstyle="-|>", color=PUNJAB, lw=1.6,
-                        connectionstyle="arc3,rad=0.18", shrinkA=2, shrinkB=6),
+        arrowprops=dict(arrowstyle="-|>", color=PUNJAB, lw=1.3, mutation_scale=12,
+                        alpha=0.9, connectionstyle="arc3,rad=0.16",
+                        shrinkA=4, shrinkB=8),
         zorder=7,
     )
 

@@ -218,7 +218,8 @@ def _style(ax):
         ax.spines[side].set_visible(False)
     for side in ("left", "bottom"):
         ax.spines[side].set_color(LINE2)
-    ax.tick_params(colors=PAPER_FAINT, labelsize=8, labelfontfamily=figstyle.FONT_MONO)
+    ax.tick_params(colors=PAPER_FAINT, labelsize=8, length=0,  # muted, no marks
+                   labelfontfamily=figstyle.FONT_MONO)
     ax.margins(x=0)
 
 
@@ -261,7 +262,8 @@ def _panel(ax, dam, river, daily, supp, curve, table):
         s_pct = trow["storage_2025_bcm"] / cap * 100.0
         m_pct = trow["median_curve_bcm"] / cap * 100.0
         ax.annotate("", xy=(HEADLINE, s_pct), xytext=(HEADLINE, m_pct),
-                    arrowprops=dict(arrowstyle="<->", color=PAPER, lw=1.4), zorder=8)
+                    arrowprops=dict(arrowstyle="<->", color=PAPER, lw=1.2,
+                                    mutation_scale=10, alpha=0.9), zorder=8)
         sign = "+" if trow["deficit_bcm"] >= 0 else "−"
         ax.annotate(
             f"25 Aug deficit\n{sign}{abs(trow['deficit_bcm']):.2f} BCM "
@@ -269,8 +271,9 @@ def _panel(ax, dam, river, daily, supp, curve, table):
             xy=(HEADLINE, (s_pct + m_pct) / 2),
             xytext=(pd.Timestamp("2025-07-16"), min(96, max(s_pct, m_pct) + 6)),
             fontsize=7.6, color=PAPER, va="center", ha="left", path_effects=_HALO,
-            arrowprops=dict(arrowstyle="-|>", color=PAPER_DIM, lw=1.0,
-                            connectionstyle="arc3,rad=-0.2", shrinkB=6), zorder=8,
+            arrowprops=dict(arrowstyle="-|>", color=PAPER, lw=1.2, mutation_scale=12,
+                            alpha=0.9, connectionstyle="arc3,rad=-0.18",
+                            shrinkA=5, shrinkB=8), zorder=8,
         )
 
     ax.set_ylim(0, 108)

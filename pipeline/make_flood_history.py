@@ -103,7 +103,7 @@ def _style(ax):
         ax.spines[side].set_visible(False)
     for side in ("left", "bottom"):
         ax.spines[side].set_color(LINE2)
-    ax.tick_params(colors=PAPER_FAINT, labelsize=8)
+    ax.tick_params(colors=PAPER_FAINT, labelsize=8, length=0)  # muted, no marks
     ax.tick_params(labelfontfamily=figstyle.FONT_MONO)  # numeric ticks in mono
 
 
@@ -151,15 +151,17 @@ def _area_panel(ax, df):
         f"2025 SAR single-pass\n{sar:,.0f} ha mapped extent",
         xy=(2025, sar), xytext=(2022.05, sar * 0.30),
         fontsize=7.8, color=FLOODED, va="center", ha="left", path_effects=_HALO,
-        arrowprops=dict(arrowstyle="-|>", color=FLOODED, lw=1.0,
-                        connectionstyle="arc3,rad=0.15", shrinkB=7), zorder=8,
+        arrowprops=dict(arrowstyle="-|>", color=FLOODED, lw=1.2, mutation_scale=12,
+                        alpha=0.9, connectionstyle="arc3,rad=0.14",
+                        shrinkA=5, shrinkB=8), zorder=8,
     )
     ax.annotate(
         f"2025 girdawari cumulative\n1.985 lakh ha ({gird:,.0f} ha)",
         xy=(2025, gird), xytext=(2021.7, gird * 3.4),
         fontsize=7.8, color=CROP, va="center", ha="left", path_effects=_HALO,
-        arrowprops=dict(arrowstyle="-|>", color=CROP, lw=1.0,
-                        connectionstyle="arc3,rad=-0.15", shrinkB=7), zorder=8,
+        arrowprops=dict(arrowstyle="-|>", color=CROP, lw=1.2, mutation_scale=12,
+                        alpha=0.9, connectionstyle="arc3,rad=-0.14",
+                        shrinkA=5, shrinkB=8), zorder=8,
     )
 
     # y ticks in human area units
@@ -210,8 +212,9 @@ def _lives_panel(ax, df):
         "single-digit to low-double-digit\nbaseline, 2018–21",
         xy=(2019.5, 20), xytext=(2016.0, 46),
         fontsize=7.4, color=PAPER_DIM, va="center", ha="left", path_effects=_HALO,
-        arrowprops=dict(arrowstyle="-", color=PAPER_FAINT, lw=0.8,
-                        connectionstyle="arc3,rad=0.2"), zorder=6,
+        arrowprops=dict(arrowstyle="->", color=PAPER_DIM, lw=1.1, mutation_scale=11,
+                        alpha=0.9, connectionstyle="arc3,rad=0.16",
+                        shrinkA=4, shrinkB=6), zorder=6,
     )
     ax.set_ylabel("lives lost  (count)", fontsize=8.5, color=PAPER_DIM)
     ax.set_xticks(range(2016, 2026))

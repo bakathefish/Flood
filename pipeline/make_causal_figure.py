@@ -121,7 +121,8 @@ def _style_axes(ax):
     ax.grid(axis="y", color=GRID, lw=0.8, zorder=0)
     ax.set_axisbelow(True)
     ax.margins(x=0)
-    ax.tick_params(labelfontfamily=figstyle.FONT_MONO)  # numeric ticks in mono
+    ax.tick_params(labelfontfamily=figstyle.FONT_MONO,  # numeric ticks in mono
+                   colors=INK2, length=0)               # muted labels, no marks
 
 
 def panel_rain(ax, rain):
@@ -159,10 +160,13 @@ def panel_rain(ax, rain):
         path_effects=_HALO,
         arrowprops=dict(
             arrowstyle="-|>",
-            color=INK2,
-            lw=1.0,
-            connectionstyle="arc3,rad=-0.28",
-            shrinkB=4,
+            color=INK,
+            lw=1.2,
+            mutation_scale=12,
+            alpha=0.9,
+            connectionstyle="arc3,rad=-0.18",
+            shrinkA=5,
+            shrinkB=7,
         ),
     )
 
@@ -288,10 +292,13 @@ def panel_reservoirs(ax, daily, supp):
         path_effects=_HALO,
         arrowprops=dict(
             arrowstyle="-|>",
-            color=INK2,
-            lw=1.0,
-            connectionstyle="arc3,rad=-0.15",
-            shrinkB=4,
+            color=INK,
+            lw=1.2,
+            mutation_scale=12,
+            alpha=0.9,
+            connectionstyle="arc3,rad=-0.14",
+            shrinkA=5,
+            shrinkB=7,
         ),
     )
     # Releases are outflow events (cusecs), not points on the % axis -> a clean
@@ -318,11 +325,13 @@ def panel_reservoirs(ax, daily, supp):
         arrowprops=dict(
             arrowstyle="-|>",
             color=DAM_COLOR["Pong"],
-            lw=1.4,
+            lw=1.3,
             ls=(0, (4, 2)),
-            connectionstyle="arc3,rad=-0.25",
+            mutation_scale=12,
+            alpha=0.9,
+            connectionstyle="arc3,rad=-0.18",
             shrinkA=6,
-            shrinkB=1,
+            shrinkB=3,
         ),
         zorder=5,
     )

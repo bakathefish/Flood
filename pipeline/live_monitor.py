@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import os
+import textwrap
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -115,65 +116,167 @@ def process_pass(items, ref_db, transform, width, height, labels, names, px_area
 # --------------------------------------------------------------------------- #
 # latest-pass PNG (dark house style, matches the atlas figures)
 # --------------------------------------------------------------------------- #
-# ink ground, cyan Tier-A inundation, hairline district boundaries. Kept in this
-# module (not the shared local_tier_a._save_overlay_png, which still styles the
-# plain check overlays) so the public monitor still reads as one design system.
-_INK = "#0a1014"
+# ink ground, cyan Tier-A new water, hairline districts, and a very dark wash
+# over land the pass did not image. Kept in this module (not the shared
+# local_tier_a._save_overlay_png, which still styles the plain check overlays)
+# so the public monitor still reads as one design system.
+_INK = "#0a1014"          # figure + axes ground
+_WASH = "#0e161d"         # land not imaged this pass (a hair above the ink)
 _PAPER = "#e9e4d6"
 _PAPER_DIM = "#9aa5a4"
-_HAIR = "#5c6b82"
-_CYAN = (0.20, 0.86, 1.0)  # Tier-A inundation (echoes the quicklook cyan)
+_PAPER_FAINT = "#5c6a70"
+_HAIR = "#5c6b82"         # district hairlines
+_CHIP_BG = "#12202b"      # legend / no-pass chip fill
+_CYAN = (0.20, 0.86, 1.0)  # Tier-A new surface water (echoes the quicklook cyan)
 
 
-def render_latest_png(vv_flood_db, mask, labels, path, title, caption=""):
-    """Render ``monitor/latest.png`` in the atlas dark house style.
+def _rgb(hex_color):
+    """``'#rrggbb'`` -> ``(r, g, b)`` floats in [0, 1]."""
+    h = hex_color.lstrip("#")
+    return tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
 
-    Ink ground with the pass's SAR VV backscatter dimmed underneath, cyan where
-    the Tier-A rule flags inundation, hairline district boundaries burnt from the
-    ``labels`` raster, a Bricolage Grotesque title and an IBM Plex Mono caption.
-    ``title`` must be free of em dashes (enforced via :func:`figstyle.clean`).
+
+def _rgba8(rgb, alpha):
+    """``(r,g,b)`` floats + alpha float -> uint8 RGBA (memory-light overlays)."""
+    return (*(int(round(c * 255)) for c in rgb), int(round(alpha * 255)))
+
+
+def render_latest_png(vv_flood_db, mask, labels, path, *, title, subtitle,
+                      footer, status=()):
+    """Render ``monitor/latest.png`` as a framed dark-house monitor card.
+
+    The canvas is a ~1200x900 (4:3) ink card with a portrait Punjab map on the
+    left and an information column on the right, so the frame stays filled even
+    when a single Sentinel-1 pass images only part of the state. The map shows
+    the pass's VV backscatter dimmed under the cyan Tier-A inundation, district
+    hairlines burnt from ``labels``, and every pixel the pass did NOT image
+    washed in a very dark ink (``_WASH``) rather than left as void; when more
+    than 15% of Punjab is unimaged a small 'no pass this cycle over this area'
+    chip is anchored in the gap. ``title`` (Bricolage bold), ``subtitle`` (Plex
+    Sans), the right-column ``status`` lines and ``footer`` (Plex Mono) are all
+    guarded against em dashes via :func:`figstyle.clean`.
     """
     import matplotlib
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Rectangle
 
     figstyle.apply()
-    fig, ax = plt.subplots(figsize=(8.4, 8.8), dpi=130)
+
+    vv = np.asarray(vv_flood_db, dtype="float64")
+    m = np.asarray(mask, dtype=bool)
+    lab = np.asarray(labels)
+    inside = lab > 0
+    valid = np.isfinite(vv)
+    uncovered = inside & ~valid
+    uncov_frac = float(uncovered.sum()) / float(inside.sum()) if inside.any() else 0.0
+
+    # crop window: district bounding box + a small margin, so Punjab fills the map
+    ys, xs = np.where(inside if inside.any() else valid)
+    r0, r1, c0, c1 = int(ys.min()), int(ys.max()), int(xs.min()), int(xs.max())
+    mr = max(1, round(0.03 * (r1 - r0)))
+    mc = max(1, round(0.03 * (c1 - c0)))
+    r0, r1 = max(0, r0 - mr), min(lab.shape[0] - 1, r1 + mr)
+    c0, c1 = max(0, c0 - mc), min(lab.shape[1] - 1, c1 + mc)
+
+    fig = plt.figure(figsize=(9.6, 7.2), dpi=125)
     fig.patch.set_facecolor(_INK)
+
+    # title block (top, full width, left aligned)
+    fig.text(0.045, 0.945, figstyle.clean(title), color=_PAPER, fontsize=20,
+             fontfamily=figstyle.FONT_DISPLAY, fontweight="bold", va="top")
+    fig.text(0.045, 0.898, figstyle.clean(subtitle), color=_PAPER_DIM,
+             fontsize=11.5, fontfamily=figstyle.FONT_BODY, va="top")
+
+    # map axes (left, portrait, honest equal aspect)
+    ax = fig.add_axes([0.045, 0.070, 0.545, 0.780])
     ax.set_facecolor(_INK)
 
-    # SAR VV backdrop, dimmed so the ink ground dominates (NaN reads as ink)
-    ax.imshow(vv_flood_db, cmap="Greys_r", vmin=-25, vmax=0, alpha=0.55,
-              interpolation="nearest")
+    # land the pass did not image: a very dark wash over the ink (under all else)
+    wash = np.zeros((*lab.shape, 4), np.uint8)
+    wash[~valid] = _rgba8(_rgb(_WASH), 1.0)
+    ax.imshow(wash, interpolation="nearest", zorder=1)
 
-    # cyan Tier-A inundation
-    flood = np.zeros((*mask.shape, 4))
-    flood[np.asarray(mask, dtype=bool)] = (*_CYAN, 0.92)
-    ax.imshow(flood, interpolation="nearest")
+    # pass VV backscatter where imaged, dimmed so the ink ground dominates
+    ax.imshow(np.where(valid, vv, np.nan), cmap="Greys_r", vmin=-25, vmax=0,
+              alpha=0.55, interpolation="nearest", zorder=2)
 
-    # hairline district boundaries from the label raster (edge = label change)
-    if labels is not None:
-        lab = np.asarray(labels)
-        edges = np.zeros(lab.shape, bool)
-        edges[:, 1:] |= lab[:, 1:] != lab[:, :-1]
-        edges[1:, :] |= lab[1:, :] != lab[:-1, :]
-        eov = np.zeros((*lab.shape, 4))
-        r, g, b = (int(_HAIR[i:i + 2], 16) / 255 for i in (1, 3, 5))
-        eov[edges] = (r, g, b, 0.55)
-        ax.imshow(eov, interpolation="nearest")
+    # cyan Tier-A new surface water
+    flood = np.zeros((*m.shape, 4), np.uint8)
+    flood[m] = _rgba8(_CYAN, 0.94)
+    ax.imshow(flood, interpolation="nearest", zorder=4)
 
-    ax.set_title(figstyle.clean(title), color=_PAPER, fontsize=13, loc="left",
-                 fontfamily=figstyle.FONT_DISPLAY, pad=10)
-    if caption:
-        ax.annotate(figstyle.clean(caption), xy=(0.0, -0.018),
-                    xycoords="axes fraction", ha="left", va="top", fontsize=7.4,
-                    color=_PAPER_DIM, fontfamily=figstyle.FONT_MONO)
+    # district hairlines (edge = label change), over covered + uncovered land
+    edges = np.zeros(lab.shape, bool)
+    edges[:, 1:] |= lab[:, 1:] != lab[:, :-1]
+    edges[1:, :] |= lab[1:, :] != lab[:-1, :]
+    hair = np.zeros((*lab.shape, 4), np.uint8)
+    hair[edges] = _rgba8(_rgb(_HAIR), 0.55)
+    ax.imshow(hair, interpolation="nearest", zorder=5)
+
+    ax.set_xlim(c0, c1)
+    ax.set_ylim(r1, r0)  # image orientation (origin upper)
+    ax.set_aspect("equal")
     ax.axis("off")
 
+    # 'no pass this cycle over this area' chip, only when the gap is material
+    if uncov_frac > 0.15:
+        yy, xx = np.where(uncovered)
+        ax.text(float(xx.mean()), float(yy.mean()),
+                figstyle.clean("no pass this cycle\nover this area"),
+                color=_PAPER_DIM, fontsize=8.6, fontfamily=figstyle.FONT_MONO,
+                ha="center", va="center", linespacing=1.4, zorder=6,
+                bbox=dict(boxstyle="round,pad=0.5", facecolor=_CHIP_BG,
+                          edgecolor=_HAIR, linewidth=0.8, alpha=0.92))
+
+    # information column (right): legend chips + status readout
+    info = fig.add_axes([0.625, 0.070, 0.345, 0.780])
+    info.set_xlim(0, 1)
+    info.set_ylim(0, 1)
+    info.axis("off")
+
+    y = 0.965
+    info.text(0.0, y, "THIS PASS", color=_PAPER_FAINT, fontsize=9.0,
+              fontfamily=figstyle.FONT_MONO, va="top")
+    y -= 0.056
+
+    def _chip(y, color, label, line=False):
+        if line:
+            info.add_line(Line2D([0.0, 0.055], [y, y], color=color, lw=2.2,
+                                 solid_capstyle="round"))
+        else:
+            info.add_patch(Rectangle((0.0, y - 0.013), 0.055, 0.026,
+                                     facecolor=color, edgecolor=_rgb(_HAIR),
+                                     linewidth=0.8))
+        info.text(0.085, y, figstyle.clean(label), color=_PAPER_DIM,
+                  fontsize=10.5, fontfamily=figstyle.FONT_BODY, va="center")
+
+    _chip(y, _CYAN, "new surface water")
+    y -= 0.052
+    _chip(y, _rgb(_HAIR), "district boundaries", line=True)
+    y -= 0.052
+    if uncov_frac > 0.001:
+        _chip(y, _rgb(_WASH), "not imaged this pass")
+        y -= 0.052
+
+    y -= 0.030
+    for i, line in enumerate(status):
+        # wrap to the info column; an unwrapped long line runs off the canvas
+        for piece in textwrap.wrap(figstyle.clean(line), width=28) or [""]:
+            info.text(0.0, y, piece,
+                      color=_PAPER if i == 0 else _PAPER_DIM,
+                      fontsize=10.8 if i == 0 else 10.0,
+                      fontfamily=figstyle.FONT_MONO, va="top")
+            y -= 0.050
+
+    # footer attribution (bottom, full width, Plex Mono)
+    fig.text(0.045, 0.030, figstyle.clean(footer), color=_PAPER_FAINT,
+             fontsize=7.3, fontfamily=figstyle.FONT_MONO, va="bottom")
+
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path, dpi=130, facecolor=_INK, bbox_inches="tight",
-                pil_kwargs={"optimize": True})
+    fig.savefig(path, dpi=125, facecolor=_INK, pil_kwargs={"optimize": True})
     plt.close(fig)
 
 
@@ -278,14 +381,30 @@ def main():
         json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8"
     )
 
+    subtitle = (
+        f"pass {latest_date}  ·  {latest_result['total_km2']:.0f} km² new surface "
+        f"water  ·  {latest_result['coverage']:.0%} of Punjab imaged"
+    )
+    flagged = latest_result["flagged"]
+    if flagged:
+        status = [f"{len(flagged)} district(s) at or above {ALERT_KM2:.0f} km²"]
+        status += [
+            f"{r['district']}  {r['flooded_km2']:.0f} km²" for r in flagged[:6]
+        ]
+    else:
+        status = [f"no district at or above the {ALERT_KM2:.0f} km² alert floor"]
+    if backlog:
+        status.append(f"backlog: {len(skipped_dates)} earlier date(s) skipped")
+
     render_latest_png(
         latest_result["vv_flood"],
         latest_result["mask"],
         labels,
         LATEST_PNG,
-        f"Punjab flood monitor: pass {latest_date} "
-        f"({latest_result['total_km2']:.0f} km², coverage {latest_result['coverage']:.0%})",
-        caption=f"{SOURCE}. Reference: {REFERENCE_DESC}.",
+        title="Punjab flood monitor",
+        subtitle=subtitle,
+        footer=f"{SOURCE}. Reference: {REFERENCE_DESC}.",
+        status=status,
     )
 
     save_state(STATE, fresh[-1])

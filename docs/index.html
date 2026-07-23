@@ -107,7 +107,8 @@ section{padding:8px 0 64px}
 
 .gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:22px}
 .panel{border:1px solid var(--line2);background:var(--ink2);position:relative}
-.panel img{width:100%;display:block;filter:saturate(.96)}
+.panel img{width:100%;max-width:100%;display:block;filter:saturate(.96)}
+.cols>*{min-width:0}
 .panel figcaption{padding:14px 16px;font-size:12.5px;color:var(--paper-dim);border-top:1px solid var(--line)}
 .panel figcaption b{color:var(--paper);display:block;margin-bottom:3px;font-size:13px}
 .panel .tag{position:absolute;top:10px;left:10px;background:rgba(10,16,20,.85);border:1px solid var(--line2);
@@ -119,7 +120,7 @@ section{padding:8px 0 64px}
 
 /* ------- timelapse ------- */
 .tl{border:1px solid var(--line2);background:var(--ink2);margin-bottom:26px;position:relative}
-.tl video{width:100%;display:block}
+.tl video,.tl img{width:100%;max-width:100%;display:block}
 .tl .tag{position:absolute;top:10px;left:10px;background:rgba(10,16,20,.85);border:1px solid var(--line2);
   color:var(--amber);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;z-index:5}
 
@@ -150,6 +151,10 @@ section{padding:8px 0 64px}
 .chip .now-dot{width:6px;height:6px;border-radius:50%;background:var(--water);box-shadow:0 0 6px var(--water);animation:pulse 2s infinite}
 .chip-divider{width:1px;background:var(--line2);margin:2px 4px}
 .nowcast-badge{font-size:11px;color:var(--paper-faint);letter-spacing:.05em;padding:7px 4px}
+.rw-scrub{display:none;align-items:center;gap:9px;padding:0 4px}
+.rw-scrub.on{display:flex}
+.rw-scrub input{accent-color:var(--risk);width:150px}
+.rw-scrub b{color:var(--risk);font-family:var(--mono);font-size:11px;font-weight:500;white-space:nowrap}
 .legend{position:absolute;left:14px;bottom:14px;z-index:500;background:rgba(10,16,20,.88);border:1px solid var(--line2);padding:10px 12px;font-size:11px;color:var(--paper-dim)}
 .legend .steps{display:flex;margin:6px 0 3px}
 .legend .steps i{width:30px;height:9px;display:block}
@@ -168,6 +173,7 @@ section{padding:8px 0 64px}
 
 /* ------- forecast section ------- */
 .fc-grid{display:grid;grid-template-columns:7fr 5fr;gap:22px}
+.fc-grid>div{min-width:0}
 @media(max-width:900px){.fc-grid{grid-template-columns:1fr}}
 .scoreboard{border:1px solid var(--line2);background:var(--ink2)}
 .scoreboard .hd{padding:14px 16px;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim)}
@@ -323,6 +329,20 @@ footer .cr{max-width:60ch}
         </div>
       </div>
     </div>
+    <div class="map-shell" style="margin-top:26px;grid-template-columns:1fr">
+      <div style="display:flex;flex-direction:column">
+        <div class="layer-row">
+          <button class="chip" id="ex-prev" aria-label="previous day">◂ day</button>
+          <input type="date" id="ex-date" class="chip" style="color:var(--paper)">
+          <button class="chip" id="ex-next" aria-label="next day">day ▸</button>
+          <span class="chip-divider"></span>
+          <button class="chip active" id="ex-ref-toggle"><span class="sw" style="background:#1a5f9e"></span><span data-i="ex1">reference water</span></button>
+          <span class="nowcast-badge" data-i="ex2">Copernicus GFM observed water · keyless WMS · pan anywhere on Earth</span>
+        </div>
+        <div class="map-left" style="min-height:480px"><div id="exmap" style="position:absolute;inset:0"></div></div>
+      </div>
+    </div>
+    <div class="swipe-cap" data-i="excap">Explore the satellite record yourself: pick any date, then pan and zoom anywhere in the world. This is the same keyless Copernicus GFM feed the pipeline consumes, straight from the source, with nothing of ours in between. The dashed boxes are that day's Sentinel-1 passes with their acquisition times; water beyond the permanent blue shows in warm pink. It opens on Punjab at the latest processed day. Try 30 Aug 2025 to see the flood at full width.</div>
   </section>
 
   <section id="forecast">
@@ -337,18 +357,7 @@ footer .cr{max-width:60ch}
         </div>
         <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window, before the Aug 26–27 dam releases, four of the five eventual flood districts were already in the model's statewide top-5. SHAP says antecedent flooding and the flood-history prior dominate, with Bhakra storage at #3. We <b>ablation-tested</b> that: delete every dam feature and the 2025 flags don't move (<code>data/forecaster_ablation.csv</code>).</div>
 
-        <div class="replay" id="replay">
-          <div class="rp-head"><span>Replay 2025: risk before water</span><span class="rp-window" id="rp-window"></span></div>
-          <div class="rp-body">
-            <div class="rp-timeline">
-              <input type="range" id="rp-slider" min="0" max="6" value="0" aria-label="2025 window scrubber">
-              <div class="rp-marks" id="rp-marks"></div>
-            </div>
-            <div id="rp-rows"></div>
-          </div>
-          <div class="rp-legend"><span><i style="background:var(--risk)"></i>model risk P(event), predicted with 2015–2024 training only</span><span><i style="background:var(--water)"></i>observed flooded fraction (satellite)</span></div>
-          <div class="rp-caption" id="rp-caption"></div>
-        </div>
+        
       </div>
       <div>
         <figure class="panel" style="margin-top:22px">
@@ -429,7 +438,8 @@ footer .cr{max-width:60ch}
           <span class="chip-divider"></span>
           <button class="chip active" data-layer="flood"><span class="sw" style="background:#63e6d5"></span><span data-i="c3">2025 flood (ha)</span></button>
           <button class="chip" data-layer="freq"><span class="sw" style="background:#ffb454"></span><span data-i="c4">Decade frequency</span></button>
-          <button class="chip" data-layer="risk"><span class="sw" style="background:#f487e8"></span><span data-i="c5">Hindcast risk '25</span></button>
+          <button class="chip" data-layer="risk"><span class="sw" style="background:#f487e8"></span><span data-i="c5">Risk replay '25</span></button>
+          <span class="rw-scrub" id="rw-scrub"><input type="range" id="risk-window" min="0" max="6" value="0" aria-label="2025 window selector"><b id="risk-window-lbl"></b></span>
           <span class="nowcast-badge" id="nowcast-badge"></span><span class="tech-note" data-i="technote"></span>
         </div>
         <div class="map-left">
@@ -629,6 +639,37 @@ function stampAge(el, utc){
   } catch(_){}
 })();
 
+/* ---------- satellite explorer (GFM WMS, global, keyless) ---------- */
+(async () => {
+  const el = document.getElementById('exmap'); if (!el || !window.L) return;
+  const m = L.map('exmap', {zoomControl:true, attributionControl:true, scrollWheelZoom:false}).setView([31.0, 75.5], 7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    {attribution:'© OpenStreetMap contributors © CARTO · flood layer © Copernicus GFM', subdomains:'abcd', maxZoom:13}).addTo(m);
+  const OWS = 'https://ows.globalfloods.eu/glofas-ows/ows';
+  let lastDay = new Date(Date.now() - 2*864e5).toISOString().slice(0,10);
+  try { const c = await (await fetch(RAW + 'monitor/current_timelapse.json?t=' + Date.now())).json(); if (c && c.last_day) lastDay = c.last_day; } catch(_){}
+  const dateIn = document.getElementById('ex-date');
+  dateIn.value = lastDay; dateIn.max = new Date().toISOString().slice(0,10); dateIn.min = '2015-01-01';
+  const wmsOpts = layers => ({layers, format:'image/png', transparent:true, version:'1.3.0'});
+  const ref = L.tileLayer.wms(OWS, {...wmsOpts('gfm_reference_water_mask_group_layer'), time: lastDay + 'T00:00Z', opacity:.55}).addTo(m);
+  let flood = null;
+  const setDay = d => {
+    if (!d) return;
+    if (flood) m.removeLayer(flood);
+    flood = L.tileLayer.wms(OWS, {...wmsOpts('gfm_observed_flood_extent_group_layer'), time: d + 'T00:00Z', opacity:.85}).addTo(m);
+  };
+  setDay(lastDay);
+  dateIn.addEventListener('change', () => setDay(dateIn.value));
+  const shift = days => { const d = new Date(dateIn.value); d.setDate(d.getDate() + days); dateIn.value = d.toISOString().slice(0,10); setDay(dateIn.value); };
+  document.getElementById('ex-prev').addEventListener('click', () => shift(-1));
+  document.getElementById('ex-next').addEventListener('click', () => shift(1));
+  const refBtn = document.getElementById('ex-ref-toggle');
+  refBtn.addEventListener('click', () => {
+    const on = !m.hasLayer(ref); refBtn.classList.toggle('active', on);
+    if (on) ref.addTo(m); else m.removeLayer(ref);
+  });
+})();
+
 /* ---------- swipe ---------- */
 (() => {
   const s = document.getElementById('swipe');
@@ -714,7 +755,7 @@ function applyLang(l){
 document.getElementById('lang-sw').addEventListener('click', e => {
   const b = e.target.closest('button'); if (b) applyLang(b.dataset.lang);
 });
-try { const saved = localStorage.getItem('sailaab-lang'); if (saved && saved !== 'en') applyLang(saved); } catch(_){}
+// language always starts in English; the toggle still works per visit
 
 /* ---------- CSV helper ---------- */
 const csv = async url => {
@@ -765,12 +806,13 @@ const csv = async url => {
   else if (nc) badge.textContent = `live window ${nc.window_start} → ${nc.window_end}`;
   else badge.textContent = 'nowcast feed pending first CI run';
 
+  let riskW = -1;   // -1 = season peak; otherwise an index into RISK_WINDOWS
   const val = (name, layer) =>
     layer === 'flood' ? +(S[name]?.rf_flooded_ha || 0)
     : layer === 'freq' ? +(F[name]?.seasons_with_fraction_gt1pct || 0)
     : layer === 'now' ? +((NC[name]?.observed_fraction_window ?? N[name]?.flooded_fraction) || 0)
     : layer === 'nowrisk' ? (NC[name]?.p_event ?? null)
-    : (R[name] || 0);
+    : (riskW < 0 ? (R[name] || 0) : (RISK_BYW[RISK_WINDOWS[riskW]]?.[name] ?? 0));
   const colorOf = (v, layer) => {
     if (v == null) return '#141c22';   // out-of-domain / no data: near-surface, dashed by stroke
     const {cols, stops} = RAMPS[layer];
@@ -778,53 +820,10 @@ const csv = async url => {
     return cols[i];
   };
 
-  // ------- replay scrubber -------
-  (() => {
-    const windows = [...new Set(hind.map(d => d.window_start))].sort();
-    if (!windows.length) return;
-    const byW = {};
-    hind.forEach(d => { (byW[d.window_start] = byW[d.window_start] || {})[d.district] =
-      { p: +d.p_event || 0, obs: +d.flooded_fraction || 0 }; });
-    const DISTS = ['Kapurthala','Firozpur','Tarn Taran','Gurdaspur','Amritsar','Jalandhar'];
-    const obsMax = Math.max(...hind.map(d => +d.flooded_fraction || 0)) || 1;
-    const slider = document.getElementById('rp-slider');
-    slider.max = windows.length - 1;
-    const marks = document.getElementById('rp-marks');
-    const relIdx = windows.findIndex(w => w >= '2025-08-24');
-    marks.innerHTML = windows.map((w, i) =>
-      `<span style="left:${(i/(windows.length-1))*100}%">${w.slice(5).replace('-','/')}</span>`).join('') +
-      (relIdx > 0 ? `<span class="ev" style="left:${((relIdx-0.5)/(windows.length-1))*100}%;top:0">▼ dam release</span>` : '');
-    const rows = document.getElementById('rp-rows');
-    rows.innerHTML = DISTS.map(d => `
-      <div class="rp-row"><span class="nm">${d}</span>
-        <span class="rp-bars">
-          <span class="rp-bar risk"><i id="rp-r-${d.replace(/ /g,'_')}"></i></span>
-          <span class="rp-bar obs"><i id="rp-o-${d.replace(/ /g,'_')}"></i></span>
-        </span>
-        <span class="rp-val" id="rp-v-${d.replace(/ /g,'_')}"></span>
-      </div>`).join('');
-    const render = i => {
-      const w = windows[i], m = byW[w] || {};
-      const end = new Date(new Date(w) - -9*864e5).toISOString().slice(0,10);
-      document.getElementById('rp-window').textContent = `${w} → ${end}`;
-      let flagged = 0, wet = 0;
-      DISTS.forEach(d => {
-        const v = m[d] || {p:0, obs:0}; const id = d.replace(/ /g,'_');
-        document.getElementById('rp-r-'+id).style.width = Math.round(v.p*100) + '%';
-        document.getElementById('rp-o-'+id).style.width = Math.round((v.obs/obsMax)*100) + '%';
-        document.getElementById('rp-v-'+id).textContent = 'P ' + v.p.toFixed(2);
-        if (v.p >= 0.3) flagged++; if (v.obs > 0.02) wet++;
-      });
-      const cap = document.getElementById('rp-caption');
-      if (w < '2025-08-24' && flagged && !wet)
-        cap.innerHTML = `<b>${flagged} district(s) already flagged</b>. The water has not arrived yet; the dam releases come Aug 26–27.`;
-      else if (wet)
-        cap.innerHTML = `The water is here: ${wet} district(s) above the event threshold. The model flagged them in advance.`;
-      else cap.innerHTML = 'Early season: risk building as ground saturates and reservoirs fill.';
-    };
-    slider.addEventListener('input', () => render(+slider.value));
-    render(0);
-  })();
+  // per-window hindcast: feeds the playable 2025 risk layer on the map
+  const RISK_WINDOWS = [...new Set(hind.map(d => d.window_start))].sort();
+  const RISK_BYW = {};
+  hind.forEach(d => { (RISK_BYW[d.window_start] = RISK_BYW[d.window_start] || {})[d.district] = +d.p_event || 0; });
 
   // scoreboard (top 6 by hindcast P)
   const sb = document.getElementById('sb-rows');
@@ -889,11 +888,29 @@ const csv = async url => {
   };
   drawLegend();
 
+  // window scrubber for the 2025 risk layer: drag through the season, watch risk move
+  const scrub = document.getElementById('rw-scrub'), rwIn = document.getElementById('risk-window'),
+        rwLbl = document.getElementById('risk-window-lbl');
+  const setRiskWindow = i => {
+    riskW = i;
+    rwLbl.textContent = i < 0 ? 'season peak'
+      : RISK_WINDOWS[i].slice(5).replace('-','/') + ' +10d' + (RISK_WINDOWS[i] === '2025-08-24' ? ' · dams release 26/8' : '');
+    geo.setStyle(styleOf);
+  };
+  if (RISK_WINDOWS.length) {
+    rwIn.max = RISK_WINDOWS.length - 1;
+    rwIn.value = Math.max(0, RISK_WINDOWS.indexOf('2025-08-14'));
+    rwIn.addEventListener('input', () => setRiskWindow(+rwIn.value));
+  }
+
   document.getElementById('layer-row').addEventListener('click', e => {
     const b = e.target.closest('.chip'); if (!b) return;
     layer = b.dataset.layer;
     document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === b));
-    geo.setStyle(styleOf); drawLegend();
+    const scrubOn = layer === 'risk' && RISK_WINDOWS.length;
+    scrub.classList.toggle('on', !!scrubOn);
+    if (scrubOn) setRiskWindow(+rwIn.value); else { riskW = -1; geo.setStyle(styleOf); }
+    drawLegend();
   });
 })();
 </script>
