@@ -111,8 +111,8 @@ section{padding:8px 0 64px}
 .cols>*{min-width:0}
 .panel figcaption{padding:14px 16px;font-size:12.5px;color:var(--paper-dim);border-top:1px solid var(--line)}
 .panel figcaption b{color:var(--paper);display:block;margin-bottom:3px;font-size:13px}
-.panel .tag{position:absolute;top:10px;left:10px;background:rgba(10,16,20,.85);border:1px solid var(--line2);
-  color:var(--amber);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;z-index:5}
+.panel .tag{display:inline-block;margin-bottom:8px;background:rgba(10,16,20,.85);border:1px solid var(--line2);
+  color:var(--amber);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px}
 .p-a{grid-column:1/8} .p-b{grid-column:8/13;transform:translateY(34px)}
 .p-c{grid-column:1/6;transform:translateY(-6px)} .p-d{grid-column:6/13}
 .p-e{grid-column:1/7} .p-f{grid-column:7/13;transform:translateY(22px)}
@@ -360,9 +360,8 @@ footer .cr{max-width:60ch}
       </div>
       <div>
         <figure class="panel" style="margin-top:22px">
-          <span class="tag">Explainability</span>
           <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/forecaster_shap.png" alt="SHAP feature attribution" loading="lazy">
-          <figcaption><b>Why the model says what it says</b> SHAP attributions: wet ground and flood history dominate, with Bhakra storage at #3. The ablation showed that ranking is attribution rather than load-bearing skill; the 2025 flags survive with every dam feature deleted.</figcaption>
+          <figcaption><span class="tag">Explainability</span><b>Why the model says what it says</b> SHAP attributions: wet ground and flood history dominate, with Bhakra storage at #3. The ablation showed that ranking is attribution rather than load-bearing skill; the 2025 flags survive with every dam feature deleted.</figcaption>
         </figure>
       </div>
     </div>
@@ -380,39 +379,33 @@ footer .cr{max-width:60ch}
     </div>
     <div class="gallery">
       <figure class="panel p-a">
-        <span class="tag">2025 · Random Forest</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/rf_flood_2025.png" alt="RF flood map of Punjab 2025" loading="lazy">
-        <figcaption><b>2025 flood extent, machine-learned from Sentinel-1</b>
+        <figcaption><span class="tag">2025 · Random Forest</span><b>2025 flood extent, machine-learned from Sentinel-1</b>
         Random Forest on SAR features (~52k ha in-district; the 105k ha headline is the wider Tier-A extent; both are published). Labels come from method agreement, and validation is spatial cross-validation across river basins. Firozpur 14,096 ha · Gurdaspur 8,099 · Kapurthala 6,597.</figcaption>
       </figure>
       <figure class="panel p-b">
-        <span class="tag">2015–2025 · First of its kind</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/frequency_2015_2025_late_season.png" alt="Decade flood frequency map" loading="lazy">
-        <figcaption><b>Decade flood-frequency atlas</b>
+        <figcaption><span class="tag">2015–2025 · First of its kind</span><b>Decade flood-frequency atlas</b>
         Punjab's first public flood-recurrence map: every monsoon 2015–2025. The Sutlej, Beas, Ravi and Ghaggar corridors light up; Kapurthala flooded in 5 of 11 seasons.</figcaption>
       </figure>
       <figure class="panel p-c">
-        <span class="tag">Causality</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/causal_2025.png" alt="Causal chart: rain, dams, releases" loading="lazy">
-        <figcaption><b>Why it flooded</b>
+        <figcaption><span class="tag">Causality</span><b>Why it flooded</b>
         10× rainfall spike over near-full reservoirs → forced releases (Ranjit Sagar 1.73 lakh cusecs, Aug 27) → inundation. Built from IMD grids and CWC/BBMB records, including the reporting gap.</figcaption>
       </figure>
       <figure class="panel p-d">
-        <span class="tag">Validation</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/rf_tierA_gfm_compare_2025.png" alt="Three-method comparison" loading="lazy">
-        <figcaption><b>Three methods, one flood</b>
+        <figcaption><span class="tag">Validation</span><b>Three methods, one flood</b>
         Physics-threshold change detection vs Random Forest vs Copernicus Global Flood Monitoring: agreement maps, confusion matrices, and every divergence explained in the method paper.</figcaption>
       </figure>
       <figure class="panel p-e">
-        <span class="tag">Counterfactual</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/headroom_2025.png" alt="Dam headroom deficit versus historical operating curves, 2025" loading="lazy">
-        <figcaption><b>What the dams could have held</b>
+        <figcaption><span class="tag">Counterfactual</span><b>What the dams could have held</b>
         2025 storage vs each dam's own median operating curve. Pong ran +1.01 BCM above it at surge-eve and Ranjit Sagar +0.45: pre-positioning headroom that existed on paper (~1.68 BCM, one to four days of peak release). Bhakra's margin was negligible, and the note says so plainly (<code>docs/notes/headroom.md</code>).</figcaption>
       </figure>
       <figure class="panel p-f">
-        <span class="tag">Duration</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/duration_2025.png" alt="Submergence duration atlas 2025" loading="lazy">
-        <figcaption><b>How long the water stayed</b>
+        <figcaption><span class="tag">Duration</span><b>How long the water stayed</b>
         Per-pixel submergence duration from daily satellite observations: 51,202 ha stayed under water for 7 days or more, which is total-paddy-loss territory. Weighting by duration refines the damage estimate from ₹523 crore at risk to ₹351 crore expected.</figcaption>
       </figure>
     </div>
@@ -459,16 +452,14 @@ footer .cr{max-width:60ch}
     </div>
     <div class="cols" style="margin-top:34px">
       <figure class="panel">
-        <span class="tag">Below district level</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/tehsil_repeat_victims.png" alt="Tehsil-level repeat flood victims, 2015–2025" loading="lazy">
-        <figcaption><b>The repeat victims, by name</b>
+        <figcaption><span class="tag">Below district level</span><b>The repeat victims, by name</b>
         All 91 tehsils scored across 11 monsoons. Khadur Sahib (Tarn Taran) flooded in 6 of 11 seasons, Sultanpur Lodhi (Kapurthala) in 5, Moonak and Patti in 4. These are the exact administrative units where girdawari verification and pre-positioning should start. Table: <code>data/tehsil_repeat_victims.csv</code>.</figcaption>
       </figure>
       <figure class="panel">
-        <span class="tag">Print-ready</span>
         <a href="https://github.com/bakathefish/Flood/tree/master/briefs" style="border-bottom:none">
           <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/briefs_preview.png" alt="Preview of the per-district flood brief PDFs" loading="lazy"></a>
-        <figcaption><b>20 district briefs, one page per DC office</b>
+        <figcaption><span class="tag">Print-ready</span><b>20 district briefs, one page per DC office</b>
         A designed A4 brief for every district: 2025 flooded hectares, cropland hit, ₹ value-at-risk (on the government's own DES yields), recurrence, hindcast probability, and its worst tehsils. <a href="https://github.com/bakathefish/Flood/tree/master/briefs">Download the PDFs</a>. They are made to be printed and handed over.</figcaption>
       </figure>
     </div>
@@ -478,15 +469,13 @@ footer .cr{max-width:60ch}
     <div class="sec-head"><span class="no">05</span><h2 data-i="s_ev">The Evidence</h2><div class="rule"></div></div>
     <div class="gallery">
       <figure class="panel p-a">
-        <span class="tag">ISRO cross-check</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/ndem_vs_sailaab.png" alt="ISRO NDEM flood map sheet beside the Sailaab open map, same flood" loading="lazy">
-        <figcaption><b>The same flood, seen by ISRO: locked vs open</b>
+        <figcaption><span class="tag">ISRO cross-check</span><b>The same flood, seen by ISRO: locked vs open</b>
         NDEM's 2025 map sheet (RISAT-1A) beside our Sentinel-1 map: the Beas-doab blob and the Sutlej–Harike stretch correspond. Registration is approximate and stated on the image: a visual cross-check, no pixel agreement claimed. Theirs is a PDF; ours is data anyone can query.</figcaption>
       </figure>
       <figure class="panel p-b">
-        <span class="tag">Ground survey</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/official_vs_sailaab.png" alt="Satellite damage ranking vs the official girdawari crop-damage table" loading="lazy">
-        <figcaption><b>The government's own survey agrees</b>
+        <figcaption><span class="tag">Ground survey</span><b>The government's own survey agrees</b>
         When the Revenue Department published its Special Girdawari table (13 Sep 2025), our satellite ranking matched it at Spearman <b>ρ = 0.72</b> across all 20 districts (0.56 over the 16 named), 5 of the top-6 identical. Divergences concentrate in the Ghaggar basin, outside our SAR windows, and are documented rather than hidden.</figcaption>
       </figure>
     </div>
@@ -528,23 +517,20 @@ footer .cr{max-width:60ch}
     </div>
     <div class="cols" style="margin-top:34px">
       <figure class="panel">
-        <span class="tag">The gap, quantified</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/cwc_station_gap.png" alt="CWC flood-forecast stations by state; Punjab has zero" loading="lazy">
-        <figcaption><b>Punjab is not on the map of India's flood-forecast network</b>
+        <figcaption><span class="tag">The gap, quantified</span><b>Punjab is not on the map of India's flood-forecast network</b>
         CWC's own state-wise table: 226 stations across 22 states, and Punjab at zero (still absent from CWC's current lists). Sailaab is the district-level layer that gap leaves open. Source: data.gov.in, GODL.</figcaption>
       </figure>
       <figure class="panel">
-        <span class="tag">70-year context</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/punjab_flood_history.png" alt="Punjab floods in 70-year context" loading="lazy">
-        <figcaption><b>2025 against the public record</b>
+        <figcaption><span class="tag">70-year context</span><b>2025 against the public record</b>
         A placid 2016–21 baseline, then 1.985 lakh ha of girdawari crop damage and 55 lives in 2025, the outlier the recurrence atlas said to prepare for. Sparse milestones, distinct metrics, no invented years.</figcaption>
       </figure>
     </div>
     <div class="cols" style="margin-top:34px">
       <figure class="panel">
-        <span class="tag">Is it getting worse?</span>
         <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/rain_trend.png" alt="65-year monsoon rainfall trend analysis, Punjab and upstream boxes" loading="lazy">
-        <figcaption><b>65 years of monsoon loading, tested honestly</b>
+        <figcaption><span class="tag">Is it getting worse?</span><b>65 years of monsoon loading, tested honestly</b>
         Pre-registered Mann-Kendall trend tests on IMD grids, 1961–2025: total monsoon loading is largely stationary, but the frequency of extreme-wet days over the upstream Himalayan box is rising (p=0.017). The hazard driver is concentration, not volume. 2025's Aug 20–Sep 5 burst: +9.7σ, rank 1 of 65 years.</figcaption>
       </figure>
       <div>
