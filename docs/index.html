@@ -299,7 +299,6 @@ footer .cr{max-width:60ch}
     <div class="fc-grid">
       <div>
         <figure class="panel">
-          <span class="tag">Latest pass · auto-refreshed</span>
           <img id="now-img" src="https://raw.githubusercontent.com/bakathefish/Flood/master/monitor/latest.png" alt="The most recent Sentinel-1 radar pass over Punjab, rendered by the live monitor" loading="lazy">
           <figcaption><b>The newest satellite pass over Punjab</b>
           Real Sentinel-1 radar, fetched and rendered by the monitor on public CI within hours of acquisition, then committed to the repo. Dark tones are smooth water. <span id="now-img-note"></span></figcaption>
@@ -656,7 +655,7 @@ function stampAge(el, utc){
   const setDay = d => {
     if (!d) return;
     if (flood) m.removeLayer(flood);
-    flood = L.tileLayer.wms(OWS, {...wmsOpts('gfm_observed_flood_extent_group_layer'), time: d + 'T00:00Z', opacity:.85}).addTo(m);
+    flood = L.tileLayer.wms(OWS, {...wmsOpts('gfm_observed_water_extent_group_layer'), time: d + 'T00:00Z', opacity:.85}).addTo(m);
   };
   setDay(lastDay);
   dateIn.addEventListener('change', () => setDay(dateIn.value));

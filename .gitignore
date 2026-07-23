@@ -23,3 +23,5 @@ data/rasters/
 data/eos04/*.tif
 data/eos04/*.zip
 private/
+broken/
+New folder/
