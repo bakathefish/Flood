@@ -849,7 +849,7 @@ def build_brief(name: str, tables: dict, geom: dict, guru_fp) -> plt.Figure:
     )
 
     # ---- tehsil table ----------------------------------------------------- #
-    _section(fig, rx, 0.454, rw, "tehsils — worst first", CYAN)
+    _section(fig, rx, 0.454, rw, "tehsils · worst first", CYAN)
     ty = 0.432
     fig.text(
         rx,

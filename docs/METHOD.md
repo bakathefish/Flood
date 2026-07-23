@@ -1,4 +1,4 @@
-# Sailaab — Method
+# Sailaab: Method
 
 ## 1. Software architecture
 Decision logic lives in the pure-Python `sailaab/` package, developed test-first
@@ -9,7 +9,7 @@ GEE steps use pre-declared acceptance checkpoints (see VERIFICATION-LOG.md).
 <!-- Sections 2+ appended by later plans: 2 Mapping, 3 Decade, 4 Validation,
      5 Forecaster, 6 Monitor -->
 
-## 2. Data acquisition — login-free by design
+## 2. Data acquisition, login-free by design
 The original design used Google Earth Engine as the compute stack. During the build we
 proved a fully account-free acquisition path and adopted it as primary, keeping GEE as
 an optional mirror: Sentinel-1 RTC via Microsoft Planetary Computer's anonymous STAC
