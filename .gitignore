@@ -22,3 +22,4 @@ data/rasters/
 /*.png
 data/eos04/*.tif
 data/eos04/*.zip
+private/
