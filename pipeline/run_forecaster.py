@@ -14,6 +14,8 @@ Committed outputs:
   atlas/forecaster_shap.png          SHAP mean-|value| summary bar
 
 Run: python -m pipeline.run_forecaster   (or python pipeline/run_forecaster.py)
+     python -m pipeline.run_forecaster --shap-only   (redraw only forecaster_shap.png
+       from the committed model + dataset; no LOYO retrain, no other output touched)
 """
 
 from __future__ import annotations
@@ -195,12 +197,49 @@ def hindcast_2025(core: pd.DataFrame, features: list[str]):
     return model, c25, flags, early
 
 
+# Readable display names for the model's raw feature columns. Display only:
+# the bar heights and their order come straight from the SHAP attributions, so
+# nothing here changes a computed value. Unknown columns fall back to the raw
+# name with underscores turned into spaces.
+_SHAP_LABELS = {
+    "punjab_mm": "Punjab rain",
+    "upstream_mm": "Upstream rain",
+    "punjab_mm_lag1": "Punjab rain (lag 1)",
+    "upstream_mm_lag1": "Upstream rain (lag 1)",
+    "punjab_mm_lag2": "Punjab rain (lag 2)",
+    "upstream_mm_lag2": "Upstream rain (lag 2)",
+    "bhakra_storage": "Bhakra storage",
+    "bhakra_delta": "Bhakra storage change",
+    "pong_storage": "Pong storage",
+    "pong_delta": "Pong storage change",
+    "ranjit_sagar_storage": "Ranjit Sagar storage",
+    "ranjit_sagar_delta": "Ranjit Sagar storage change",
+    "antecedent_fraction": "Antecedent flooding",
+    "week_of_season": "Week of season",
+    "prior_mean_annual_flooded_ha": "Flood-history prior (mean ha)",
+    "prior_seasons_with_fraction_gt2pct": "Flood-history prior (seasons >2%)",
+}
+
+
+def _shap_label(feature: str) -> str:
+    return _SHAP_LABELS.get(feature, feature.replace("_", " "))
+
+
 def shap_summary(model, train_feats: pd.DataFrame, features: list[str], out_png: Path):
+    """Draw the mean(|SHAP value|) summary bar in the atlas house style.
+
+    The bar heights are the model's own SHAP attributions and their descending
+    order is unchanged; only the drawing is restyled (dark ground, magenta bars
+    to match the forecaster accent, IBM Plex typography, muted grid). Returns the
+    ``(feature, mean_abs)`` list in descending order, identical to before.
+    """
     import matplotlib
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     import shap
+
+    from sailaab import figstyle
 
     expl = shap.TreeExplainer(model)
     sv = expl.shap_values(train_feats[features])
@@ -208,17 +247,57 @@ def shap_summary(model, train_feats: pd.DataFrame, features: list[str], out_png:
     order = np.argsort(mean_abs)[::-1]
     top = [(features[i], float(mean_abs[i])) for i in order]
 
-    plt.figure(figsize=(7, 5))
-    shap.summary_plot(
-        sv,
-        train_feats[features],
-        plot_type="bar",
-        show=False,
-        max_display=len(features),
+    # --- dark house palette (matches atlas/headroom_2025.png etc.) ---
+    INK, LINE2 = "#0a1014", "#28394a"
+    PAPER, PAPER_DIM, PAPER_FAINT = "#e9e4d6", "#9aa5a4", "#5c6a70"
+    RISK = "#f487e8"  # magenta = forecaster accent (site --risk)
+
+    figstyle.apply()
+    n = len(order)
+    vals = mean_abs[order]
+    labels = [_shap_label(features[i]) for i in order]
+    vmax = float(vals.max()) if n else 1.0
+
+    fig, ax = plt.subplots(figsize=(7.8, 6.4), dpi=200)
+    fig.patch.set_facecolor(INK)
+    ax.set_facecolor(INK)
+    fig.subplots_adjust(left=0.315, right=0.965, top=0.855, bottom=0.085)
+
+    ypos = np.arange(n)[::-1]  # largest attribution at the top
+    ax.barh(ypos, vals, color=RISK, height=0.66, zorder=3)
+    for y, v in zip(ypos, vals):
+        ax.text(v + vmax * 0.014, y, f"{v:.3f}", va="center", ha="left",
+                fontsize=7.8, color=PAPER_DIM, fontfamily=figstyle.FONT_MONO,
+                zorder=4)
+
+    ax.set_yticks(ypos)
+    ax.set_yticklabels(labels, fontsize=9.0, color=PAPER)
+    ax.set_ylim(-0.7, n - 0.3)
+    ax.set_xlim(0, vmax * 1.18)
+    ax.grid(axis="x", color=LINE2, lw=0.6, alpha=0.55, zorder=0)
+    ax.set_axisbelow(True)
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+    ax.spines["bottom"].set_color(LINE2)
+    ax.tick_params(colors=PAPER_FAINT, length=0)
+    for lab in ax.get_xticklabels():
+        lab.set_fontfamily(figstyle.FONT_MONO)
+        lab.set_fontsize(8)
+    ax.set_xlabel(
+        figstyle.clean("mean(|SHAP value|)  ·  average impact on flood-event probability"),
+        fontsize=8.6, color=PAPER_DIM,
     )
-    plt.tight_layout()
+
+    fig.text(0.018, 0.965, figstyle.clean("What the flood-risk forecaster leans on"),
+             fontsize=15.5, weight="bold", color=PAPER, ha="left", va="top",
+             fontfamily=figstyle.FONT_DISPLAY)
+    fig.text(0.018, 0.918,
+             figstyle.clean("Mean absolute SHAP attribution over the 2015–2024 "
+                            "core-season fit; wet ground and flood history lead"),
+             fontsize=9.2, color=PAPER_DIM, ha="left", va="top")
+
     out_png.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(out_png, dpi=120)
+    fig.savefig(out_png, dpi=200, facecolor=INK, pil_kwargs={"optimize": True})
     plt.close("all")
     return top
 
@@ -295,5 +374,30 @@ def main():
     print("FORECASTER_SUMMARY_JSON_END")
 
 
+def shap_only():
+    """Redraw ONLY atlas/forecaster_shap.png from the committed model + dataset,
+    without re-running LOYO training. Loads data/models/forecaster_2025.joblib
+    (fit 2015-2024, core season) and reproduces its SHAP training slice from
+    data/forecaster_dataset.csv (core_season == 1 and year < 2025). Touches no
+    other output.
+    """
+    import joblib
+
+    bundle = joblib.load(MODELS / "forecaster_2025.joblib")
+    model, features = bundle["model"], bundle["features"]
+    df = pd.read_csv(DATA / "forecaster_dataset.csv")
+    train = df[(df.core_season == 1) & (df.year < 2025)]
+    top = shap_summary(model, train, features, ATLAS / "forecaster_shap.png")
+    out = ATLAS / "forecaster_shap.png"
+    print(f"wrote {out.relative_to(ROOT)}  ({out.stat().st_size / 1024:.0f} KB)")
+    print("shap_top:", top[:6])
+    return top
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--shap-only" in sys.argv:
+        shap_only()
+    else:
+        main()
