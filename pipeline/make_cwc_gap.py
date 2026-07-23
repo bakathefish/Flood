@@ -42,6 +42,7 @@ from matplotlib.patches import Patch  # noqa: E402
 from matplotlib.patheffects import withStroke  # noqa: E402
 
 from sailaab import cwc  # noqa: E402
+from sailaab import figstyle  # noqa: E402
 
 DATA = ROOT / "data"
 IN_CSV = DATA / "cwc_ff_stations_2018.csv"
@@ -68,11 +69,13 @@ def _style(ax):
         ax.spines[side].set_visible(False)
     ax.spines["bottom"].set_color(LINE2)
     ax.tick_params(colors=PAPER_FAINT, labelsize=8, length=0)
+    ax.tick_params(axis="x", labelfontfamily=figstyle.FONT_MONO)  # numeric ticks
 
 
 def build_figure(states_ranked, tot):
     """Stacked horizontal bar ranking (level + inflow) of the 22 listed states,
     with Punjab pinned at 0 at the foot of the ranking."""
+    figstyle.apply()
     labels = states_ranked["state_ut"].tolist() + ["Punjab"]
     level = np.append(states_ranked["level_stations"].to_numpy(), 0)
     inflow = np.append(states_ranked["inflow_stations"].to_numpy(), 0)
@@ -103,7 +106,7 @@ def build_figure(states_ranked, tot):
     # Punjab: a hard zero. Mark the origin and annotate.
     ax.plot([0], [punjab_y], marker="|", ms=13, mew=2.4, color=PUNJAB, zorder=6)
     ax.annotate(
-        "PUNJAB — 0 stations\n(absent from the table)",
+        "PUNJAB: 0 stations\n(absent from the table)",
         xy=(0, punjab_y), xytext=(6.2, punjab_y + 1.15),
         fontsize=9.6, color=PUNJAB, va="center", ha="left", weight="bold",
         path_effects=_HALO,
@@ -129,24 +132,26 @@ def build_figure(states_ranked, tot):
     _style(ax)
 
     # ---- title block -------------------------------------------------------
-    fig.text(0.030, 0.972, "Punjab is not on the map of India's flood-forecast network",
-             fontsize=16.5, weight="bold", color=PAPER, ha="left", va="top")
+    fig.text(0.030, 0.972,
+             figstyle.clean("Punjab is not on the map of India's flood-forecast network"),
+             fontsize=16.5, weight="bold", color=PAPER, ha="left", va="top",
+             fontfamily=figstyle.FONT_DISPLAY)
     fig.text(0.030, 0.940,
              f"CWC's own state-wise table lists {tot['total']} flood-forecasting "
              f"stations ({tot['level']} level + {tot['inflow']} inflow) across 22 "
-             "states/UTs — Punjab has none",
+             "states/UTs. Punjab has none",
              fontsize=9.8, color=PAPER_DIM, ha="left", va="top")
     fig.text(0.030, 0.918,
              "State-wise Existing Flood Forecasting Stations of the Central Water "
              'Commission, "as on Jan 2018"',
              fontsize=9.0, color=PAPER_FAINT, ha="left", va="top", style="italic")
 
-    # legend — parked in the empty upper-right, clear of the long top bars
+    # legend: parked in the empty upper-right, clear of the long top bars
     handles = [
         Patch(facecolor=LEVEL, label="level-forecast stations (166)"),
         Patch(facecolor=INFLOW, label="inflow-forecast stations (60)"),
         Line2D([0], [0], marker="|", color=PUNJAB, lw=0, ms=11, mew=2.4,
-               label="Punjab — zero (absent from the table)"),
+               label="Punjab: zero (absent from the table)"),
     ]
     ax.legend(handles=handles, loc="upper right", bbox_to_anchor=(1.0, 0.82),
               fontsize=8.0, frameon=False, labelcolor=PAPER, labelspacing=0.5,
@@ -156,9 +161,9 @@ def build_figure(states_ranked, tot):
     fig.add_artist(Line2D([0.030, 0.970], [0.088, 0.088], color=LINE2, lw=1.0))
     fig.text(
         0.030, 0.078,
-        'Vintage: this is CWC\'s network "as on Jan 2018" — the newest state-wise '
+        'Vintage: this is CWC\'s network "as on Jan 2018", the newest state-wise '
         "table published on the OGD portal (sweep 2026-07-22). Punjab’s listed "
-        "neighbours: Haryana 1, Jammu & Kashmir 3, Rajasthan 3 — Punjab, 0.",
+        "neighbours: Haryana 1, Jammu & Kashmir 3, Rajasthan 3; Punjab, 0.",
         fontsize=7.4, color=PAPER, ha="left", va="top", wrap=True,
     )
     fig.text(

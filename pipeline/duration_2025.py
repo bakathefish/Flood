@@ -47,6 +47,7 @@ from sailaab.districts import load_districts, rasterize_districts
 from sailaab.tehsils import load_tehsils
 from sailaab.stats import crop_value_at_risk
 from sailaab.gfm import web_mercator_area_km2
+from sailaab import figstyle
 from pipeline.fetch_gfm import bbox_3857, grid_shape, write_mask_tif
 
 REPO = Path(__file__).resolve().parents[1]
@@ -56,7 +57,7 @@ MAX_BRIDGE = 4  # wet-bridge cap (days) = max real observation gap in the window
 
 # Agronomic paddy yield-loss fractions per duration class (1-2, 3-6, 7-13, 14+ d).
 # Conservative bands from IRRI submergence agronomy (Setter & Laureles 1996;
-# Sarkar et al. 2006; Ismail et al. 2013) — labelled ESTIMATE. See duration.md.
+# Sarkar et al. 2006; Ismail et al. 2013), labelled ESTIMATE. See duration.md.
 LOSS_FRACTION = {1: 0.10, 2: 0.35, 3: 0.70, 4: 1.00}
 
 DEFAULT_GFM_DIR = REPO / "data" / "gfm" / "2025"
@@ -294,6 +295,8 @@ def render_png(cls, labels, bounds, max_width=1400):
     from matplotlib.colors import BoundaryNorm, ListedColormap
     from matplotlib.patches import Patch
 
+    figstyle.apply()
+
     factor = max(1, int(np.ceil(cls.shape[1] / max_width)))
     c = _maxpool(cls.astype(np.int32), factor)
     lab = _maxpool(labels.astype(np.int32), factor)
@@ -323,15 +326,17 @@ def render_png(cls, labels, bounds, max_width=1400):
         ax.scatter(ex, ey, s=0.12, c=PAPER_FAINT, marker=".", linewidths=0)
 
     ax.set_title(
-        "Punjab 2025 flood - submergence duration (Aug 15 - Sep 30)\n"
-        "days a pixel stayed underwater - Copernicus GFM ~100 m, "
-        "wet-bridge <=4 d, permanent water removed",
+        figstyle.clean(
+            "Punjab 2025 flood: submergence duration (Aug 15–Sep 30)\n"
+            "days a pixel stayed underwater: Copernicus GFM ~100 m, "
+            "wet-bridge <=4 d, permanent water removed"
+        ),
         fontsize=11,
         color=PAPER,
     )
     ax.set_xlabel("EPSG:3857 easting (m)", color=PAPER_DIM, fontsize=8)
     ax.set_ylabel("EPSG:3857 northing (m)", color=PAPER_DIM, fontsize=8)
-    ax.tick_params(colors=PAPER_FAINT, labelsize=7)
+    ax.tick_params(colors=PAPER_FAINT, labelsize=7, labelfontfamily=figstyle.FONT_MONO)
     for sp in ax.spines.values():
         sp.set_color(LINE2)
 

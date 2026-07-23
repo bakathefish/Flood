@@ -242,7 +242,7 @@ footer .cr{max-width:60ch}
     <div class="brand">SAILAAB<span class="tld">.</span></div>
     <div class="coords">30.9010° N · 75.8573° E · PUNJAB, IN</div>
     <nav>
-      <a href="#atlas" data-i="nav_atlas">Atlas</a><a href="#districts" data-i="nav_dist">Districts</a><a href="#forecast" data-i="nav_fc">Forecast</a><a href="#evidence" data-i="nav_ev">Evidence</a>
+      <a href="#now" data-i="nav_now">Now</a><a href="#forecast" data-i="nav_fc">Forecast</a><a href="#atlas" data-i="nav_atlas">Atlas</a><a href="#districts" data-i="nav_dist">Districts</a><a href="#evidence" data-i="nav_ev">Evidence</a>
       <a href="https://github.com/bakathefish/Flood" data-i="nav_repo">Repository</a>
       <span class="lang-sw" id="lang-sw"><button data-lang="en" class="active">EN</button><button data-lang="pa">ਪੰ</button><button data-lang="hi">हि</button></span>
     </nav>
@@ -256,9 +256,9 @@ footer .cr{max-width:60ch}
     <div class="gurmukhi rv d3">ਸੈਲਾਬ · ਪੰਜਾਬ ਦੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਪ੍ਰਣਾਲੀ</div>
     <p class="lede rv d3" data-i="lede" data-html="1">In August 2025 Punjab suffered its <strong>worst flood since 1988</strong>: all 23 districts, ~3.55 lakh people, 1.48–1.75 lakh hectares of crops (official range). India's flood-forecast network had <strong>zero stations</strong> in the state, and the satellite maps that could have guided relief sat locked inside PDFs. Sailaab rebuilds the capability in the open: <strong>SAR flood mapping, a decade hazard atlas, damage analytics, a district flood forecaster and a live monitor</strong>, with every line of code and every number public.</p>
     <div class="cta-row rv d4">
-      <a class="btn primary" href="#districts" data-i="cta1">Explore your district</a>
+      <a class="btn primary" href="#now" data-i="cta0">See Punjab right now</a>
+      <a class="btn" href="#districts" data-i="cta1">Explore your district</a>
       <a class="btn" href="https://github.com/bakathefish/Flood" data-i="cta2">Source & method</a>
-      <a class="btn" href="https://raw.githubusercontent.com/bakathefish/Flood/master/docs/SAILAAB-synopsis.pdf" data-i="cta3">Synopsis (PDF)</a>
     </div>
   </div>
 
@@ -271,7 +271,7 @@ footer .cr{max-width:60ch}
       <div class="live-head"><span class="pulse"></span> <span data-i="livehead">Live monitor: runs itself every 6 h, no keys, no accounts</span></div>
       <div id="live-line">querying last satellite pass…</div>
       <div id="live-districts"></div>
-      <div class="live-note">Sentinel-1 → change detection → district km² → trilingual alerts (ਪੰਜਾਬੀ · हिन्दी · EN), committed to the public repo by CI.</div>
+      <div class="live-note">Sentinel-1 → change detection → district km² → trilingual alerts (ਪੰਜਾਬੀ · हिन्दी · EN), committed to the public repo by CI. <span id="live-age"></span></div>
     </div>
   </div>
 
@@ -287,8 +287,81 @@ footer .cr{max-width:60ch}
     <div class="num"><b>0</b><span data-i="n7">CWC flood-forecast stations in Punjab</span></div>
   </div>
 
+  <section id="now">
+    <div class="sec-head"><span class="no">01</span><h2 data-i="s_now">Right now</h2><div class="rule"></div></div>
+    <p style="max-width:72ch;color:var(--paper-dim);margin-bottom:22px" data-i="nowintro">Sailaab is not an archive of 2025. It is watching this monsoon. Everything in this section renders from files the monitor committed within the last few hours, and it will look different tomorrow.</p>
+    <div class="fc-grid">
+      <div>
+        <figure class="panel">
+          <span class="tag">Latest pass · auto-refreshed</span>
+          <img id="now-img" src="https://raw.githubusercontent.com/bakathefish/Flood/master/monitor/latest.png" alt="The most recent Sentinel-1 radar pass over Punjab, rendered by the live monitor" loading="lazy">
+          <figcaption><b>The newest satellite pass over Punjab</b>
+          Real Sentinel-1 radar, fetched and rendered by the monitor on public CI within hours of acquisition, then committed to the repo. Dark tones are smooth water. <span id="now-img-note"></span></figcaption>
+        </figure>
+        <div class="tl" id="now-tl" style="margin-top:22px;margin-bottom:0">
+          <span class="tag">This monsoon · day by day</span>
+          <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/timelapse_current.gif" alt="Rolling timelapse of satellite-observed water over Punjab for the current monsoon" loading="lazy" onerror="document.getElementById('now-tl').style.display='none'">
+          <div class="swipe-cap" data-i="nowtl">The 2026 season so far: daily satellite-observed water (Copernicus GFM, keyless), rebuilt automatically as new passes arrive. One honest reading note: most of this early-season water is flood-irrigated rice transplanting, the same paddy signal the forecaster filters out. Disaster flooding shows up as corridors along the rivers, not statewide speckle, and this view will catch it the day it happens.</div>
+        </div>
+      </div>
+      <div>
+        <div class="scoreboard">
+          <div class="hd" data-i="nowhd">Live district risk · current 10-day window</div>
+          <div id="now-board"><div class="sb-note">loading the live feed…</div></div>
+          <div class="sb-note" id="now-note"></div>
+        </div>
+        <div class="phone">
+          <div class="tabs" id="alert-tabs">
+            <button class="active" data-l="pa">ਪੰਜਾਬੀ</button>
+            <button data-l="hi">हिन्दी</button>
+            <button data-l="en">English</button>
+          </div>
+          <div class="alert-body">
+            <div class="alert-msg pa" id="alert-msg">ਹੜ੍ਹ ਚੇਤਾਵਨੀ: Firozpur ਜ਼ਿਲ੍ਹੇ ਵਿੱਚ ~141.0 ਵਰਗ ਕਿਲੋਮੀਟਰ ਖੇਤਰ ਪਾਣੀ ਹੇਠ ਹੈ (ਸੈਟੇਲਾਈਟ ਦੁਆਰਾ ਪਛਾਣਿਆ)। ਰੁਝਾਨ: ਵਧ ਰਿਹਾ। ਹੈਲਪਲਾਈਨ: 1070</div>
+            <div class="alert-meta">Demo render at 2025 flood scale. Live alerts appear in <code>monitor/latest.json</code> whenever a district crosses the 25 km² floor, generated by the same tested code.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="forecast">
+    <div class="sec-head"><span class="no">02</span><h2 data-i="s3">The proof: 2025, held out</h2><div class="rule"></div></div>
+    <p style="max-width:72ch;color:var(--paper-dim);margin-bottom:22px" data-i="fcintro">The live board above runs the same model you see tested here. We trained it only on 2015 to 2024, then handed it 2025, the worst flood since 1988, and let the year grade it.</p>
+    <div class="fc-grid">
+      <div>
+        <div class="scoreboard">
+          <div class="hd">Trained on 2015–2024 only → asked about <b>2025</b> · peak P in the pre-declared Aug 14–Sep 12 flood windows</div>
+          <div id="sb-rows"></div>
+          <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Our satellite damage ranking also matches the government's ground survey: Spearman <b style="color:var(--water)">ρ = 0.72</b> across all 20 districts (0.56 over the 16 officially named) vs the Special Girdawari table. Full tables: <code>data/forecaster_2025_hindcast.csv</code>, <code>data/official_relief_2025.csv</code>.</div>
+        </div>
+        <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window, before the Aug 26–27 dam releases, four of the five eventual flood districts were already in the model's statewide top-5. SHAP says antecedent flooding and the flood-history prior dominate, with Bhakra storage at #3. We <b>ablation-tested</b> that: delete every dam feature and the 2025 flags don't move (<code>data/forecaster_ablation.csv</code>).</div>
+
+        <div class="replay" id="replay">
+          <div class="rp-head"><span>Replay 2025: risk before water</span><span class="rp-window" id="rp-window"></span></div>
+          <div class="rp-body">
+            <div class="rp-timeline">
+              <input type="range" id="rp-slider" min="0" max="6" value="0" aria-label="2025 window scrubber">
+              <div class="rp-marks" id="rp-marks"></div>
+            </div>
+            <div id="rp-rows"></div>
+          </div>
+          <div class="rp-legend"><span><i style="background:var(--risk)"></i>model risk P(event), predicted with 2015–2024 training only</span><span><i style="background:var(--water)"></i>observed flooded fraction (satellite)</span></div>
+          <div class="rp-caption" id="rp-caption"></div>
+        </div>
+      </div>
+      <div>
+        <figure class="panel" style="margin-top:22px">
+          <span class="tag">Explainability</span>
+          <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/forecaster_shap.png" alt="SHAP feature attribution" loading="lazy">
+          <figcaption><b>Why the model says what it says</b> SHAP attributions: wet ground and flood history dominate, with Bhakra storage at #3. The ablation showed that ranking is attribution rather than load-bearing skill; the 2025 flags survive with every dam feature deleted.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
   <section id="atlas">
-    <div class="sec-head"><span class="no">01</span><h2 data-i="s1">The Atlas</h2><div class="rule"></div></div>
+    <div class="sec-head"><span class="no">03</span><h2 data-i="s1">The Atlas</h2><div class="rule"></div></div>
     <div class="tl">
       <span class="tag">Aug 15 – Sep 15 2025 · every satellite pass</span>
       <video autoplay muted loop playsinline preload="metadata"
@@ -347,7 +420,7 @@ footer .cr{max-width:60ch}
   </section>
 
   <section id="districts">
-    <div class="sec-head"><span class="no">02</span><h2 data-i="s2">The Districts</h2><div class="rule"></div></div>
+    <div class="sec-head"><span class="no">04</span><h2 data-i="s2">The Districts</h2><div class="rule"></div></div>
     <div class="map-shell">
       <div style="display:flex;flex-direction:column">
         <div class="layer-row" id="layer-row">
@@ -392,53 +465,8 @@ footer .cr{max-width:60ch}
     </div>
   </section>
 
-  <section id="forecast">
-    <div class="sec-head"><span class="no">03</span><h2 data-i="s3">The Forecast: 2025, held out</h2><div class="rule"></div></div>
-    <div class="fc-grid">
-      <div>
-        <div class="scoreboard">
-          <div class="hd">Trained on 2015–2024 only → asked about <b>2025</b> · peak P in the pre-declared Aug 14–Sep 12 flood windows</div>
-          <div id="sb-rows"></div>
-          <div class="sb-note">✓ = district actually flooded in Aug–Sep 2025. All five real flood districts rank on top; every other district scores ≤ 0.27. Our satellite damage ranking also matches the government's ground survey: Spearman <b style="color:var(--water)">ρ = 0.72</b> across all 20 districts (0.56 over the 16 officially named) vs the Special Girdawari table. Full tables: <code>data/forecaster_2025_hindcast.csv</code>, <code>data/official_relief_2025.csv</code>.</div>
-        </div>
-        <div class="lead-call"><b>~10 days of lead:</b> by the Aug 14–24 window, before the Aug 26–27 dam releases, four of the five eventual flood districts were already in the model's statewide top-5. SHAP says antecedent flooding and the flood-history prior dominate, with Bhakra storage at #3. We <b>ablation-tested</b> that: delete every dam feature and the 2025 flags don't move (<code>data/forecaster_ablation.csv</code>).</div>
-
-        <div class="replay" id="replay">
-          <div class="rp-head"><span>Replay 2025: risk before water</span><span class="rp-window" id="rp-window"></span></div>
-          <div class="rp-body">
-            <div class="rp-timeline">
-              <input type="range" id="rp-slider" min="0" max="6" value="0" aria-label="2025 window scrubber">
-              <div class="rp-marks" id="rp-marks"></div>
-            </div>
-            <div id="rp-rows"></div>
-          </div>
-          <div class="rp-legend"><span><i style="background:var(--risk)"></i>model risk P(event), predicted with 2015–2024 training only</span><span><i style="background:var(--water)"></i>observed flooded fraction (satellite)</span></div>
-          <div class="rp-caption" id="rp-caption"></div>
-        </div>
-      </div>
-      <div>
-        <div class="phone">
-          <div class="tabs" id="alert-tabs">
-            <button class="active" data-l="pa">ਪੰਜਾਬੀ</button>
-            <button data-l="hi">हिन्दी</button>
-            <button data-l="en">English</button>
-          </div>
-          <div class="alert-body">
-            <div class="alert-msg pa" id="alert-msg">ਹੜ੍ਹ ਚੇਤਾਵਨੀ: Firozpur ਜ਼ਿਲ੍ਹੇ ਵਿੱਚ ~141.0 ਵਰਗ ਕਿਲੋਮੀਟਰ ਖੇਤਰ ਪਾਣੀ ਹੇਠ ਹੈ (ਸੈਟੇਲਾਈਟ ਦੁਆਰਾ ਪਛਾਣਿਆ)। ਰੁਝਾਨ: ਵਧ ਰਿਹਾ। ਹੈਲਪਲਾਈਨ: 1070</div>
-            <div class="alert-meta">Demo render at 2025 flood scale. Live alerts appear in <code>monitor/latest.json</code> whenever a district crosses the 25 km² floor, generated by the same tested code.</div>
-          </div>
-        </div>
-        <figure class="panel" style="margin-top:22px">
-          <span class="tag">Explainability</span>
-          <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/forecaster_shap.png" alt="SHAP feature attribution" loading="lazy">
-          <figcaption><b>Why the model says what it says</b> SHAP attributions: wet ground and flood history dominate, with Bhakra storage at #3. The ablation showed that ranking is attribution rather than load-bearing skill; the 2025 flags survive with every dam feature deleted.</figcaption>
-        </figure>
-      </div>
-    </div>
-  </section>
-
   <section id="evidence">
-    <div class="sec-head"><span class="no">04</span><h2 data-i="s_ev">The Evidence</h2><div class="rule"></div></div>
+    <div class="sec-head"><span class="no">05</span><h2 data-i="s_ev">The Evidence</h2><div class="rule"></div></div>
     <div class="gallery">
       <figure class="panel p-a">
         <span class="tag">ISRO cross-check</span>
@@ -468,7 +496,7 @@ footer .cr{max-width:60ch}
   </section>
 
   <section id="system">
-    <div class="sec-head"><span class="no">05</span><h2 data-i="s4">The System</h2><div class="rule"></div></div>
+    <div class="sec-head"><span class="no">06</span><h2 data-i="s4">The System</h2><div class="rule"></div></div>
     <div class="cols">
       <div>
         <h3>Five modules, one pipeline</h3>
@@ -561,6 +589,46 @@ const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
   } catch (e) { line.textContent = 'Live feed: see monitor/latest.json in the repository.'; }
 })();
 
+/* ---------- freshness ---------- */
+function feedAge(utc){
+  const h = (Date.now() - Date.parse(utc)) / 3.6e6;
+  if (!isFinite(h)) return null;
+  const label = h < 1.5 ? 'updated within the hour' : 'monitor last ran ' + Math.round(h) + ' h ago';
+  return {h, label};
+}
+function stampAge(el, utc){
+  const a = feedAge(utc); if (!el || !a) return;
+  el.textContent = '· ' + a.label;
+  if (a.h > 24) { el.style.color = 'var(--amber)'; el.textContent += ' (a CI pause, not a flood gap: rerun is one click in Actions)'; }
+}
+
+/* ---------- right now board ---------- */
+(async () => {
+  const img = document.getElementById('now-img');
+  if (img) img.src = RAW + 'monitor/latest.png?t=' + Date.now();
+  try {
+    const j = await (await fetch(RAW + 'monitor/latest.json?t=' + Date.now())).json();
+    const note = document.getElementById('now-img-note');
+    if (note && j.latest_pass) note.textContent = 'This render: pass of ' + j.latest_pass + ', coverage ' + Math.round((j.coverage_fraction||0)*100) + '%.';
+    stampAge(document.getElementById('live-age'), j.generated_utc);
+  } catch(_){}
+  try {
+    const n = await (await fetch(RAW + 'monitor/nowcast.json?t=' + Date.now())).json();
+    const board = document.getElementById('now-board'), nnote = document.getElementById('now-note');
+    if (!n || !board) return;
+    const rows = (n.districts||[]).slice().sort((a,b)=> ((b.p_event??-1)-(a.p_event??-1)) || ((b.observed_km2||0)-(a.observed_km2||0))).slice(0,6);
+    const havep = !!n.core_season;
+    board.innerHTML = rows.map((d,i)=>{
+      const val = havep ? 'P = '+(+d.p_event).toFixed(2) : ((+d.observed_km2||0).toFixed(1)+' km²');
+      const w = havep ? Math.min(100,(+d.p_event||0)*100) : Math.min(100,(+d.observed_km2||0)/2);
+      return `<div class="sb-row"><span class="rk">${i+1}</span><span>${d.district}</span><span class="bar"><i style="width:${w}%"></i></span><span class="p">${val}</span></div>`;
+    }).join('');
+    if (nnote) nnote.textContent = havep
+      ? `Live model probabilities for the ${n.window_start} to ${n.window_end} window, recomputed every 6 hours by the same tested code the 2025 proof below uses.`
+      : `Observed water per district in the current window, from the latest satellite passes. The forecaster switches on ${n.activates}, when its trained post-transplant season begins; live probabilities will appear here on their own.`;
+  } catch(_){}
+})();
+
 /* ---------- swipe ---------- */
 (() => {
   const s = document.getElementById('swipe');
@@ -588,14 +656,17 @@ const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
 /* ---------- i18n ---------- */
 const I18N = {
  pa: {
-  nav_atlas:'ਐਟਲਸ', nav_dist:'ਜ਼ਿਲ੍ਹੇ', nav_fc:'ਭਵਿੱਖਬਾਣੀ', nav_ev:'ਸਬੂਤ', nav_repo:'ਰਿਪੋਜ਼ਟਰੀ',
+  nav_now:'ਹੁਣ', nav_atlas:'ਐਟਲਸ', nav_dist:'ਜ਼ਿਲ੍ਹੇ', nav_fc:'ਭਵਿੱਖਬਾਣੀ', nav_ev:'ਪਰਖਾਂ', nav_repo:'ਰਿਪੋਜ਼ਟਰੀ',
   kicker:'ਖੁੱਲ੍ਹੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਜਾਣਕਾਰੀ · ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ',
   h1:'ਉਹ ਹੜ੍ਹ ਨਕਸ਼ੇ ਜੋ ਪੰਜਾਬ ਕੋਲ ਕਦੇ ਨਹੀਂ ਸਨ।<br><em>ਖੁੱਲ੍ਹੇ। ਪਰਖੇ ਹੋਏ। ਚੱਲ ਰਹੇ।</em>',
   lede:'ਅਗਸਤ 2025 ਵਿੱਚ ਪੰਜਾਬ ਨੇ <strong>1988 ਤੋਂ ਬਾਅਦ ਦਾ ਸਭ ਤੋਂ ਭਿਆਨਕ ਹੜ੍ਹ</strong> ਝੱਲਿਆ: ਸਾਰੇ 23 ਜ਼ਿਲ੍ਹੇ, ~3.55 ਲੱਖ ਲੋਕ, 1.48–1.75 ਲੱਖ ਹੈਕਟੇਅਰ ਫ਼ਸਲਾਂ। ਭਾਰਤ ਦੇ ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਨੈੱਟਵਰਕ ਵਿੱਚ ਸੂਬੇ ਦੇ <strong>ਜ਼ੀਰੋ ਸਟੇਸ਼ਨ</strong> ਸਨ; ਜੋ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ੇ ਰਾਹਤ ਦਾ ਰਾਹ ਦਿਖਾ ਸਕਦੇ ਸਨ, ਉਹ PDF ਵਿੱਚ ਬੰਦ ਪਏ ਸਨ। ਸੈਲਾਬ ਇਹ ਸਮਰੱਥਾ ਖੁੱਲ੍ਹੇ ਵਿੱਚ ਮੁੜ ਉਸਾਰਦਾ ਹੈ: <strong>SAR ਹੜ੍ਹ ਨਕਸ਼ੇ, ਦਹਾਕੇ ਦਾ ਖ਼ਤਰਾ ਐਟਲਸ, ਨੁਕਸਾਨ ਵਿਸ਼ਲੇਸ਼ਣ, ਜ਼ਿਲ੍ਹਾ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ ਅਤੇ ਲਾਈਵ ਮਾਨੀਟਰ</strong>, ਹਰ ਲਾਈਨ ਕੋਡ ਅਤੇ ਹਰ ਅੰਕੜਾ ਜਨਤਕ।',
-  cta1:'ਆਪਣਾ ਜ਼ਿਲ੍ਹਾ ਵੇਖੋ', cta2:'ਸਰੋਤ ਅਤੇ ਵਿਧੀ', cta3:'ਸੰਖੇਪ (PDF)',
+  cta0:'ਪੰਜਾਬ ਹੁਣੇ ਵੇਖੋ', cta1:'ਆਪਣਾ ਜ਼ਿਲ੍ਹਾ ਵੇਖੋ', cta2:'ਸਰੋਤ ਅਤੇ ਵਿਧੀ',
   livehead:'ਲਾਈਵ ਮਾਨੀਟਰ: ਹਰ 6 ਘੰਟੇ ਆਪਣੇ ਆਪ, ਬਿਨਾਂ ਕੁੰਜੀ, ਬਿਨਾਂ ਖਾਤੇ',
   n1:'ਮੈਪ ਕੀਤੇ ਮਾਨਸੂਨ', n2:'ਪ੍ਰੋਸੈਸ ਕੀਤੇ ਹੜ੍ਹ ਦਿਨ', n3:'ਹੈਕਟੇਅਰ ਡੁੱਬੇ, 2025 (SAR Tier-A)', n4:'ਫ਼ਸਲ ਨੁਕਸਾਨ (ਅਨੁਮਾਨ ਬੈਂਡ)', n5:'ਚੇਤਾਵਨੀ ਭਾਸ਼ਾਵਾਂ', n6:'ਸੁਤੰਤਰ ਪਰਖਾਂ (GFM·S2·ਗਿਰਦਾਵਰੀ)', n7:'ਪੰਜਾਬ ਵਿੱਚ CWC ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਸਟੇਸ਼ਨ', n8:'ਤਹਿਸੀਲਾਂ ਵੱਖ-ਵੱਖ ਸਕੋਰ ਕੀਤੀਆਂ', n9:'ਸਰਕਾਰੀ ਗਿਰਦਾਵਰੀ ਨਾਲ ਮੇਲ',
-  s1:'ਐਟਲਸ', s2:'ਜ਼ਿਲ੍ਹੇ', s3:'ਭਵਿੱਖਬਾਣੀ: 2025 ਹੋਲਡ-ਆਊਟ', s4:'ਸਿਸਟਮ', s_ev:'ਸਬੂਤ',
+  s1:'ਐਟਲਸ', s2:'ਜ਼ਿਲ੍ਹੇ', s3:'ਸਬੂਤ: 2025 ਹੋਲਡ-ਆਊਟ', s4:'ਸਿਸਟਮ', s_ev:'ਪਰਖਾਂ', s_now:'ਇਸ ਵੇਲੇ',
+  nowintro:'ਸੈਲਾਬ 2025 ਦਾ ਪੁਰਾਲੇਖ ਨਹੀਂ ਹੈ। ਇਹ ਇਸ ਮਾਨਸੂਨ ਉੱਤੇ ਨਜ਼ਰ ਰੱਖ ਰਿਹਾ ਹੈ। ਇਸ ਹਿੱਸੇ ਦੀ ਹਰ ਚੀਜ਼ ਪਿਛਲੇ ਕੁਝ ਘੰਟਿਆਂ ਵਿੱਚ ਮਾਨੀਟਰ ਵੱਲੋਂ ਕਮਿਟ ਕੀਤੀਆਂ ਫਾਈਲਾਂ ਤੋਂ ਬਣਦੀ ਹੈ, ਅਤੇ ਕੱਲ੍ਹ ਇਹ ਵੱਖਰੀ ਦਿਖੇਗੀ।',
+  nowhd:'ਲਾਈਵ ਜ਼ਿਲ੍ਹਾ ਜੋਖਮ · ਮੌਜੂਦਾ 10-ਦਿਨ ਵਿੰਡੋ',
+  nowtl:'2026 ਦਾ ਮੌਸਮ ਹੁਣ ਤੱਕ: ਰੋਜ਼ਾਨਾ ਸੈਟੇਲਾਈਟ ਪਾਣੀ (Copernicus GFM), ਨਵੇਂ ਪਾਸ ਆਉਂਦਿਆਂ ਹੀ ਆਪਣੇ ਆਪ ਅੱਪਡੇਟ। ਸ਼ੁਰੂਆਤੀ ਪਾਣੀ ਦਾ ਵੱਡਾ ਹਿੱਸਾ ਝੋਨੇ ਦੀ ਲਵਾਈ ਹੈ; ਹੜ੍ਹ ਦਰਿਆਈ ਪੱਟੀਆਂ ਵਿੱਚ ਦਿਖਦਾ ਹੈ।',
   tlcap:'ਪੂਰੀ ਆਫ਼ਤ ਬਾਰਾਂ ਸਕਿੰਟਾਂ ਵਿੱਚ: ਹਰ ਸੈਟੇਲਾਈਟ ਪਾਸ ਨਾਲ ਵਧਦਾ ਪਾਣੀ, ਮਿਤੀ ਸਮੇਤ। ਦੋ ਉਛਾਲ: 20–25 ਅਗਸਤ ਦੀ ਬਾਰਿਸ਼ ਅਤੇ 26–27 ਅਗਸਤ ਦੇ ਡੈਮ ਰਿਲੀਜ਼।',
   c1:'ਹੁਣ · ਵੇਖਿਆ', c2:'ਹੁਣ · ਮਾਡਲ ਜੋਖਮ', c3:'2025 ਹੜ੍ਹ (ਹੈਕ.)', c4:'ਦਹਾਕਾ ਬਾਰੰਬਾਰਤਾ', c5:"ਹਿੰਡਕਾਸਟ ਜੋਖਮ '25",
   dp0:'ਕੋਈ ਜ਼ਿਲ੍ਹਾ ਚੁਣੋ', sw1:'ਪਹਿਲਾਂ · ਜੁਲਾਈ 2025', sw2:'ਹੜ੍ਹ · ਅਗ–ਸਤੰ 2025',
@@ -604,14 +675,17 @@ const I18N = {
   lbl:['2025 ਡੁੱਬਿਆ (RF)','2025 ਡੁੱਬਿਆ (Tier-A)','ਡੁੱਬੀ ਫ਼ਸਲੀ ਜ਼ਮੀਨ','ਝੋਨੇ ਦਾ ਮੁੱਲ ਜੋਖਮ ਵਿੱਚ',"ਮੌਸਮ >1% ਡੁੱਬੇ ('15–'25)",'ਔਸਤ ਸਾਲਾਨਾ ਡੁੱਬਿਆ','ਹਿੰਡਕਾਸਟ P (ਹੜ੍ਹ ਵਿੰਡੋ)','ਹੁਣ · ਇਹ ਵਿੰਡੋ (ਵੇਖਿਆ)','ਹੁਣ · ਮਾਡਲ ਜੋਖਮ']
  },
  hi: {
-  nav_atlas:'एटलस', nav_dist:'जिले', nav_fc:'पूर्वानुमान', nav_ev:'प्रमाण', nav_repo:'रिपॉज़िटरी',
+  nav_now:'अभी', nav_atlas:'एटलस', nav_dist:'जिले', nav_fc:'पूर्वानुमान', nav_ev:'प्रमाण', nav_repo:'रिपॉज़िटरी',
   kicker:'खुली बाढ़ इंटेलिजेंस · इस मानसून लाइव',
   h1:'वे बाढ़ नक्शे जो पंजाब के पास कभी नहीं थे।<br><em>खुले। प्रमाणित। चालू।</em>',
   lede:'अगस्त 2025 में पंजाब ने <strong>1988 के बाद की सबसे भीषण बाढ़</strong> झेली: सभी 23 जिले, ~3.55 लाख लोग, 1.48–1.75 लाख हेक्टेयर फ़सलें। भारत के बाढ़-पूर्वानुमान नेटवर्क में राज्य के <strong>शून्य स्टेशन</strong> थे; जो सैटेलाइट नक्शे राहत की राह दिखा सकते थे, वे PDF में बंद थे। सैलाब यह क्षमता खुले में फिर से बनाता है: <strong>SAR बाढ़ मानचित्रण, दशक का जोखिम एटलस, क्षति विश्लेषण, जिला बाढ़ पूर्वानुमान और लाइव मॉनिटर</strong>, हर लाइन कोड और हर आँकड़ा सार्वजनिक।',
-  cta1:'अपना जिला देखें', cta2:'स्रोत और विधि', cta3:'सारांश (PDF)',
+  cta0:'पंजाब अभी देखें', cta1:'अपना जिला देखें', cta2:'स्रोत और विधि',
   livehead:'लाइव मॉनिटर: हर 6 घंटे स्वतः, बिना कुंजी, बिना खाते',
   n1:'मैप किए मानसून', n2:'प्रोसेस किए बाढ़ दिन', n3:'हेक्टेयर जलमग्न, 2025 (SAR Tier-A)', n4:'फ़सल क्षति (अनुमान बैंड)', n5:'चेतावनी भाषाएँ', n6:'स्वतंत्र प्रमाणन (GFM·S2·गिरदावरी)', n7:'पंजाब में CWC बाढ़-पूर्वानुमान स्टेशन', n8:'तहसीलें अलग-अलग स्कोर की गईं', n9:'सरकारी गिरदावरी से मेल',
-  s1:'एटलस', s2:'जिले', s3:'पूर्वानुमान: 2025 होल्ड-आउट', s4:'सिस्टम', s_ev:'प्रमाण',
+  s1:'एटलस', s2:'जिले', s3:'सबूत: 2025 होल्ड-आउट', s4:'सिस्टम', s_ev:'प्रमाण', s_now:'इस समय',
+  nowintro:'सैलाब 2025 का पुरालेख नहीं है। यह इस मानसून पर नज़र रख रहा है। इस हिस्से की हर चीज़ पिछले कुछ घंटों में मॉनिटर द्वारा कमिट की गई फ़ाइलों से बनती है, और कल यह अलग दिखेगी।',
+  nowhd:'लाइव ज़िला जोखिम · मौजूदा 10-दिन विंडो',
+  nowtl:'2026 का मौसम अब तक: दैनिक सैटेलाइट जल (Copernicus GFM), नए पास आते ही अपने आप अपडेट। शुरुआती पानी का बड़ा हिस्सा धान की रोपाई है; बाढ़ नदी पट्टियों में दिखती है।',
   tlcap:'पूरी आपदा बारह सेकंड में: हर सैटेलाइट पास के साथ बढ़ता पानी, तिथि सहित। दो उछाल: 20–25 अगस्त की बारिश और 26–27 अगस्त के बांध रिलीज़।',
   c1:'अभी · देखा गया', c2:'अभी · मॉडल जोखिम', c3:'2025 बाढ़ (हे.)', c4:'दशक आवृत्ति', c5:"हिंडकास्ट जोखिम '25",
   dp0:'कोई जिला चुनें', sw1:'पहले · जुलाई 2025', sw2:'बाढ़ · अग–सितं 2025',

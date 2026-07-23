@@ -46,6 +46,7 @@ from matplotlib.patches import Patch  # noqa: E402
 from matplotlib.patheffects import withStroke  # noqa: E402
 
 from sailaab.history import load_history, milestones, period_to_year  # noqa: E402
+from sailaab import figstyle  # noqa: E402
 
 DATA = ROOT / "data"
 IN_CSV = DATA / "punjab_flood_damage_history.csv"
@@ -103,6 +104,7 @@ def _style(ax):
     for side in ("left", "bottom"):
         ax.spines[side].set_color(LINE2)
     ax.tick_params(colors=PAPER_FAINT, labelsize=8)
+    ax.tick_params(labelfontfamily=figstyle.FONT_MONO)  # numeric ticks in mono
 
 
 # --------------------------------------------------------------------------- #
@@ -119,7 +121,7 @@ def _area_panel(ax, df):
     ax.axhline(WORST_YEAR_HA, color=REF, lw=1.2, ls=(0, (6, 3)), zorder=2)
     ax.annotate(
         "Punjab worst flood year, 1953–2010:  2.79 Mha (2.79 million ha)\n"
-        "year not published in source — not placed on the time axis",
+        "year not published in source, not placed on the time axis",
         xy=(XMIN + 0.15, WORST_YEAR_HA), xytext=(XMIN + 0.15, WORST_YEAR_HA * 1.28),
         fontsize=7.6, color=PAPER, va="bottom", ha="left", path_effects=_HALO, zorder=6,
     )
@@ -168,13 +170,13 @@ def _area_panel(ax, df):
 
     handles = [
         Line2D([0], [0], color=FLOODED, marker="o", ms=6.5, mec=INK, lw=0,
-               label="flooded area — mapped / “area affected” (ha)"),
+               label="flooded area: mapped / “area affected” (ha)"),
         Line2D([0], [0], color=CROP, marker="s", ms=6.5, mec=INK, lw=0,
-               label="crop-damage area — girdawari / reported (ha)"),
+               label="crop-damage area: girdawari / reported (ha)"),
         Line2D([0], [0], color=REF, lw=1.2, ls=(0, (6, 3)),
                label="1953–2010 worst year, 2.79 Mha (year not published)"),
         Line2D([0], [0], color=PAPER, marker="o", ms=8, mec=PAPER, mew=1.4, lw=0,
-               label="2025 (haloed) — two separate points, never merged"),
+               label="2025 (haloed): two separate points, never merged"),
     ]
     ax.legend(handles=handles, loc="lower right", fontsize=7.0, frameon=False,
               labelcolor=PAPER, labelspacing=0.35, handlelength=1.6,
@@ -221,6 +223,7 @@ def _lives_panel(ax, df):
 # figure assembly
 # --------------------------------------------------------------------------- #
 def build_figure(df):
+    figstyle.apply()
     fig = plt.figure(figsize=(9.6, 9.4), dpi=200)
     fig.patch.set_facecolor(INK)
     gs = fig.add_gridspec(2, 1, height_ratios=[2.35, 1.0], hspace=0.16,
@@ -232,10 +235,11 @@ def build_figure(df):
     plt.setp(ax_area.get_xticklabels(), visible=False)
 
     # ---- title block -------------------------------------------------------
-    fig.text(0.115, 0.967, "Punjab floods in 70-year context",
-             fontsize=16.5, weight="bold", color=PAPER, ha="left", va="top")
+    fig.text(0.115, 0.967, figstyle.clean("Punjab floods in 70-year context"),
+             fontsize=16.5, weight="bold", color=PAPER, ha="left", va="top",
+             fontfamily=figstyle.FONT_DISPLAY)
     fig.text(0.115, 0.933,
-             "2025 against the public damage record — a sparse milestone "
+             "2025 against the public damage record: a sparse milestone "
              "timeline (no continuous public annual series exists)",
              fontsize=9.6, color=PAPER_DIM, ha="left", va="top")
     fig.text(0.115, 0.911,
@@ -249,14 +253,14 @@ def build_figure(df):
              "The contrast: a placid 2016–21 baseline (flooded area ≤ 0.023 Mha; "
              "crops ≤ 1.51 lakh ha; single-digit-to-low-double-digit lives) → "
              "2025 at 1.985 lakh ha girdawari crop damage and 55 lives lost. 2025 is the "
-             "outlier the recurrence atlas said to prepare for — this figure gives "
+             "outlier the recurrence atlas said to prepare for. This figure gives "
              "context, it does not replace the official record.",
              fontsize=7.6, color=PAPER, ha="left", va="top", wrap=True)
     fig.text(0.115, 0.055,
-             "Sources — data.gov.in (GODL): max area 1953–2010 "
+             "Sources: data.gov.in (GODL): max area 1953–2010 "
              "(uuid c00fd02a…, Rajya Sabha); flood damage 2016–2018 (f03e92a4…, "
              "MoEFCC); hydromet damages 2018–19→2021–22 (082dd5e0…). 2025: this "
-             "repo — SAR statewide Tier-A 105,183 ha (VERIFICATION-LOG); Special "
+             "repo, SAR statewide Tier-A 105,183 ha (VERIFICATION-LOG); Special "
              "Girdawari 198,524 ha and 55 deaths (official_relief_2025.csv).",
              fontsize=6.6, color=PAPER_DIM, ha="left", va="top", wrap=True)
     fig.text(0.115, 0.022,
@@ -270,7 +274,7 @@ def build_figure(df):
 
 # --------------------------------------------------------------------------- #
 def _print_verdict(df):
-    print("\n================ PUNJAB FLOOD DAMAGE — 70-YEAR MILESTONES ================")
+    print("\n================ PUNJAB FLOOD DAMAGE: 70-YEAR MILESTONES ================")
     print(f"consolidated record: {IN_CSV.relative_to(ROOT)}  ({len(df)} rows)")
     for cls in ("flooded_area", "crop_damage_area", "lives", "houses"):
         m = milestones(df, cls)
@@ -283,7 +287,7 @@ def _print_verdict(df):
             else:
                 parts.append(f"{r['period']}={r['value']:.0f}")
         print(f"  {cls:17s}: " + " | ".join(parts))
-    print("  worst year 1953–2010: 2.79 Mha (2,790,000 ha) — year NOT published in source")
+    print("  worst year 1953–2010: 2.79 Mha (2,790,000 ha), year NOT published in source")
     print("===========================================================================")
 
 

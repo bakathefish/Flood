@@ -41,6 +41,7 @@ from rasterio.transform import from_bounds
 from rasterio.warp import transform_geom
 
 from sailaab import config
+from sailaab import figstyle
 from sailaab.districts import district_fractions, load_districts, rasterize_districts
 from sailaab.frequency import summarize_repeat_victims
 from sailaab.stats import crop_value_at_risk
@@ -235,6 +236,7 @@ def render_atlas(repeat_rows, ts, out_path=ATLAS_PNG):
     from matplotlib.path import Path as MplPath
     from shapely.geometry import shape
 
+    figstyle.apply()
     ink = "#0a1014"
     seasons = {r["tehsil"]: r["seasons_gt1pct"] for r in repeat_rows}
     vmax = max(seasons.values()) or 1
@@ -301,9 +303,11 @@ def render_atlas(repeat_rows, ts, out_path=ATLAS_PNG):
     ax.autoscale_view()
     ax.axis("off")
     ax.set_title(
-        "Punjab repeat flood victims at tehsil level, 2015-2025\n"
-        "late-monsoon (>= Jul 25) seasons with > 1 % of tehsil flooded; "
-        "Copernicus GFM ~100 m; top-10 named",
+        figstyle.clean(
+            "Punjab repeat flood victims at tehsil level, 2015–2025\n"
+            "late-monsoon (>= Jul 25) seasons with > 1 % of tehsil flooded; "
+            "Copernicus GFM ~100 m; top-10 named"
+        ),
         color="#e8eef2",
         fontsize=10.5,
         pad=12,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # pipeline/make_headroom.py
-"""Render ``atlas/headroom_2025.png`` + ``data/headroom_2025.csv`` — the dam
+"""Render ``atlas/headroom_2025.png`` + ``data/headroom_2025.csv``: the dam
 head*room* deficit analysis: how much LESS pre-positioned empty storage the three
 BBMB dams held on the eve of the 2025 flood than the median of their own
 2015-2024 practice would have provided on the same day-of-season.
@@ -46,6 +46,7 @@ from matplotlib.patches import Patch  # noqa: E402
 from matplotlib.patheffects import withStroke  # noqa: E402
 
 from sailaab import headroom as hr  # noqa: E402
+from sailaab import figstyle  # noqa: E402
 from sailaab.causal import LIVE_CAPACITY_BCM  # noqa: E402
 from sailaab.reservoirs import normalize  # noqa: E402
 
@@ -217,7 +218,7 @@ def _style(ax):
         ax.spines[side].set_visible(False)
     for side in ("left", "bottom"):
         ax.spines[side].set_color(LINE2)
-    ax.tick_params(colors=PAPER_FAINT, labelsize=8)
+    ax.tick_params(colors=PAPER_FAINT, labelsize=8, labelfontfamily=figstyle.FONT_MONO)
     ax.margins(x=0)
 
 
@@ -276,7 +277,7 @@ def _panel(ax, dam, river, daily, supp, curve, table):
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.set_ylabel("% live cap", fontsize=8.5, color=PAPER_DIM)
     ax.set_title(f"{dam}  ·  {river}", fontsize=11, color=PAPER, loc="left",
-                 weight="bold", pad=4)
+                 weight="bold", fontfamily=figstyle.FONT_DISPLAY, pad=4)
     ax.annotate(
         f"live cap {cap:.3f} BCM · median from {int(ny.min())}–{int(ny.max())} "
         f"prior yrs/day",
@@ -287,6 +288,7 @@ def _panel(ax, dam, river, daily, supp, curve, table):
 
 
 def build_figure(daily, supp, curves, table, buf):
+    figstyle.apply()
     fig = plt.figure(figsize=(9.6, 10.6), dpi=200)
     fig.patch.set_facecolor(INK)
     gs = fig.add_gridspec(3, 1, hspace=0.22, left=0.075, right=0.975, top=0.845,
@@ -306,10 +308,11 @@ def build_figure(daily, supp, curves, table, buf):
         ax.set_xlim(START, END)
 
     # ---- title block -------------------------------------------------------
-    fig.text(0.075, 0.967, "Dam headroom on the eve of the 2025 flood",
-             fontsize=16.5, weight="bold", color=PAPER, ha="left", va="top")
+    fig.text(0.075, 0.967, figstyle.clean("Dam headroom on the eve of the 2025 flood"),
+             fontsize=16.5, weight="bold", color=PAPER, ha="left", va="top",
+             fontfamily=figstyle.FONT_DISPLAY)
     fig.text(0.075, 0.933,
-             "The management component — 2025 storage (amber) vs each dam's own "
+             "The management component: 2025 storage (amber) vs each dam's own "
              "2015–24 median filling curve (cyan, IQR shaded)",
              fontsize=9.6, color=PAPER_DIM, ha="left", va="top")
     fig.text(0.075, 0.911,
@@ -336,7 +339,7 @@ def build_figure(daily, supp, curves, table, buf):
         f"On 25 Aug 2025 (eve of the Aug 26–27 release surge): Pong held "
         f"{b['Pong']['deficit_bcm']:+.2f} BCM ({b['Pong']['deficit_pctpts']:+.0f} pts) and Ranjit Sagar "
         f"{b['Ranjit Sagar']['deficit_bcm']:+.2f} BCM ({b['Ranjit Sagar']['deficit_pctpts']:+.0f} pts) MORE than "
-        f"their decade-median fill — both above their normal IQR; Bhakra "
+        f"their decade-median fill, both above their normal IQR; Bhakra "
         f"{b['Bhakra']['deficit_bcm']:+.2f} BCM ({b['Bhakra']['deficit_pctpts']:+.0f} pts) tracked its median. "
         f"That missing headroom equals only ~{b['Ranjit Sagar']['absorbable_days']:.0f}–"
         f"{b['Pong']['absorbable_days']:.0f} days of each dam's peak documented release."
@@ -344,13 +347,13 @@ def build_figure(daily, supp, curves, table, buf):
     fig.text(0.075, 0.100, cap_line, fontsize=8.0, color=PAPER, ha="left", va="top",
              wrap=True)
     fig.text(0.075, 0.055,
-             "NOT a claim the flood was avoidable — the record +10σ upstream rain is the "
+             "NOT a claim the flood was avoidable: the record +10σ upstream rain is the "
              "primary cause (atlas/causal_2025.png). Dams fill early for legitimate "
              "irrigation/power and forecast-uncertainty reasons; this only measures the gap "
              "to the decade-median practice. Qualitative prior work: SANDRP (2025-09-07).",
              fontsize=7.0, color=PAPER_DIM, ha="left", va="top", wrap=True)
     fig.text(0.075, 0.020,
-             "Data — reservoirs: CWC via data.gov.in (daily, to 11 Jul 2025); Aug–Sep window "
+             "Data. Reservoirs: CWC via data.gov.in (daily, to 11 Jul 2025); Aug–Sep window "
              "BBMB via press (SANDRP, The Tribune, Down To Earth, Babushahi). Ranjit Sagar Aug "
              "storage = hypsometric estimate from its own 2015–24 level↔storage rating. "
              "Deficit = 2025 − raw daily median; see docs/notes/headroom.md.",

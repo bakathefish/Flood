@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # pipeline/make_rain_trend.py
-"""Long-record monsoon rain-loading TREND panel — the honest climate statistic.
+"""Long-record monsoon rain-loading TREND panel: the honest climate statistic.
 
 Reads the committed 1961-2025 daily box means, computes the three pre-registered
-extreme-rain indices per box per monsoon (R95cnt, RX5day, PRCPTOT — see
+extreme-rain indices per box per monsoon (R95cnt, RX5day, PRCPTOT; see
 ``docs/notes/rain-trend.md``), runs the pre-registered trend test
 (Mann-Kendall with von Storch lag-1 pre-whitening + Theil-Sen slope, alpha=0.05),
 and renders one house-style small-multiple per index with the Sen slope line, the
@@ -41,6 +41,7 @@ from matplotlib.lines import Line2D  # noqa: E402
 from matplotlib.patheffects import withStroke  # noqa: E402
 
 from sailaab import climatology as cl  # noqa: E402
+from sailaab import figstyle  # noqa: E402
 
 DATA = ROOT / "data"
 DAILY_CSV = DATA / "rain_daily_boxes_1961_2025.csv"
@@ -51,7 +52,7 @@ OUT = ROOT / "atlas" / "rain_trend.png"
 BASE_PERIOD = range(1961, 1991)  # 1961-1990 WMO normal (fixed R95 base)
 ALPHA = 0.05
 
-# box column -> (display name, hue) — same blue/orange pairing as the causal fig
+# box column -> (display name, hue): same blue/orange pairing as the causal fig
 BOXES = [
     ("upstream_mm", "upstream", "Upstream (Sutlej–Beas–Ravi)", "#2a78d6"),
     ("punjab_mm", "punjab", "Punjab plains", "#eb6834"),
@@ -69,9 +70,13 @@ SIG_WASH = "#dfeadb"  # faint green tint behind a significant panel
 NS_WASH = "#f1f0ea"  # faint neutral tint behind a non-significant panel
 HL = "#111111"  # 2025 highlight ring
 
+figstyle.apply()
 plt.rcParams.update(
     {
-        "font.family": "DejaVu Sans",
+        # generic family (IBM Plex Sans is first in font.sans-serif via
+        # figstyle.apply); any rendered glyph must exist in IBM Plex Sans, so the
+        # footnote uses a spelled-out "ring" rather than a hollow-circle marker.
+        "font.family": "sans-serif",
         "figure.facecolor": "white",
         "axes.facecolor": "white",
         "axes.edgecolor": AXIS,
@@ -173,6 +178,7 @@ def _style(ax):
     ax.grid(axis="y", color=GRID, lw=0.8, zorder=0)
     ax.set_axisbelow(True)
     ax.margins(x=0.01)
+    ax.tick_params(labelfontfamily=figstyle.FONT_MONO)  # numeric ticks in mono
 
 
 def _sen_line(ax, years, y, hue, sig):
@@ -247,11 +253,12 @@ def build_figure(idx, results, ctx, base_label):
 
         ax.set_ylabel(unit, fontsize=9.5, color=INK2)
         ax.set_title(
-            f"{short} — {subtitle}",
+            f"{short}: {subtitle}",
             fontsize=11,
             color=INK,
             loc="left",
             weight="bold",
+            fontfamily=figstyle.FONT_DISPLAY,
             pad=6,
         )
         _style(ax)
@@ -282,12 +289,13 @@ def build_figure(idx, results, ctx, base_label):
     fig.text(
         0.095,
         0.965,
-        "Is Punjab’s monsoon rain loading trending?",
+        figstyle.clean("Is Punjab’s monsoon rain loading trending?"),
         fontsize=16,
         weight="bold",
         color=INK,
         ha="left",
         va="top",
+        fontfamily=figstyle.FONT_DISPLAY,
     )
     fig.text(
         0.095,
@@ -346,7 +354,7 @@ def build_figure(idx, results, ctx, base_label):
     fig.text(
         0.095,
         0.015,
-        "Sen line solid = significant, dashed = not · ○ = 2025 · green panel = "
+        "Sen line solid = significant, dashed = not · ring = 2025 · green panel = "
         "≥1 box significant, grey = none · boxes as in docs/notes/imd-rain.md.",
         fontsize=6.8,
         color=MUTED,

@@ -39,6 +39,7 @@ from matplotlib.lines import Line2D  # noqa: E402
 from matplotlib.patheffects import withStroke  # noqa: E402
 
 from sailaab import causal  # noqa: E402
+from sailaab import figstyle  # noqa: E402
 from sailaab.reservoirs import normalize  # noqa: E402
 
 DATA = ROOT / "data"
@@ -75,9 +76,13 @@ _GUR_NAME = "Nirmala UI"
 _HAVE_GUR = any(f.name == _GUR_NAME for f in font_manager.fontManager.ttflist)
 GUR = font_manager.FontProperties(family=_GUR_NAME) if _HAVE_GUR else None
 
+figstyle.apply()
 plt.rcParams.update(
     {
-        "font.family": "DejaVu Sans",
+        # generic family (IBM Plex Sans is first in font.sans-serif via
+        # figstyle.apply); any rendered glyph must exist in IBM Plex Sans, so the
+        # reporting-gap note spells out "severed" instead of a slashed arrow.
+        "font.family": "sans-serif",
         "figure.facecolor": "white",
         "axes.facecolor": "white",
         "axes.edgecolor": AXIS,
@@ -116,6 +121,7 @@ def _style_axes(ax):
     ax.grid(axis="y", color=GRID, lw=0.8, zorder=0)
     ax.set_axisbelow(True)
     ax.margins(x=0)
+    ax.tick_params(labelfontfamily=figstyle.FONT_MONO)  # numeric ticks in mono
 
 
 def panel_rain(ax, rain):
@@ -142,7 +148,7 @@ def panel_rain(ax, rain):
     up_med = float(clim.loc[pk["date"], "upstream_mm_p50"])
     ratio = pk["upstream_mm"] / up_med if up_med else float("nan")
     ax.annotate(
-        f"26 Aug — {pk['upstream_mm']:.0f} mm upstream, {pk['punjab_mm']:.0f} mm Punjab\n"
+        f"26 Aug: {pk['upstream_mm']:.0f} mm upstream, {pk['punjab_mm']:.0f} mm Punjab\n"
         f"≈{ratio:.0f}× the 2015–24 same-day median",
         xy=(pk["date"], pk["punjab_mm"]),
         xytext=(pd.Timestamp("2025-07-05"), 45),
@@ -258,7 +264,7 @@ def panel_reservoirs(ax, daily, supp):
     # FRL / danger reference (100 % of live capacity == brim-full)
     ax.axhline(100, color=INK2, lw=1.2, ls=(0, (6, 3)), zorder=3)
     ax.annotate(
-        "FRL — brim-full / danger level  (Bhakra 1,680 ft · Pong 1,390 ft)",
+        "FRL: brim-full / danger level  (Bhakra 1,680 ft · Pong 1,390 ft)",
         xy=(START, 100),
         xytext=(2, 3),
         textcoords="offset points",
@@ -271,7 +277,7 @@ def panel_reservoirs(ax, daily, supp):
 
     # consolidated causal callouts (sparse, high-value)
     ax.annotate(
-        "Near-full by early Sept: Bhakra 1,678 ft —\n"
+        "Near-full by early Sept: Bhakra 1,678 ft,\n"
         "~1.5 ft under danger; Pong over its 1,390 ft brim\n(1,393 ft, 26 Aug)",
         xy=(pd.Timestamp("2025-09-03"), 93),
         xytext=(pd.Timestamp("2025-06-10"), 88),
@@ -370,7 +376,7 @@ def _spans(ax, flood_label=False, gap_label=False, flood_y=70, gap_y=52):
     mid_fl = FLOOD0 + (FLOOD1 - FLOOD0) / 2
     if flood_label:
         ax.annotate(
-            "flood window\n26 Aug – 6 Sep",
+            "flood window\n26 Aug–6 Sep",
             xy=(mid_fl, flood_y),
             textcoords="data",
             fontsize=7.2,
@@ -381,7 +387,7 @@ def _spans(ax, flood_label=False, gap_label=False, flood_y=70, gap_y=52):
         )
     if gap_label:
         ax.annotate(
-            "reporting gap\n(BBMB ↛ CWC, 11 Jul)",
+            "reporting gap\n(BBMB → CWC severed, 11 Jul)",
             xy=(mid_gap, gap_y),
             textcoords="data",
             fontsize=7.2,
@@ -426,14 +432,15 @@ def build(rain, daily, supp):
     fig.text(
         0.085,
         0.965,
-        "Why Punjab flooded in 2025",
+        figstyle.clean("Why Punjab flooded in 2025"),
         fontsize=18,
         weight="bold",
         color=INK,
         ha="left",
         va="top",
+        fontfamily=figstyle.FONT_DISPLAY,
     )
-    sub = "ਸੈਲਾਬ 2025 — ਹੜ੍ਹ ਕਿਉਂ ਆਇਆ" if GUR else "Sailaab 2025 — why the flood came"
+    sub = "ਸੈਲਾਬ 2025: ਹੜ੍ਹ ਕਿਉਂ ਆਇਆ" if GUR else "Sailaab 2025: why the flood came"
     fig.text(
         0.085,
         0.918,
@@ -459,9 +466,9 @@ def build(rain, daily, supp):
     fig.add_artist(Line2D([0.085, 0.975], [0.170, 0.170], color=GRID, lw=1.0))
     causal_sentence = (
         "Record late-August rain over the Sutlej–Beas–Ravi catchments (≈10× the 2015–24 "
-        "same-day median) filled reservoirs that were already climbing — Bhakra to 93% "
+        "same-day median) filled reservoirs that were already climbing: Bhakra to 93% "
         "of live capacity (1,678 ft, ~1.5 ft below its 1,680 ft danger level) and Pong "
-        "over its 1,390 ft brim — forcing emergency releases (Ranjit Sagar 1.73 lakh "
+        "over its 1,390 ft brim, forcing emergency releases (Ranjit Sagar 1.73 lakh "
         "cusecs, Bhakra ~85,000 cusecs) that inundated the plains downstream: Punjab’s "
         "worst floods since 1988."
     )
@@ -478,7 +485,7 @@ def build(rain, daily, supp):
     fig.text(
         0.085,
         0.045,
-        "Data — rainfall: IMD 0.25° gridded, area-mean over the upstream & Punjab boxes.  "
+        "Data. Rainfall: IMD 0.25° gridded, area-mean over the upstream & Punjab boxes.  "
         "Reservoirs: CWC via data.gov.in (daily, to 11 Jul 2025); Aug–Sep flood window "
         "BBMB via press (SANDRP, The Tribune, Down To Earth, Babushahi).  "
         "Solid = API · dashed = BBMB/press-reported.",

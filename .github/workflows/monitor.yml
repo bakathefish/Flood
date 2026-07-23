@@ -20,10 +20,20 @@ jobs:
       - run: python -m pytest -q          # never publish from a red tree
       - run: python -m pipeline.live_monitor   # secretless: anonymous Planetary Computer STAC
       - run: python -m pipeline.nowcast        # live forecaster nowcast -> monitor/nowcast.json (never fails the job)
+      - name: cache current-timelapse daily masks   # git-ignored data/gfm/, so only new days are fetched each run
+        uses: actions/cache@v4
+        with:
+          path: data/gfm/current
+          key: gfm-current-${{ github.run_id }}
+          restore-keys: |
+            gfm-current-
+      - run: python pipeline/make_current_timelapse.py   # keyless GFM WMS -> rolling current-season timelapse
+        continue-on-error: true                          # a WMS hiccup must never block the core monitor publish
       - name: commit state
         run: |
           git config user.name "bakathefish"
           git config user.email "bakathefish@gmail.com"
           git add monitor/
+          git add atlas/web/timelapse_current.gif atlas/web/timelapse_current_still.png
           git diff --cached --quiet || git commit -m "monitor: update latest flood pass"
           git push

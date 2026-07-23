@@ -1,5 +1,5 @@
 # pipeline/live_monitor.py
-"""6-hourly live flood monitor — ZERO secrets, Microsoft Planetary Computer.
+"""6-hourly live flood monitor: ZERO secrets, Microsoft Planetary Computer.
 
 Queries the anonymous MPC STAC for Sentinel-1 RTC scenes over Punjab in the last
 ``LOOKBACK_DAYS`` days, advances the ``monitor/state.json`` watermark
@@ -31,11 +31,11 @@ from pathlib import Path
 import numpy as np
 
 from pipeline.local_tier_a import (
-    _save_overlay_png,
     composite_window,
     open_client,
     search_window,
 )
+from sailaab import figstyle
 from sailaab.districts import district_fractions, load_districts, rasterize_districts
 from sailaab.monitor import load_state, new_scenes, save_state
 from sailaab.monitor_pc import (
@@ -110,6 +110,71 @@ def process_pass(items, ref_db, transform, width, height, labels, names, px_area
         "coverage": round(coverage, 3),
         "scenes": len(items),
     }
+
+
+# --------------------------------------------------------------------------- #
+# latest-pass PNG (dark house style, matches the atlas figures)
+# --------------------------------------------------------------------------- #
+# ink ground, cyan Tier-A inundation, hairline district boundaries. Kept in this
+# module (not the shared local_tier_a._save_overlay_png, which still styles the
+# plain check overlays) so the public monitor still reads as one design system.
+_INK = "#0a1014"
+_PAPER = "#e9e4d6"
+_PAPER_DIM = "#9aa5a4"
+_HAIR = "#5c6b82"
+_CYAN = (0.20, 0.86, 1.0)  # Tier-A inundation (echoes the quicklook cyan)
+
+
+def render_latest_png(vv_flood_db, mask, labels, path, title, caption=""):
+    """Render ``monitor/latest.png`` in the atlas dark house style.
+
+    Ink ground with the pass's SAR VV backscatter dimmed underneath, cyan where
+    the Tier-A rule flags inundation, hairline district boundaries burnt from the
+    ``labels`` raster, a Bricolage Grotesque title and an IBM Plex Mono caption.
+    ``title`` must be free of em dashes (enforced via :func:`figstyle.clean`).
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    figstyle.apply()
+    fig, ax = plt.subplots(figsize=(8.4, 8.8), dpi=130)
+    fig.patch.set_facecolor(_INK)
+    ax.set_facecolor(_INK)
+
+    # SAR VV backdrop, dimmed so the ink ground dominates (NaN reads as ink)
+    ax.imshow(vv_flood_db, cmap="Greys_r", vmin=-25, vmax=0, alpha=0.55,
+              interpolation="nearest")
+
+    # cyan Tier-A inundation
+    flood = np.zeros((*mask.shape, 4))
+    flood[np.asarray(mask, dtype=bool)] = (*_CYAN, 0.92)
+    ax.imshow(flood, interpolation="nearest")
+
+    # hairline district boundaries from the label raster (edge = label change)
+    if labels is not None:
+        lab = np.asarray(labels)
+        edges = np.zeros(lab.shape, bool)
+        edges[:, 1:] |= lab[:, 1:] != lab[:, :-1]
+        edges[1:, :] |= lab[1:, :] != lab[:-1, :]
+        eov = np.zeros((*lab.shape, 4))
+        r, g, b = (int(_HAIR[i:i + 2], 16) / 255 for i in (1, 3, 5))
+        eov[edges] = (r, g, b, 0.55)
+        ax.imshow(eov, interpolation="nearest")
+
+    ax.set_title(figstyle.clean(title), color=_PAPER, fontsize=13, loc="left",
+                 fontfamily=figstyle.FONT_DISPLAY, pad=10)
+    if caption:
+        ax.annotate(figstyle.clean(caption), xy=(0.0, -0.018),
+                    xycoords="axes fraction", ha="left", va="top", fontsize=7.4,
+                    color=_PAPER_DIM, fontfamily=figstyle.FONT_MONO)
+    ax.axis("off")
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path, dpi=130, facecolor=_INK, bbox_inches="tight",
+                pil_kwargs={"optimize": True})
+    plt.close(fig)
 
 
 def main():
@@ -213,12 +278,14 @@ def main():
         json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8"
     )
 
-    _save_overlay_png(
+    render_latest_png(
         latest_result["vv_flood"],
         latest_result["mask"],
+        labels,
         LATEST_PNG,
-        f"Punjab flood monitor — pass {latest_date} "
+        f"Punjab flood monitor: pass {latest_date} "
         f"({latest_result['total_km2']:.0f} km², coverage {latest_result['coverage']:.0%})",
+        caption=f"{SOURCE}. Reference: {REFERENCE_DESC}.",
     )
 
     save_state(STATE, fresh[-1])

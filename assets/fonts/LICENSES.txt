@@ -1,0 +1,46 @@
+Fonts bundled for the Punjab Flood Atlas figure typography
+==========================================================
+
+All fonts here are licensed under the SIL Open Font License, Version 1.1
+(SIL OFL). Full license text for each family is included alongside this file
+(OFL-IBMPlex.txt, OFL-BricolageGrotesque.txt). The OFL permits redistribution
+and bundling provided the license text travels with the fonts and the fonts are
+not sold on their own.
+
+Files and provenance
+--------------------
+
+IBM Plex Sans  (Regular 400, Medium 500, SemiBold 600, Bold 700)
+  IBMPlexSans-Regular.ttf, IBMPlexSans-Medium.ttf,
+  IBMPlexSans-SemiBold.ttf, IBMPlexSans-Bold.ttf
+  Static instances cut from the upstream variable font:
+    https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsans/IBMPlexSans%5Bwdth,wght%5D.ttf
+  Copyright (c) IBM Corp. with Reserved Font Name "IBM Plex".
+  License: OFL-IBMPlex.txt (SIL OFL 1.1).
+
+IBM Plex Mono  (Regular 400, Medium 500)
+  IBMPlexMono-Regular.ttf, IBMPlexMono-Medium.ttf
+  Downloaded as-is (static) from:
+    https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/IBMPlexMono-Regular.ttf
+    https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/IBMPlexMono-Medium.ttf
+  Copyright (c) IBM Corp. with Reserved Font Name "IBM Plex".
+  License: OFL-IBMPlex.txt (SIL OFL 1.1).
+
+Bricolage Grotesque  (Bold 700)
+  BricolageGrotesque-Bold.ttf
+  Static instance cut from the upstream variable font:
+    https://raw.githubusercontent.com/google/fonts/main/ofl/bricolagegrotesque/BricolageGrotesque%5Bopsz,wdth,wght%5D.ttf
+  Copyright (c) 2022 The Bricolage Project Authors
+  (https://github.com/ateliertriay/bricolage), Reserved Font Name
+  "Bricolage Grotesque".
+  License: OFL-BricolageGrotesque.txt (SIL OFL 1.1).
+
+How the static instances were produced
+--------------------------------------
+The IBM Plex Sans and Bricolage Grotesque files are single-weight static
+instances cut from the official Google Fonts variable sources using
+fontTools.varLib.instancer (all axes pinned to default except wght, which is
+pinned to the target weight; the name table was normalised so each family
+reports a single family name with the weight in the subfamily / usWeightClass).
+This keeps per-weight selection reliable in matplotlib. IBM Plex Mono was small
+enough to ship the upstream static files directly.

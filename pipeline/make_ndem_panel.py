@@ -59,6 +59,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from sailaab import figstyle  # noqa: E402
+
 DATA = ROOT / "data"
 OUT = ROOT / "atlas" / "ndem_vs_sailaab.png"
 
@@ -237,6 +239,7 @@ def compose(ndem_rgb):
     H = int(round(panel_top + panel_h + credit_row + footer + bot_m))
 
     dpi = 100
+    figstyle.apply()
     fig = plt.figure(figsize=(W / dpi, H / dpi), dpi=dpi)
     fig.patch.set_facecolor(BG)
 
@@ -289,17 +292,18 @@ def compose(ndem_rgb):
     ftext(
         m,
         40,
-        "The same flood, two access models",
+        figstyle.clean("The same flood, two access models"),
         fontsize=25,
         weight="bold",
         color=TITLE,
         ha="left",
         va="center",
+        fontfamily=figstyle.FONT_DISPLAY,
     )
     ftext(
         m,
         84,
-        "Punjab, August 2025 - the Beas breaks its banks across the Kapurthala "
+        "Punjab, August 2025: the Beas breaks its banks across the Kapurthala "
         "doab. ISRO mapped it; so did we.",
         fontsize=12.5,
         color=MUTED,
@@ -341,7 +345,7 @@ def compose(ndem_rgb):
     ftext(
         lx,
         ly + 22,
-        "locked A0 sheet — “For Official Use”",
+        "locked A0 sheet: “For Official Use”",
         fontsize=9.5,
         color=FAINT,
         ha="left",
@@ -371,7 +375,7 @@ def compose(ndem_rgb):
     ftext(
         lx,
         panel_top + panel_h + 22,
-        "Map excerpt: NDEM / NRSC / ISRO, ndem.nrsc.gov.in — Govt. of India "
+        "Map excerpt: NDEM / NRSC / ISRO, ndem.nrsc.gov.in, Govt. of India "
         "map product, downscaled for comparison/criticism with credit.",
         fontsize=8.6,
         color=FAINT,
@@ -414,7 +418,7 @@ def compose(ndem_rgb):
     ftext(
         m,
         fy + 70,
-        "Approximate extent match — the two halves are aligned by district "
+        "Approximate extent match: the two halves are aligned by district "
         "shape, not georeferenced (the NDEM sheet is a projection-less raster PDF). "
         "Left: Resourcesat-2A AWiFS, 19-08-2025, Kapurthala & Tarn Taran "
         "(MAP ID 2025/FL/PB/2/19082025).",

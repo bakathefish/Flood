@@ -7,12 +7,21 @@ vintage). Modern districts are merged into their 2011 parents before comparing.
 Deterministic output: atlas/official_vs_sailaab.png
 """
 
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+
+from sailaab import figstyle  # noqa: E402
 
 INK = "#0a1014"
 LINE = "#28394a"
@@ -48,12 +57,13 @@ def main() -> None:
     rho_named = spearman(named.rf_flooded_ha.to_numpy(), named.value.to_numpy())
     rho_all = spearman(all20.rf_flooded_ha.to_numpy(), all20.value.to_numpy())
 
+    figstyle.apply()
     fig, ax = plt.subplots(figsize=(10.5, 7.2), dpi=170)
     fig.patch.set_facecolor(INK)
     ax.set_facecolor(INK)
     for s in ax.spines.values():
         s.set_color(LINE)
-    ax.tick_params(colors=DIM, labelsize=9)
+    ax.tick_params(colors=DIM, labelsize=9, labelfontfamily=figstyle.FONT_MONO)
     ax.grid(True, color=LINE, lw=0.5, alpha=0.5)
 
     x = named.value.to_numpy()
@@ -68,16 +78,18 @@ def main() -> None:
             ax.annotate(r.district, (r.value, r.rf_flooded_ha), textcoords="offset points",
                         xytext=OFFSETS.get(r.district, (7, 5)), color=AMBER, fontsize=9, family="monospace")
 
-    ax.set_xlabel("Official Special Girdawari crop damage (ha, cumulative season) — Revenue Dept, 13 Sep 2025",
+    ax.set_xlabel("Official Special Girdawari crop damage (ha, cumulative season): Revenue Dept, 13 Sep 2025",
                   color=DIM, fontsize=9.5)
     ax.set_ylabel("Sailaab RF flooded area (ha, SAR snapshot)", color=DIM, fontsize=9.5)
-    ax.set_title("The satellite agrees with the ground survey\n", color=PAPER, fontsize=15, family="monospace", loc="left")
+    ax.set_title(figstyle.clean("The satellite agrees with the ground survey") + "\n",
+                 color=PAPER, fontsize=15, fontfamily=figstyle.FONT_DISPLAY, loc="left")
     ax.text(0.0, 1.02, f"Spearman rank correlation ρ = {rho_named:.2f} (named districts) · ρ = {rho_all:.2f} (all 20) · "
-            "5 of top-6 districts match", transform=ax.transAxes, color=WATER, fontsize=10.5, family="monospace")
+            "5 of top-6 districts match", transform=ax.transAxes, color=WATER, fontsize=10.5,
+            fontfamily=figstyle.FONT_BODY)
     ax.text(0.0, -0.14, "Scales differ by design: girdawari counts season-cumulative damage incl. waterlogging; the SAR "
             "figure is a peak-window snapshot.\nDivergences concentrate in the Ghaggar basin (Patiala/Sangrur/Mansa), "
-            "outside the descending-orbit SAR windows — documented in docs/notes/gov-data.md.",
-            transform=ax.transAxes, color=DIM, fontsize=8.5, family="monospace", va="top")
+            "outside the descending-orbit SAR windows, documented in docs/notes/gov-data.md.",
+            transform=ax.transAxes, color=DIM, fontsize=8.5, fontfamily=figstyle.FONT_BODY, va="top")
 
     fig.tight_layout()
     fig.savefig("atlas/official_vs_sailaab.png", facecolor=INK, bbox_inches="tight")
