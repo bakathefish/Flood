@@ -16,12 +16,13 @@
 <style>
 @page{size:A4;margin:16mm 15mm 17mm}
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--ink:#101820;--dim:#4b5a63;--faint:#8a969c;--water:#0e8f84;--amber:#b26a00;--risk:#a13d8f;--line:#d8d4c8;--wash:#f4f2ea}
+:root{--ink:#e9e4d6;--dim:#9aa5a4;--faint:#66747b;--water:#4fd8c9;--amber:#ffb454;--risk:#f487e8;--line:#26343f;--wash:#0e161d;--bg:#0a1014}
+html,body{background:var(--bg);-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{font-family:'IBM Plex Sans',sans-serif;font-size:9.8pt;line-height:1.52;color:var(--ink)}
 .mono{font-family:'IBM Plex Mono',monospace}
 h1,h2{font-family:'Bricolage Grotesque',serif}
 .avoid{break-inside:avoid}
-.masthead{border-bottom:2.5px solid var(--ink);padding-bottom:8px;margin-bottom:10px}
+.masthead{border-bottom:2.5px solid var(--water);padding-bottom:8px;margin-bottom:10px}
 .masthead .kick{font-family:'IBM Plex Mono';font-size:7.5pt;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
 h1{font-size:24pt;font-weight:800;letter-spacing:-.4px;line-height:1.05}
 .masthead .sub{font-size:10.5pt;color:var(--dim);margin-top:4px}
@@ -33,7 +34,7 @@ strong{font-weight:600}
 ul{margin:0 0 6px 14px}
 li{margin-bottom:2.5px}
 table{width:100%;border-collapse:collapse;font-size:8.8pt;margin:5px 0 8px;break-inside:avoid}
-th{font-family:'IBM Plex Mono';font-size:7.2pt;letter-spacing:.06em;text-transform:uppercase;text-align:left;color:var(--dim);border-bottom:1.2px solid var(--ink);padding:3px 6px 3px 0}
+th{font-family:'IBM Plex Mono';font-size:7.2pt;letter-spacing:.06em;text-transform:uppercase;text-align:left;color:var(--dim);border-bottom:1.2px solid var(--dim);padding:3px 6px 3px 0}
 td{border-bottom:.6px solid var(--line);padding:3.5px 6px 3.5px 0;vertical-align:top}
 td b{color:var(--ink)}
 .callout{border-left:3px solid var(--amber);background:var(--wash);padding:7px 10px;margin:7px 0;break-inside:avoid;font-size:9.4pt}
@@ -54,14 +55,14 @@ td b{color:var(--ink)}
 
 <h2><span class="no">02</span>The problem, priced</h2>
 <ul>
-<li>The 2025 Punjab flood: <strong>₹14,000 crore</strong> interim state loss estimate; ₹1,600 crore central assistance; ₹71 crore immediate relief (official figures, committed in-repo).</li>
-<li>Punjab has <strong>zero CWC flood-forecast stations</strong>, absent from CWC's own state-wise table and current lists. There is no incumbent public district-forecast layer to displace; Sailaab fills an empty slot.</li>
-<li>Girdawari damage assessment deployed <strong>2,167 patwaris</strong> for weeks of manual survey; the satellite layer that could target it runs for ~₹0.</li>
+<li>The 2025 Punjab flood: ₹14,000 crore interim state loss estimate; ₹1,600 crore central assistance; ₹71 crore immediate relief (official figures, committed in-repo).</li>
+<li>Punjab has zero CWC flood-forecast stations, absent from CWC's own state-wise table and current lists. There is no incumbent public district-forecast layer to displace; Sailaab fills an empty slot.</li>
+<li>Girdawari damage assessment deployed 2,167 patwaris for weeks of manual survey; the satellite layer that could target it runs for ~₹0.</li>
 <li>PMFBY insurers and agricultural lenders lack an independent, reproducible flood-loss extent.</li>
 </ul>
 
 <h2><span class="no">03</span>Value proposition, and the AI component</h2>
-<p>For a district collector, four answers in one click: which tehsils flood repeatedly (a named list: Khadur Sahib 6 of 11 monsoons), what is flooding <em>now</em> (6-hourly satellite), what is likely <em>next window</em> (live forecaster probabilities), and what the damage is worth (₹ band on government yields). The AI is the pipeline itself: a Random Forest SAR classifier, a self-labeled decade of training data, and an XGBoost forecaster that is <strong>ablation-stress-tested and honest about persistence</strong>. Auditable discipline is the differentiator for a government buyer.</p>
+<p>For a district collector, four answers in one click: which tehsils flood repeatedly (a named list: Khadur Sahib 6 of 11 monsoons), what is flooding <em>now</em> (6-hourly satellite), what is likely <em>next window</em> (live forecaster probabilities), and what the damage is worth (₹ band on government yields). The AI is the pipeline itself: a Random Forest SAR classifier, a self-labeled decade of training data, and an XGBoost forecaster that is ablation-stress-tested and honest about persistence. Auditable discipline is the differentiator for a government buyer.</p>
 
 <h2><span class="no">04</span>Sustainability model: three tiers</h2>
 <table>
@@ -70,14 +71,14 @@ td b{color:var(--ink)}
 <tr><td><b>Institutional instances</b></td><td>state SDMAs / Revenue Depts (MoU or procurement)</td><td>hosted multi-state instances, SLAs, village-circle girdawari-verification exports, training</td><td>pilot-ready</td></tr>
 <tr><td><b>Analytics services</b></td><td>PMFBY insurers, lenders, CSR / climate-resilience funds</td><td>independent loss-extent audits, recurrence underwriting layers</td><td>roadmap</td></tr>
 </table>
-<div class="callout"><strong>Unit economics, honestly stated.</strong> Core infrastructure cost today is <strong>₹0/month</strong> (public CI + open data). A per-state instance is priced against the avoided cost of manual survey targeting: even a 5% efficiency gain on one girdawari cycle (2,167 patwaris, weeks of work) dwarfs any realistic hosting fee. Scale compute rides the IndiaAI Compute subsidy lane (student/institution route documented in-repo). All pricing is an assumption to be tested in mentorship; the open core is not contingent on any of it.</div>
+<div class="callout">Unit economics, honestly stated. Core infrastructure cost today is ₹0/month (public CI + open data). A per-state instance is priced against the avoided cost of manual survey targeting: even a 5% efficiency gain on one girdawari cycle (2,167 patwaris, weeks of work) dwarfs any realistic hosting fee. Scale compute rides the IndiaAI Compute subsidy lane (student/institution route documented in-repo). All pricing is an assumption to be tested in mentorship; the open core is not contingent on any of it.</div>
 
 <h2><span class="no">05</span>Roll-out</h2>
 <ul>
-<li><strong>Phase 0 (done):</strong> Punjab system live through monsoon 2026; the live forecaster activates 25 July, inside judging week; jurors can watch CI commit.</li>
-<li><strong>Phase 1 (this monsoon):</strong> PSDMA + worst-hit District Collector outreach (drafted, dispatches with this submission); operational feedback; EOS-04 Indian-SAR cross-validation via NRSC Bhoonidhi.</li>
-<li><strong>Phase 2 (two quarters):</strong> three-state expansion (the pipeline is a bounding box + district file; Assam and Bihar have NRSC frequency atlases but no live open district layer), Bhashini voice alerts, village-circle girdawari integration.</li>
-<li><strong>Phase 3:</strong> national coverage via IndiaAI / NRSC partnerships; formal engagement with CWC on the station-gap finding.</li>
+<li>Phase 0 (done): Punjab system live through monsoon 2026; the live forecaster activates 25 July, inside judging week; jurors can watch CI commit.</li>
+<li>Phase 1 (this monsoon): PSDMA + worst-hit District Collector outreach (drafted, dispatches with this submission); operational feedback; EOS-04 Indian-SAR cross-validation via NRSC Bhoonidhi.</li>
+<li>Phase 2 (two quarters): three-state expansion (the pipeline is a bounding box + district file; Assam and Bihar have NRSC frequency atlases but no live open district layer), Bhashini voice alerts, village-circle girdawari integration.</li>
+<li>Phase 3: national coverage via IndiaAI / NRSC partnerships; formal engagement with CWC on the station-gap finding.</li>
 </ul>
 
 <h2><span class="no">06</span>Marketing &amp; distribution</h2>
@@ -85,10 +86,10 @@ td b{color:var(--ink)}
 
 <h2><span class="no">07</span>Risks, with evidence</h2>
 <ul>
-<li><strong>Data feeds go dark.</strong> Happened: the BBMB dams stopped reporting centrally in July 2025. <em>Proven survivable by ablation</em>: detection skill does not depend on the reservoir feed.</li>
-<li><strong>Single-sensor reliance.</strong> Sentinel-1 today; EOS-04/Bhoonidhi second SAR source is the Phase-1 mitigation.</li>
-<li><strong>Adoption friction.</strong> The zero-login open core removes procurement as a precondition, so institutions can adopt before they contract.</li>
-<li><strong>Founder concentration.</strong> Solo student builder, mitigated by design: 408 tests, a method paper, a data-source registry, and a full verification log make the system transferable. ISB mentorship asks: government procurement navigation, PPP structuring.</li>
+<li>Data feeds go dark. Happened: the BBMB dams stopped reporting centrally in July 2025. <em>Proven survivable by ablation</em>: detection skill does not depend on the reservoir feed.</li>
+<li>Single-sensor reliance. Sentinel-1 today; EOS-04/Bhoonidhi second SAR source is the Phase-1 mitigation.</li>
+<li>Adoption friction. The zero-login open core removes procurement as a precondition, so institutions can adopt before they contract.</li>
+<li>Founder concentration. Solo student builder, mitigated by design: 408 tests, a method paper, a data-source registry, and a full verification log make the system transferable. ISB mentorship asks: government procurement navigation, PPP structuring.</li>
 </ul>
 
 <h2><span class="no">08</span>Team</h2>
