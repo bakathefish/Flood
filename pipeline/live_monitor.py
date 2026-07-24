@@ -8,7 +8,8 @@ coarse (150 m) VV composite of just that pass, diffs it against the committed
 pre-monsoon reference composite (``monitor/reference_vv_150m.tif``), applies the
 Tier-A rule (:mod:`sailaab.sar_local`), reduces the mask to per-district flooded
 km² (:mod:`sailaab.districts`), and writes ``monitor/latest.json`` +
-``monitor/latest.png``. No new scenes -> print and exit 0.
+``monitor/latest.png`` (plus a compressed ``latest.jpg`` twin the site
+loads). No new scenes -> print and exit 0.
 
 No Earth Engine, no service account, no subscription key: MPC asset signing is
 anonymous. The legacy EE path is preserved verbatim in
@@ -277,6 +278,10 @@ def render_latest_png(vv_flood_db, mask, labels, path, *, title, subtitle,
 
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=125, facecolor=_INK, pil_kwargs={"optimize": True})
+    # JPEG twin for the site: the speckled SAR field makes the PNG ~700 KB,
+    # while the JPEG lands near 100 KB. docs/index.html loads the JPEG.
+    fig.savefig(Path(path).with_suffix(".jpg"), dpi=125, facecolor=_INK,
+                pil_kwargs={"quality": 82, "optimize": True, "progressive": True})
     plt.close(fig)
 
 

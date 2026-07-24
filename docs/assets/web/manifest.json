@@ -1,0 +1,87 @@
+{
+ "forecaster_shap": {
+  "w": 1560,
+  "h": 1280,
+  "bytes": 46666
+ },
+ "rf_flood_2025": {
+  "w": 729,
+  "h": 852,
+  "bytes": 42488
+ },
+ "frequency_2015_2025_late_season": {
+  "w": 973,
+  "h": 1157,
+  "bytes": 147368
+ },
+ "causal_2025": {
+  "w": 1600,
+  "h": 1120,
+  "bytes": 109460
+ },
+ "rf_tierA_gfm_compare_2025": {
+  "w": 1130,
+  "h": 527,
+  "bytes": 23730
+ },
+ "headroom_2025": {
+  "w": 1600,
+  "h": 1758,
+  "bytes": 129264
+ },
+ "duration_2025": {
+  "w": 1015,
+  "h": 1160,
+  "bytes": 94886
+ },
+ "tehsil_repeat_victims": {
+  "w": 1077,
+  "h": 1135,
+  "bytes": 65022
+ },
+ "briefs_preview": {
+  "w": 1600,
+  "h": 752,
+  "bytes": 68448
+ },
+ "ndem_vs_sailaab": {
+  "w": 1600,
+  "h": 820,
+  "bytes": 142140
+ },
+ "official_vs_sailaab": {
+  "w": 1600,
+  "h": 1098,
+  "bytes": 45432
+ },
+ "cwc_station_gap": {
+  "w": 1600,
+  "h": 1767,
+  "bytes": 72912
+ },
+ "punjab_flood_history": {
+  "w": 1600,
+  "h": 1467,
+  "bytes": 86322
+ },
+ "rain_trend": {
+  "w": 1600,
+  "h": 1774,
+  "bytes": 158376
+ },
+ "timelapse_2025_poster": {
+  "w": 1280,
+  "h": 1120,
+  "bytes": 163490
+ },
+ "swipe_pre": {
+  "w": 862,
+  "h": 980,
+  "bytes": 248046
+ },
+ "swipe_flood": {
+  "w": 862,
+  "h": 980,
+  "bytes": 246752
+ }
+}

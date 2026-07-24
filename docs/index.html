@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Devanagari:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
 <style>
 :root{
   --ink:#0a1014; --ink2:#0e161d; --line:#1d2b35; --line2:#28394a;
@@ -27,8 +27,6 @@ body{
     radial-gradient(ellipse 90% 60% at 70% -10%, rgba(26,143,146,.14), transparent 60%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420' viewBox='0 0 420 420'%3E%3Cg fill='none' stroke='%231b2833' stroke-width='1' opacity='.55'%3E%3Cpath d='M-20 60 C 90 20 160 110 250 80 S 400 30 460 70'/%3E%3Cpath d='M-20 120 C 80 90 170 170 260 140 S 410 90 460 130'/%3E%3Cpath d='M-20 190 C 70 160 180 240 270 205 S 420 160 460 200'/%3E%3Cpath d='M-20 260 C 90 230 170 310 260 275 S 410 230 460 270'/%3E%3Cpath d='M-20 330 C 80 300 180 380 270 345 S 420 300 460 340'/%3E%3Cpath d='M-20 400 C 90 370 160 450 250 415 S 400 370 460 410'/%3E%3C/g%3E%3C/svg%3E");
 }
-body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E")}
 a{color:var(--water);text-decoration:none;border-bottom:1px solid rgba(79,216,201,.35)}
 a:hover{color:#8ff0e5;border-bottom-color:#8ff0e5}
 .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
@@ -101,6 +99,8 @@ h1 em{font-style:normal;color:var(--water)}
 .num span{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--paper-faint)}
 
 section{padding:8px 0 64px}
+/* below-fold sections skip render work until scrolled near (maps excluded) */
+.cv{content-visibility:auto;contain-intrinsic-size:auto 1400px}
 .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:34px;border-bottom:1px solid var(--line);padding-bottom:12px}
 .sec-head .no{color:var(--water-deep);font-size:13px;letter-spacing:.15em}
 .sec-head h2{font-family:var(--disp);font-weight:600;font-size:clamp(24px,3.4vw,36px);letter-spacing:-.3px}
@@ -108,7 +108,7 @@ section{padding:8px 0 64px}
 
 .gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:22px}
 .panel{border:1px solid var(--line2);background:var(--ink2);position:relative}
-.panel img{width:100%;max-width:100%;display:block;filter:saturate(.96)}
+.panel img{width:100%;max-width:100%;height:auto;display:block}
 .cols>*{min-width:0}
 .panel figcaption{padding:14px 16px;font-size:12.5px;color:var(--paper-dim);border-top:1px solid var(--line)}
 .panel figcaption b{color:var(--paper);display:block;margin-bottom:3px;font-size:13px}
@@ -121,13 +121,13 @@ section{padding:8px 0 64px}
 
 /* ------- timelapse ------- */
 .tl{border:1px solid var(--line2);background:var(--ink2);margin-bottom:26px;position:relative}
-.tl video,.tl img{width:100%;max-width:100%;display:block}
+.tl video,.tl img{width:100%;max-width:100%;height:auto;display:block}
 .tl .tag{position:absolute;top:10px;left:10px;background:rgba(10,16,20,.85);border:1px solid var(--line2);
   color:var(--amber);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;z-index:5}
 
 /* ------- swipe ------- */
 .swipe{position:relative;border:1px solid var(--line2);background:var(--ink2);overflow:hidden;user-select:none;margin-top:22px}
-.swipe img{width:100%;display:block;pointer-events:none}
+.swipe img{width:100%;height:auto;display:block;pointer-events:none}
 .swipe .top{position:absolute;inset:0;clip-path:inset(0 50% 0 0)}
 .swipe .handle{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--amber);pointer-events:none;z-index:4}
 .swipe .handle::after{content:"◂ ▸";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -289,13 +289,13 @@ footer .cr{max-width:60ch}
     <div class="fc-grid">
       <div>
         <figure class="panel">
-          <img id="now-img" src="https://raw.githubusercontent.com/bakathefish/Flood/master/monitor/latest.png" alt="The most recent Sentinel-1 radar pass over Punjab, rendered by the live monitor" loading="lazy">
+          <img id="now-img" src="https://raw.githubusercontent.com/bakathefish/Flood/master/monitor/latest.jpg" width="1200" height="900" alt="The most recent Sentinel-1 radar pass over Punjab, rendered by the live monitor" loading="lazy" decoding="async">
           <figcaption><b>The newest satellite pass over Punjab</b>
           Real Sentinel-1 radar, fetched and rendered by the monitor on public CI within hours of acquisition, then committed to the repo. Dark tones are smooth water. <span id="now-img-note"></span></figcaption>
         </figure>
         <div class="tl" id="now-tl" style="margin-top:22px;margin-bottom:0">
           <span class="tag">This monsoon · day by day</span>
-          <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/timelapse_current.gif" alt="Rolling timelapse of satellite-observed water over Punjab for the current monsoon" loading="lazy" onerror="document.getElementById('now-tl').style.display='none'">
+          <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/timelapse_current.gif" width="1280" height="1120" alt="Rolling timelapse of satellite-observed water over Punjab for the current monsoon" loading="lazy" decoding="async" onerror="document.getElementById('now-tl').style.display='none'">
           <div class="swipe-cap" data-i="nowtl">The 2026 season so far: daily satellite-observed water (Copernicus GFM, keyless), rebuilt automatically as new passes arrive. One honest reading note: most of this early-season water is flood-irrigated rice transplanting, the same paddy signal the forecaster filters out. Disaster flooding shows up as corridors along the rivers, not statewide speckle, and this view will catch it the day it happens.</div>
         </div>
       </div>
@@ -348,59 +348,59 @@ footer .cr{max-width:60ch}
       </div>
       <div>
         <figure class="panel" style="margin-top:22px">
-          <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/forecaster_shap.png" alt="SHAP feature attribution" loading="lazy">
+          <img src="assets/web/forecaster_shap.webp" width="1560" height="1280" alt="SHAP feature attribution" loading="lazy" decoding="async">
           <figcaption><span class="tag">Explainability</span><b>Why the model says what it says</b> SHAP attributions: wet ground and flood history dominate, with Bhakra storage at #3. The ablation showed that ranking is attribution rather than load-bearing skill; the 2025 flags survive with every dam feature deleted.</figcaption>
         </figure>
       </div>
     </div>
   </section>
 
-  <section id="atlas">
+  <section id="atlas" class="cv">
     <div class="sec-head"><span class="no">03</span><h2 data-i="s1">The Atlas</h2><div class="rule"></div></div>
     <div class="tl">
       <span class="tag">Aug 15 – Sep 15 2025 · every satellite pass</span>
-      <video autoplay muted loop playsinline preload="metadata"
-        poster="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/timelapse_final_still.png"
-        src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/timelapse_2025.mp4"
+      <video autoplay muted loop playsinline preload="metadata" width="1280" height="1120"
+        poster="assets/web/timelapse_2025_poster.webp"
+        src="assets/web/timelapse_2025.mp4"
         aria-label="Date-stamped timelapse of the 2025 Punjab flood spreading across the state"></video>
       <div class="swipe-cap" data-i="tlcap">The whole disaster in twelve seconds: cumulative SAR-detected water, date-stamped, one frame per Sentinel-1 pass. The two surges you can see are the Aug 20–25 rain spike and the Aug 26–27 dam releases reaching the rivers.</div>
     </div>
     <div class="gallery">
       <figure class="panel p-a">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/rf_flood_2025.png" alt="RF flood map of Punjab 2025" loading="lazy">
+        <img src="assets/web/rf_flood_2025.webp" width="729" height="852" alt="RF flood map of Punjab 2025" loading="lazy" decoding="async">
         <figcaption><span class="tag">2025 · Random Forest</span><b>2025 flood extent, machine-learned from Sentinel-1</b>
         Random Forest on SAR features (~52k ha in-district; the 105k ha headline is the wider Tier-A extent; both are published). Labels come from method agreement, and validation is spatial cross-validation across river basins. Firozpur 14,096 ha · Gurdaspur 8,099 · Kapurthala 6,597.</figcaption>
       </figure>
       <figure class="panel p-b">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/frequency_2015_2025_late_season.png" alt="Decade flood frequency map" loading="lazy">
+        <img src="assets/web/frequency_2015_2025_late_season.webp" width="973" height="1157" alt="Decade flood frequency map" loading="lazy" decoding="async">
         <figcaption><span class="tag">2015–2025 · First of its kind</span><b>Decade flood-frequency atlas</b>
         Punjab's first public flood-recurrence map: every monsoon 2015–2025. The Sutlej, Beas, Ravi and Ghaggar corridors light up; Kapurthala flooded in 5 of 11 seasons.</figcaption>
       </figure>
       <figure class="panel p-c">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/causal_2025.png" alt="Causal chart: rain, dams, releases" loading="lazy">
+        <img src="assets/web/causal_2025.webp" width="1600" height="1120" alt="Causal chart: rain, dams, releases" loading="lazy" decoding="async">
         <figcaption><span class="tag">Causality</span><b>Why it flooded</b>
         10× rainfall spike over near-full reservoirs → forced releases (Ranjit Sagar 1.73 lakh cusecs, Aug 27) → inundation. Built from IMD grids and CWC/BBMB records, including the reporting gap.</figcaption>
       </figure>
       <figure class="panel p-d">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/rf_tierA_gfm_compare_2025.png" alt="Three-method comparison" loading="lazy">
+        <img src="assets/web/rf_tierA_gfm_compare_2025.webp" width="1130" height="527" alt="Three-method comparison" loading="lazy" decoding="async">
         <figcaption><span class="tag">Validation</span><b>Three methods, one flood</b>
         Physics-threshold change detection vs Random Forest vs Copernicus Global Flood Monitoring: agreement maps, confusion matrices, and every divergence explained in the method paper.</figcaption>
       </figure>
       <figure class="panel p-e">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/headroom_2025.png" alt="Dam headroom deficit versus historical operating curves, 2025" loading="lazy">
+        <img src="assets/web/headroom_2025.webp" width="1600" height="1758" alt="Dam headroom deficit versus historical operating curves, 2025" loading="lazy" decoding="async">
         <figcaption><span class="tag">Counterfactual</span><b>What the dams could have held</b>
         2025 storage vs each dam's own median operating curve. Pong ran +1.01 BCM above it at surge-eve and Ranjit Sagar +0.45: pre-positioning headroom that existed on paper (~1.68 BCM, one to four days of peak release). Bhakra's margin was negligible, and the note says so plainly (<code>docs/notes/headroom.md</code>).</figcaption>
       </figure>
       <figure class="panel p-f">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/duration_2025.png" alt="Submergence duration atlas 2025" loading="lazy">
+        <img src="assets/web/duration_2025.webp" width="1015" height="1160" alt="Submergence duration atlas 2025" loading="lazy" decoding="async">
         <figcaption><span class="tag">Duration</span><b>How long the water stayed</b>
         Per-pixel submergence duration from daily satellite observations: 51,202 ha stayed under water for 7 days or more, which is total-paddy-loss territory. Weighting by duration refines the damage estimate from ₹523 crore at risk to ₹351 crore expected.</figcaption>
       </figure>
     </div>
 
     <div class="swipe" id="swipe">
-      <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/swipe_flood.jpg" alt="During the flood: Sentinel-1 radar, Aug 25–Sep 6 2025">
-      <div class="top"><img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/swipe_pre.jpg" alt="Before the flood: Sentinel-1 radar, Jul 1–Aug 10 2025"></div>
+      <img src="assets/web/swipe_flood.webp" width="862" height="980" alt="During the flood: Sentinel-1 radar, Aug 25–Sep 6 2025" loading="lazy" decoding="async">
+      <div class="top"><img src="assets/web/swipe_pre.webp" width="862" height="980" alt="Before the flood: Sentinel-1 radar, Jul 1–Aug 10 2025" loading="lazy" decoding="async"></div>
       <div class="handle" id="swipe-handle"></div>
       <span class="lbl l" data-i="sw1">Before · Jul 2025</span><span class="lbl r" data-i="sw2">Flood · Aug–Sep 2025</span>
       <input type="range" min="0" max="100" value="50" aria-label="Before/after comparison slider">
@@ -440,29 +440,29 @@ footer .cr{max-width:60ch}
     </div>
     <div class="cols mt34">
       <figure class="panel">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/tehsil_repeat_victims.png" alt="Tehsil-level repeat flood victims, 2015–2025" loading="lazy">
+        <img src="assets/web/tehsil_repeat_victims.webp" width="1077" height="1135" alt="Tehsil-level repeat flood victims, 2015–2025" loading="lazy" decoding="async">
         <figcaption><span class="tag">Below district level</span><b>The repeat victims, by name</b>
         All 91 tehsils scored across 11 monsoons. Khadur Sahib (Tarn Taran) flooded in 6 of 11 seasons, Sultanpur Lodhi (Kapurthala) in 5, Moonak and Patti in 4. These are the exact administrative units where girdawari verification and pre-positioning should start. Table: <code>data/tehsil_repeat_victims.csv</code>.</figcaption>
       </figure>
       <figure class="panel">
         <a href="https://github.com/bakathefish/Flood/tree/master/briefs" style="border-bottom:none">
-          <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/briefs_preview.png" alt="Preview of the per-district flood brief PDFs" loading="lazy"></a>
+          <img src="assets/web/briefs_preview.webp" width="1600" height="752" alt="Preview of the per-district flood brief PDFs" loading="lazy" decoding="async"></a>
         <figcaption><span class="tag">Print-ready</span><b>20 district briefs, one page per DC office</b>
         A designed A4 brief for every district: 2025 flooded hectares, cropland hit, ₹ value-at-risk (on the government's own DES yields), recurrence, hindcast probability, and its worst tehsils. <a href="https://github.com/bakathefish/Flood/tree/master/briefs">Download the PDFs</a>. They are made to be printed and handed over.</figcaption>
       </figure>
     </div>
   </section>
 
-  <section id="evidence">
+  <section id="evidence" class="cv">
     <div class="sec-head"><span class="no">05</span><h2 data-i="s_ev">The Evidence</h2><div class="rule"></div></div>
     <div class="gallery">
       <figure class="panel p-a">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/ndem_vs_sailaab.png" alt="ISRO NDEM flood map sheet beside the Sailaab open map, same flood" loading="lazy">
+        <img src="assets/web/ndem_vs_sailaab.webp" width="1600" height="820" alt="ISRO NDEM flood map sheet beside the Sailaab open map, same flood" loading="lazy" decoding="async">
         <figcaption><span class="tag">ISRO cross-check</span><b>The same flood, seen by ISRO: locked vs open</b>
         NDEM's 2025 map sheet (RISAT-1A) beside our Sentinel-1 map: the Beas-doab blob and the Sutlej–Harike stretch correspond. Registration is approximate and stated on the image: a visual cross-check, no pixel agreement claimed. Theirs is a PDF; ours is data anyone can query.</figcaption>
       </figure>
       <figure class="panel p-b">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/official_vs_sailaab.png" alt="Satellite damage ranking vs the official girdawari crop-damage table" loading="lazy">
+        <img src="assets/web/official_vs_sailaab.webp" width="1600" height="1098" alt="Satellite damage ranking vs the official girdawari crop-damage table" loading="lazy" decoding="async">
         <figcaption><span class="tag">Ground survey</span><b>The government's own survey agrees</b>
         When the Revenue Department published its Special Girdawari table (13 Sep 2025), our satellite ranking matched it at Spearman <b>ρ = 0.72</b> across all 20 districts (0.56 over the 16 named), 5 of the top-6 identical. Divergences concentrate in the Ghaggar basin, outside our SAR windows, and are documented rather than hidden.</figcaption>
       </figure>
@@ -481,7 +481,7 @@ footer .cr{max-width:60ch}
     </div>
   </section>
 
-  <section id="system">
+  <section id="system" class="cv">
     <div class="sec-head"><span class="no">06</span><h2 data-i="s4">The System</h2><div class="rule"></div></div>
     <div class="cols">
       <div>
@@ -499,25 +499,25 @@ footer .cr{max-width:60ch}
         <h3>Engineering honesty</h3>
         <p>Every satellite step is gated by a pre-declared checkpoint: the expected number is written down <i>before</i> the run, then the actual, then PASS or FAIL. The log ships in the repo, failures included.</p>
         <div class="honesty">Training labels are bootstrapped from method agreement and labeled as such. Both spatial folds are reported. The June "floods" that turned out to be rice transplanting are documented, calibrated and published. And we ran an ablation on ourselves: delete the dam features and the 2025 flags don't move, while a persistence baseline nearly matches pooled precision. We published that too.</div>
-        <p class="mt14">441 automated tests, written before the code they test. MIT-licensed code, CC-BY data products.
+        <p class="mt14">459 automated tests, written before the code they test. MIT-licensed code, CC-BY data products.
         Method paper, data-source registry and verification log live in the <a href="https://github.com/bakathefish/Flood/tree/master/docs">repository docs</a>.</p>
       </div>
     </div>
     <div class="cols mt34">
       <figure class="panel">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/cwc_station_gap.png" alt="CWC flood-forecast stations by state; Punjab has zero" loading="lazy">
+        <img src="assets/web/cwc_station_gap.webp" width="1600" height="1767" alt="CWC flood-forecast stations by state; Punjab has zero" loading="lazy" decoding="async">
         <figcaption><span class="tag">The gap, quantified</span><b>Punjab is not on the map of India's flood-forecast network</b>
         CWC's own state-wise table: 226 stations across 22 states, and Punjab at zero (still absent from CWC's current lists). Sailaab is the district-level layer that gap leaves open. Source: data.gov.in, GODL.</figcaption>
       </figure>
       <figure class="panel">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/punjab_flood_history.png" alt="Punjab floods in 70-year context" loading="lazy">
+        <img src="assets/web/punjab_flood_history.webp" width="1600" height="1467" alt="Punjab floods in 70-year context" loading="lazy" decoding="async">
         <figcaption><span class="tag">70-year context</span><b>2025 against the public record</b>
         A placid 2016–21 baseline, then 1.985 lakh ha of girdawari crop damage and 55 lives in 2025, the outlier the recurrence atlas said to prepare for. Sparse milestones, distinct metrics, no invented years.</figcaption>
       </figure>
     </div>
     <div class="cols mt34">
       <figure class="panel">
-        <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/rain_trend.png" alt="65-year monsoon rainfall trend analysis, Punjab and upstream boxes" loading="lazy">
+        <img src="assets/web/rain_trend.webp" width="1600" height="1774" alt="65-year monsoon rainfall trend analysis, Punjab and upstream boxes" loading="lazy" decoding="async">
         <figcaption><span class="tag">Is it getting worse?</span><b>65 years of monsoon loading, tested honestly</b>
         Pre-registered Mann-Kendall trend tests on IMD grids, 1961–2025: total monsoon loading is largely stationary, but the frequency of extreme-wet days over the upstream Himalayan box is rising (p=0.017). The hazard driver is concentration, not volume. 2025's Aug 20–Sep 5 burst: +9.7σ, rank 1 of 65 years.</figcaption>
       </figure>
@@ -544,32 +544,54 @@ footer .cr{max-width:60ch}
 
 <div class="dtip" id="dtip"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
+
+/* one fetch per live feed, shared by every consumer (raw caches ~5 min,
+   the monitor runs 6-hourly: no cache-busters needed) */
+const LIVE = fetch(RAW + 'monitor/latest.json').then(r => r.json()).catch(() => null);
+const NOWCAST = fetch(RAW + 'monitor/nowcast.json').then(r => r.json()).catch(() => null);
+
+/* run fn once, when el first scrolls near the viewport */
+const lazyInit = (id, fn, margin) => {
+  const el = document.getElementById(id); if (!el) return;
+  if (!('IntersectionObserver' in window)) { fn(); return; }
+  const io = new IntersectionObserver(es => {
+    if (es.some(e => e.isIntersecting)) { io.disconnect(); fn(); }
+  }, {rootMargin: (margin || 600) + 'px 0px'});
+  io.observe(el);
+};
+
+/* Leaflet (CSS + JS) is injected only when the first map comes near */
+let leafletP = null;
+const loadLeaflet = () => leafletP || (leafletP = new Promise((res, rej) => {
+  const css = document.createElement('link');
+  css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.onload = () => res(window.L); s.onerror = rej;
+  document.head.appendChild(s);
+}));
 
 /* ---------- live strip ---------- */
 (async () => {
   const line = document.getElementById('live-line');
   const dist = document.getElementById('live-districts');
-  try {
-    const r = await fetch(RAW + 'monitor/latest.json?t=' + Date.now());
-    const j = await r.json();
-    const flagged = j.flagged || [];
-    line.innerHTML = `Last satellite pass: <b>${j.latest_pass}</b> · coverage ${Math.round((j.coverage_fraction||0)*100)}% · flooded: <b>${(+j.total_flooded_km2).toLocaleString()} km²</b> · ${flagged.length ? `<span style="color:var(--alert)">${flagged.length} district(s) above the ${j.alert_floor_km2} km² alert floor</span>` : `all districts below the ${j.alert_floor_km2} km² alert floor, a quiet window (this same feed read 2,039 km² on 27 Aug 2025)`}`;
-    const top = (j.districts || []).filter(d => d.flooded_km2 > 0).slice(0,4)
-      .map(d => `${d.district} ${d.flooded_km2.toFixed(1)} km²`).join(' · ');
-    if (top) dist.textContent = 'Riverine traces: ' + top;
-    try {
-      const n = await (await fetch(RAW + 'monitor/nowcast.json?t=' + Date.now())).json();
-      if (n && n.core_season) {
-        const best = (n.districts||[]).filter(d => d.p_event != null).sort((a,b)=>b.p_event-a.p_event)[0];
-        if (best) dist.textContent += `${dist.textContent ? ' · ' : ''}Model risk this window: ${best.district} P=${(+best.p_event).toFixed(2)}`;
-      } else if (n) {
-        dist.textContent += `${dist.textContent ? ' · ' : ''}Live model risk activates ${n.activates}`;
-      }
-    } catch(_){}
-  } catch (e) { line.textContent = 'Live feed: see monitor/latest.json in the repository.'; }
+  const j = await LIVE;
+  if (!j) { line.textContent = 'Live feed: see the monitor folder in the repository.'; return; }
+  const flagged = j.flagged || [];
+  line.innerHTML = `Last satellite pass: <b>${j.latest_pass}</b> · coverage ${Math.round((j.coverage_fraction||0)*100)}% · flooded: <b>${(+j.total_flooded_km2).toLocaleString()} km²</b> · ${flagged.length ? `<span style="color:var(--alert)">${flagged.length} district(s) above the ${j.alert_floor_km2} km² alert floor</span>` : `all districts below the ${j.alert_floor_km2} km² alert floor, a quiet window (this same feed read 2,039 km² on 27 Aug 2025)`}`;
+  const top = (j.districts || []).filter(d => d.flooded_km2 > 0).slice(0,4)
+    .map(d => `${d.district} ${d.flooded_km2.toFixed(1)} km²`).join(' · ');
+  if (top) dist.textContent = 'Riverine traces: ' + top;
+  const n = await NOWCAST;
+  if (n && n.core_season) {
+    const best = (n.districts||[]).filter(d => d.p_event != null).sort((a,b)=>b.p_event-a.p_event)[0];
+    if (best) dist.textContent += `${dist.textContent ? ' · ' : ''}Model risk this window: ${best.district} P=${(+best.p_event).toFixed(2)}`;
+  } else if (n) {
+    dist.textContent += `${dist.textContent ? ' · ' : ''}Live model risk activates ${n.activates}`;
+  }
 })();
 
 /* ---------- freshness ---------- */
@@ -587,16 +609,14 @@ function stampAge(el, utc){
 
 /* ---------- right now board ---------- */
 (async () => {
-  const img = document.getElementById('now-img');
-  if (img) img.src = RAW + 'monitor/latest.png?t=' + Date.now();
-  try {
-    const j = await (await fetch(RAW + 'monitor/latest.json?t=' + Date.now())).json();
+  const j = await LIVE;
+  if (j) {
     const note = document.getElementById('now-img-note');
     if (note && j.latest_pass) note.textContent = 'This render: pass of ' + j.latest_pass + ', coverage ' + Math.round((j.coverage_fraction||0)*100) + '%.';
     stampAge(document.getElementById('live-age'), j.generated_utc);
-  } catch(_){}
+  }
   try {
-    const n = await (await fetch(RAW + 'monitor/nowcast.json?t=' + Date.now())).json();
+    const n = await NOWCAST;
     const board = document.getElementById('now-board'), nnote = document.getElementById('now-note');
     if (!n || !board) return;
     const rows = (n.districts||[]).slice().sort((a,b)=> ((b.p_event??-1)-(a.p_event??-1)) || ((b.observed_km2||0)-(a.observed_km2||0))).slice(0,6);
@@ -612,15 +632,15 @@ function stampAge(el, utc){
   } catch(_){}
 })();
 
-/* ---------- satellite explorer (GFM WMS, global, keyless) ---------- */
-(async () => {
-  const el = document.getElementById('exmap'); if (!el || !window.L) return;
+/* ---------- satellite explorer (GFM WMS, global, keyless; lazy) ---------- */
+lazyInit('exmap', async () => {
+  const L = await loadLeaflet().catch(() => null); if (!L) return;
   const m = L.map('exmap', {zoomControl:true, attributionControl:true, scrollWheelZoom:false}).setView([31.1, 75.35], 8);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
     {attribution:'© OpenStreetMap contributors © CARTO · flood layer © Copernicus GFM', subdomains:'abcd', maxZoom:13}).addTo(m);
   const OWS = 'https://ows.globalfloods.eu/glofas-ows/ows';
   let lastDay = new Date(Date.now() - 2*864e5).toISOString().slice(0,10);
-  try { const c = await (await fetch(RAW + 'monitor/current_timelapse.json?t=' + Date.now())).json(); if (c && c.last_day) lastDay = c.last_day; } catch(_){}
+  try { const c = await (await fetch(RAW + 'monitor/current_timelapse.json')).json(); if (c && c.last_day) lastDay = c.last_day; } catch(_){}
   const dateIn = document.getElementById('ex-date');
   dateIn.value = lastDay; dateIn.max = new Date().toISOString().slice(0,10); dateIn.min = '2015-01-01';
   const wmsOpts = layers => ({layers, format:'image/png', transparent:true, version:'1.3.0'});
@@ -641,7 +661,7 @@ function stampAge(el, utc){
     const on = !m.hasLayer(ref); refBtn.classList.toggle('active', on);
     if (on) ref.addTo(m); else m.removeLayer(ref);
   });
-})();
+});
 
 /* ---------- swipe ---------- */
 (() => {
@@ -738,8 +758,36 @@ const csv = async url => {
   return rows.map(r => { const v = r.split(','); const o = {}; cols.forEach((c,i)=>o[c]=v[i]); return o; });
 };
 
-/* ---------- district map + panel + scoreboard ---------- */
-(async () => {
+/* ---------- district data: shared hindcast + scoreboard (lazy) ---------- */
+const TARGET_W = ['2025-08-14','2025-08-24','2025-09-03'];
+let hindP = null;
+const getHind = () => hindP || (hindP = csv('assets/data/forecaster_2025_hindcast.csv').catch(() => []));
+/* season-peak P per district over the pre-declared 2025 flood windows */
+const peakP = hind => {
+  const R = {};
+  hind.filter(d => TARGET_W.includes(d.window_start)).forEach(d => {
+    const p = +d.p_event;
+    if (!(d.district in R) || p > R[d.district]) R[d.district] = p;
+  });
+  return R;
+};
+const FLOODED_2025 = new Set(['Kapurthala','Firozpur','Tarn Taran','Gurdaspur','Amritsar']);
+
+/* scoreboard (top 6 by hindcast P) fills when the forecast section nears */
+lazyInit('sb-rows', async () => {
+  const R = peakP(await getHind());
+  const sb = document.getElementById('sb-rows');
+  Object.entries(R).sort((a,b)=>b[1]-a[1]).slice(0,6).forEach(([name,p],i) => {
+    sb.insertAdjacentHTML('beforeend',
+      `<div class="sb-row"><span class="rk">#${i+1}</span><span>${name}</span>
+       <span class="bar"><i style="width:${Math.round(p*100)}%"></i></span>
+       <span class="p">${p.toFixed(2)}</span></div>`.replace('</div>',
+       `<span class="ok">${FLOODED_2025.has(name) ? '✓ flooded' : ''}</span></div>`));
+  });
+}, 800);
+
+/* ---------- district map + panel (lazy) ---------- */
+lazyInit('dmap', async () => {
   // ramps validated with the dataviz six-checks script (dark surface); low steps rely on tooltip+panel relief
   const RAMPS = {
     now:   {cols:['#123036','#155a5c','#1f8a84','#35b5a9','#63e6d5'], stops:[0,.0005,.002,.01,.05], unit:'observed flooded %, last pass', fmt:v=>(v*100).toFixed(2)+'% of district'},
@@ -748,20 +796,18 @@ const csv = async url => {
     freq:  {cols:['#33230f','#5c3c12','#8f5c1a','#c98a2e','#ffb454'], stops:[0,1,2,3,4], unit:'seasons >1% flooded, 2015–25', fmt:v=>v+' of 11 seasons'},
     risk:  {cols:['#361a3a','#632c68','#95429a','#c75fc4','#f487e8'], stops:[0,.02,.1,.3,.6], unit:'P(flood event), Aug 14–Sep 12 flood windows (hindcast)', fmt:v=>'P = '+(+v).toFixed(2)}
   };
-  const FLOODED_2025 = new Set(['Kapurthala','Firozpur','Tarn Taran','Gurdaspur','Amritsar']);
-
-  const jget = url => fetch(url + '?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
-  const cget = url => csv(url).catch(() => []);
-  const [stats, freq, hind, gj, live, nc, offi] = await Promise.all([
-    csv(RAW + 'data/district_flood_stats_2025.csv'),
-    csv(RAW + 'data/flood_frequency_districts_late_season.csv'),
-    csv(RAW + 'data/forecaster_2025_hindcast.csv'),
-    fetch(RAW + 'data/punjab_districts.geojson').then(r => r.json()),
-    jget(RAW + 'monitor/latest.json'),
-    jget(RAW + 'monitor/nowcast.json'),
-    cget(RAW + 'data/official_relief_2025.csv')
+  const [L, stats, freq, hind, gj, live, nc, offi] = await Promise.all([
+    loadLeaflet().catch(() => null),
+    csv('assets/data/district_flood_stats_2025.csv'),
+    csv('assets/data/flood_frequency_districts_late_season.csv'),
+    getHind(),
+    fetch('assets/web/punjab_districts.json').then(r => r.json()),
+    LIVE, NOWCAST,
+    csv('assets/data/official_relief_2025.csv').catch(() => [])
   ]);
-  const S = {}, F = {}, R = {}, N = {}, NC = {}, O = {};
+  if (!L) return;
+  const S = {}, F = {}, N = {}, NC = {}, O = {};
+  const R = peakP(hind);
   const VMERGE = {'Fazilka':'Firozpur','Pathankot':'Gurdaspur','Malerkotla':'Sangrur','Tarn-Taran':'Tarn Taran'};
   offi.filter(d => d.metric === 'crop_damage_ha').forEach(d => {
     const n = VMERGE[d.district] || d.district;
@@ -769,8 +815,6 @@ const csv = async url => {
   });
   stats.forEach(d => S[d.district] = d);
   freq.forEach(d => F[d.district] = d);
-  const TARGET_W = ['2025-08-14','2025-08-24','2025-09-03'];
-  hind.filter(d => TARGET_W.includes(d.window_start)).forEach(d => { const p = +d.p_event; if (!(d.district in R) || p > R[d.district]) R[d.district] = p; });
   (live?.districts || []).forEach(d => N[d.district] = d);
   (nc?.districts || []).forEach(d => NC[d.district] = d);
 
@@ -797,16 +841,6 @@ const csv = async url => {
   const RISK_WINDOWS = [...new Set(hind.map(d => d.window_start))].sort();
   const RISK_BYW = {};
   hind.forEach(d => { (RISK_BYW[d.window_start] = RISK_BYW[d.window_start] || {})[d.district] = +d.p_event || 0; });
-
-  // scoreboard (top 6 by hindcast P)
-  const sb = document.getElementById('sb-rows');
-  Object.entries(R).sort((a,b)=>b[1]-a[1]).slice(0,6).forEach(([name,p],i) => {
-    sb.insertAdjacentHTML('beforeend',
-      `<div class="sb-row"><span class="rk">#${i+1}</span><span>${name}</span>
-       <span class="bar"><i style="width:${Math.round(p*100)}%"></i></span>
-       <span class="p">${p.toFixed(2)}</span></div>`.replace('</div>',
-       `<span class="ok">${FLOODED_2025.has(name) ? '✓ flooded' : ''}</span></div>`));
-  });
 
   // map
   let layer = 'flood';
@@ -879,13 +913,13 @@ const csv = async url => {
   document.getElementById('layer-row').addEventListener('click', e => {
     const b = e.target.closest('.chip'); if (!b) return;
     layer = b.dataset.layer;
-    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === b));
+    document.querySelectorAll('#layer-row .chip').forEach(c => c.classList.toggle('active', c === b));
     const scrubOn = layer === 'risk' && RISK_WINDOWS.length;
     scrub.classList.toggle('on', !!scrubOn);
     if (scrubOn) setRiskWindow(+rwIn.value); else { riskW = -1; geo.setStyle(styleOf); }
     drawLegend();
   });
-})();
+});
 </script>
 </body>
 </html>

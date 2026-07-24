@@ -70,6 +70,29 @@ def test_partial_and_full_coverage_both_render(tmp_path):
     assert (tmp_path / "full.png").exists()
 
 
+def test_writes_compressed_jpg_twin(tmp_path):
+    """The SAR field makes the PNG ~700 KB; the site loads a JPEG twin.
+
+    Contract: rendering latest.png also writes latest.jpg on the same canvas
+    (1200x900), and the JPEG is materially smaller than the PNG.
+    """
+    from PIL import Image
+
+    vv, mask, labels = _synthetic(coverage_cols=80)
+    out = tmp_path / "latest.png"
+    render_latest_png(
+        vv, mask, labels, out,
+        title="Punjab flood monitor", subtitle="jpg twin", footer=FOOTER,
+        status=["no district at or above the 25 km² alert floor"],
+    )
+    jpg = out.with_suffix(".jpg")
+    assert jpg.exists(), "render must also emit the web JPEG twin"
+    with Image.open(jpg) as im:
+        assert im.format == "JPEG"
+        assert im.size == (1200, 900)
+    assert jpg.stat().st_size < out.stat().st_size
+
+
 def test_em_dash_in_any_slot_is_rejected(tmp_path):
     vv, mask, labels = _synthetic(coverage_cols=80)
     for bad in ("title", "subtitle", "footer"):
