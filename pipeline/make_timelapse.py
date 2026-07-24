@@ -206,13 +206,15 @@ def _text(draw, xy, s, font, fill, anchor="la", stroke=2):
     )
 
 
-def _legend(draw, fonts):
-    """Swatch + label legend, lower-left."""
-    rows = [
-        (STEEL, "permanent water"),
-        (CYAN, "flood to date"),
-        (BRIGHT, "new this day"),
-    ]
+def _legend(draw, fonts, rows=None):
+    """Swatch + label legend, lower-left. ``rows`` overrides the default
+    (cumulative-mode) labels; the current-season daily clip passes its own."""
+    if rows is None:
+        rows = [
+            (STEEL, "permanent water"),
+            (CYAN, "flood to date"),
+            (BRIGHT, "new this day"),
+        ]
     f = fonts["legend"]
     y = CANVAS_H - 168
     for color, label in rows:

@@ -126,6 +126,31 @@ def test_mask_km2_counts_true_pixels():
 
 
 # --------------------------------------------------------------------------- #
+# daily mode: signed change vs previous pass + season peak
+# --------------------------------------------------------------------------- #
+def test_change_label_signed_and_worded():
+    # daily frames show the change against the PREVIOUS covered pass; water
+    # that drained away must read as a fall, not vanish silently
+    assert nowlapse.change_label(12.4) == "up 12 km² vs previous pass"
+    assert nowlapse.change_label(-8.6) == "down 9 km² vs previous pass"
+    assert nowlapse.change_label(0.2) == "level with previous pass"
+    assert nowlapse.change_label(-0.4) == "level with previous pass"
+
+
+def test_peak_day_first_maximum_wins():
+    days = ["2026-06-01", "2026-06-13", "2026-07-02"]
+    areas = [10.0, 42.5, 42.5]
+    assert nowlapse.peak_day(days, areas) == ("2026-06-13", 42.5)
+
+
+def test_peak_day_validates_input():
+    with pytest.raises(ValueError):
+        nowlapse.peak_day([], [])
+    with pytest.raises(ValueError):
+        nowlapse.peak_day(["2026-06-01"], [1.0, 2.0])
+
+
+# --------------------------------------------------------------------------- #
 # frame labels -- must never contain an em dash or en dash
 # --------------------------------------------------------------------------- #
 def _all_labels():
@@ -135,6 +160,9 @@ def _all_labels():
         nowlapse.season_range_label("2026-06-01", "2026-07-23"),
         nowlapse.kicker(2026),
         nowlapse.delta_label(12.0),
+        nowlapse.change_label(12.0),
+        nowlapse.change_label(-12.0),
+        nowlapse.change_label(0.0),
         nowlapse.coverage_caption(3),
         nowlapse.coverage_caption(1),
     ]

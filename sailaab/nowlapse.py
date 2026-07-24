@@ -186,6 +186,35 @@ def delta_label(new_km2) -> str:
     return f"+{fmt_km2(new_km2)} this day"
 
 
+def change_label(delta_km2) -> str:
+    """Signed change against the previous covered pass, dash-free.
+
+    Daily frames compare each pass to the previous one, so water that drained
+    away reads as a fall instead of silently vanishing: ``'up 12 km² vs
+    previous pass'`` / ``'down 9 km² vs previous pass'``; changes under half a
+    km² read ``'level with previous pass'``.
+    """
+    d = float(delta_km2)
+    if abs(d) < 0.5:
+        return "level with previous pass"
+    word = "up" if d > 0 else "down"
+    return f"{word} {fmt_km2(abs(d))} vs previous pass"
+
+
+def peak_day(days, areas) -> tuple[str, float]:
+    """``(iso, km2)`` of the largest single-pass extent (first maximum wins).
+
+    The daily timelapse's hold frame reports the season PEAK rather than a
+    cumulative union, so the headline number is a real single-day observation.
+    """
+    days = list(days)
+    areas = [float(a) for a in areas]
+    if not days or len(days) != len(areas):
+        raise ValueError("days and areas must be equal-length and non-empty")
+    i = max(range(len(areas)), key=lambda k: (areas[k], -k))
+    return days[i], areas[i]
+
+
 def coverage_caption(n_covered) -> str:
     """``3 -> '3 days with a Sentinel-1 pass'`` (singular-aware)."""
     n = int(n_covered)

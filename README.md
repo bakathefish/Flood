@@ -46,13 +46,13 @@ We also benchmarked an imported deep-learning U-Net (Sen1Floods11, test IoU 0.63
 
 ## Architecture
 
-All decision logic lives in the pure-Python package `sailaab/`, written test-first; `tests/` mirrors it 1:1 with 459 tests. Satellite and cloud side effects stay in thin scripts: `gee/` for Code Editor JS, `pipeline/` for CLIs. Every cloud step is gated by a pre-declared numeric checkpoint in `docs/VERIFICATION-LOG.md`. The expected band is written down before the run, then the actual, then PASS or FAIL. Failures ship.
+All decision logic lives in the pure-Python package `sailaab/`, written test-first; `tests/` mirrors it 1:1 with 463 tests. Satellite and cloud side effects stay in thin scripts: `gee/` for Code Editor JS, `pipeline/` for CLIs. Every cloud step is gated by a pre-declared numeric checkpoint in `docs/VERIFICATION-LOG.md`. The expected band is written down before the run, then the actual, then PASS or FAIL. Failures ship.
 
 ```
 sailaab/    pure, tested core (masks, stats, dataset, model, alerts, monitor, validation, eos04 …)
 gee/        Wave-1 interactive GEE scripts (JS)
 pipeline/   batch CLIs (decade runs, forecaster, ablation, briefs, live monitor, EOS-04 comparison)
-tests/      pytest, every sailaab/ module covered (459 tests)
+tests/      pytest, every sailaab/ module covered (463 tests)
 data/       small CSVs + GeoJSON only (committed); bulk rasters stay local
 atlas/      output maps and figures (incl. atlas/web/ swipe + timelapse assets)
 briefs/     20 designed per-district A4 PDFs
@@ -65,7 +65,7 @@ docs/       site (index.html) · METHOD.md · DATA-SOURCES.md · VERIFICATION-LO
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q          # 459 tests; Earth-Engine-marked tests excluded by default
+python -m pytest -q          # 463 tests; Earth-Engine-marked tests excluded by default
 ```
 
 Every figure and CSV regenerates from the committed inputs via the `pipeline/` CLIs. They are deterministic and need no accounts. The live monitor runs from `.github/workflows/monitor.yml` on a public runner with zero secrets.

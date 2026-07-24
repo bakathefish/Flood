@@ -6,18 +6,22 @@ product). For every day from 1 June of the current year up to today (India
 Standard Time), it asks the keyless Copernicus GFM WMS whether a Sentinel-1 pass
 imaged the Punjab bounding box that day (the S1 footprint layer) and, if so,
 pulls that day's observed-flood-extent tile and decodes it to a boolean mask
-(``sailaab.gfm``). Days with no S1 pass are skipped. The cumulative union grows
-frame by frame in the exact dark-cartography style of the 2025 timelapse (cyan
-flood-to-date, brighter fresh-today wavefront, permanent water underneath,
-district hairlines, a running km^2 counter), and the driver writes:
+(``sailaab.gfm``). Days with no S1 pass are skipped. Each frame shows THAT
+DAY'S observed water (not a growing union: water that drains between passes
+disappears from the next frame, and June's transplant-paddy signal does not
+haunt September), in the dark-cartography style of the 2025 timelapse: cyan
+water this pass day, brighter new-vs-previous-pass wavefront, permanent water
+underneath, district hairlines, a per-day km^2 counter with a signed change
+line, and a season-peak hold card. The driver writes:
 
     atlas/web/timelapse_current.gif        adaptive-palette GIF (< 7 MB)
     atlas/web/timelapse_current_still.png  the final (latest) frame
     monitor/current_timelapse.json         manifest (season_start, last_day,
-                                           days_with_coverage, cumulative_km2)
+                                           days_with_coverage, latest_km2,
+                                           peak_km2, peak_day)
 
-All pure logic (IST season-day enumeration, cumulative update, km^2 from pixel
-counts, dash-free labels) lives in ``sailaab/nowlapse.py`` and is unit-tested;
+All pure logic (IST season-day enumeration, km^2 from pixel counts, the signed
+change and season-peak labels) lives in ``sailaab/nowlapse.py`` and is unit-tested;
 the WMS fetch reuses ``pipeline/fetch_gfm`` (retries + polite pacing), and the
 rendering reuses ``pipeline/make_timelapse`` primitives unchanged. Decoded daily
 masks are cached under ``data/gfm/current/`` (git-ignored), so a rerun only
@@ -73,6 +77,7 @@ from pipeline.make_timelapse import (  # noqa: E402
     MARGIN_Y,
     MUTED,
     RIGHT_X,
+    STEEL,
     TEXT,
     _base_frame,
     _fonts,
@@ -232,23 +237,35 @@ def _load_refwater(day, bounds, width, height, pause):
 # ---------------------------------------------------------------------------
 # frame rendering (dark-cartography style of the 2025 timelapse; dash-free text)
 # ---------------------------------------------------------------------------
-def _render_day(rgb, origin, polylines, fonts, iso, year, area_cum, area_new, progress):
+def _daily_legend_rows():
+    return [
+        (STEEL, "permanent water"),
+        (CYAN, "water this pass day"),
+        (BRIGHT, "new vs previous pass"),
+    ]
+
+
+def _render_day(rgb, origin, polylines, fonts, iso, year, area_day, delta, progress):
+    """One frame = one pass day: that day's water, its km^2, and the signed
+    change against the previous covered pass (``delta`` is ``None`` on the
+    first frame, which has nothing to compare against)."""
     canvas, draw = _base_frame(rgb, origin, polylines)
     _text(draw, (RIGHT_X, 34), nowlapse.kicker(year), fonts["kicker"], MUTED, "ra")
     _text(draw, (RIGHT_X, 58), iso, fonts["date"], TEXT, "ra")
-    _text(draw, (RIGHT_X, 140), nowlapse.fmt_km2(area_cum), fonts["area"], CYAN, "ra")
-    _text(draw, (RIGHT_X, 196), "cumulative flood extent", fonts["small"], MUTED, "ra")
+    _text(draw, (RIGHT_X, 140), nowlapse.fmt_km2(area_day), fonts["area"], CYAN, "ra")
+    _text(draw, (RIGHT_X, 196), "water observed this pass day", fonts["small"], MUTED, "ra")
     _text(draw, (RIGHT_X, 218), "beyond permanent water", fonts["small"], MUTED, "ra")
-    if area_new >= 0.5:
+    if delta is not None:
+        rising = delta >= 0.5
         _text(
             draw,
             (RIGHT_X, 250),
-            nowlapse.delta_label(area_new),
+            nowlapse.change_label(delta),
             fonts["delta"],
-            BRIGHT,  # fresh-today wavefront colour
+            BRIGHT if rising else MUTED,
             "ra",
         )
-    _legend(draw, fonts)
+    _legend(draw, fonts, rows=_daily_legend_rows())
     _text(
         draw,
         (LEFT_X, CANVAS_H - 30),
@@ -261,22 +278,36 @@ def _render_day(rgb, origin, polylines, fonts, iso, year, area_cum, area_new, pr
     return canvas
 
 
-def _render_hold(rgb, origin, polylines, fonts, year, area_cum, start_iso, last_iso, n):
+def _render_hold(rgb, origin, polylines, fonts, year, peak_iso, peak_km2,
+                 latest_iso, latest_km2, start_iso, n):
+    """Season hold card: the PEAK single-pass extent (a real observation, not
+    a cumulative union) plus the latest pass reading. ``rgb`` is the latest
+    pass's map so the card matches what the monitor currently sees."""
     canvas, draw = _base_frame(rgb, origin, polylines)
     _text(draw, (RIGHT_X, 34), nowlapse.kicker(year), fonts["kicker"], MUTED, "ra")
-    _text(draw, (RIGHT_X, 58), "CURRENT SEASON", fonts["holdtitle"], TEXT, "ra")
-    _text(draw, (RIGHT_X, 92), "SO FAR", fonts["holdtitle"], TEXT, "ra")
-    _text(draw, (RIGHT_X, 150), nowlapse.fmt_km2(area_cum), fonts["hero"], CYAN, "ra")
-    _text(draw, (RIGHT_X, 224), "beyond permanent water", fonts["small"], MUTED, "ra")
+    _text(draw, (RIGHT_X, 58), "SEASON PEAK", fonts["holdtitle"], TEXT, "ra")
+    _text(draw, (RIGHT_X, 92), "SINGLE PASS", fonts["holdtitle"], TEXT, "ra")
+    _text(draw, (RIGHT_X, 150), nowlapse.fmt_km2(peak_km2), fonts["hero"], CYAN, "ra")
+    _text(draw, (RIGHT_X, 224),
+          f"on {nowlapse.pretty_date(peak_iso)} · beyond permanent water",
+          fonts["small"], MUTED, "ra")
     _text(
         draw,
         (RIGHT_X, 248),
-        f"{nowlapse.season_range_label(start_iso, last_iso)} · {n} days",
+        f"latest {nowlapse.pretty_date(latest_iso)}: {nowlapse.fmt_km2(latest_km2)}",
         fonts["small"],
         MUTED,
         "ra",
     )
-    _legend(draw, fonts)
+    _text(
+        draw,
+        (RIGHT_X, 272),
+        f"{nowlapse.season_range_label(start_iso, latest_iso)} · {n} days",
+        fonts["small"],
+        MUTED,
+        "ra",
+    )
+    _legend(draw, fonts, rows=_daily_legend_rows())
     _text(
         draw,
         (LEFT_X, CANVAS_H - 30),
@@ -306,14 +337,18 @@ def _save_gif_under_budget(frames, durations):
 # ---------------------------------------------------------------------------
 # manifest
 # ---------------------------------------------------------------------------
-def _write_manifest(generated, season_start_iso, last_day, n_cov, cum_km2):
+def _write_manifest(generated, season_start_iso, last_day, n_cov,
+                    latest_km2=None, peak_km2=None, peak_iso=None):
     MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
+    rnd = lambda v: None if v is None else round(float(v), 1)  # noqa: E731
     payload = {
         "generated_utc": generated,
         "season_start": season_start_iso,
         "last_day": last_day,
         "days_with_coverage": int(n_cov),
-        "cumulative_km2": (None if cum_km2 is None else round(float(cum_km2), 1)),
+        "latest_km2": rnd(latest_km2),
+        "peak_km2": rnd(peak_km2),
+        "peak_day": peak_iso,
     }
     MANIFEST_PATH.write_text(
         json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8"
@@ -347,13 +382,12 @@ def build(today=None, pause=REQUEST_PAUSE_S):
     bbox_area_km2 = web_mercator_area_km2(np.ones(shape, dtype=bool), bounds)
 
     if not days:
-        _write_manifest(generated, season_start_iso, None, 0, 0.0)
+        _write_manifest(generated, season_start_iso, None, 0)
         return {
             "generated_utc": generated,
             "season_start": season_start_iso,
             "days_candidate": 0,
             "days_with_coverage": 0,
-            "cumulative_km2": 0.0,
             "gif": None,
             "wms_requests": 0,
             "note": "season not started (before 1 June)",
@@ -377,13 +411,12 @@ def build(today=None, pause=REQUEST_PAUSE_S):
 
     n_cov = len(covered_days)
     if n_cov == 0:
-        _write_manifest(generated, season_start_iso, None, 0, 0.0)
+        _write_manifest(generated, season_start_iso, None, 0)
         return {
             "generated_utc": generated,
             "season_start": season_start_iso,
             "days_candidate": len(days),
             "days_with_coverage": 0,
-            "cumulative_km2": 0.0,
             "gif": None,
             "wms_requests": total_requests,
             "skipped_days": skipped,
@@ -400,42 +433,42 @@ def build(today=None, pause=REQUEST_PAUSE_S):
     )
     fonts = _fonts()
 
-    # Cumulative area beyond permanent water, per covered day (pixel-fraction of
-    # the cos^2-corrected box area), for the honest on-frame + manifest counter.
-    masks = [m for _, m in covered_days]
+    # One frame per covered day: THAT day's water beyond permanent water (no
+    # cumulative union; drained water leaves the next frame), with a bright
+    # wavefront where water is new against the previous covered pass and a
+    # signed km^2 change line. Areas are pixel-fractions of the
+    # cos^2-corrected box area.
     frames, durations = [], []
-    areas = []
-    prev_area = 0.0
-    cum_final = None
-    for i, (cum, fresh) in enumerate(nowlapse.cumulative_and_fresh(masks)):
-        cum_beyond = cum & ~refwater
-        fresh_beyond = fresh & ~refwater
-        a_cum = nowlapse.mask_km2(cum_beyond, bbox_area_km2)
-        a_new = max(0.0, a_cum - prev_area)
-        prev_area = a_cum
-        areas.append(a_cum)
-        rgb = composite_map(cum, fresh, refwater)
+    day_isos, areas = [], []
+    prev_mask = None
+    prev_area = None
+    for i, (iso, mask) in enumerate(covered_days):
+        day_beyond = mask & ~refwater
+        fresh_vs_prev = (
+            day_beyond & ~prev_mask if prev_mask is not None
+            else np.zeros_like(day_beyond)
+        )
+        a_day = nowlapse.mask_km2(day_beyond, bbox_area_km2)
+        delta = None if prev_area is None else a_day - prev_area
+        day_isos.append(iso)
+        areas.append(a_day)
+        rgb = composite_map(day_beyond, fresh_vs_prev, refwater)
         frames.append(
             _render_day(
-                rgb,
-                origin,
-                polylines,
-                fonts,
-                covered_days[i][0],
-                year,
-                a_cum,
-                a_new,
+                rgb, origin, polylines, fonts, iso, year, a_day, delta,
                 (i + 1) / n_cov,
             )
         )
         durations.append(DAY_MS)
-        cum_final = cum
+        prev_mask, prev_area = day_beyond, a_day
 
-    final_area = areas[-1]
+    latest_area = areas[-1]
     last_day = covered_days[-1][0]
-    rgb_final = composite_map(cum_final, np.zeros_like(cum_final), refwater)
+    peak_iso, peak_km2 = nowlapse.peak_day(day_isos, areas)
+    rgb_final = composite_map(prev_mask, np.zeros_like(prev_mask), refwater)
     hold = _render_hold(
-        rgb_final, origin, polylines, fonts, year, final_area, days[0], last_day, n_cov
+        rgb_final, origin, polylines, fonts, year,
+        peak_iso, peak_km2, last_day, latest_area, days[0], n_cov,
     )
     for _ in range(HOLD_FRAMES):
         frames.append(hold)
@@ -445,7 +478,8 @@ def build(today=None, pause=REQUEST_PAUSE_S):
     STILL_PATH.parent.mkdir(parents=True, exist_ok=True)
     hold.save(STILL_PATH)
 
-    _write_manifest(generated, season_start_iso, last_day, n_cov, final_area)
+    _write_manifest(generated, season_start_iso, last_day, n_cov,
+                    latest_area, peak_km2, peak_iso)
 
     return {
         "generated_utc": generated,
@@ -454,7 +488,9 @@ def build(today=None, pause=REQUEST_PAUSE_S):
         "days_candidate": len(days),
         "days_with_coverage": n_cov,
         "days_skipped_wms_error": skipped,
-        "cumulative_km2": round(final_area, 1),
+        "latest_km2": round(latest_area, 1),
+        "peak_km2": round(peak_km2, 1),
+        "peak_day": peak_iso,
         "map_px": (map_w, map_h),
         "gif": str(GIF_PATH),
         "gif_bytes": gif_bytes,
@@ -488,7 +524,8 @@ def main():
         print(
             f"gif: {info['gif']}  ({info['gif_bytes'] / 1e6:.2f} MB, "
             f"{info['gif_colors']} colors)  days_with_coverage={info['days_with_coverage']}"
-            f"  cumulative_km2={info['cumulative_km2']}"
+            f"  peak_km2={info['peak_km2']} ({info['peak_day']})"
+            f"  latest_km2={info['latest_km2']}"
         )
     else:
         print(f"no frames produced: {info.get('note')}")

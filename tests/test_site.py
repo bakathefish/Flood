@@ -227,6 +227,15 @@ def test_each_live_feed_fetched_once(html):
         assert n == 1, f"{feed} fetched {n}x; share one promise"
 
 
+def test_explorer_day_navigation_is_clamped(html):
+    # walking "day >" past the last processed GFM day makes the WMS return
+    # its InvalidDimensionValue error as white tiles (the "broken table")
+    assert "clampDay(" in html, "explorer must clamp typed and stepped dates"
+    assert re.search(r"dateIn\.max\s*=\s*lastDay", html), (
+        "date input max must be the last PROCESSED day, not today"
+    )
+
+
 def test_preconnect_to_raw(media):
     hrefs = [l.get("href", "") for l in media.links if l.get("rel") == "preconnect"]
     assert any("raw.githubusercontent.com" in h for h in hrefs)

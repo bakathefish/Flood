@@ -296,7 +296,7 @@ footer .cr{max-width:60ch}
         <div class="tl" id="now-tl" style="margin-top:22px;margin-bottom:0">
           <span class="tag">This monsoon · day by day</span>
           <img src="https://raw.githubusercontent.com/bakathefish/Flood/master/atlas/web/timelapse_current.gif" width="1280" height="1120" alt="Rolling timelapse of satellite-observed water over Punjab for the current monsoon" loading="lazy" decoding="async" onerror="document.getElementById('now-tl').style.display='none'">
-          <div class="swipe-cap" data-i="nowtl">The 2026 season so far: daily satellite-observed water (Copernicus GFM, keyless), rebuilt automatically as new passes arrive. One honest reading note: most of this early-season water is flood-irrigated rice transplanting, the same paddy signal the forecaster filters out. Disaster flooding shows up as corridors along the rivers, not statewide speckle, and this view will catch it the day it happens.</div>
+          <div class="swipe-cap" data-i="nowtl">One frame per satellite pass: the water actually observed on that day (Copernicus GFM, keyless), so water that drains between passes disappears from the next frame, with a signed change line against the previous pass. Rebuilt automatically as new passes arrive. One honest reading note: much of the early-season signal is flood-irrigated rice transplanting, the same paddy signal the forecaster filters out. Disaster flooding shows up as corridors along the rivers, not scattered speckle, and this view will catch it the day it happens.</div>
         </div>
       </div>
       <div>
@@ -331,7 +331,7 @@ footer .cr{max-width:60ch}
         <div class="map-left" style="min-height:480px"><div id="exmap" style="position:absolute;inset:0"></div></div>
       </div>
     </div>
-    <div class="swipe-cap" data-i="excap">Explore the satellite record yourself: pick any date, then pan and zoom anywhere in the world. This is the same keyless Copernicus GFM feed the pipeline consumes, straight from the source, with nothing of ours in between. The dashed boxes are that day's Sentinel-1 passes with their acquisition times; water beyond the permanent blue shows in warm pink. It opens on Punjab at the latest processed day. Try 30 Aug 2025 to see the flood at full width.</div>
+    <div class="swipe-cap" data-i="excap">Explore the satellite record yourself: pick any date, then pan and zoom anywhere in the world. This is the same keyless Copernicus GFM feed the pipeline consumes, straight from the source, with nothing of ours in between. The dashed boxes are that day's Sentinel-1 passes with their acquisition times; water beyond the permanent blue shows in warm pink, and it only appears inside that day's boxes (each pass images a swath, not the whole state). The date arrows stay inside the processed archive. It opens on Punjab at the latest processed day. Try 30 Aug 2025, then zoom into the Sutlej near Firozpur.</div>
   </section>
 
   <section id="forecast">
@@ -499,7 +499,7 @@ footer .cr{max-width:60ch}
         <h3>Engineering honesty</h3>
         <p>Every satellite step is gated by a pre-declared checkpoint: the expected number is written down <i>before</i> the run, then the actual, then PASS or FAIL. The log ships in the repo, failures included.</p>
         <div class="honesty">Training labels are bootstrapped from method agreement and labeled as such. Both spatial folds are reported. The June "floods" that turned out to be rice transplanting are documented, calibrated and published. And we ran an ablation on ourselves: delete the dam features and the 2025 flags don't move, while a persistence baseline nearly matches pooled precision. We published that too.</div>
-        <p class="mt14">459 automated tests, written before the code they test. MIT-licensed code, CC-BY data products.
+        <p class="mt14">463 automated tests, written before the code they test. MIT-licensed code, CC-BY data products.
         Method paper, data-source registry and verification log live in the <a href="https://github.com/bakathefish/Flood/tree/master/docs">repository docs</a>.</p>
       </div>
     </div>
@@ -641,19 +641,24 @@ lazyInit('exmap', async () => {
   const OWS = 'https://ows.globalfloods.eu/glofas-ows/ows';
   let lastDay = new Date(Date.now() - 2*864e5).toISOString().slice(0,10);
   try { const c = await (await fetch(RAW + 'monitor/current_timelapse.json')).json(); if (c && c.last_day) lastDay = c.last_day; } catch(_){}
+  // clamp every date to the processed GFM archive: a TIME outside it makes
+  // the WMS return its InvalidDimensionValue error as white tiles
+  const MIN_DAY = '2015-01-01';
+  const clampDay = d => d < MIN_DAY ? MIN_DAY : (d > lastDay ? lastDay : d);
   const dateIn = document.getElementById('ex-date');
-  dateIn.value = lastDay; dateIn.max = new Date().toISOString().slice(0,10); dateIn.min = '2015-01-01';
+  dateIn.value = lastDay; dateIn.max = lastDay; dateIn.min = MIN_DAY;
   const wmsOpts = layers => ({layers, format:'image/png', transparent:true, version:'1.3.0'});
   const ref = L.tileLayer.wms(OWS, {...wmsOpts('gfm_reference_water_mask_group_layer'), time: lastDay + 'T00:00Z', opacity:.85}).addTo(m);
   let flood = null;
   const setDay = d => {
-    if (!d) return;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '')) return;
+    d = clampDay(d); dateIn.value = d;
     if (flood) m.removeLayer(flood);
     flood = L.tileLayer.wms(OWS, {...wmsOpts('gfm_observed_water_extent_group_layer'), time: d + 'T00:00Z', opacity:.85}).addTo(m);
   };
   setDay(lastDay);
   dateIn.addEventListener('change', () => setDay(dateIn.value));
-  const shift = days => { const d = new Date(dateIn.value); d.setDate(d.getDate() + days); dateIn.value = d.toISOString().slice(0,10); setDay(dateIn.value); };
+  const shift = days => { const d = new Date(dateIn.value + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + days); setDay(d.toISOString().slice(0,10)); };
   document.getElementById('ex-prev').addEventListener('click', () => shift(-1));
   document.getElementById('ex-next').addEventListener('click', () => shift(1));
   const refBtn = document.getElementById('ex-ref-toggle');
