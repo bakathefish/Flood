@@ -326,12 +326,13 @@ footer .cr{max-width:60ch}
           <button class="chip" id="ex-next" aria-label="next day">day ▸</button>
           <span class="chip-divider"></span>
           <button class="chip active" id="ex-ref-toggle"><span class="sw" style="background:#1a5f9e"></span><span data-i="ex1">reference water</span></button>
+          <button class="chip" id="ex-passes"><span class="sw" style="background:#bf0000"></span><span data-i="ex3">passes</span></button>
           <span class="nowcast-badge" data-i="ex2">Copernicus GFM observed water · keyless WMS · pan anywhere on Earth</span>
         </div>
         <div class="map-left" style="min-height:480px"><div id="exmap" style="position:absolute;inset:0"></div></div>
       </div>
     </div>
-    <div class="swipe-cap" data-i="excap">Explore the satellite record yourself: pick any date, then pan and zoom anywhere in the world. This is the same keyless Copernicus GFM feed the pipeline consumes, straight from the source, with nothing of ours in between. The dashed boxes are that day's Sentinel-1 passes with their acquisition times; water beyond the permanent blue shows in warm pink, and it only appears inside that day's boxes (each pass images a swath, not the whole state). The date arrows stay inside the processed archive. It opens on Punjab at the latest processed day. Try 30 Aug 2025, then zoom into the Sutlej near Firozpur.</div>
+    <div class="swipe-cap" data-i="excap">Explore the satellite record yourself: pick any date, then pan and zoom anywhere in the world. This is the same keyless Copernicus GFM feed the pipeline consumes, straight from the source. Observed water shows in warm pink over the permanent blue. Each pass images a swath, not the whole state, so pink appears only where the satellite looked that day; toggle "passes" to see those swaths with their acquisition times. The date arrows stay inside the processed archive. It opens on Punjab at the latest processed day. Try 30 Aug 2025, then zoom into the Sutlej near Firozpur.</div>
   </section>
 
   <section id="forecast">
@@ -499,7 +500,7 @@ footer .cr{max-width:60ch}
         <h3>Engineering honesty</h3>
         <p>Every satellite step is gated by a pre-declared checkpoint: the expected number is written down <i>before</i> the run, then the actual, then PASS or FAIL. The log ships in the repo, failures included.</p>
         <div class="honesty">Training labels are bootstrapped from method agreement and labeled as such. Both spatial folds are reported. The June "floods" that turned out to be rice transplanting are documented, calibrated and published. And we ran an ablation on ourselves: delete the dam features and the 2025 flags don't move, while a persistence baseline nearly matches pooled precision. We published that too.</div>
-        <p class="mt14">463 automated tests, written before the code they test. MIT-licensed code, CC-BY data products.
+        <p class="mt14">465 automated tests, written before the code they test. MIT-licensed code, CC-BY data products.
         Method paper, data-source registry and verification log live in the <a href="https://github.com/bakathefish/Flood/tree/master/docs">repository docs</a>.</p>
       </div>
     </div>
@@ -648,13 +649,52 @@ lazyInit('exmap', async () => {
   const dateIn = document.getElementById('ex-date');
   dateIn.value = lastDay; dateIn.max = lastDay; dateIn.min = MIN_DAY;
   const wmsOpts = layers => ({layers, format:'image/png', transparent:true, version:'1.3.0'});
-  const ref = L.tileLayer.wms(OWS, {...wmsOpts('gfm_reference_water_mask_group_layer'), time: lastDay + 'T00:00Z', opacity:.85}).addTo(m);
-  let flood = null;
+
+  // BOTH GFM group layers (observed water AND reference water) bake red/green
+  // pass boxes and orange time labels into their tiles, and the server
+  // exposes no decoration-free layer. Its CORS is open, so tiles are
+  // filtered per-pixel instead: water is the only blue-dominant color in
+  // either palette, so blue-dominant pixels are kept (optionally repainted
+  // via `tint`) and every decoration pixel goes transparent. The pass boxes
+  // stay available behind the "passes" chip.
+  const CleanWMS = L.TileLayer.WMS.extend({
+    createTile(coords, done) {
+      const tile = document.createElement('canvas');
+      const size = this.getTileSize();
+      tile.width = size.x; tile.height = size.y;
+      const tint = this.options.tint;
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const ctx = tile.getContext('2d', {willReadFrequently: true});
+        ctx.drawImage(img, 0, 0);
+        const id = ctx.getImageData(0, 0, tile.width, tile.height);
+        const p = id.data;
+        for (let i = 0; i < p.length; i += 4) {
+          if (!p[i+3]) continue;
+          if (p[i+2] > p[i] && p[i+2] >= p[i+1]) {
+            if (tint) { p[i] = tint[0]; p[i+1] = tint[1]; p[i+2] = tint[2]; }
+          } else p[i+3] = 0;
+        }
+        ctx.putImageData(id, 0, 0);
+        done(null, tile);
+      };
+      img.onerror = () => done(null, tile);  // a failed tile stays empty, never a white square
+      img.src = this.getTileUrl(coords);
+      return tile;
+    }
+  });
+
+  const ref = new CleanWMS(OWS, {...wmsOpts('gfm_reference_water_mask_group_layer'), time: lastDay + 'T00:00Z', opacity:.85}).addTo(m);
+
+  let flood = null, passes = null, passesOn = false;
   const setDay = d => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '')) return;
     d = clampDay(d); dateIn.value = d;
     if (flood) m.removeLayer(flood);
-    flood = L.tileLayer.wms(OWS, {...wmsOpts('gfm_observed_water_extent_group_layer'), time: d + 'T00:00Z', opacity:.85}).addTo(m);
+    flood = new CleanWMS(OWS, {...wmsOpts('gfm_observed_water_extent_group_layer'), time: d + 'T00:00Z', opacity:.95, tint: [244, 135, 232]}).addTo(m);
+    if (passes) { m.removeLayer(passes); passes = null; }
+    if (passesOn) passes = L.tileLayer.wms(OWS, {...wmsOpts('gfm_sentinel_1_footprint'), time: d + 'T00:00Z', opacity:.7}).addTo(m);
   };
   setDay(lastDay);
   dateIn.addEventListener('change', () => setDay(dateIn.value));
@@ -665,6 +705,11 @@ lazyInit('exmap', async () => {
   refBtn.addEventListener('click', () => {
     const on = !m.hasLayer(ref); refBtn.classList.toggle('active', on);
     if (on) ref.addTo(m); else m.removeLayer(ref);
+  });
+  const passBtn = document.getElementById('ex-passes');
+  passBtn.addEventListener('click', () => {
+    passesOn = !passesOn; passBtn.classList.toggle('active', passesOn);
+    setDay(dateIn.value);
   });
 });
 

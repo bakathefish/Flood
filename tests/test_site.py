@@ -236,6 +236,28 @@ def test_explorer_day_navigation_is_clamped(html):
     )
 
 
+def test_explorer_strips_gfm_tile_decorations(html):
+    # the GFM group layer bakes red/green pass boxes and orange time labels
+    # into its tiles and exposes no water-only layer; the server's CORS is
+    # open, so the explorer must filter tiles per-pixel: keep blue-dominant
+    # water (repainted warm pink), drop every decoration pixel
+    assert "createTile" in html, "explorer must render filtered canvas tiles"
+    assert "crossOrigin" in html
+    assert "getImageData" in html
+    # BOTH gfm group layers bundle the decorations (reference water included)
+    assert html.count("new CleanWMS(") == 2, (
+        "observed AND reference layers must go through the pixel filter"
+    )
+
+
+def test_explorer_passes_toggle_off_by_default(html):
+    # the stripped pass swaths remain available behind an opt-in chip
+    assert "gfm_sentinel_1_footprint" in html
+    m = re.search(r'<button[^>]*id="ex-passes"[^>]*>', html)
+    assert m, "passes chip missing"
+    assert "active" not in m.group(0), "passes chip must start inactive"
+
+
 def test_preconnect_to_raw(media):
     hrefs = [l.get("href", "") for l in media.links if l.get("rel") == "preconnect"]
     assert any("raw.githubusercontent.com" in h for h in hrefs)

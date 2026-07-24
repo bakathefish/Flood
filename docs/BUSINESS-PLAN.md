@@ -79,7 +79,7 @@ system's name into policy rooms (SANDRP already covers this space).
 - **Single-sensor reliance**: EOS-04/Bhoonidhi second SAR source in Phase 1.
 - **Adoption friction**: zero-login open core removes procurement as a
   precondition; institutions can adopt before they contract.
-- **Founder concentration**: solo student builder; mitigations: 463 tests,
+- **Founder concentration**: solo student builder; mitigations: 465 tests,
   full method paper, verification log. The system is transferable by design.
   ISB mentorship asks: government procurement navigation, PPP structuring.
 
