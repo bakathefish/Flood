@@ -1,62 +1,50 @@
 {
- "generated_utc": "2026-07-23T11:05:49Z",
+ "generated_utc": "2026-07-25T03:16:01Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-07-20",
- "latest_pass_utc": "2026-07-20T00:59:53.430336Z",
- "new_scenes": 7,
+ "latest_pass": "2026-07-24",
+ "latest_pass_utc": "2026-07-24T13:04:15.445566Z",
+ "new_scenes": 3,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.867,
- "total_flooded_km2": 2.4,
+ "coverage_fraction": 0.71,
+ "total_flooded_km2": 22.4,
  "passes": [
   {
-   "date": "2026-07-19",
-   "scenes": 4,
-   "total_flooded_km2": 0.3,
-   "flagged": 0,
-   "coverage_fraction": 0.593
-  },
-  {
-   "date": "2026-07-20",
+   "date": "2026-07-24",
    "scenes": 3,
-   "total_flooded_km2": 2.4,
+   "total_flooded_km2": 22.4,
    "flagged": 0,
-   "coverage_fraction": 0.867
+   "coverage_fraction": 0.71
   }
  ],
  "districts": [
   {
-   "district": "Firozpur",
-   "flooded_km2": 1.6,
-   "flooded_fraction": 0.0003
-  },
-  {
-   "district": "Tarn Taran",
-   "flooded_km2": 0.5,
-   "flooded_fraction": 0.0002
-  },
-  {
-   "district": "Kapurthala",
-   "flooded_km2": 0.2,
-   "flooded_fraction": 0.0001
+   "district": "Amritsar",
+   "flooded_km2": 19.0,
+   "flooded_fraction": 0.0071
   },
   {
    "district": "Gurdaspur",
-   "flooded_km2": 0.1,
-   "flooded_fraction": 0.0
+   "flooded_km2": 1.8,
+   "flooded_fraction": 0.0005
   },
   {
-   "district": "Amritsar",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
+   "district": "Kapurthala",
+   "flooded_km2": 0.8,
+   "flooded_fraction": 0.0005
   },
   {
    "district": "Barnala",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
+   "flooded_km2": 0.4,
+   "flooded_fraction": 0.0003
+  },
+  {
+   "district": "Firozpur",
+   "flooded_km2": 0.4,
+   "flooded_fraction": 0.0001
   },
   {
    "district": "Bathinda",
@@ -125,6 +113,11 @@
   },
   {
    "district": "Sangrur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Tarn Taran",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   }
