@@ -19,7 +19,7 @@ In August and September 2025 Punjab had its worst flood since 1988: all 23 distr
 | **Forecaster** | XGBoost district flood-risk model trained on the pipeline's own 2,420 SAR-derived labels. Leave-one-year-out validation, SHAP attributions, conformal uncertainty, and an ablation stress test |
 | **Live monitor** | A 6-hourly secretless GitHub Action: new Sentinel-1 pass in, district flood km² out, written to `monitor/latest.json` with ਪੰਜਾਬੀ, हिन्दी and English alerts plus live model risk in `monitor/nowcast.json` |
 
-The site is interactive: an every-district map with five switchable layers (2025 flood, decade frequency, hindcast risk, live observed, live model risk), per-district panels, the SAR swipe, the flood timelapse, and the live feed. Every figure loads from version-controlled CSVs in this repo.
+The public site (built in React with Meta's Astryx design system, trilingual in Punjabi, Hindi and English) is interactive: the live district-risk forecast, the live satellite monitor, an every-district map you can scrub through any monsoon from 2015 to now with decade-recurrence and rupee-impact layers, per-district panels, auto-generated trilingual alerts, and the held-out 2025 validation. Every figure loads from version-controlled data in this repo.
 
 ## Headline results
 
@@ -57,7 +57,8 @@ data/       small CSVs + GeoJSON only (committed); bulk rasters stay local
 atlas/      output maps and figures (incl. atlas/web/ swipe + timelapse assets)
 briefs/     20 designed per-district A4 PDFs
 monitor/    live state written by CI every 6 h (latest.json, nowcast.json)
-docs/       site (index.html) · METHOD.md · DATA-SOURCES.md · VERIFICATION-LOG.md · SYNOPSIS.md ·
+webapp/     React + Astryx front-end source (built into docs/)
+docs/       built site (index.html + assets/) · METHOD.md · DATA-SOURCES.md · VERIFICATION-LOG.md · SYNOPSIS.md ·
             SAILAAB-synopsis.pdf · SAILAAB-business-plan.pdf · notes/ (pre-declarations per component)
 ```
 

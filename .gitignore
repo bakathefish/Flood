@@ -28,3 +28,10 @@ data/eos04/*.zip
 private/
 broken/
 New folder/
+
+# personal ID document scanned in by mistake — never commit
+eAadhaar_*.pdf
+# front-end build output (the built copy lives in docs/) and QA screenshots
+webapp/dist/
+webapp/*.png
+webapp/*.jpg
