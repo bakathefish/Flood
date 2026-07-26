@@ -12,10 +12,12 @@ import {Button} from '@astryxdesign/core/Button';
 import {Badge} from '@astryxdesign/core/Badge';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Card} from '@astryxdesign/core/Card';
-import MapSection from './MapSection';
 import AlertSection from './AlertSection';
 import ForecastSection from './ForecastSection';
-import ProofSection from './ProofSection';
+// heavy, below-the-fold sections (Leaflet + Recharts + PapaParse) are code-split
+// so the hero paints without their ~200 KB gzip on the critical path
+const MapSection = React.lazy(() => import('./MapSection'));
+const ProofSection = React.lazy(() => import('./ProofSection'));
 
 const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
 
@@ -49,11 +51,11 @@ const LANGS = [
 
 const T = {
   en: {
-    eyebrow: 'Punjab · open flood intelligence · live this monsoon',
+    eyebrow: 'Punjab · open AI flood intelligence · live this monsoon',
     h1: 'The flood forecast Punjab never had.',
     lede: 'In August 2025 Punjab saw its worst flood since 1988. All 23 districts went under, about 3.55 lakh people were affected, and India’s flood-forecast network had zero stations in the state. Sailaab rebuilds that capability in the open, and it is running right now.',
     seeLive: 'See it live →',
-    source: 'Source & method',
+    source: 'Open source (MIT) · method',
     gap: 'flood-forecast stations in Punjab. 226 exist across 22 other states. That absence is the gap this project fills.',
     who1L: 'Built for',
     who1: 'District disaster and revenue officers, relief agencies, and flood-exposed residents who read Punjabi or Hindi.',
@@ -66,9 +68,9 @@ const T = {
     techL: 'Built on',
     tech: 'Sentinel-1 SAR via Microsoft Planetary Computer (STAC) and Google Earth Engine · scikit-learn Random Forest · XGBoost with SHAP, conformal prediction and ablation · a PyTorch U-Net baseline · Leaflet + Recharts + Astryx on the front end · GitHub Actions CI every 6 hours · hand-written trilingual alert templates filled from the live numbers. 450+ tests, written before the code.',
     respTitle: 'Responsible by design',
-    resp1L: 'Ethics', resp1: 'Advisory, not a replacement for official warnings — a human stays in the loop.',
+    resp1L: 'Ethics', resp1: 'Advisory, not a replacement for official warnings; a human stays in the loop.',
     resp2L: 'Privacy', resp2: 'No personal data. Every input is public Earth-observation imagery and aggregate district statistics.',
-    resp3L: 'Environment', resp3: 'Light models on free-tier compute — negligible carbon, in service of climate adaptation (SDG 13).',
+    resp3L: 'Environment', resp3: 'Light models on free-tier compute, negligible carbon, in service of climate adaptation (SDG 13).',
     resp4L: 'Uncertainty & bias', resp4: 'Conformal intervals are calibrated on average but under-covered the 2025 extreme, a failure we publish rather than hide, alongside the rice-transplant false positive and both spatial folds.',
     liveTitle: 'Live this monsoon',
     liveHead: 'Live monitor · runs itself every 6 hours, no keys, no accounts',
@@ -78,13 +80,14 @@ const T = {
     liveCovL: 'Coverage',
     liveFloodL: 'Water flagged',
     liveLoading: 'querying…',
+    footer: 'SAILAAB · built by a Punjab student during the 2026 monsoon · India AI Impact Festival 2026 · Code MIT · Maps & tables CC-BY-4.0 · Contains modified Copernicus Sentinel & CEMS-GFM data',
   },
   hi: {
-    eyebrow: 'खुली बाढ़ इंटेलिजेंस · इस मानसून लाइव',
+    eyebrow: 'पंजाब · खुली AI बाढ़ इंटेलिजेंस · इस मानसून लाइव',
     h1: 'वह बाढ़ पूर्वानुमान जो पंजाब के पास कभी नहीं था।',
     lede: 'अगस्त 2025 में पंजाब ने 1988 के बाद की सबसे भीषण बाढ़ झेली: सभी 23 ज़िले, ~3.55 लाख लोग प्रभावित, और भारत के बाढ़-पूर्वानुमान नेटवर्क में राज्य के शून्य स्टेशन। सैलाब यह क्षमता खुले में फिर से बनाता है, और यह अभी चल रहा है।',
     seeLive: 'लाइव देखें →',
-    source: 'स्रोत और विधि',
+    source: 'ओपन सोर्स (MIT) · विधि',
     gap: 'पंजाब में बाढ़-पूर्वानुमान स्टेशन। 22 अन्य राज्यों में 226 मौजूद हैं। यही कमी यह परियोजना भरती है।',
     who1L: 'किसके लिए',
     who1: 'ज़िला आपदा व राजस्व अधिकारी, राहत एजेंसियाँ, और पंजाबी या हिन्दी पढ़ने वाले बाढ़-प्रभावित निवासी।',
@@ -109,13 +112,14 @@ const T = {
     liveCovL: 'कवरेज',
     liveFloodL: 'चिह्नित जल',
     liveLoading: 'खोजा जा रहा है…',
+    footer: 'SAILAAB · 2026 मानसून में एक पंजाबी छात्र द्वारा निर्मित · India AI Impact Festival 2026 · कोड MIT · नक्शे व तालिकाएँ CC-BY-4.0 · संशोधित Copernicus Sentinel व CEMS-GFM डेटा युक्त',
   },
   pa: {
-    eyebrow: 'ਖੁੱਲ੍ਹੀ ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਜਾਣਕਾਰੀ · ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ',
+    eyebrow: 'ਪੰਜਾਬ · ਖੁੱਲ੍ਹੀ AI ਹੜ੍ਹ ਖੁਫ਼ੀਆ ਜਾਣਕਾਰੀ · ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ',
     h1: 'ਉਹ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ ਜੋ ਪੰਜਾਬ ਕੋਲ ਕਦੇ ਨਹੀਂ ਸੀ।',
     lede: 'ਅਗਸਤ 2025 ਵਿੱਚ ਪੰਜਾਬ ਨੇ 1988 ਤੋਂ ਬਾਅਦ ਦਾ ਸਭ ਤੋਂ ਭਿਆਨਕ ਹੜ੍ਹ ਝੱਲਿਆ: ਸਾਰੇ 23 ਜ਼ਿਲ੍ਹੇ, ~3.55 ਲੱਖ ਲੋਕ ਪ੍ਰਭਾਵਿਤ, ਅਤੇ ਭਾਰਤ ਦੇ ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਨੈੱਟਵਰਕ ਵਿੱਚ ਸੂਬੇ ਦੇ ਜ਼ੀਰੋ ਸਟੇਸ਼ਨ। ਸੈਲਾਬ ਇਹ ਸਮਰੱਥਾ ਖੁੱਲ੍ਹੇ ਵਿੱਚ ਮੁੜ ਉਸਾਰਦਾ ਹੈ, ਅਤੇ ਇਹ ਹੁਣੇ ਚੱਲ ਰਿਹਾ ਹੈ।',
     seeLive: 'ਲਾਈਵ ਵੇਖੋ →',
-    source: 'ਸਰੋਤ ਅਤੇ ਵਿਧੀ',
+    source: 'ਓਪਨ ਸੋਰਸ (MIT) · ਵਿਧੀ',
     gap: 'ਪੰਜਾਬ ਵਿੱਚ ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਸਟੇਸ਼ਨ। 22 ਹੋਰ ਸੂਬਿਆਂ ਵਿੱਚ 226 ਹਨ। ਇਹੀ ਘਾਟ ਇਹ ਪ੍ਰੋਜੈਕਟ ਪੂਰੀ ਕਰਦਾ ਹੈ।',
     who1L: 'ਕਿਸ ਲਈ',
     who1: 'ਜ਼ਿਲ੍ਹਾ ਆਫ਼ਤ ਤੇ ਮਾਲ ਅਧਿਕਾਰੀ, ਰਾਹਤ ਏਜੰਸੀਆਂ, ਅਤੇ ਪੰਜਾਬੀ ਜਾਂ ਹਿੰਦੀ ਪੜ੍ਹਨ ਵਾਲੇ ਹੜ੍ਹ-ਪ੍ਰਭਾਵਿਤ ਵਾਸੀ।',
@@ -140,12 +144,13 @@ const T = {
     liveCovL: 'ਕਵਰੇਜ',
     liveFloodL: 'ਚਿੰਨ੍ਹਿਤ ਪਾਣੀ',
     liveLoading: 'ਲੱਭਿਆ ਜਾ ਰਿਹਾ ਹੈ…',
+    footer: 'SAILAAB · 2026 ਮਾਨਸੂਨ ਵਿੱਚ ਇੱਕ ਪੰਜਾਬੀ ਵਿਦਿਆਰਥੀ ਵੱਲੋਂ ਬਣਾਇਆ · India AI Impact Festival 2026 · ਕੋਡ MIT · ਨਕਸ਼ੇ ਤੇ ਸਾਰਣੀਆਂ CC-BY-4.0 · ਸੋਧਿਆ Copernicus Sentinel ਤੇ CEMS-GFM ਡੇਟਾ ਸਹਿਤ',
   },
 };
 
 const MODULES = [
   {
-    tag: null,
+    tag: 'AI',
     en: {name: 'Atlas', desc: 'Sentinel-1 radar change detection and a Random Forest map of standing water, per district, with how long each area stayed submerged.'},
     hi: {name: 'एटलस', desc: 'Sentinel-1 रडार परिवर्तन-पहचान और स्थिर जल का Random Forest नक्शा, हर ज़िले के लिए, यह भी कि कौन-सा क्षेत्र कितने समय जलमग्न रहा।'},
     pa: {name: 'ਐਟਲਸ', desc: 'Sentinel-1 ਰਾਡਾਰ ਤਬਦੀਲੀ-ਪਛਾਣ ਅਤੇ ਖੜ੍ਹੇ ਪਾਣੀ ਦਾ Random Forest ਨਕਸ਼ਾ, ਹਰ ਜ਼ਿਲ੍ਹੇ ਲਈ, ਨਾਲੇ ਕਿਹੜਾ ਖੇਤਰ ਕਿੰਨਾ ਚਿਰ ਡੁੱਬਿਆ ਰਿਹਾ।'},
@@ -232,6 +237,11 @@ export default function App() {
   const [lang, setLang] = useState('en');
   const t = T[lang];
 
+  // announce the page language so screen readers pronounce hi/pa correctly
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
   return (
     <AppShell height="auto" contentPadding={0} variant="surface">
       {/* masthead */}
@@ -244,6 +254,8 @@ export default function App() {
                 key={l.code}
                 variant={lang === l.code ? 'primary' : 'ghost'}
                 onClick={() => setLang(l.code)}
+                lang={l.code}
+                aria-pressed={lang === l.code}
               >
                 {l.label}
               </Button>
@@ -269,7 +281,7 @@ export default function App() {
       <ForecastSection lang={lang} />
       <AlertSection lang={lang} />
       <LiveSection t={t} />
-      <MapSection lang={lang} />
+      <React.Suspense fallback={null}><MapSection lang={lang} /></React.Suspense>
 
       {/* how it is built */}
       <Band paddingBlock={8} maxWidth={1080}>
@@ -287,13 +299,13 @@ export default function App() {
                 <Divider />
                 <HStack gap={4} vAlign="start" paddingBlock={3} wrap="wrap">
                   <Text type="supporting" hasTabularNumbers>{String(i + 1).padStart(2, '0')}</Text>
-                  <VStack gap={1} width={190}>
+                  <VStack gap={1} width={190} maxWidth="100%">
                     <HStack gap={2} vAlign="center" wrap="wrap">
                       <Text type="label">{m[lang].name}</Text>
                       {m.tag && <Badge variant="blue" label={m.tag} />}
                     </HStack>
                   </VStack>
-                  <VStack width={440}>
+                  <VStack width={440} maxWidth="100%">
                     <Text color="secondary">{m[lang].desc}</Text>
                   </VStack>
                 </HStack>
@@ -349,13 +361,13 @@ export default function App() {
       </Band>
 
       {/* proof, at the very end */}
-      <ProofSection lang={lang} />
+      <React.Suspense fallback={null}><ProofSection lang={lang} /></React.Suspense>
 
       {/* footer */}
       <Section variant="transparent" padding={0} dividers={['top']}>
         <HStack justify="center" width="100%">
           <VStack width="100%" maxWidth={1080} paddingInline={4} paddingBlock={5} gap={1}>
-            <Text type="supporting" color="secondary">SAILAAB · built by a Punjab student during the 2026 monsoon · India AI Impact Festival 2026 · Code MIT · Maps &amp; tables CC-BY-4.0 · Contains modified Copernicus Sentinel &amp; CEMS-GFM data</Text>
+            <Text type="supporting" color="secondary">{t.footer}</Text>
             <Link href="https://github.com/bakathefish/Flood" isStandalone>github.com/bakathefish/Flood</Link>
           </VStack>
         </HStack>

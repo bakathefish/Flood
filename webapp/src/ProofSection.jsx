@@ -20,9 +20,9 @@ async function loadCsv(url) {
 }
 
 const PRED_T = {
-  en: {title: 'Predicted flood risk by district — held out to 2025', cap: 'The model’s held-out 2025 forecast, trained only on 2015–24. Teal flooded, grey did not — it ranked the flooded districts on top.'},
-  hi: {title: 'ज़िलेवार अनुमानित बाढ़ जोखिम — 2025 पर होल्ड-आउट', cap: 'मॉडल का होल्ड-आउट 2025 पूर्वानुमान, केवल 2015–24 पर प्रशिक्षित। टील डूबे, ग्रे नहीं — इसने डूबे ज़िलों को शीर्ष पर रखा।'},
-  pa: {title: 'ਜ਼ਿਲ੍ਹਾ-ਵਾਰ ਅਨੁਮਾਨਿਤ ਹੜ੍ਹ ਖ਼ਤਰਾ — 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ', cap: 'ਮਾਡਲ ਦਾ ਹੋਲਡ-ਆਊਟ 2025 ਪੂਰਵ-ਅਨੁਮਾਨ, ਸਿਰਫ਼ 2015–24 ਉੱਤੇ ਸਿਖਲਾਈ। ਟੀਲ ਡੁੱਬੇ, ਸਲੇਟੀ ਨਹੀਂ — ਇਸ ਨੇ ਡੁੱਬੇ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ’ਤੇ ਰੱਖਿਆ।'},
+  en: {title: 'Predicted flood risk by district, held out to 2025', cap: 'Each bar is the district’s peak predicted probability across the 2025 windows, from a model trained only on 2015 to 2024. Teal flooded, grey did not. It ranked the flooded districts on top.'},
+  hi: {title: 'ज़िलेवार अनुमानित बाढ़ जोखिम, 2025 पर होल्ड-आउट', cap: 'हर बार 2025 की विंडोज़ में ज़िले की उच्चतम अनुमानित संभावना है, केवल 2015 से 2024 पर प्रशिक्षित मॉडल से। टील डूबे, ग्रे नहीं। इसने डूबे ज़िलों को शीर्ष पर रखा।'},
+  pa: {title: 'ਜ਼ਿਲ੍ਹਾ-ਵਾਰ ਅਨੁਮਾਨਿਤ ਹੜ੍ਹ ਖ਼ਤਰਾ, 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ', cap: 'ਹਰ ਬਾਰ 2025 ਦੀਆਂ ਵਿੰਡੋਜ਼ ਵਿੱਚ ਜ਼ਿਲ੍ਹੇ ਦੀ ਸਭ ਤੋਂ ਵੱਧ ਅਨੁਮਾਨਿਤ ਸੰਭਾਵਨਾ ਹੈ, ਸਿਰਫ਼ 2015 ਤੋਂ 2024 ਉੱਤੇ ਸਿਖਲਾਈ ਮਾਡਲ ਤੋਂ। ਟੀਲ ਡੁੱਬੇ, ਸਲੇਟੀ ਨਹੀਂ। ਇਸ ਨੇ ਡੁੱਬੇ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ’ਤੇ ਰੱਖਿਆ।'},
 };
 
 const P_T = {

@@ -31,7 +31,7 @@ The public site (built in React with Meta's Astryx design system, trilingual in 
 - **Population exposure.** 0.76 to 1.78 lakh people lived inside the mapped water (GHSL, conservation-checked), against 3.55 lakh officially "affected". The gap is low-density cropland: 146 to 206 people/km² in the flooded zone versus a state mean near 550.
 - **Dam headroom (pre-declared).** At surge-eve, Pong sat 1.01 BCM above its own median operating curve and Ranjit Sagar 0.45 BCM. Bhakra's margin was 0.22 BCM, which we report as negligible. The total, about 1.68 BCM, is one to four days of peak release (`docs/notes/headroom.md`).
 - **Climate context.** Pre-registered Mann-Kendall tests on 65 years of IMD grids: total monsoon loading is largely stationary, but extreme-wet-day frequency over the upstream Himalayan box is rising (p = 0.017). The 2025 Aug 20 to Sep 5 burst was +9.7σ, rank 1 of the record.
-- **The gap, quantified.** Punjab has zero CWC flood-forecast stations. It is absent from the 226-station national table and from CWC's current lists, and the one historical Ravi site is defunct (`docs/notes/cwc-gap.md`).
+- **The gap, quantified.** Punjab has zero CWC flood-forecast stations. It is absent from the 226-station national table (CWC's latest published station list, dated Jan 2018) and from CWC's current lists, and the one historical Ravi site is defunct (`docs/notes/cwc-gap.md`).
 
 ## Validated four independent ways
 
