@@ -31,7 +31,7 @@ const P_T = {
   en: {
     eyebrow: 'Proof · held out to 2025',
     title: 'Graded by the worst flood since 1988',
-    intro: 'The forecast and the maps were trained on 2015–24, then handed 2025 — a year they had never seen — and let it grade them. Every satellite claim is gated by a number written down before the run, with PASS or FAIL shipped either way.',
+    intro: 'The forecast and the maps were trained on 2015–24, then handed 2025, a year they had never seen, and let it grade them. Every satellite claim is gated by a number written down before the run, with PASS or FAIL shipped either way.',
     stats: [
       {v: '81.7%', l: 'of mapped flood pixels confirmed by a different satellite (Sentinel-2 optical, 237 truth points). Pre-declared gate: 60%.'},
       {v: 'ρ = 0.72', l: 'rank agreement between our 2025 satellite damage map and the government’s Special Girdawari survey across all 20 districts (0.56 over the 16 named).'},
@@ -41,12 +41,12 @@ const P_T = {
     honesty: 'We also benchmarked an imported deep-learning U-Net: it scored IoU 0.63 in the lab but under-segmented Punjab badly (recall 0.24). Our simpler stack beat it, and we published that result instead of hiding it. Failures ship in the verification log too.',
     take: 'Take the documents',
     links: [
-      {t: 'Method paper — every threshold, model, and validation', u: REPO + '/blob/master/docs/METHOD.md'},
-      {t: 'Verification log — pre-declared bands, actuals, PASS/FAIL', u: REPO + '/blob/master/docs/VERIFICATION-LOG.md'},
-      {t: '20 district briefs — one printable page per DC office', u: REPO + '/tree/master/briefs'},
-      {t: 'Synopsis (PDF) — the whole project in 5 pages', u: SITE + 'SAILAAB-synopsis.pdf'},
+      {t: 'Method paper: every threshold, model, and validation', u: REPO + '/blob/master/docs/METHOD.md'},
+      {t: 'Verification log: pre-declared bands, actuals, PASS/FAIL', u: REPO + '/blob/master/docs/VERIFICATION-LOG.md'},
+      {t: '20 district briefs, one printable page per DC office', u: REPO + '/tree/master/briefs'},
+      {t: 'Synopsis (PDF): the whole project in 5 pages', u: SITE + 'SAILAAB-synopsis.pdf'},
       {t: 'Sustainability & deployment plan (PDF)', u: SITE + 'SAILAAB-business-plan.pdf'},
-      {t: 'Source code (MIT) — reproduce every number', u: REPO},
+      {t: 'Source code (MIT): reproduce every number', u: REPO},
     ],
   },
   hi: {

@@ -15,7 +15,7 @@ import Papa from 'papaparse';
 const MAP_T = {
   en: {
     no: '03', title: 'Explore the record',
-    intro: 'Pull up any monsoon from 2015 to now and watch the water move — even the years the model was never trained on. Or switch to the decade of recurrence and the rupee impact. Hover to compare, click any district for the full breakdown.',
+    intro: 'Pull up any monsoon from 2015 to now and watch the water move, even the years the model was never trained on. Or switch to the decade of recurrence and the rupee impact. Hover to compare, click any district for the full breakdown.',
     year: 'Flood by year', freq: 'Decade recurrence', impact: 'Impact (₹)', now: 'Live now (2026)',
     hint: 'Click a district for its numbers.',
     lgYear: 'Hectares flooded that monsoon', lgFreq: 'Seasons flooded ≥1%, 2015–25 (of 11)',

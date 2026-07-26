@@ -16,7 +16,7 @@ const F_T = {
   en: {
     no: '01', title: 'The forecast',
     lead: 'Punjab’s first district-level flood forecast.',
-    intro: 'An XGBoost model, trained on a decade of satellite-derived flood labels (2015–24). Open, reproducible, and running live this monsoon — in a state that had zero official flood-forecast stations.',
+    intro: 'An XGBoost model, trained on a decade of satellite-derived flood labels (2015–24). Open, reproducible, and running live this monsoon, in a state that had zero official flood-forecast stations.',
     explain: 'Every 6 hours it scores each district: the chance it floods in the next 10 days.',
     boardNote: 'Risk tracks the monsoon: in a quiet window every district reads near zero, and it climbs as flood conditions build. The held-out 2025 run below shows what the board looked like during the real event.',
     liveHead: 'Live risk · this window',
