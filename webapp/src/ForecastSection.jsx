@@ -18,6 +18,7 @@ const F_T = {
     lead: 'Punjab’s first district-level flood forecast.',
     intro: 'An XGBoost model, trained on a decade of satellite-derived flood labels (2015–24). Open, reproducible, and running live this monsoon — in a state that had zero official flood-forecast stations.',
     explain: 'Every 6 hours it scores each district: the chance it floods in the next 10 days.',
+    boardNote: 'Risk tracks the monsoon: in a quiet window every district reads near zero, and it climbs as flood conditions build. The held-out 2025 run below shows what the board looked like during the real event.',
     liveHead: 'Live risk · this window',
     districtCol: 'District',
     riskCol: 'flood risk',
@@ -30,6 +31,7 @@ const F_T = {
     lead: 'पंजाब का पहला ज़िला-स्तरीय बाढ़ पूर्वानुमान।',
     intro: 'एक XGBoost मॉडल, दशक भर के सैटेलाइट-आधारित बाढ़ लेबल (2015–24) पर प्रशिक्षित। खुला, पुनरुत्पाद्य और इस मानसून लाइव — उस राज्य में जहाँ शून्य आधिकारिक बाढ़-पूर्वानुमान स्टेशन थे।',
     explain: 'हर 6 घंटे यह हर ज़िले को स्कोर करता है: अगले 10 दिनों में उसके डूबने की संभावना।',
+    boardNote: 'जोखिम मानसून के साथ चलता है: शांत विंडो में हर ज़िला लगभग शून्य दिखाता है, और बाढ़ की स्थिति बनते ही यह बढ़ता है। नीचे 2025 का होल्ड-आउट रन दिखाता है कि असली घटना के दौरान बोर्ड कैसा दिखता था।',
     liveHead: 'लाइव जोखिम · यह विंडो',
     districtCol: 'ज़िला',
     riskCol: 'बाढ़ जोखिम',
@@ -42,11 +44,12 @@ const F_T = {
     lead: 'ਪੰਜਾਬ ਦੀ ਪਹਿਲੀ ਜ਼ਿਲ੍ਹਾ-ਪੱਧਰੀ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ।',
     intro: 'ਇੱਕ XGBoost ਮਾਡਲ, ਦਹਾਕੇ ਭਰ ਦੇ ਸੈਟੇਲਾਈਟ-ਆਧਾਰਿਤ ਹੜ੍ਹ ਲੇਬਲਾਂ (2015–24) ਉੱਤੇ ਸਿਖਲਾਈ। ਖੁੱਲ੍ਹਾ, ਮੁੜ-ਪੈਦਾ ਕਰਨਯੋਗ ਅਤੇ ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ — ਉਸ ਸੂਬੇ ਵਿੱਚ ਜਿੱਥੇ ਜ਼ੀਰੋ ਸਰਕਾਰੀ ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਸਟੇਸ਼ਨ ਸਨ।',
     explain: 'ਹਰ 6 ਘੰਟੇ ਇਹ ਹਰ ਜ਼ਿਲ੍ਹੇ ਨੂੰ ਸਕੋਰ ਕਰਦਾ ਹੈ: ਅਗਲੇ 10 ਦਿਨਾਂ ਵਿੱਚ ਉਸ ਦੇ ਡੁੱਬਣ ਦੀ ਸੰਭਾਵਨਾ।',
+    boardNote: 'ਖ਼ਤਰਾ ਮਾਨਸੂਨ ਨਾਲ ਚੱਲਦਾ ਹੈ: ਸ਼ਾਂਤ ਵਿੰਡੋ ਵਿੱਚ ਹਰ ਜ਼ਿਲ੍ਹਾ ਲਗਭਗ ਜ਼ੀਰੋ ਦਿਖਾਉਂਦਾ ਹੈ, ਅਤੇ ਹੜ੍ਹ ਦੀਆਂ ਹਾਲਤਾਂ ਬਣਦਿਆਂ ਹੀ ਇਹ ਵਧਦਾ ਹੈ। ਹੇਠਾਂ 2025 ਦਾ ਹੋਲਡ-ਆਊਟ ਰਨ ਦਿਖਾਉਂਦਾ ਹੈ ਕਿ ਅਸਲ ਘਟਨਾ ਦੌਰਾਨ ਬੋਰਡ ਕਿਹੋ ਜਿਹਾ ਦਿਖਦਾ ਸੀ।',
     liveHead: 'ਲਾਈਵ ਖ਼ਤਰਾ · ਇਹ ਵਿੰਡੋ',
     districtCol: 'ਜ਼ਿਲ੍ਹਾ',
     riskCol: 'ਹੜ੍ਹ ਖ਼ਤਰਾ',
     waterCol: 'ਹੁਣ ਪਾਣੀ',
-    summary: 'ਖੱਬੇ ਪਾਸੇ ਦੀ ਸਾਰਣੀ ਹਰ ਜ਼ਿਲ੍ਹੇ ਦੇ ਹੜ੍ਹ ਖ਼ਤਰੇ ਦੀ ਮਾਡਲ ਦੀ ਲਾਈਵ ਰੈਂਕਿੰਗ ਹੈ। ਸਿਰਫ਼ 2015 ਤੋਂ 2024 ਉੱਤੇ ਸਿਖਲਾਈ ਅਤੇ 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ, ਇਸ ਨੇ ਸਭ ਤੋਂ ਵੱਧ ਪ੍ਰਭਾਵਿਤ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ਦੇ ਨੇੜੇ ਰੱਖਿਆ। ਇੱਕ ਸਰਲ ਬੇਸਲਾਈਨ ਜੋ ਪਿਛਲੀ ਵਿੰਡੋ ਦੀ ਹੜ੍ਹ ਨੂੰ ਅੱਗੇ ਲੈ ਜਾਂਦਾ ਹੈ, ਇਸ ਦੇ ਲਗਭਗ ਬਰਾਬਰ ਹੈ, ਇਸ ਲਈ ਇਸ ਨੂੰ ਇੱਕ ਇਮਾਨਦਾਰ ਖੁੱਲ੍ਹੀ ਰੈਂਕਿੰਗ ਸਮਝੋ, ਕੋਈ ਸਟੀਕ ਭਵਿੱਖਬਾਣੀਕਾਰ ਨਹੀਂ। ਪੂਰਾ ਹੋਲਡ-ਆਊਟ ਸਤਿਆਪਨ, ਅਤੇ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ਾ ਸਰਕਾਰ ਦੇ ਜ਼ਮੀਨੀ ਸਰਵੇ ਨਾਲ ਕਿਵੇਂ ਮੇਲ ਖਾਂਦਾ ਹੈ, ਹੇਠਾਂ ਹੈ।',
+    summary: 'ਖੱਬੇ ਪਾਸੇ ਦੀ ਸਾਰਣੀ ਹਰ ਜ਼ਿਲ੍ਹੇ ਦੇ ਹੜ੍ਹ ਖ਼ਤਰੇ ਦੀ ਮਾਡਲ ਦੀ ਲਾਈਵ ਰੈਂਕਿੰਗ ਹੈ। ਸਿਰਫ਼ 2015 ਤੋਂ 2024 ਉੱਤੇ ਸਿਖਲਾਈ ਅਤੇ 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ, ਇਸ ਨੇ ਸਭ ਤੋਂ ਵੱਧ ਪ੍ਰਭਾਵਿਤ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ਦੇ ਨੇੜੇ ਰੱਖਿਆ। ਇੱਕ ਸਰਲ ਬੇਸਲਾਈਨ ਜੋ ਪਿਛਲੀ ਵਿੰਡੋ ਦੇ ਹੜ੍ਹ ਨੂੰ ਅੱਗੇ ਲੈ ਜਾਂਦਾ ਹੈ, ਇਸ ਦੇ ਲਗਭਗ ਬਰਾਬਰ ਹੈ, ਇਸ ਲਈ ਇਸ ਨੂੰ ਇੱਕ ਇਮਾਨਦਾਰ ਖੁੱਲ੍ਹੀ ਰੈਂਕਿੰਗ ਸਮਝੋ, ਕੋਈ ਸਟੀਕ ਭਵਿੱਖਬਾਣੀਕਾਰ ਨਹੀਂ। ਪੂਰਾ ਹੋਲਡ-ਆਊਟ ਸਤਿਆਪਨ, ਅਤੇ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ਾ ਸਰਕਾਰ ਦੇ ਜ਼ਮੀਨੀ ਸਰਵੇ ਨਾਲ ਕਿਵੇਂ ਮੇਲ ਖਾਂਦਾ ਹੈ, ਹੇਠਾਂ ਹੈ।',
     seeProof: 'ਵੇਖੋ 2025 ਵਿੱਚ ਇਹ ਕਿਵੇਂ ਰਿਹਾ, ਅਤੇ ਪੂਰਾ ਸਤਿਆਪਨ →',
   },
 };
@@ -78,6 +81,9 @@ export default function ForecastSection({lang}) {
           <VStack maxWidth={780} gap={3}>
             <Text type="large" color="secondary">{t.intro}</Text>
             <Text type="large">{t.explain}</Text>
+          </VStack>
+          <VStack maxWidth={780}>
+            <Text color="secondary">{t.boardNote}</Text>
           </VStack>
 
           {rows.length > 0 && (

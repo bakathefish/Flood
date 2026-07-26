@@ -37,7 +37,7 @@ The public site (built in React with Meta's Astryx design system, trilingual in 
 
 | Check | Against | Result |
 |---|---|---|
-| Fresh-point confusion matrices | Copernicus GFM (different algorithm) | OA 0.983; F1 and the full envelope published |
+| Fresh-point confusion matrices | Copernicus GFM (different algorithm; also the label seed, so compared on fresh held-out points) | OA 0.983; F1 and the full envelope published |
 | 237 optical truth points | Sentinel-2 NDWI (different sensor, different physics) | 81.7% of RF flood pixels confirmed; the pre-declared gate was 60%, and every precision/recall ordering held |
 | Visual map-sheet comparison | ISRO NDEM 2025 (RISAT-1A) | The Beas-doab and Sutlej-Harike patterns correspond; registration is approximate and says so on the image |
 | District damage ranking | Punjab Revenue Dept Special Girdawari (ground survey) | ρ = 0.72 across all 20 districts, 5 of the top 6 identical |

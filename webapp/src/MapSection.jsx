@@ -122,7 +122,7 @@ export default function MapSection({lang}) {
     const name = dn(raw);
     if (layer === 'year') return +((byYear[year] && byYear[year][name]) || 0);
     if (layer === 'freq') return +((freq[name] && freq[name].seasons_with_fraction_gt1pct) || 0);
-    if (layer === 'impact') return +((stats[name] && stats[name].crop_var_inr) || 0) / 1e7;
+    if (layer === 'impact') return +((stats[name] && (stats[name].crop_var_inr_v2 || stats[name].crop_var_inr)) || 0) / 1e7;
     return +((now[name] && now[name].observed_km2) || 0);
   };
   const fmt = (v) => {
@@ -157,7 +157,7 @@ export default function MapSection({lang}) {
   const n = sel ? now[dn(sel)] : null;
   const fq = sel ? freq[dn(sel)] : null;
   const selYearHa = sel && byYear[year] ? byYear[year][dn(sel)] : null;
-  const crore = s ? (+s.crop_var_inr / 1e7).toFixed(0) : null;
+  const crore = s ? (+((s.crop_var_inr_v2 || s.crop_var_inr)) / 1e7).toFixed(0) : null;
   const activeLabel = (LAYERS.find((L) => L.k === layer) || {}).label || '';
   const headDesc = layer === 'year' ? `${year} ${t.yr}` : activeLabel;
 
