@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-07-25T13:47:42Z",
+ "generated_utc": "2026-07-26T06:42:30Z",
  "window_start": "2026-07-25",
  "window_end": "2026-08-04",
  "core_season": true,
@@ -12,7 +12,7 @@
  "districts": [
   {
    "district": "Kapurthala",
-   "p_event": 0.0078,
+   "p_event": 0.0088,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -54,12 +54,6 @@
   },
   {
    "district": "Barnala",
-   "p_event": 0.0004,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Hoshiarpur",
    "p_event": 0.0004,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
@@ -119,6 +113,12 @@
    "observed_km2": 0.0
   },
   {
+   "district": "Hoshiarpur",
+   "p_event": 0.0002,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
    "district": "Ludhiana",
    "p_event": 0.0002,
    "observed_fraction_window": 0.0,
@@ -131,5 +131,5 @@
    "observed_km2": 0.0
   }
  ],
- "notes": "Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are not identically calibrated (treat rain features as a consistent proxy). Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows; XGBoost ingests the missing values natively. Current-window rain summed over 1/1 elapsed days. GFM observed extent: 1 S1-active of 1 current-window days and 4/10 antecedent-window days (~900 px grid, permanent water removed)."
+ "notes": "Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are not identically calibrated (treat rain features as a consistent proxy). Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows; XGBoost ingests the missing values natively. Current-window rain summed over 2/2 elapsed days. GFM observed extent: 1 S1-active of 2 current-window days and 4/10 antecedent-window days (~900 px grid, permanent water removed)."
 }
