@@ -1,302 +1,161 @@
 # tests/test_site.py
-"""Performance and integrity contract for the public site (docs/index.html).
+"""Publish-gate contract for the built public site (docs/).
 
-Written first (red) for the 2026-07-24 performance pass. Before it, the page
-shipped ~8.4 MB of full-resolution figures hot-linked from
-raw.githubusercontent.com (5-minute CDN cache, no width/height, so the layout
-jumped as they arrived), fetched monitor/latest.json and monitor/nowcast.json
-three times each behind ?t=Date.now() cache-busters, booted two Leaflet maps
-plus a remote WMS at page open, and painted a full-viewport mix-blend-mode
-noise overlay on every scroll frame.
+The public site is a React + Astryx single-page app: source lives in webapp/
+and Vite builds it into docs/ for GitHub Pages, served under the /Flood/ base.
+docs/index.html is therefore a thin shell (a #root div plus a hashed JS/CSS
+bundle); the interactive logic lives inside the bundle, not in hand-authored
+markup.
 
-The contract these tests pin:
-  * every <img>/<video> declares its intrinsic width and height (no CLS),
-    and declared dimensions match the real pixels of local files;
-  * static figures are served same-origin from docs/assets/web/ as capped
-    WebP within a hard byte budget; only live monitor artifacts (rewritten
-    by CI every 6 h) may stay on raw.githubusercontent.com;
-  * each live JSON feed is fetched exactly once, with no cache-busters;
-  * Leaflet and both maps initialize lazily via IntersectionObserver;
-  * no full-viewport blend modes or per-image filters;
-  * below-fold sections use content-visibility so first paint stays cheap.
+The monitor CI runs the whole test suite before it publishes ("never publish
+from a red tree"). These tests are the site half of that gate: they don't
+rebuild the app (the runner has no npm), they check that the committed docs/
+artifacts are internally consistent and that every runtime data feed the app
+loads is present and well-formed, so a half-deployed or data-broken site can
+never ship silently.
 """
 
 from __future__ import annotations
 
+import csv
 import json
 import re
 from html.parser import HTMLParser
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 INDEX = DOCS / "index.html"
-WEB = DOCS / "assets" / "web"
+ASSETS = DOCS / "assets"
 
-# live artifacts CI rewrites every 6 h: these MUST stay remote (raw serves the
-# fresh commit; a docs/ copy would go stale between site deploys)
-LIVE_REMOTE_OK = {
-    "monitor/latest.jpg",
-    "atlas/web/timelapse_current.gif",
+BASE = "/Flood/"                    # GitHub Pages project-site base path
+GEOJSON_BUDGET_BYTES = 150_000     # simplified district boundaries
+
+# data feeds the SPA loads at runtime, with the columns each caller relies on
+DATA_CSVS = {
+    "district_flood_stats_2025.csv": ["district", "tierA_flooded_ha", "rf_flooded_ha"],
+    "flood_frequency_districts_late_season.csv": ["district", "max_season_fraction"],
+    "forecaster_2025_hindcast.csv": ["district", "window_start", "p_event"],
+    "gfm_district_window_fractions_2015_2025.csv": ["year", "window_start", "district"],
 }
 
-IMG_BUDGET_BYTES = 250_000          # per static image (WebP, <=1600 px wide)
-VIDEO_BUDGET_BYTES = 1_200_000      # the 12 s timelapse mp4
-TOTAL_BUDGET_BYTES = 2_600_000      # all local static media the page references
-GEOJSON_BUDGET_BYTES = 150_000      # simplified district boundaries
 
-
-class _Media(HTMLParser):
-    """Collect <img>, <video> and <source> tags plus <script>/<link> heads."""
+class _Head(HTMLParser):
+    """Collect <script>, <link> and <div> attributes from the shell."""
 
     def __init__(self):
         super().__init__()
-        self.imgs: list[dict] = []
-        self.videos: list[dict] = []
         self.scripts: list[dict] = []
         self.links: list[dict] = []
+        self.divs: list[dict] = []
 
     def handle_starttag(self, tag, attrs):
         d = dict(attrs)
-        if tag == "img":
-            self.imgs.append(d)
-        elif tag == "video":
-            self.videos.append(d)
-        elif tag == "script":
+        if tag == "script":
             self.scripts.append(d)
         elif tag == "link":
             self.links.append(d)
+        elif tag == "div":
+            self.divs.append(d)
 
 
-@pytest.fixture(scope="module")
-def html() -> str:
-    return INDEX.read_text(encoding="utf-8")
-
-
-@pytest.fixture(scope="module")
-def media(html) -> _Media:
-    p = _Media()
-    p.feed(html)
+def _parse() -> _Head:
+    p = _Head()
+    p.feed(INDEX.read_text(encoding="utf-8"))
     return p
 
 
-def _local_path(src: str) -> Path | None:
-    """Repo path for a same-origin (relative) src, else None."""
-    if re.match(r"^https?://", src):
-        return None
-    return DOCS / src
+def _as_local(url: str) -> Path:
+    """Map a /Flood/... same-origin URL to its path under docs/."""
+    assert url.startswith(BASE), f"asset {url!r} must be served under {BASE}"
+    return DOCS / url[len(BASE):]
 
 
 # --------------------------------------------------------------------------- #
-# dimensions: the "messy while loading" fix
+# the shell: a valid SPA entry point that mounts the app
 # --------------------------------------------------------------------------- #
-def test_every_img_declares_dimensions(media):
-    for img in media.imgs:
-        src = img.get("src", "?")
-        assert img.get("width", "").isdigit() and img.get("height", "").isdigit(), (
-            f"<img src={src}> missing integer width/height (causes layout shift)"
-        )
+def test_shell_exists_and_mounts_root():
+    assert INDEX.exists(), "docs/index.html (built site) is missing"
+    head = _parse()
+    assert any(d.get("id") == "root" for d in head.divs), "shell has no #root mount"
 
 
-def test_every_video_declares_dimensions(media):
-    for v in media.videos:
-        assert v.get("width", "").isdigit() and v.get("height", "").isdigit(), (
-            "<video> missing integer width/height (causes layout shift)"
-        )
+def test_shell_metadata():
+    html = INDEX.read_text(encoding="utf-8")
+    assert "<title>Sailaab" in html, "title must name the project"
+    assert 'name="description"' in html, "meta description missing (SEO/share cards)"
+    assert 'name="theme-color"' in html, "theme-color missing"
+    assert f'href="{BASE}favicon.svg"' in html, "favicon must be referenced under the base"
 
 
-def test_declared_dimensions_match_local_files(media):
-    from PIL import Image
-
-    checked = 0
-    for img in media.imgs:
-        p = _local_path(img["src"])
-        if p is None:
-            continue
-        assert p.exists(), f"referenced local image missing: {img['src']}"
-        w, h = Image.open(p).size
-        assert (int(img["width"]), int(img["height"])) == (w, h), (
-            f"{img['src']}: declared {img['width']}x{img['height']} != file {w}x{h}"
-        )
-        checked += 1
-    assert checked >= 15, "expected the static figure set to be local by now"
+# --------------------------------------------------------------------------- #
+# the bundle: shell points at a real, present, base-correct build
+# --------------------------------------------------------------------------- #
+def test_bundle_js_present_and_hashed():
+    head = _parse()
+    modules = [s["src"] for s in head.scripts
+               if s.get("type") == "module" and s.get("src")]
+    assert len(modules) == 1, f"expected exactly one entry module, found {modules}"
+    src = modules[0]
+    assert src.startswith(f"{BASE}assets/"), f"entry script not under {BASE}assets/: {src}"
+    assert re.search(r"index-[A-Za-z0-9_-]+\.js$", src), "entry script is not a hashed build"
+    p = _as_local(src)
+    assert p.exists() and p.stat().st_size > 0, f"shell points at a missing JS bundle: {src}"
 
 
-def test_imgs_are_lazy_and_async(media):
-    for img in media.imgs:
-        src = img.get("src", "?")
-        assert img.get("loading") == "lazy", f"<img src={src}> not loading=lazy"
-        assert img.get("decoding") == "async", f"<img src={src}> not decoding=async"
+def test_bundle_css_present_and_hashed():
+    head = _parse()
+    sheets = [l["href"] for l in head.links
+              if l.get("rel") == "stylesheet" and l.get("href")]
+    assert len(sheets) == 1, f"expected exactly one stylesheet, found {sheets}"
+    href = sheets[0]
+    assert href.startswith(f"{BASE}assets/"), f"stylesheet not under {BASE}assets/: {href}"
+    assert re.search(r"index-[A-Za-z0-9_-]+\.css$", href), "stylesheet is not a hashed build"
+    p = _as_local(href)
+    assert p.exists() and p.stat().st_size > 0, f"shell points at a missing CSS bundle: {href}"
 
 
-def test_stretched_imgs_keep_aspect_ratio(html):
-    # width:100% via CSS + a height attribute distorts unless height:auto is set
-    assert re.search(r"img\s*{[^}]*height\s*:\s*auto", html) or "height:auto" in html, (
-        "CSS must set height:auto on sized <img> so width/height attrs only "
-        "reserve aspect ratio"
+def test_all_referenced_assets_use_the_base():
+    # a stray root-relative asset (/assets/...) 404s on the project site
+    head = _parse()
+    urls = [s.get("src", "") for s in head.scripts] + [l.get("href", "") for l in head.links]
+    for u in urls:
+        if u.startswith("/") and not u.startswith(BASE):
+            raise AssertionError(f"asset escapes the {BASE} base and will 404: {u}")
+
+
+def test_nojekyll_present():
+    # without it, GitHub Pages' Jekyll step can drop files and break asset serving
+    assert (DOCS / ".nojekyll").exists(), "docs/.nojekyll missing (Pages may mangle assets)"
+    assert (DOCS / "favicon.svg").exists(), "docs/favicon.svg missing"
+
+
+# --------------------------------------------------------------------------- #
+# runtime data feeds: present, same-origin, well-formed
+# --------------------------------------------------------------------------- #
+def test_district_geojson_is_simplified_and_complete():
+    p = ASSETS / "punjab_districts.json"
+    assert p.exists(), "docs/assets/punjab_districts.json missing (map has no boundaries)"
+    assert p.stat().st_size <= GEOJSON_BUDGET_BYTES, (
+        f"district geojson is {p.stat().st_size:,} B > {GEOJSON_BUDGET_BYTES:,} B; "
+        "ship the simplified copy"
     )
-
-
-# --------------------------------------------------------------------------- #
-# where bytes come from: same-origin optimized set, live-only remotes
-# --------------------------------------------------------------------------- #
-def _media_srcs(media):
-    out = [i["src"] for i in media.imgs]
-    for v in media.videos:
-        for k in ("src", "poster"):
-            if v.get(k):
-                out.append(v[k])
-    return out
-
-
-def test_only_live_artifacts_are_remote(media):
-    for src in _media_srcs(media):
-        if not re.match(r"^https?://", src):
-            continue
-        tail = re.sub(r"^https://raw\.githubusercontent\.com/[^/]+/[^/]+/[^/]+/", "", src)
-        assert tail in LIVE_REMOTE_OK, (
-            f"static media must be served same-origin from docs/assets/web/, "
-            f"found remote: {src}"
-        )
-
-
-def test_local_static_media_within_budget(media):
-    total = 0
-    seen = set()
-    for src in _media_srcs(media):
-        p = _local_path(src)
-        if p is None or src in seen:
-            continue
-        seen.add(src)
-        assert p.exists(), f"missing local asset: {src}"
-        n = p.stat().st_size
-        budget = VIDEO_BUDGET_BYTES if p.suffix == ".mp4" else IMG_BUDGET_BYTES
-        assert n <= budget, f"{src} is {n:,} B, over its {budget:,} B budget"
-        total += n
-    assert total <= TOTAL_BUDGET_BYTES, (
-        f"local static media totals {total:,} B > {TOTAL_BUDGET_BYTES:,} B"
-    )
-
-
-def test_swipe_pair_identical_dimensions():
-    from PIL import Image
-
-    pre = Image.open(WEB / "swipe_pre.webp").size
-    flood = Image.open(WEB / "swipe_flood.webp").size
-    assert pre == flood, "before/after swipe images must share dimensions"
-
-
-def test_now_card_is_compressed_jpg(media):
-    srcs = [i["src"] for i in media.imgs]
-    assert any(s.endswith("monitor/latest.jpg") for s in srcs), (
-        "live card must load the JPEG twin, not the ~700 KB PNG"
-    )
-    seed = ROOT / "monitor" / "latest.jpg"
-    assert seed.exists(), "seed monitor/latest.jpg must be committed"
-    assert seed.stat().st_size <= 300_000
-
-
-def test_district_geojson_is_simplified_local_copy(html):
-    p = WEB / "punjab_districts.json"
-    assert p.exists(), "simplified district boundaries missing"
-    assert p.stat().st_size <= GEOJSON_BUDGET_BYTES
     gj = json.loads(p.read_text(encoding="utf-8"))
-    assert len(gj["features"]) == 20
-    assert all("district" in f["properties"] for f in gj["features"])
-    assert "data/punjab_districts.geojson" not in html, (
-        "page must fetch the simplified same-origin copy"
+    assert gj.get("type") == "FeatureCollection"
+    assert len(gj["features"]) == 20, "Punjab has 20 mapped districts"
+    assert all("district" in f["properties"] for f in gj["features"]), (
+        "every feature needs a 'district' property to join the data feeds"
     )
 
 
-# --------------------------------------------------------------------------- #
-# network discipline: one fetch per feed, no busters
-# --------------------------------------------------------------------------- #
-def test_no_cache_busters(html):
-    assert "?t=" not in html, (
-        "no ?t=Date.now() cache-busters: raw already caps caching at 5 min"
-    )
-
-
-def test_each_live_feed_fetched_once(html):
-    # prose may name the files; the network may hit each exactly once
-    for feed in ("monitor/latest.json", "monitor/nowcast.json",
-                 "monitor/current_timelapse.json"):
-        n = html.count(f"fetch(RAW + '{feed}'")
-        assert n == 1, f"{feed} fetched {n}x; share one promise"
-
-
-def test_explorer_day_navigation_is_clamped(html):
-    # walking "day >" past the last processed GFM day makes the WMS return
-    # its InvalidDimensionValue error as white tiles (the "broken table")
-    assert "clampDay(" in html, "explorer must clamp typed and stepped dates"
-    assert re.search(r"dateIn\.max\s*=\s*lastDay", html), (
-        "date input max must be the last PROCESSED day, not today"
-    )
-
-
-def test_explorer_strips_gfm_tile_decorations(html):
-    # the GFM group layer bakes red/green pass boxes and orange time labels
-    # into its tiles and exposes no water-only layer; the server's CORS is
-    # open, so the explorer must filter tiles per-pixel: keep blue-dominant
-    # water (repainted warm pink), drop every decoration pixel
-    assert "createTile" in html, "explorer must render filtered canvas tiles"
-    assert "crossOrigin" in html
-    assert "getImageData" in html
-    # BOTH gfm group layers bundle the decorations (reference water included)
-    assert html.count("new CleanWMS(") == 2, (
-        "observed AND reference layers must go through the pixel filter"
-    )
-
-
-def test_explorer_passes_toggle_off_by_default(html):
-    # the stripped pass swaths remain available behind an opt-in chip
-    assert "gfm_sentinel_1_footprint" in html
-    m = re.search(r'<button[^>]*id="ex-passes"[^>]*>', html)
-    assert m, "passes chip missing"
-    assert "active" not in m.group(0), "passes chip must start inactive"
-
-
-def test_preconnect_to_raw(media):
-    hrefs = [l.get("href", "") for l in media.links if l.get("rel") == "preconnect"]
-    assert any("raw.githubusercontent.com" in h for h in hrefs)
-
-
-# --------------------------------------------------------------------------- #
-# maps: nothing heavy before the user scrolls near it
-# --------------------------------------------------------------------------- #
-def test_leaflet_not_loaded_eagerly(media):
-    for s in media.scripts:
-        assert "leaflet" not in s.get("src", "").lower(), (
-            "Leaflet must be injected lazily, not a blocking <script src>"
-        )
-    for l in media.links:
-        assert "leaflet" not in l.get("href", "").lower(), (
-            "Leaflet CSS must be injected lazily, not a head <link>"
-        )
-
-
-def test_maps_init_behind_intersection_observer(html):
-    assert "IntersectionObserver" in html
-    # both map containers must go through the lazy-init helper
-    for container in ("'exmap'", "'dmap'"):
-        assert re.search(r"lazyInit\(\s*" + container, html), (
-            f"map {container} must initialize via lazyInit(...)"
-        )
-
-
-# --------------------------------------------------------------------------- #
-# paint cost: no full-viewport blends, no per-image filters, cheap first paint
-# --------------------------------------------------------------------------- #
-def test_no_expensive_paint_styles(html):
-    assert "mix-blend-mode" not in html, (
-        "full-viewport blend overlay taxes every scroll frame"
-    )
-    assert "saturate(" not in html, "per-image CSS filters add paint cost"
-
-
-def test_below_fold_sections_are_containable(html):
-    assert "content-visibility:auto" in html.replace(" ", ""), (
-        "below-fold sections should use content-visibility:auto"
-    )
+def test_data_csvs_present_and_have_expected_columns():
+    for name, required in DATA_CSVS.items():
+        p = ASSETS / name
+        assert p.exists(), f"data feed missing from the deploy: assets/{name}"
+        with p.open(encoding="utf-8", newline="") as fh:
+            reader = csv.reader(fh)
+            header = next(reader, [])
+            rows = sum(1 for _ in reader)
+        for col in required:
+            assert col in header, f"assets/{name} lost required column {col!r}"
+        assert rows > 0, f"assets/{name} has a header but no data rows"
