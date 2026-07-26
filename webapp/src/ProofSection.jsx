@@ -11,7 +11,9 @@ import {Card} from '@astryxdesign/core/Card';
 import {Link} from '@astryxdesign/core/Link';
 
 const REPO = 'https://github.com/bakathefish/Flood';
-const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
+// same-origin GitHub Pages base ('/Flood/') serves the committed docs/ PDFs as
+// application/pdf (opens inline), unlike raw.githubusercontent's octet-stream
+const SITE = import.meta.env.BASE_URL;
 const AXIS = '#8a93a0', GRID = '#2b313b', TIP_BG = '#1b2027', TIP_BD = '#3a414c', TIP_FG = '#e6e9ee', FLOODED = '#3ad0c0', DRY = '#565f6b';
 
 async function loadCsv(url) {
@@ -42,8 +44,8 @@ const P_T = {
       {t: 'Method paper — every threshold, model, and validation', u: REPO + '/blob/master/docs/METHOD.md'},
       {t: 'Verification log — pre-declared bands, actuals, PASS/FAIL', u: REPO + '/blob/master/docs/VERIFICATION-LOG.md'},
       {t: '20 district briefs — one printable page per DC office', u: REPO + '/tree/master/briefs'},
-      {t: 'Synopsis (PDF) — the whole project in 5 pages', u: RAW + 'docs/SAILAAB-synopsis.pdf'},
-      {t: 'Sustainability & deployment plan (PDF)', u: RAW + 'docs/SAILAAB-business-plan.pdf'},
+      {t: 'Synopsis (PDF) — the whole project in 5 pages', u: SITE + 'SAILAAB-synopsis.pdf'},
+      {t: 'Sustainability & deployment plan (PDF)', u: SITE + 'SAILAAB-business-plan.pdf'},
       {t: 'Source code (MIT) — reproduce every number', u: REPO},
     ],
   },
@@ -63,8 +65,8 @@ const P_T = {
       {t: 'विधि पेपर — हर थ्रेशोल्ड, मॉडल और सत्यापन', u: REPO + '/blob/master/docs/METHOD.md'},
       {t: 'वेरिफिकेशन लॉग — पूर्व-घोषित बैंड, वास्तविक, PASS/FAIL', u: REPO + '/blob/master/docs/VERIFICATION-LOG.md'},
       {t: '20 ज़िला ब्रीफ़ — हर DC दफ़्तर के लिए एक प्रिंट-योग्य पेज', u: REPO + '/tree/master/briefs'},
-      {t: 'सारांश (PDF) — पूरी परियोजना 5 पेज में', u: RAW + 'docs/SAILAAB-synopsis.pdf'},
-      {t: 'स्थिरता व परिनियोजन योजना (PDF)', u: RAW + 'docs/SAILAAB-business-plan.pdf'},
+      {t: 'सारांश (PDF) — पूरी परियोजना 5 पेज में', u: SITE + 'SAILAAB-synopsis.pdf'},
+      {t: 'स्थिरता व परिनियोजन योजना (PDF)', u: SITE + 'SAILAAB-business-plan.pdf'},
       {t: 'सोर्स कोड (MIT) — हर संख्या पुनरुत्पन्न करें', u: REPO},
     ],
   },
@@ -84,8 +86,8 @@ const P_T = {
       {t: 'ਵਿਧੀ ਪੇਪਰ — ਹਰ ਥ੍ਰੈਸ਼ਹੋਲਡ, ਮਾਡਲ ਤੇ ਸਤਿਆਪਨ', u: REPO + '/blob/master/docs/METHOD.md'},
       {t: 'ਵੈਰੀਫਿਕੇਸ਼ਨ ਲੌਗ — ਪੂਰਵ-ਘੋਸ਼ਿਤ ਬੈਂਡ, ਵਾਸਤਵਿਕ, PASS/FAIL', u: REPO + '/blob/master/docs/VERIFICATION-LOG.md'},
       {t: '20 ਜ਼ਿਲ੍ਹਾ ਬਰੀਫ਼ — ਹਰ DC ਦਫ਼ਤਰ ਲਈ ਇੱਕ ਪ੍ਰਿੰਟ-ਯੋਗ ਪੇਜ', u: REPO + '/tree/master/briefs'},
-      {t: 'ਸਾਰ (PDF) — ਪੂਰਾ ਪ੍ਰੋਜੈਕਟ 5 ਪੇਜਾਂ ਵਿੱਚ', u: RAW + 'docs/SAILAAB-synopsis.pdf'},
-      {t: 'ਸਥਿਰਤਾ ਤੇ ਤੈਨਾਤੀ ਯੋਜਨਾ (PDF)', u: RAW + 'docs/SAILAAB-business-plan.pdf'},
+      {t: 'ਸਾਰ (PDF) — ਪੂਰਾ ਪ੍ਰੋਜੈਕਟ 5 ਪੇਜਾਂ ਵਿੱਚ', u: SITE + 'SAILAAB-synopsis.pdf'},
+      {t: 'ਸਥਿਰਤਾ ਤੇ ਤੈਨਾਤੀ ਯੋਜਨਾ (PDF)', u: SITE + 'SAILAAB-business-plan.pdf'},
       {t: 'ਸੋਰਸ ਕੋਡ (MIT) — ਹਰ ਸੰਖਿਆ ਮੁੜ-ਪੈਦਾ ਕਰੋ', u: REPO},
     ],
   },
