@@ -35,3 +35,5 @@ eAadhaar_*.pdf
 webapp/dist/
 webapp/*.png
 webapp/*.jpg
+# internal build-planning notes (kept local, never in the public judged repo)
+docs/superpowers/
