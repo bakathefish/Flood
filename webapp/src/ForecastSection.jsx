@@ -22,7 +22,7 @@ const F_T = {
     districtCol: 'District',
     riskCol: 'flood risk',
     waterCol: 'water now',
-    summary: 'Punjab is calm this week — every district is well under 1%, and none is near the alert level. What the model does well is rank the risk: held out to 2025 it put the flooded districts on top, ρ = 0.72 against the government’s own girdawari survey. It is an honest open baseline, not a precise oracle — the full held-out validation is below.',
+    summary: 'The table on the left is the model’s live ranking of each district’s flood risk. Trained only on 2015 to 2024 and held out to 2025, it put the worst-hit districts near the top. A one-line baseline that just carries forward last window’s flooding nearly matches it, so read this as an honest open ranking, not a precise oracle. The full held-out validation, and how the satellite map compares to the government’s ground survey, is below.',
     seeProof: 'See how it did in 2025, and the full validation →',
   },
   hi: {
@@ -34,7 +34,7 @@ const F_T = {
     districtCol: 'ज़िला',
     riskCol: 'बाढ़ जोखिम',
     waterCol: 'अभी जल',
-    summary: 'पंजाब इस हफ़्ते शांत है — हर ज़िला 1% से काफ़ी नीचे, कोई भी अलर्ट स्तर के पास नहीं। मॉडल जो अच्छा करता है वह है जोखिम की रैंकिंग: 2025 पर होल्ड-आउट में इसने डूबे ज़िलों को शीर्ष पर रखा, सरकार के अपने गिरदावरी सर्वे के मुकाबले ρ = 0.72। यह एक ईमानदार खुला बेसलाइन है, कोई सटीक भविष्यवक्ता नहीं — पूरा होल्ड-आउट सत्यापन नीचे है।',
+    summary: 'बाईं ओर की तालिका हर ज़िले के बाढ़ जोखिम की मॉडल की लाइव रैंकिंग है। केवल 2015 से 2024 पर प्रशिक्षित और 2025 पर होल्ड-आउट, इसने सबसे ज़्यादा प्रभावित ज़िलों को शीर्ष के पास रखा। एक सरल बेसलाइन जो पिछली विंडो की बाढ़ को आगे बढ़ाता है, इसके लगभग बराबर है, इसलिए इसे एक ईमानदार खुली रैंकिंग समझें, कोई सटीक भविष्यवक्ता नहीं। पूरा होल्ड-आउट सत्यापन, और सैटेलाइट नक्शा सरकार के ज़मीनी सर्वे से कैसे मेल खाता है, नीचे है।',
     seeProof: 'देखें 2025 में यह कैसा रहा, और पूरा सत्यापन →',
   },
   pa: {
@@ -46,7 +46,7 @@ const F_T = {
     districtCol: 'ਜ਼ਿਲ੍ਹਾ',
     riskCol: 'ਹੜ੍ਹ ਖ਼ਤਰਾ',
     waterCol: 'ਹੁਣ ਪਾਣੀ',
-    summary: 'ਪੰਜਾਬ ਇਸ ਹਫ਼ਤੇ ਸ਼ਾਂਤ ਹੈ — ਹਰ ਜ਼ਿਲ੍ਹਾ 1% ਤੋਂ ਕਾਫ਼ੀ ਹੇਠਾਂ, ਕੋਈ ਵੀ ਅਲਰਟ ਪੱਧਰ ਦੇ ਨੇੜੇ ਨਹੀਂ। ਮਾਡਲ ਜੋ ਚੰਗਾ ਕਰਦਾ ਹੈ ਉਹ ਹੈ ਖ਼ਤਰੇ ਦੀ ਰੈਂਕਿੰਗ: 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ ਵਿੱਚ ਇਸ ਨੇ ਡੁੱਬੇ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ’ਤੇ ਰੱਖਿਆ, ਸਰਕਾਰ ਦੇ ਆਪਣੇ ਗਿਰਦਾਵਰੀ ਸਰਵੇ ਦੇ ਮੁਕਾਬਲੇ ρ = 0.72। ਇਹ ਇੱਕ ਇਮਾਨਦਾਰ ਖੁੱਲ੍ਹਾ ਬੇਸਲਾਈਨ ਹੈ, ਕੋਈ ਸਟੀਕ ਭਵਿੱਖਬਾਣੀਕਾਰ ਨਹੀਂ — ਪੂਰਾ ਹੋਲਡ-ਆਊਟ ਸਤਿਆਪਨ ਹੇਠਾਂ ਹੈ।',
+    summary: 'ਖੱਬੇ ਪਾਸੇ ਦੀ ਸਾਰਣੀ ਹਰ ਜ਼ਿਲ੍ਹੇ ਦੇ ਹੜ੍ਹ ਖ਼ਤਰੇ ਦੀ ਮਾਡਲ ਦੀ ਲਾਈਵ ਰੈਂਕਿੰਗ ਹੈ। ਸਿਰਫ਼ 2015 ਤੋਂ 2024 ਉੱਤੇ ਸਿਖਲਾਈ ਅਤੇ 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ, ਇਸ ਨੇ ਸਭ ਤੋਂ ਵੱਧ ਪ੍ਰਭਾਵਿਤ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ਦੇ ਨੇੜੇ ਰੱਖਿਆ। ਇੱਕ ਸਰਲ ਬੇਸਲਾਈਨ ਜੋ ਪਿਛਲੀ ਵਿੰਡੋ ਦੀ ਹੜ੍ਹ ਨੂੰ ਅੱਗੇ ਲੈ ਜਾਂਦਾ ਹੈ, ਇਸ ਦੇ ਲਗਭਗ ਬਰਾਬਰ ਹੈ, ਇਸ ਲਈ ਇਸ ਨੂੰ ਇੱਕ ਇਮਾਨਦਾਰ ਖੁੱਲ੍ਹੀ ਰੈਂਕਿੰਗ ਸਮਝੋ, ਕੋਈ ਸਟੀਕ ਭਵਿੱਖਬਾਣੀਕਾਰ ਨਹੀਂ। ਪੂਰਾ ਹੋਲਡ-ਆਊਟ ਸਤਿਆਪਨ, ਅਤੇ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ਾ ਸਰਕਾਰ ਦੇ ਜ਼ਮੀਨੀ ਸਰਵੇ ਨਾਲ ਕਿਵੇਂ ਮੇਲ ਖਾਂਦਾ ਹੈ, ਹੇਠਾਂ ਹੈ।',
     seeProof: 'ਵੇਖੋ 2025 ਵਿੱਚ ਇਹ ਕਿਵੇਂ ਰਿਹਾ, ਅਤੇ ਪੂਰਾ ਸਤਿਆਪਨ →',
   },
 };

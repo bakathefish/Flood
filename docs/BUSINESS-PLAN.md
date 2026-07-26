@@ -11,7 +11,7 @@ from the synopsis (ISB mentorship track); nothing here changes the open core.
 A five-module open pipeline (2025 flood atlas, decade hazard atlas, impact
 engine (₹351–523 cr damage band), district forecaster (~10-day demonstrated
 lead), live 6-hourly monitor with ਪੰਜਾਬੀ/हिन्दी/EN alerts) running today on
-free public infrastructure with zero accounts. 386 automated tests; validated
+free public infrastructure with zero accounts. 450+ automated tests; validated
 against Copernicus GFM, Sentinel-2, ISRO NDEM, and the government's own
 girdawari (ρ = 0.72).
 

@@ -37,7 +37,7 @@ for p in (str(ROOT), str(ROOT / "pipeline")):
 
 import pandas as pd  # noqa: E402
 
-import fetch_rain  # noqa: E402  (reuse boxes, _box_mean, masking, daily_box_frame)
+from pipeline import fetch_rain  # noqa: E402  (reuse boxes, _box_mean, masking, daily_box_frame)
 
 DATA = ROOT / "data"
 IMD_DIR = ROOT / "data" / "rasters" / "imd"

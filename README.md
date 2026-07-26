@@ -24,7 +24,7 @@ The public site (built in React with Meta's Astryx design system, trilingual in 
 ## Headline results
 
 - **2025 mapping.** 105,183 ha statewide SAR-flooded area (Tier-A change detection, 90 m, full coverage). The RF map adds about 52k ha in-district. The three-method envelope against Copernicus GFM is published: Tier-A 34k < RF 52k < GFM 86k in-district.
-- **Forecast, held out.** Trained on 2015 to 2024 only, the model flagged all five of 2025's worst-flooded districts, with Kapurthala first at P = 0.72. Four of the five were already in the statewide top-5 by the Aug 14–24 window, roughly ten days before the Aug 26–27 dam releases. Pooled LOYO ROC-AUC 0.946, leakage-checked.
+- **Forecast, held out.** Trained on 2015 to 2024 only, the model ranked 2025's worst-flooded districts at the top, Kapurthala first, with four already in the statewide top-5 by the Aug 14–24 window, roughly ten days before the Aug 26–27 dam releases. Honest recall is five of the six districts that flooded (Jalandhar was missed), and a one-line persistence baseline ("it flooded last window") ranks about as well: it edges the model on average precision, while the model edges it on pooled LOYO ROC-AUC (0.946, leakage-checked) and the early window. Read it as a strong open ranking, not incremental forecast skill; the full 20-district record ships.
 - **The ground survey agrees.** Our satellite damage ranking matched the Revenue Department's Special Girdawari table at ρ = 0.72 across all 20 districts (0.56 over the 16 named), with 5 of the top 6 identical. The divergences sit in the Ghaggar basin, outside our SAR windows, and are documented.
 - **Damage.** 36,195 ha of cropland flooded in the peak snapshot. That is ₹523 crore of paddy at risk (v2, on DES district yields), refined to ₹351 crore once duration is weighted in: 51,202 ha stayed under water for 7 days or more. The official cumulative-season figure (1.48 to 1.75 lakh ha) is stated alongside, and the gap (snapshot vs season, recession bias) is explained rather than hidden.
 - **Relief targeting.** 91 tehsils scored. The repeat victims have names: Khadur Sahib flooded in 6 of 11 seasons, Sultanpur Lodhi in 5 (`data/tehsil_repeat_victims.csv`). One printable brief per district lives in `briefs/`.
@@ -69,7 +69,7 @@ pip install -r requirements.txt
 python -m pytest -q          # 450+ tests; Earth-Engine-marked tests excluded by default
 ```
 
-Every figure and CSV regenerates from the committed inputs via the `pipeline/` CLIs. They are deterministic and need no accounts. The live monitor runs from `.github/workflows/monitor.yml` on a public runner with zero secrets.
+The CSV and analytics figures regenerate from the committed inputs via the `pipeline/` CLIs, deterministically and with no accounts; the SAR and raster maps re-fetch open imagery (still no login) or use the local bulk rasters. The live monitor runs from `.github/workflows/monitor.yml` on a public runner with zero secrets.
 
 ## Data sources
 
@@ -77,7 +77,7 @@ Sentinel-1/2 (Copernicus, via anonymous Planetary Computer STAC), Copernicus GFM
 
 ## Honesty rules
 
-Training labels are bootstrapped from method agreement and labeled as such. Both spatial-CV folds are reported, including the near-separable strata artifact. Every headline number sits next to the official figure it should be compared with. The June and July "floods" that are actually rice transplanting are documented and excluded from training. We ran an ablation on ourselves: delete the dam features and the 2025 flags do not move, and a persistence baseline nearly matches pooled precision. Both results are published as they came out (`docs/notes/ablation.md`). An EOS-04 (ISRO SAR) pixel-level cross-validation is pre-declared with acceptance bands, committed before any scene was downloaded (`docs/notes/eos04.md`). Known limits (urban double-bounce, radar shadow, recession bias) are documented too.
+Training labels are bootstrapped from method agreement and labeled as such. Both spatial-CV folds are reported, including the near-separable strata artifact. Every headline number sits next to the official figure it should be compared with. The June and July "floods" that are actually rice transplanting are documented and excluded from training. We ran an ablation on ourselves: delete the dam features and the 2025 flags do not move, and a one-line persistence baseline actually edges the model on average precision (it flags the same worst districts), so the model's advantage is ROC-AUC and the pre-crest window, not raw skill. All of it is published as it came out (`docs/notes/ablation.md`). An EOS-04 (ISRO SAR) pixel-level cross-validation is pre-declared with acceptance bands, committed before any scene was downloaded (`docs/notes/eos04.md`). Known limits (urban double-bounce, radar shadow, recession bias) are documented too.
 
 ## Documents
 
