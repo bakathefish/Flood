@@ -9,7 +9,6 @@ import {Text} from '@astryxdesign/core/Text';
 import {Heading} from '@astryxdesign/core/Heading';
 import {Card} from '@astryxdesign/core/Card';
 import {Link} from '@astryxdesign/core/Link';
-import Figure from './Figure';
 
 const REPO = 'https://github.com/bakathefish/Flood';
 const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
@@ -26,11 +25,6 @@ const PRED_T = {
   pa: {title: 'ਜ਼ਿਲ੍ਹਾ-ਵਾਰ ਅਨੁਮਾਨਿਤ ਹੜ੍ਹ ਖ਼ਤਰਾ — 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ', cap: 'ਮਾਡਲ ਦਾ ਹੋਲਡ-ਆਊਟ 2025 ਪੂਰਵ-ਅਨੁਮਾਨ, ਸਿਰਫ਼ 2015–24 ਉੱਤੇ ਸਿਖਲਾਈ। ਟੀਲ ਡੁੱਬੇ, ਸਲੇਟੀ ਨਹੀਂ — ਇਸ ਨੇ ਡੁੱਬੇ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ’ਤੇ ਰੱਖਿਆ।'},
 };
 
-// one on-theme figure — the government-agreement scatter (dark background)
-const FIGS = [
-  {src: 'assets/web/official_vs_sailaab.webp', tag: 'Government survey', alt: 'Satellite damage ranking beside the official girdawari table', caption: 'The Revenue Department’s own Special Girdawari table beside our satellite ranking: ρ = 0.72 across all 20 districts, 5 of the top 6 identical.'},
-];
-
 const P_T = {
   en: {
     eyebrow: 'Proof · held out to 2025',
@@ -39,7 +33,7 @@ const P_T = {
     stats: [
       {v: '81.7%', l: 'of mapped flood pixels confirmed by a different satellite (Sentinel-2 optical, 237 truth points). Pre-declared gate: 60%.'},
       {v: 'ρ = 0.72', l: 'rank agreement with the government’s own Special Girdawari survey, across all 20 districts.'},
-      {v: '465', l: 'automated tests, written before the code they check.'},
+      {v: '450+', l: 'automated tests, written before the code they check.'},
       {v: '3', l: 'independent validations: Copernicus GFM, Sentinel-2 optical, and the government ground survey.'},
     ],
     honesty: 'We also benchmarked an imported deep-learning U-Net: it scored IoU 0.63 in the lab but under-segmented Punjab badly (recall 0.24). Our simpler stack beat it, and we published that result instead of hiding it. Failures ship in the verification log too.',
@@ -60,7 +54,7 @@ const P_T = {
     stats: [
       {v: '81.7%', l: 'मैप किए बाढ़ पिक्सल एक अलग सैटेलाइट (Sentinel-2 ऑप्टिकल, 237 सत्य-बिंदु) द्वारा पुष्ट। पूर्व-घोषित गेट: 60%।'},
       {v: 'ρ = 0.72', l: 'सरकार के अपने विशेष गिरदावरी सर्वे से रैंक-मेल, सभी 20 ज़िलों में।'},
-      {v: '465', l: 'स्वचालित टेस्ट, जिस कोड को जाँचते हैं उससे पहले लिखे गए।'},
+      {v: '450+', l: 'स्वचालित टेस्ट, जिस कोड को जाँचते हैं उससे पहले लिखे गए।'},
       {v: '3', l: 'स्वतंत्र सत्यापन: Copernicus GFM, Sentinel-2 ऑप्टिकल, और सरकारी ज़मीनी सर्वे।'},
     ],
     honesty: 'हमने एक आयातित डीप-लर्निंग U-Net भी बेंचमार्क किया: लैब में IoU 0.63, पर पंजाब में बुरी तरह under-segment (recall 0.24)। हमारा सरल स्टैक जीता, और हमने वह परिणाम छिपाने के बजाय प्रकाशित किया। असफलताएँ भी वेरिफिकेशन लॉग में जाती हैं।',
@@ -81,7 +75,7 @@ const P_T = {
     stats: [
       {v: '81.7%', l: 'ਮੈਪ ਕੀਤੇ ਹੜ੍ਹ ਪਿਕਸਲ ਇੱਕ ਵੱਖਰੇ ਸੈਟੇਲਾਈਟ (Sentinel-2 ਆਪਟੀਕਲ, 237 ਸੱਚ-ਬਿੰਦੂ) ਦੁਆਰਾ ਪੁਸ਼ਟ। ਪੂਰਵ-ਘੋਸ਼ਿਤ ਗੇਟ: 60%।'},
       {v: 'ρ = 0.72', l: 'ਸਰਕਾਰ ਦੇ ਆਪਣੇ ਖ਼ਾਸ ਗਿਰਦਾਵਰੀ ਸਰਵੇ ਨਾਲ ਰੈਂਕ-ਮੇਲ, ਸਾਰੇ 20 ਜ਼ਿਲ੍ਹਿਆਂ ਵਿੱਚ।'},
-      {v: '465', l: 'ਆਟੋਮੈਟਿਕ ਟੈਸਟ, ਜਿਸ ਕੋਡ ਨੂੰ ਜਾਂਚਦੇ ਹਨ ਉਸ ਤੋਂ ਪਹਿਲਾਂ ਲਿਖੇ।'},
+      {v: '450+', l: 'ਆਟੋਮੈਟਿਕ ਟੈਸਟ, ਜਿਸ ਕੋਡ ਨੂੰ ਜਾਂਚਦੇ ਹਨ ਉਸ ਤੋਂ ਪਹਿਲਾਂ ਲਿਖੇ।'},
       {v: '3', l: 'ਸੁਤੰਤਰ ਸਤਿਆਪਨ: Copernicus GFM, Sentinel-2 ਆਪਟੀਕਲ, ਤੇ ਸਰਕਾਰੀ ਜ਼ਮੀਨੀ ਸਰਵੇ।'},
     ],
     honesty: 'ਅਸੀਂ ਇੱਕ ਆਯਾਤ ਡੀਪ-ਲਰਨਿੰਗ U-Net ਵੀ ਬੈਂਚਮਾਰਕ ਕੀਤਾ: ਲੈਬ ਵਿੱਚ IoU 0.63, ਪਰ ਪੰਜਾਬ ਵਿੱਚ ਬੁਰੀ ਤਰ੍ਹਾਂ under-segment (recall 0.24)। ਸਾਡਾ ਸਰਲ ਸਟੈਕ ਜਿੱਤਿਆ, ਤੇ ਅਸੀਂ ਉਹ ਨਤੀਜਾ ਲੁਕਾਉਣ ਦੀ ਬਜਾਏ ਪ੍ਰਕਾਸ਼ਿਤ ਕੀਤਾ। ਅਸਫ਼ਲਤਾਵਾਂ ਵੀ ਵੈਰੀਫਿਕੇਸ਼ਨ ਲੌਗ ਵਿੱਚ ਜਾਂਦੀਆਂ ਹਨ।',

@@ -62,10 +62,7 @@ SEED = 42
 RASTER_DIR = Path("data/rasters")
 MODEL_DIR = Path("data/models")
 ATLAS = Path("atlas")
-SCRATCH = Path(
-    "C:/Users/rudra/AppData/Local/Temp/claude/"
-    "C--Users-rudra-OneDrive-Desktop-d/720623cf-3d92-4140-9645-d2526c85c313/scratchpad"
-)
+SCRATCH = Path("data/scratch")
 
 BASE_FEATURES = [
     ("VV_flood", "rf_vv_flood.tif"),

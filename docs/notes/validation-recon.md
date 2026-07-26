@@ -113,8 +113,7 @@ attempted, per instructions). If EMSR838 vectors are needed, they require a free
 ## 3. India AI Impact Festival — fresh re-verification (2026-07-21)
 
 Sources fetched today via `r.jina.ai`: homepage and `/faq`; the two "Resources" Google-Drive PDFs
-pulled directly (`drive.google.com/uc?export=download&id=…`). Diffed against the Jul-20 cache in
-`.claude-crawl/reads/`.
+pulled directly (`drive.google.com/uc?export=download&id=…`). Diffed against the local Jul-20 cache.
 
 **Deadline banner — VERBATIM (unchanged since Jul 20):**
 > Submission Deadline Extended till - July 26, 2026

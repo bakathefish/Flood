@@ -64,7 +64,7 @@ const T = {
     sysTitle: 'The system',
     sysIntro: 'Five modules, one open pipeline, from raw satellite radar to a plain-language alert in three languages. Every number is reproducible from public data.',
     techL: 'Built on',
-    tech: 'Sentinel-1 SAR via Microsoft Planetary Computer (STAC) and Google Earth Engine · scikit-learn Random Forest · XGBoost with SHAP, conformal prediction and ablation · a PyTorch U-Net baseline · Leaflet + Recharts + Astryx on the front end · GitHub Actions CI every 6 hours · hand-written trilingual alert templates filled from the live numbers. 465 tests, written before the code.',
+    tech: 'Sentinel-1 SAR via Microsoft Planetary Computer (STAC) and Google Earth Engine · scikit-learn Random Forest · XGBoost with SHAP, conformal prediction and ablation · a PyTorch U-Net baseline · Leaflet + Recharts + Astryx on the front end · GitHub Actions CI every 6 hours · hand-written trilingual alert templates filled from the live numbers. 450+ tests, written before the code.',
     respTitle: 'Responsible by design',
     resp1L: 'Ethics', resp1: 'Advisory, not a replacement for official warnings — a human stays in the loop.',
     resp2L: 'Privacy', resp2: 'No personal data. Every input is public Earth-observation imagery and aggregate district statistics.',

@@ -46,10 +46,7 @@ MODEL_PATH = Path("data/models/unet_sen1floods11.pt")
 CSV_OUT = Path("data/unet_benchmark.csv")
 QUICKLOOK = Path("atlas/checks/unet_punjab_quicklook.png")
 NOTES = Path("docs/notes/unet.md")
-SCRATCH = Path(
-    "C:/Users/rudra/AppData/Local/Temp/claude/"
-    "C--Users-rudra-OneDrive-Desktop-d/720623cf-3d92-4140-9645-d2526c85c313/scratchpad"
-)
+SCRATCH = Path("data/scratch")
 
 
 def _read(path):

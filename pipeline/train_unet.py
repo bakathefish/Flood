@@ -44,17 +44,10 @@ EVAL_BATCH = 4
 LR = 1e-3
 POS_WEIGHT = 2.0  # mild positive weighting; Dice already handles imbalance
 PATIENCE = 4
-DEFAULT_DATA_DIR = Path(
-    "C:/Users/rudra/AppData/Local/Temp/claude/"
-    "C--Users-rudra-OneDrive-Desktop-d/720623cf-3d92-4140-9645-d2526c85c313/"
-    "scratchpad/sen1floods11"
-)
+DEFAULT_DATA_DIR = Path("data/sen1floods11")
 MODEL_OUT = Path("data/models/unet_sen1floods11.pt")
 NOTES = Path("docs/notes/unet.md")
-SCRATCH = Path(
-    "C:/Users/rudra/AppData/Local/Temp/claude/"
-    "C--Users-rudra-OneDrive-Desktop-d/720623cf-3d92-4140-9645-d2526c85c313/scratchpad"
-)
+SCRATCH = Path("data/scratch")
 
 
 def _seed_everything(seed=SEED):

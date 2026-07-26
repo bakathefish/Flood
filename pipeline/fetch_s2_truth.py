@@ -600,10 +600,7 @@ def run():
     }
     print("=== s2_truth RESULTS ===", flush=True)
     print(json.dumps(results, indent=2, default=str), flush=True)
-    scratch = Path(
-        "C:/Users/rudra/AppData/Local/Temp/claude/"
-        "C--Users-rudra-OneDrive-Desktop-d/720623cf-3d92-4140-9645-d2526c85c313/scratchpad"
-    )
+    scratch = Path("data/scratch")
     scratch.mkdir(parents=True, exist_ok=True)
     with open(scratch / "s2_results.json", "w") as fh:
         json.dump(results, fh, indent=2, default=str)
