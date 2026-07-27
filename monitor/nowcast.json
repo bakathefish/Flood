@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-07-27T03:38:20Z",
+ "generated_utc": "2026-07-27T10:01:19Z",
  "window_start": "2026-07-25",
  "window_end": "2026-08-04",
  "core_season": true,
@@ -55,8 +55,8 @@
   {
    "district": "Rupnagar",
    "p_event": 0.0004,
-   "observed_fraction_window": 0.0001,
-   "observed_km2": 0.1
+   "observed_fraction_window": 0.0002,
+   "observed_km2": 0.2
   },
   {
    "district": "Barnala",
@@ -89,16 +89,22 @@
    "observed_km2": 0.0
   },
   {
-   "district": "Jalandhar",
-   "p_event": 0.0003,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
    "district": "Nawanshahr",
    "p_event": 0.0003,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
+   "observed_fraction_window": 0.001,
+   "observed_km2": 1.2
+  },
+  {
+   "district": "Jalandhar",
+   "p_event": 0.0003,
+   "observed_fraction_window": 0.0001,
+   "observed_km2": 0.2
+  },
+  {
+   "district": "Ludhiana",
+   "p_event": 0.0002,
+   "observed_fraction_window": 0.0001,
+   "observed_km2": 0.4
   },
   {
    "district": "Bathinda",
@@ -114,12 +120,6 @@
   },
   {
    "district": "Fatehgarh Sahib",
-   "p_event": 0.0002,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Ludhiana",
    "p_event": 0.0002,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
