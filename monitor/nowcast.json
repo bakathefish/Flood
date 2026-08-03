@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-07-31T08:57:39Z",
+ "generated_utc": "2026-08-03T03:32:28Z",
  "window_start": "2026-07-25",
  "window_end": "2026-08-04",
  "core_season": true,
@@ -12,124 +12,124 @@
  "districts": [
   {
    "district": "Kapurthala",
-   "p_event": 0.0088,
+   "p_event": 0.0281,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Firozpur",
-   "p_event": 0.0058,
-   "observed_fraction_window": 0.0001,
-   "observed_km2": 0.8
-  },
-  {
-   "district": "Amritsar",
-   "p_event": 0.0038,
+   "p_event": 0.0147,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Tarn Taran",
-   "p_event": 0.003,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Patiala",
-   "p_event": 0.0006,
+   "p_event": 0.0114,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Gurdaspur",
-   "p_event": 0.0005,
+   "p_event": 0.0018,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Sangrur",
-   "p_event": 0.0005,
+   "p_event": 0.0018,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
-   "district": "Rupnagar",
-   "p_event": 0.0004,
-   "observed_fraction_window": 0.0002,
-   "observed_km2": 0.2
-  },
-  {
-   "district": "Barnala",
-   "p_event": 0.0004,
+   "district": "Patiala",
+   "p_event": 0.0016,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
-   "district": "Mansa",
-   "p_event": 0.0004,
+   "district": "Amritsar",
+   "p_event": 0.0013,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
-   "district": "Moga",
-   "p_event": 0.0004,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Sahibzada Ajit Singh Nagar",
-   "p_event": 0.0004,
+   "district": "Jalandhar",
+   "p_event": 0.0013,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Nawanshahr",
-   "p_event": 0.0003,
-   "observed_fraction_window": 0.0011,
-   "observed_km2": 1.4
+   "p_event": 0.0013,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
-   "district": "Jalandhar",
-   "p_event": 0.0003,
-   "observed_fraction_window": 0.0001,
-   "observed_km2": 0.2
-  },
-  {
-   "district": "Ludhiana",
-   "p_event": 0.0002,
-   "observed_fraction_window": 0.0001,
-   "observed_km2": 0.4
+   "district": "Barnala",
+   "p_event": 0.0008,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Bathinda",
-   "p_event": 0.0002,
+   "p_event": 0.0008,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Faridkot",
-   "p_event": 0.0002,
+   "p_event": 0.0008,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Fatehgarh Sahib",
-   "p_event": 0.0002,
+   "p_event": 0.0008,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Hoshiarpur",
-   "p_event": 0.0002,
+   "p_event": 0.0008,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
+   "district": "Ludhiana",
+   "p_event": 0.0008,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
+   "district": "Mansa",
+   "p_event": 0.0008,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
+   "district": "Moga",
+   "p_event": 0.0008,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Muktsar",
-   "p_event": 0.0002,
+   "p_event": 0.0008,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
+   "district": "Rupnagar",
+   "p_event": 0.0008,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
+   "district": "Sahibzada Ajit Singh Nagar",
+   "p_event": 0.0008,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   }
  ],
- "notes": "Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are not identically calibrated (treat rain features as a consistent proxy). Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows; XGBoost ingests the missing values natively. Current-window rain summed over 7/7 elapsed days. GFM observed extent: 2 S1-active of 7 current-window days and 4/10 antecedent-window days (~900 px grid, permanent water removed)."
+ "notes": "Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are not identically calibrated (treat rain features as a consistent proxy). Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows; XGBoost ingests the missing values natively. Current-window rain summed over 10/10 elapsed days. GFM observed extent: 0 S1-active of 10 current-window days and 0/10 antecedent-window days (~900 px grid, permanent water removed)."
 }

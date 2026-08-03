@@ -1,26 +1,36 @@
 {
- "generated_utc": "2026-07-30T02:46:16Z",
+ "generated_utc": "2026-08-03T03:29:37Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-07-29",
- "latest_pass_utc": "2026-07-29T13:11:57.102938Z",
- "new_scenes": 1,
+ "latest_pass": "2026-07-31",
+ "latest_pass_utc": "2026-07-31T12:56:09.648343Z",
+ "new_scenes": 4,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.0,
- "total_flooded_km2": 0.0,
+ "coverage_fraction": 0.592,
+ "total_flooded_km2": 0.3,
  "passes": [
   {
-   "date": "2026-07-29",
-   "scenes": 1,
-   "total_flooded_km2": 0.0,
+   "date": "2026-07-31",
+   "scenes": 4,
+   "total_flooded_km2": 0.3,
    "flagged": 0,
-   "coverage_fraction": 0.0
+   "coverage_fraction": 0.592
   }
  ],
  "districts": [
+  {
+   "district": "Patiala",
+   "flooded_km2": 0.2,
+   "flooded_fraction": 0.0001
+  },
+  {
+   "district": "Gurdaspur",
+   "flooded_km2": 0.1,
+   "flooded_fraction": 0.0
+  },
   {
    "district": "Amritsar",
    "flooded_km2": 0.0,
@@ -48,11 +58,6 @@
   },
   {
    "district": "Firozpur",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
-  },
-  {
-   "district": "Gurdaspur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
@@ -93,11 +98,6 @@
   },
   {
    "district": "Nawanshahr",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
-  },
-  {
-   "district": "Patiala",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
