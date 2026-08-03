@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-08-03T09:56:18Z",
+ "generated_utc": "2026-08-03T14:51:06Z",
  "window_start": "2026-07-25",
  "window_end": "2026-08-04",
  "core_season": true,
@@ -12,57 +12,45 @@
  "districts": [
   {
    "district": "Kapurthala",
-   "p_event": 0.0199,
+   "p_event": 0.0183,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Firozpur",
-   "p_event": 0.0131,
+   "p_event": 0.012,
    "observed_fraction_window": 0.0001,
    "observed_km2": 0.8
   },
   {
    "district": "Amritsar",
-   "p_event": 0.0076,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Tarn Taran",
    "p_event": 0.0069,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
+   "district": "Tarn Taran",
+   "p_event": 0.0063,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
    "district": "Patiala",
-   "p_event": 0.0014,
+   "p_event": 0.0013,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Gurdaspur",
-   "p_event": 0.0011,
+   "p_event": 0.001,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Sangrur",
-   "p_event": 0.0011,
+   "p_event": 0.001,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
-  },
-  {
-   "district": "Nawanshahr",
-   "p_event": 0.0008,
-   "observed_fraction_window": 0.0011,
-   "observed_km2": 1.4
-  },
-  {
-   "district": "Jalandhar",
-   "p_event": 0.0008,
-   "observed_fraction_window": 0.0001,
-   "observed_km2": 0.2
   },
   {
    "district": "Rupnagar",
@@ -93,6 +81,18 @@
    "p_event": 0.0008,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
+  },
+  {
+   "district": "Nawanshahr",
+   "p_event": 0.0007,
+   "observed_fraction_window": 0.0011,
+   "observed_km2": 1.4
+  },
+  {
+   "district": "Jalandhar",
+   "p_event": 0.0007,
+   "observed_fraction_window": 0.0001,
+   "observed_km2": 0.2
   },
   {
    "district": "Ludhiana",
