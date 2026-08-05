@@ -267,9 +267,15 @@ def district_flood_stats(mask, labels, names, bounds, refwater=None) -> dict:
     for i, name in enumerate(names, start=1):
         d_ha = float(district_ha[i])
         f_ha = float(flooded_ha[i])
+        covered = d_ha > 0
         out[name] = {
-            "observed_fraction": (f_ha / d_ha) if d_ha > 0 else 0.0,
-            "observed_km2": f_ha / 100.0,
+            # A district absent from this pass has no pixels at all. Reporting
+            # 0.0 there would be a false all-clear: each Sentinel-1 pass images
+            # a strip, not the whole state, so "not imaged" and "imaged and dry"
+            # must stay distinguishable all the way to the site.
+            "covered": covered,
+            "observed_fraction": (f_ha / d_ha) if covered else None,
+            "observed_km2": (f_ha / 100.0) if covered else None,
             "flooded_ha": f_ha,
             "district_ha": d_ha,
         }
@@ -310,6 +316,9 @@ def build_nowcast_json(
             {
                 "district": name,
                 "p_event": pe,
+                # default True keeps older callers that pass only fraction/km2
+                # unchanged; the stats helper sets it explicitly
+                "covered": bool(obs.get("covered", True)),
                 "observed_fraction_window": (
                     None if frac is None else round(float(frac), 4)
                 ),

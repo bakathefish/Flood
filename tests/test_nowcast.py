@@ -240,6 +240,54 @@ def test_district_flood_stats_km2_matches_web_mercator_helper():
     )
 
 
+def test_district_with_no_imaged_pixels_is_unknown_not_dry():
+    # A Sentinel-1 pass images a strip, not the whole state, so a district can
+    # be absent from the raster entirely. Reporting that as fraction 0.0 is a
+    # false all-clear: "not imaged" must never render as "no water".
+    n = 20
+    labels = np.zeros((n, n), dtype=np.int32)
+    labels[:, : n // 2] = 1  # only the west district is covered by this pass
+    mask = np.zeros((n, n), dtype=bool)
+
+    stats = nowcast.district_flood_stats(
+        mask, labels, ["west", "east"], PUNJAB_BOUNDS_3857
+    )
+    assert stats["east"]["covered"] is False
+    assert stats["east"]["observed_fraction"] is None
+    assert stats["east"]["observed_km2"] is None
+    # the imaged district still reports a real zero
+    assert stats["west"]["covered"] is True
+    assert stats["west"]["observed_fraction"] == 0.0
+
+
+def test_uncovered_district_serialises_as_null_not_nan():
+    import json
+
+    n = 10
+    labels = np.zeros((n, n), dtype=np.int32)
+    labels[:, : n // 2] = 1
+    mask = np.zeros((n, n), dtype=bool)
+    stats = nowcast.district_flood_stats(
+        mask, labels, ["west", "east"], PUNJAB_BOUNDS_3857
+    )
+    payload = nowcast.build_nowcast_json(
+        generated_utc="2026-08-05T00:00:00Z",
+        window={
+            "window_start": "2026-08-04",
+            "window_end": "2026-08-14",
+            "core_season": True,
+        },
+        sources={},
+        districts=["west", "east"],
+        observed=stats,
+    )
+    # allow_nan=False is what a browser's JSON.parse effectively enforces
+    text = json.dumps(payload, allow_nan=False)
+    east = [r for r in json.loads(text)["districts"] if r["district"] == "east"][0]
+    assert east["observed_fraction_window"] is None
+    assert east["covered"] is False
+
+
 def test_district_flood_stats_two_districts_and_refwater():
     n = 20
     labels = np.zeros((n, n), dtype=np.int32)

@@ -331,6 +331,7 @@ def fetch_gfm_observed(
 
     observed = {
         n: {
+            "covered": cur_stats[n]["covered"],
             "observed_fraction": cur_stats[n]["observed_fraction"],
             "observed_km2": cur_stats[n]["observed_km2"],
         }
