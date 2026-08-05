@@ -4,10 +4,12 @@ The v1 district forecaster lost to a one-feature persistence baseline on PR-AUC
 (0.269 against 0.308). This note records why it lost, what was rebuilt, and what
 the rebuild did and did not fix.
 
-**Headline: the rebuild did not produce a forecaster that beats persistence.**
-An apparent large gain on flood onset disappeared once the model was chosen
-without seeing the year it was judged on. The data products and the evaluation
-fixes are real and are kept; the skill claim is withdrawn.
+**Headline: no improvement over persistence is demonstrated here.** An apparent
+large gain on flood onset did not survive choosing the model without seeing the
+year it was judged on. The data product and the evaluation fixes are real and
+are kept; the skill claim is withdrawn. This is not a finding that learned
+models are intrinsically worse, and the note is careful to keep that distinction
+throughout: with three event seasons the sample cannot settle it either way.
 
 Driver: `pipeline/run_forecaster_v2.py` (variant comparison),
 `pipeline/run_forecaster_selection.py` (honest in-fold selection). Pure helpers
@@ -34,17 +36,32 @@ form district-specific predictions by interacting the static prior with the
 statewide series, so it is not literally reduced to persistence, but it has
 almost no district-specific weather to learn from.
 
-## 2. District-resolved rainfall
+## 2. District-level rainfall series
 
-The IMD 0.25 degree daily grid was already on disk for 1961 to 2025 and was
-being collapsed to two box means. It is now reduced per district polygon by
-area-overlap weights: the intersection area of each grid cell with each district,
-scaled by `cos(latitude)` and normalised to sum to 1 per district. Area weighting
-is necessary rather than decorative, because Punjab districts are comparable in
-size to a single 0.25 degree cell (6 to 19 cells per district) and a
-centroid-in-cell rule would drop the smallest districts entirely.
+From the IMD 0.25 degree daily grid, Sailaab now derives district-level rainfall
+series for all 20 Punjab districts for 1961 to 2025. These series show
+district-level variation within 98.7% of the defined monsoon windows, whereas the
+previous two-box statewide predictors provide none. **This is a data and
+monitoring contribution; it is not evidence of improved flood-forecast skill.**
 
-District rainfall now varies within 98.7% of windows, against 0% before.
+To be precise about what this is and is not: it is spatial *aggregation* of an
+existing 0.25 degree product to district polygons, not downscaling, and it
+creates no information below the IMD grid resolution.
+
+Method. Each district's series is the area-weighted mean of the grid cells it
+overlaps. Weights are the intersection area of the cell with the district polygon,
+scaled by `cos(latitude)` to correct for meridian convergence, normalised to sum
+to 1 per district. Area weighting is necessary rather than decorative here,
+because Punjab districts are comparable in size to a single 0.25 degree cell
+(6 to 19 cells per district) and a centroid-in-cell rule would drop the smallest
+districts entirely. Cells carrying the IMD no-data sentinel are excluded and the
+surviving weights renormalised, so a partially masked district reports the mean
+of the cells that reported rather than a value pulled toward zero; a district
+whose cells are all missing reports no value rather than a zero. Windows are
+half-open, matching the decade grid, so adjacent windows never double-count the
+seam day. Behaviour is pinned by 19 tests in `tests/test_rain_districts.py`,
+including weight normalisation, area proportionality, latitude weighting,
+multipolygon handling, and the missing-data renormalisation.
 
 Sanity check on the peak window of the 2025 event (2025-08-24), using nothing
 that went into building the weights:
@@ -87,9 +104,12 @@ seasons rather than rows.
 ## 4. Onset versus continuation
 
 Flood water persists for longer than a 10-day window, so scoring every row lets a
-model take credit for water already on the ground. Splitting the 27 positives by
-whether the district was already above the event threshold when the window
-opened:
+model take credit for water already on the ground. Of the 27 observed positive
+district-windows, 17 were continuation cases in which water was already present
+and 10 were onset transitions from dry to flooded. The rule is explicit: a row is
+onset if `antecedent_fraction`, the previous window's flooded fraction for that
+district, is at or below the 2% event threshold, and continuation otherwise.
+Split by year:
 
 | year | onset (district was dry) | continuation (already wet) |
 | --- | --- | --- |
@@ -145,10 +165,44 @@ Per-year AP difference: +0.032 in 2019, -0.131 in 2023, +0.000 in 2025 (in 2025
 the selector chose persistence itself). Equal-year mean **-0.033**, interval
 [-0.131, +0.032].
 
-**The learned model does not beat persistence when it is chosen honestly.** With
-three event seasons and ten onset transitions, the inner selection has at most
-two event years to learn from and is too noisy to identify a better model. The
-apparent gain was selection, not skill.
+In the three onset event-years available, fold-internal model selection did not
+produce a learned variant that outperformed persistence: selected-model AP was
+0.017 versus 0.058, with identical recall@3 and recall@5. Because inner selection
+had at most two event-years, this evaluation does not establish that learned
+models are intrinsically worse; it shows that no improvement over persistence is
+demonstrated here. Persistence therefore remains the operational baseline, and
+learned variants remain experimental. The previously reported district-rainfall
+gain did not survive fold-safe model selection and should not be interpreted as
+demonstrated out-of-sample forecasting skill.
+
+## 5b. Continuation, and the whole task
+
+Continuation is the majority of the positives, so leaving it unreported would
+leave most of the task uncharacterised. The same in-fold selection procedure,
+applied to each regime:
+
+| regime | rows | positives | prevalence | selected AP | persistence AP | selected R@3 | persistence R@3 | selected R@5 | persistence R@5 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| onset | 1,484 | 10 | 0.0067 | 0.017 | 0.058 | 0.600 | 0.600 | 0.800 | 0.800 |
+| continuation | 56 | 17 | 0.3036 | 0.260 | 0.402 | 0.824 | 0.824 | 1.000 | 1.000 |
+| all rows | 1,540 | 27 | 0.0175 | 0.102 | 0.308 | 0.667 | 0.667 | 0.852 | 0.889 |
+
+Continuation positives fall in 2023 (9) and 2025 (8); onset positives in 2019 (2),
+2023 (2) and 2025 (6). Per event-year AP difference against persistence is
++0.000 in both continuation years, because in both the selector chose persistence
+itself; on all rows it is +0.000 in 2019, -0.189 in 2023, +0.000 in 2025, equal-year
+mean -0.063.
+
+Variants chosen by the selector, by regime: onset picked district rain in 7 folds,
+statewide rain in 2, the opening-5-day variant in 1 and persistence in 1;
+continuation picked persistence in 3 and learned variants in 3; all rows picked
+persistence in 9 of 11. The pattern is consistent: whenever the inner sweep has
+event years to learn from, it tends to return persistence. Recall at the operating
+budgets is identical to persistence in every regime except all-rows recall@5, where
+persistence is better.
+
+Persistence is stronger on continuation than anywhere else, which is what the
+physics predicts: water observed last window is usually still there.
 
 ## 6. What is kept, and what is withdrawn
 
@@ -164,12 +218,16 @@ Kept, because each is verifiable independently of any skill claim:
 Withdrawn:
 
 - any claim that the forecaster beats persistence, on any regime;
-- any lead-time, advance-warning or "10-day forecast" language. The variant
-  denied rain from inside the target window scores AP 0.010 on onset, so
-  essentially all measured discrimination comes from rain observed during the
-  window being scored. Rain falling inside a window can also postdate the
-  inundation it is credited with anticipating, so even the opening-days variants
-  are not validated forecasts without a daily rolling-origin test;
+- any lead-time, advance-warning or "10-day forecast" language. In the
+  learned-model ablation, excluding rainfall observed inside the scored window
+  reduced onset AP to 0.010; the reported discrimination should therefore be
+  interpreted primarily as contemporaneous association, not advance warning.
+  Rain falling inside a window can also postdate the inundation it is credited
+  with anticipating, so even the opening-days variants are not validated
+  forecasts. Any lead-time claim requires a daily rolling-origin evaluation.
+  This restriction is about the learned model: persistence itself discriminates
+  strongly, and the rain-denied learned variant retains AP 0.010 rather than
+  nothing;
 - probability language for the logistic variants. Class-balanced weighting leaves
   them badly calibrated, with Brier skill around -9.7 against climatology. They
   are rankers, not probability estimates.

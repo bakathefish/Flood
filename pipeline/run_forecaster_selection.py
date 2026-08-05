@@ -65,9 +65,23 @@ CANDIDATES = {
 }
 
 
-def _onset(core: pd.DataFrame) -> pd.DataFrame:
-    dry = core["antecedent_fraction"] <= config.FLOOD_EVENT_FRACTION
-    return core[dry.fillna(True)]
+def _subset(core: pd.DataFrame, regime: str) -> pd.DataFrame:
+    """Split the modelling rows by how wet the district already was.
+
+    onset        district below the event threshold when the window opened
+    continuation district already above it
+    all          both together
+
+    Continuation is the majority of the positives (17 of 27) and is reported
+    alongside onset so the whole task is characterised, not just the half that
+    an early-warning system cares about.
+    """
+    dry = (core["antecedent_fraction"] <= config.FLOOD_EVENT_FRACTION).fillna(True)
+    if regime == "onset":
+        return core[dry]
+    if regime == "continuation":
+        return core[~dry]
+    return core
 
 
 def _inner_ap(frame: pd.DataFrame, feats, train_years) -> float:
@@ -94,8 +108,7 @@ def _inner_ap(frame: pd.DataFrame, feats, train_years) -> float:
     return float(average_precision_score(yy, pp))
 
 
-def main() -> None:
-    df = build_frame()
+def run_regime(df: pd.DataFrame, regime: str) -> pd.DataFrame:
     years = sorted(df["year"].unique())
 
     rows, picks = [], []
@@ -103,7 +116,7 @@ def main() -> None:
         train_years = [y for y in years if y != test_year]
         prior = fold_safe_prior(df, train_years)
         fold = df.merge(prior, on="district", how="left", validate="m:1")
-        onset = _onset(fold[fold["core_season"]])
+        onset = _subset(fold[fold["core_season"]], regime)
 
         tr_all = onset[onset["year"].isin(train_years)]
         te = onset[onset["year"] == test_year].copy()
@@ -134,7 +147,7 @@ def main() -> None:
         te["chosen_C"] = best_c
         rows.append(te)
         print(
-            f"{test_year}: chose {chosen:28s} C={best_c}  "
+            f"  {test_year}: chose {chosen:28s} C={best_c}  "
             f"positives={int(te['flood_event'].sum())}"
         )
 
@@ -147,8 +160,13 @@ def main() -> None:
     pb = oof["antecedent_fraction"].fillna(0.0).to_numpy()
 
     print("\n" + "=" * 68)
-    print("HONEST SELECTION: variant chosen inside each fold, onset regime")
+    print(f"HONEST SELECTION: variant chosen inside each fold, {regime} regime")
     print("=" * 68)
+    npos = int(oof["flood_event"].sum())
+    print(
+        f"rows {len(oof)}, positives {npos}, prevalence {npos / len(oof):.4f}, "
+        f"positives by year {dict(oof.groupby('year')['flood_event'].sum().loc[lambda s: s > 0].astype(int))}"
+    )
     print(f"variants chosen across folds: {dict(Counter(picks))}")
     for label, scores in (("selected", p), ("persistence", pb)):
         print(
@@ -182,7 +200,13 @@ def main() -> None:
             f"[{lo:+.3f}, {hi:+.3f}] (descriptive, {len(by_year)} blocks)"
         )
 
-    oof.to_csv(OUT, index=False)
+    return oof.assign(regime=regime)
+
+
+def main() -> None:
+    df = build_frame()
+    frames = [run_regime(df, r) for r in ("onset", "continuation", "all")]
+    pd.concat(frames, ignore_index=True).to_csv(OUT, index=False)
     print(f"\nwrote {OUT}")
 
 
