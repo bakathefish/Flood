@@ -1,6 +1,4 @@
 node_modules/
-.claude-crawl/
-.claude/
 .planning/
 __pycache__/
 .pytest_cache/

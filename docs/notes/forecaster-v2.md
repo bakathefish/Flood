@@ -39,9 +39,9 @@ almost no district-specific weather to learn from.
 ## 2. District-level rainfall series
 
 From the IMD 0.25 degree daily grid, Sailaab now derives district-level rainfall
-series for all 20 Punjab districts for 1961 to 2025. These series show
-district-level variation within 98.7% of the defined monsoon windows, whereas the
-previous two-box statewide predictors provide none. **This is a data and
+series for all 20 districts in the project's Punjab boundary layer, for 1961 to
+2025. These series show district-level variation within 98.7% of the defined
+monsoon windows, whereas the previous two-box statewide predictors provide none. **This is a data and
 monitoring contribution; it is not evidence of improved flood-forecast skill.**
 
 To be precise about what this is and is not: it is spatial *aggregation* of an
@@ -106,10 +106,10 @@ seasons rather than rows.
 Flood water persists for longer than a 10-day window, so scoring every row lets a
 model take credit for water already on the ground. Of the 27 observed positive
 district-windows, 17 were continuation cases in which water was already present
-and 10 were onset transitions from dry to flooded. The rule is explicit: a row is
-onset if `antecedent_fraction`, the previous window's flooded fraction for that
-district, is at or below the 2% event threshold, and continuation otherwise.
-Split by year:
+and 10 were onset transitions from dry to flooded. The rule is explicit: rows
+whose previous-window flooded fraction is at or below 2% form the onset risk set,
+and a positive row in that set is an onset transition; rows above 2% form the
+continuation risk set. Split by year:
 
 | year | onset (district was dry) | continuation (already wet) |
 | --- | --- | --- |
@@ -196,10 +196,11 @@ mean -0.063.
 Variants chosen by the selector, by regime: onset picked district rain in 7 folds,
 statewide rain in 2, the opening-5-day variant in 1 and persistence in 1;
 continuation picked persistence in 3 and learned variants in 3; all rows picked
-persistence in 9 of 11. The pattern is consistent: whenever the inner sweep has
-event years to learn from, it tends to return persistence. Recall at the operating
-budgets is identical to persistence in every regime except all-rows recall@5, where
-persistence is better.
+persistence in 9 of 11. Selection differed by regime: persistence was chosen in
+1 of 11 onset folds, 3 of 6 continuation folds, and 9 of 11 all-row folds; none
+of the resulting selected systems demonstrated an aggregate advantage over
+persistence. Recall at the operating budgets is identical to persistence in every
+regime except all-rows recall@5, where persistence is better.
 
 Persistence is stronger on continuation than anywhere else, which is what the
 physics predicts: water observed last window is usually still there.
@@ -210,8 +211,9 @@ Kept, because each is verifiable independently of any skill claim:
 
 - district-resolved rainfall for 1961 to 2025, varying in 98.7% of windows and
   physically consistent with the 2025 event;
-- fold-safe priors and the season-boundary reset, both of which removed real
-  leakage from the published evaluation;
+- fold-safe priors and the season-boundary reset, which respectively removed
+  target leakage and unintended cross-season state carry-over from the published
+  evaluation;
 - the onset and continuation decomposition;
 - warning-shaped metrics and year-block intervals.
 
@@ -231,6 +233,22 @@ Withdrawn:
 - probability language for the logistic variants. Class-balanced weighting leaves
   them badly calibrated, with Brier skill around -9.7 against climatology. They
   are rankers, not probability estimates.
+
+## 6b. What the audit itself established
+
+The audit is not only an absence of improvement. It established three specific
+things, and they are the reason this note exists rather than a quiet revision:
+
+- the fold-safe selected system improved neither reported recall budget in any
+  regime, so the negative result holds at the operating points a user would
+  actually act on, not merely on an aggregate score;
+- aggregate selected average precision was below persistence in the onset,
+  continuation and all-row evaluations alike, so the conclusion does not depend
+  on which slice is chosen;
+- the original apparent rainfall gain was traced rather than left unexplained. It
+  decomposes into learner choice, the temporal availability of the rainfall used,
+  and the selection procedure itself, which is why the note can say what went
+  wrong instead of only that something did.
 
 ## 7. Operational recommendation
 
