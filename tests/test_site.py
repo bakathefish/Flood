@@ -159,3 +159,18 @@ def test_data_csvs_present_and_have_expected_columns():
         for col in required:
             assert col in header, f"assets/{name} lost required column {col!r}"
         assert rows > 0, f"assets/{name} has a header but no data rows"
+
+
+def test_shipped_bundle_carries_no_vendor_names():
+    """The design-system dependency bundles translator-note metadata that names a
+    third-party vendor as an example. Those notes are never rendered, but they do
+    ship inside the published JavaScript. pipeline/sanitize_web_bundle.py
+    rewrites them; this pins the result so a rebuild that skips that step fails
+    here instead of republishing them."""
+    forbidden = ("OpenAI",)
+    bundles = sorted((DOCS / "assets").glob("*.js"))
+    assert bundles, "no built JS bundle found in docs/assets"
+    for path in bundles:
+        text = path.read_text(encoding="utf-8", errors="surrogatepass")
+        for name in forbidden:
+            assert name not in text, f"{path.name} contains {name!r}"
