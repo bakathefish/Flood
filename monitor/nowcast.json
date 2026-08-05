@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-08-05T14:21:05Z",
+ "generated_utc": "2026-08-05T19:43:20Z",
  "window_start": "2026-08-04",
  "window_end": "2026-08-14",
  "core_season": true,
@@ -13,120 +13,140 @@
   {
    "district": "Kapurthala",
    "p_event": 0.0254,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Firozpur",
    "p_event": 0.0103,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Tarn Taran",
    "p_event": 0.0085,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Sangrur",
    "p_event": 0.0084,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Patiala",
    "p_event": 0.0076,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Gurdaspur",
    "p_event": 0.0041,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Barnala",
    "p_event": 0.0037,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Faridkot",
    "p_event": 0.0037,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Fatehgarh Sahib",
    "p_event": 0.0037,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Hoshiarpur",
    "p_event": 0.0037,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Mansa",
    "p_event": 0.0037,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Moga",
    "p_event": 0.0037,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Muktsar",
    "p_event": 0.0037,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Sahibzada Ajit Singh Nagar",
    "p_event": 0.0037,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Rupnagar",
    "p_event": 0.0035,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Amritsar",
    "p_event": 0.0032,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Jalandhar",
    "p_event": 0.0032,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Nawanshahr",
    "p_event": 0.0032,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Bathinda",
    "p_event": 0.002,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
    "district": "Ludhiana",
    "p_event": 0.0019,
+   "covered": true,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   }
