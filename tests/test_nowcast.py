@@ -390,11 +390,18 @@ def test_build_nowcast_json_core_season_ranks_by_p_event():
 
 def test_degraded_payload_is_schema_valid_with_nulls():
     """The never-fail CI fallback must still emit the locked schema: every district
-    present, p_event and observed_* null, sources unavailable, a DEGRADED note."""
+    present, p_event and observed_* null, sources unavailable, a DEGRADED note.
+
+    It also carries an explicit unavailable forecast block. Omitting the block
+    was the old signal, and a consumer that had not learned the omission rule
+    read it as nothing to report. See tests/test_nowcast_degraded_state.py.
+    """
     from pipeline import nowcast as pipeline_nowcast
 
     payload = pipeline_nowcast.degraded("2026-07-21T00:00:00Z", "2026-07-21", "boom")
+    assert payload["forecast"]["status"] == "unavailable"
     assert set(payload) == {
+        "forecast",
         "generated_utc",
         "window_start",
         "window_end",

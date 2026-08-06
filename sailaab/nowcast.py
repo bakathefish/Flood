@@ -362,7 +362,15 @@ def build_nowcast_json(
         "generated_utc": generated_utc,
         "window_start": window["window_start"],
         "window_end": window["window_end"],
-        "core_season": bool(window["core_season"]),
+        # ``None`` survives as null rather than collapsing to False. A reader
+        # that cannot tell "outside the season" from "we could not work out
+        # what season it is" will render a failed run as a benign off-season
+        # state, which is an all-clear by another name.
+        "core_season": (
+            None
+            if window.get("core_season") is None
+            else bool(window["core_season"])
+        ),
         "activates": window.get("activates"),
         "sources": sources,
         "districts": rows,

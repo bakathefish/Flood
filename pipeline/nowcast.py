@@ -145,14 +145,23 @@ def _build_notes(
 
 
 def degraded(generated, today_iso, reason) -> dict:
-    """A schema-valid nulls payload for the never-fail CI contract."""
+    """A schema-valid nulls payload for the never-fail CI contract.
+
+    Two things this must never do. It must not claim to know the season when
+    the failure was working out the season, because a reader turns
+    ``core_season: false`` into "the forecaster is resting until the monsoon",
+    which is a reassuring thing to print on the day the pipeline broke. And it
+    must carry an explicit unavailable marker rather than merely omitting the
+    forecast, so a consumer that never learned the omission rule still shows
+    the failure.
+    """
     try:
         window = nowcast.resolve_window(today_iso)
     except Exception:
         window = {
             "window_start": None,
             "window_end": None,
-            "core_season": False,
+            "core_season": None,  # unknown, not "out of season"
             "activates": None,
         }
     return nowcast.build_nowcast_json(
@@ -166,6 +175,14 @@ def degraded(generated, today_iso, reason) -> dict:
         districts=_fallback_districts(),
         observed={},
         p_event=None,
+        forecast={
+            "status": "unavailable",
+            "reason": reason,
+            "note": (
+                "No forecast was produced this cycle. This is not an all-clear: "
+                "absence of a forecast is absence of information."
+            ),
+        },
         notes=f"DEGRADED: {reason}",
     )
 

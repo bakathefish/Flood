@@ -111,8 +111,17 @@ export default function ForecastSection({lang}) {
   // "no news": it means the forecast could not be made, and it must read the
   // same as an explicit unavailable rather than silently showing a board.
   const fc = nc && nc.forecast;
-  const preCore = !!nc && nc.core_season === false;
-  const unavailable = !!nc && !preCore && (!fc || fc.status === 'unavailable' || scored.length === 0);
+  const saysUnavailable = !!fc && fc.status === 'unavailable';
+  const feedFailed = !!nc && typeof nc.notes === 'string' && nc.notes.startsWith('DEGRADED');
+  // Out of season is a benign state, so it must never be inferred from a feed
+  // that is reporting its own failure. A run that broke while working out the
+  // date can still emit core_season false, and rendering that as "resting
+  // until the monsoon" would be an all-clear printed on the worst possible
+  // day. A null core_season means unknown and is not treated as off-season
+  // either.
+  const preCore = !!nc && nc.core_season === false && !saysUnavailable && !feedFailed;
+  const unavailable = !!nc && !preCore
+    && (saysUnavailable || feedFailed || !fc || scored.length === 0);
   const showBoard = !!nc && !preCore && !unavailable;
   const threshold = fc && Number.isFinite(+fc.alert_threshold) ? (+fc.alert_threshold).toFixed(3) : null;
 
