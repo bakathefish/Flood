@@ -16,7 +16,7 @@ Layout
            neighbouring districts greyed for context.
 * Right    stat block -- 2025 flooded ha (RF + Tier-A), cropland flooded ha,
            value-at-risk (Rs crore), population exposed (RF & GFM brackets),
-           decade seasons >1% / >2%, hindcast peak P + statewide rank, and the
+           decade seasons >1% / >2%, peak walk-forward ranking score + statewide rank, and the
            district's tehsils table (2025 ha, decade seasons flooded) worst-first.
 * Footer   one-line method, open-data + validation credit, generation date.
 
@@ -945,7 +945,7 @@ def build_brief(name: str, tables: dict, geom: dict, guru_fp) -> plt.Figure:
         0.043,
         "Method: Sentinel-1 SAR change-detection (Tier-A) + "
         "Random-Forest flood mask; per-tehsil reduction; XGBoost forecaster "
-        "(leave-one-year-out).",
+        "(walk-forward).",
         fontsize=6.6,
         color=SUBINK,
         family="DejaVu Sans",

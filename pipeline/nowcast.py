@@ -138,10 +138,14 @@ def _build_notes(
     else:
         parts.append("Rain context unavailable (Open-Meteo unreachable).")
     parts.append(
-        f"GFM observed extent: {gfm_meta.get('current_days_active', 0)} S1-active of "
-        f"{gfm_meta.get('current_days', 0)} current-window days and "
-        f"{gfm_meta.get('prev_days_active', 0)}/{gfm_meta.get('prev_days', 0)} antecedent-"
-        f"window days (~{gfm_meta.get('grid_px')} px grid, permanent water removed)."
+        f"GFM: {gfm_meta.get('current_days_fetched', 0)} of "
+        f"{gfm_meta.get('current_days', 0)} current-window days returned data, "
+        f"{gfm_meta.get('current_days_with_flood', 0)} of those carried flood "
+        f"pixels; antecedent window "
+        f"{gfm_meta.get('prev_days_fetched', 0)}/{gfm_meta.get('prev_days', 0)} "
+        f"returned (~{gfm_meta.get('grid_px')} px grid, permanent water removed). "
+        f"A day with no flood pixels may be a dry day or a day with no pass; "
+        f"only the returned-data count establishes coverage."
     )
     return " ".join(parts)
 
@@ -212,9 +216,9 @@ def _print_summary(payload, window, rain, reservoirs, res_source, gfm_meta) -> N
                     k: gfm_meta.get(k)
                     for k in (
                         "current_days",
-                        "current_days_active",
+                        "current_days_with_flood",
                         "prev_days",
-                        "prev_days_active",
+                        "prev_days_with_flood",
                         "wms_requests",
                     )
                 },

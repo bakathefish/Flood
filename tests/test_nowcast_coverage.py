@@ -102,3 +102,55 @@ def test_every_district_covered_behaves_normally():
         "Amritsar",
     ]
     assert all(d["p_event"] is not None for d in payload["districts"])
+
+
+# --------------------------------------------------------------------------- #
+# the sensed flag: the mechanism production actually uses
+# --------------------------------------------------------------------------- #
+def test_sensed_false_covers_nothing_even_with_full_district_rasters():
+    """The real false-dry shape: every district rasterized, no imagery returned.
+
+    The earlier coverage test simulated missing imagery by deleting district
+    labels from the raster. Production rasterizes every district polygon on
+    every run regardless of acquisition, so that arrangement never occurs and
+    the test proved nothing about the live path. This is the arrangement that
+    does occur: a complete label raster, an all-zero flood mask because every
+    request failed, and therefore no observation to stand behind any number.
+    """
+    import numpy as np
+
+    from sailaab import nowcast as nc
+
+    size = 8
+    labels = np.zeros((size, size), dtype=int)
+    labels[:, :4] = 1  # Kapurthala
+    labels[:, 4:] = 2  # Firozpur
+    names = ["Kapurthala", "Firozpur"]
+    bounds = (8220944.0, 3443277.0, 8566034.0, 3842330.0)
+    empty = np.zeros((size, size), dtype=bool)
+
+    imaged_and_dry = nc.district_flood_stats(empty, labels, names, bounds, sensed=True)
+    for n in names:
+        assert imaged_and_dry[n]["covered"] is True
+        assert imaged_and_dry[n]["observed_km2"] == 0.0
+
+    nothing_came_back = nc.district_flood_stats(
+        empty, labels, names, bounds, sensed=False
+    )
+    for n in names:
+        assert nothing_came_back[n]["covered"] is False
+        assert nothing_came_back[n]["observed_km2"] is None
+        assert nothing_came_back[n]["observed_fraction"] is None
+
+
+def test_sensed_defaults_true_only_for_pure_callers():
+    """Analysis code passing a real mask keeps the old behaviour."""
+    import numpy as np
+
+    from sailaab import nowcast as nc
+
+    labels = np.ones((4, 4), dtype=int)
+    mask = np.zeros((4, 4), dtype=bool)
+    mask[0, 0] = True
+    out = nc.district_flood_stats(mask, labels, ["A"], (0.0, 0.0, 1000.0, 1000.0))
+    assert out["A"]["covered"] is True

@@ -1,8 +1,9 @@
 # pipeline/fetch_live_inputs.py
 """Keyless live inputs for the district flood-risk nowcast.
 
-Three fetchers, all no-login / no-secret, each returning plain dicts the pure
-``sailaab.nowcast`` layer turns into the 16-feature vector:
+Three fetchers, all no-login / no-secret, returning plain dicts. The deployed
+forecaster reads ten satellite-only features (``sailaab.forecast_live``); the
+rain and reservoir fetchers below supply page context, not model inputs.
 
 * :func:`fetch_rain` — Open-Meteo ERA5 **archive** + **forecast** APIs
   (``archive-api.open-meteo.com`` / ``api.open-meteo.com``, keyless): a 3x3
@@ -276,10 +277,19 @@ def _district_labels(bounds, size):
 
 
 def _union_over_days(days, bounds, size, pause):
-    """OR of the daily GFM flood masks over ``days``. A day with no S1 pass yields
-    an empty mask; a failed request is skipped. Returns ``(union, fetched, active)``."""
+    """OR of the daily GFM flood masks over ``days``.
+
+    Returns ``(union, fetched, with_flood)``. ``fetched`` counts days the
+    service actually answered for; that is the only coverage signal available
+    here and it is what decides whether any district may be called observed.
+    ``with_flood`` counts days whose mask had flood pixels, which is a
+    statement about water, NOT about whether a satellite acquisition exists:
+    a day the satellite imaged and found dry looks identical to a day it never
+    flew. It was previously reported as "S1-active", which claimed the second
+    meaning while measuring the first.
+    """
     union = np.zeros((size, size), dtype=bool)
-    fetched = active = 0
+    fetched = with_flood = 0
     for d in days:
         try:
             m = flood_mask(_wms_rgba(FLOOD_LAYER, d, bounds, size))
@@ -287,10 +297,10 @@ def _union_over_days(days, bounds, size, pause):
             continue
         fetched += 1
         if m.any():
-            active += 1
+            with_flood += 1
         union |= m
         time.sleep(pause)
-    return union, fetched, active
+    return union, fetched, with_flood
 
 
 def fetch_gfm_recent(
@@ -411,9 +421,12 @@ def fetch_gfm_observed(
         "names": names,
         "grid_px": size,
         "current_days": len(cur_days),
-        "current_days_active": cur_active,
+        # days the service actually answered for: the only coverage evidence
+        "current_days_fetched": cur_fetched,
+        "current_days_with_flood": cur_active,
         "prev_days": len(prev_days),
-        "prev_days_active": prev_active,
+        "prev_days_fetched": prev_fetched,
+        "prev_days_with_flood": prev_active,
         "refwater_ok": ref_ok,
         "wms_requests": cur_fetched + prev_fetched + (1 if ref_ok else 0),
     }
