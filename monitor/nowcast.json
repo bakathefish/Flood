@@ -1,5 +1,30 @@
 {
- "generated_utc": "2026-08-06T02:57:35Z",
+ "forecast": {
+  "kind": "district flood onset",
+  "horizon_days": 3,
+  "threshold_fraction": 0.005,
+  "issued_for": "2026-08-06",
+  "definition": "model score for Copernicus GFM observing flooding above 0.5% of district area on any of the next 3 days, using only what was known on the issue day",
+  "calibration": "a ranking score, not a calibrated probability: it has not been fitted to a reliability curve, so read the tier and the rank rather than the number",
+  "coverage": "20 of 20 districts observed within 0 day(s)",
+  "alert_threshold": 0.7916666865348816,
+  "alert_rate": 0.001,
+  "trained_years": [
+   2015,
+   2016,
+   2017,
+   2018,
+   2019,
+   2020,
+   2021,
+   2022,
+   2023,
+   2024,
+   2025
+  ],
+  "validation": "walk-forward, each season forecast using only earlier seasons, with the alert threshold taken from inner out-of-fold scores. At this operating point back-testing raised about 24 alerts a season, roughly one in three followed by flooding within three days, catching about one onset in four. Season-level performance is heterogeneous. Retrospective and post-selection; the 2026 monsoon is the prospective test."
+ },
+ "generated_utc": "2026-08-06T06:29:47Z",
  "window_start": "2026-08-04",
  "window_end": "2026-08-14",
  "core_season": true,
@@ -11,145 +36,205 @@
  },
  "districts": [
   {
-   "district": "Kapurthala",
-   "p_event": 0.0254,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
    "district": "Firozpur",
-   "p_event": 0.0103,
+   "p_event": 0.0405,
    "covered": true,
    "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Tarn Taran",
-   "p_event": 0.0085,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Sangrur",
-   "p_event": 0.0084,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Patiala",
-   "p_event": 0.0076,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Gurdaspur",
-   "p_event": 0.0041,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Barnala",
-   "p_event": 0.0037,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Faridkot",
-   "p_event": 0.0037,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Fatehgarh Sahib",
-   "p_event": 0.0037,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Hoshiarpur",
-   "p_event": 0.0037,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Mansa",
-   "p_event": 0.0037,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Moga",
-   "p_event": 0.0037,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Muktsar",
-   "p_event": 0.0037,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Sahibzada Ajit Singh Nagar",
-   "p_event": 0.0037,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Rupnagar",
-   "p_event": 0.0035,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
-   "district": "Amritsar",
-   "p_event": 0.0032,
-   "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
+   "observed_km2": 0.0,
+   "rank": 1,
+   "tier": "elevated",
+   "transparent_score": 1.875
   },
   {
    "district": "Jalandhar",
-   "p_event": 0.0032,
+   "p_event": 0.0367,
    "covered": true,
    "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
+   "observed_km2": 0.0,
+   "rank": 2,
+   "tier": "elevated",
+   "transparent_score": 1.775
   },
   {
-   "district": "Nawanshahr",
-   "p_event": 0.0032,
+   "district": "Kapurthala",
+   "p_event": 0.0035,
    "covered": true,
    "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
+   "observed_km2": 0.0,
+   "rank": 3,
+   "tier": "elevated",
+   "transparent_score": 2.025
+  },
+  {
+   "district": "Muktsar",
+   "p_event": 0.0028,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 4,
+   "tier": "elevated",
+   "transparent_score": 1.8250000000000002
+  },
+  {
+   "district": "Sangrur",
+   "p_event": 0.0027,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 5,
+   "tier": "elevated",
+   "transparent_score": 1.925
+  },
+  {
+   "district": "Patiala",
+   "p_event": 0.0026,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 6,
+   "tier": "low",
+   "transparent_score": 1.725
+  },
+  {
+   "district": "Tarn Taran",
+   "p_event": 0.0015,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 7,
+   "tier": "low",
+   "transparent_score": 1.975
+  },
+  {
+   "district": "Hoshiarpur",
+   "p_event": 0.0011,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 8,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Amritsar",
+   "p_event": 0.0004,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 9,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Barnala",
+   "p_event": 0.0003,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 16,
+   "tier": "low",
+   "transparent_score": 1.375
   },
   {
    "district": "Bathinda",
-   "p_event": 0.002,
+   "p_event": 0.0003,
    "covered": true,
    "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
+   "observed_km2": 0.0,
+   "rank": 15,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Faridkot",
+   "p_event": 0.0003,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 11,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Fatehgarh Sahib",
+   "p_event": 0.0003,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 14,
+   "tier": "low",
+   "transparent_score": 1.375
   },
   {
    "district": "Ludhiana",
-   "p_event": 0.0019,
+   "p_event": 0.0003,
    "covered": true,
    "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
+   "observed_km2": 0.0,
+   "rank": 17,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Mansa",
+   "p_event": 0.0003,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 18,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Moga",
+   "p_event": 0.0003,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 19,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Nawanshahr",
+   "p_event": 0.0003,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 10,
+   "tier": "low",
+   "transparent_score": 1.875
+  },
+  {
+   "district": "Rupnagar",
+   "p_event": 0.0003,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 13,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Sahibzada Ajit Singh Nagar",
+   "p_event": 0.0003,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 12,
+   "tier": "low",
+   "transparent_score": 1.375
+  },
+  {
+   "district": "Gurdaspur",
+   "p_event": 0.0002,
+   "covered": true,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0,
+   "rank": 20,
+   "tier": "low",
+   "transparent_score": 1.375
   }
  ],
- "notes": "Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are not identically calibrated (treat rain features as a consistent proxy). Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows; XGBoost ingests the missing values natively. Current-window rain summed over 3/3 elapsed days. GFM observed extent: 0 S1-active of 3 current-window days and 3/10 antecedent-window days (~900 px grid, permanent water removed)."
+ "notes": "No district is above the alert threshold today. Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are not identically calibrated (treat rain features as a consistent proxy). Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows; XGBoost ingests the missing values natively. Current-window rain summed over 3/3 elapsed days. GFM observed extent: 0 S1-active of 3 current-window days and 3/10 antecedent-window days (~900 px grid, permanent water removed)."
 }

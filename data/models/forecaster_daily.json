@@ -1,0 +1,39 @@
+{
+  "feature_order": [
+    "prior_wet_days",
+    "prior_max_fraction",
+    "frac_now",
+    "frac_max3d",
+    "day_of_season",
+    "neighbour",
+    "season_climo",
+    "excite_h0",
+    "excite_h1",
+    "excite_h2"
+  ],
+  "climatology_fallback": 0.02053226498783803,
+  "threshold": 0.005,
+  "horizon_days": 3,
+  "core_season_md": "07-25",
+  "alert_rate": 0.001,
+  "alert_threshold": 0.7916666865348816,
+  "excite_tau_days": 3.0,
+  "excite_max_hops": 2,
+  "trained_years": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "n_rows": 13978,
+  "n_positive": 287,
+  "n_districts": 20,
+  "n_climatology_cells": 200
+}

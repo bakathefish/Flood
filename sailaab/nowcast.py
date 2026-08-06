@@ -294,6 +294,8 @@ def build_nowcast_json(
     observed: dict,
     p_event: dict | None = None,
     notes: str = "",
+    forecast: dict | None = None,
+    extras: dict | None = None,
 ) -> dict:
     """Shape the locked ``monitor/nowcast.json`` payload.
 
@@ -302,6 +304,14 @@ def build_nowcast_json(
     the window is core-season, or is ``None`` (pre-core / out-of-domain) in which
     case every ``p_event`` is emitted as ``null``. Rows carry all supplied
     districts, sorted by ``p_event`` (core) or ``observed_km2`` (pre-core), desc.
+
+    ``forecast`` is an optional block describing what the score MEANS: the
+    horizon, the threshold and the fact that it is a ranking rather than a
+    calibrated probability. It is emitted verbatim so the published feed is
+    self-describing and a reader cannot mistake the number for a percentage
+    chance. ``extras`` maps ``district -> dict`` of additional per-district
+    fields (rank, tier, the transparent rule's score) merged into each row.
+    Both are optional so callers written against the older schema keep working.
     """
     rows = []
     for name in districts:
@@ -325,6 +335,8 @@ def build_nowcast_json(
                 "observed_km2": None if km2 is None else round(float(km2), 1),
             }
         )
+        if extras and name in extras:
+            rows[-1].update(extras[name])
 
     def _f(x, default):
         return default if x is None else x
@@ -340,7 +352,9 @@ def build_nowcast_json(
     else:
         rows.sort(key=lambda r: (-_f(r["observed_km2"], 0.0), r["district"]))
 
+    payload_forecast = {"forecast": forecast} if forecast else {}
     return {
+        **payload_forecast,
         "generated_utc": generated_utc,
         "window_start": window["window_start"],
         "window_end": window["window_end"],

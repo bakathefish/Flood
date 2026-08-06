@@ -165,9 +165,14 @@ def forward_event(
     shifted = [g.shift(-h) for h in range(1, horizon + 1)]
     stack = pd.concat(shifted, axis=1)
     any_wet = stack.max(axis=1, skipna=True)
-    # a row is unusable only if the whole horizon is unavailable
-    all_missing = stack.isna().all(axis=1)
-    any_wet[all_missing] = np.nan
+    # A negative is only earned when the WHOLE horizon was observed and none of
+    # it was wet. If any horizon day is missing and none of the observed ones
+    # flooded, the outcome is censored, not negative: the flood may have
+    # happened on a day the satellite did not look. Scoring those as negatives
+    # silently credits the model for floods nobody could see.
+    seen_wet = stack.max(axis=1, skipna=True) > 0
+    any_missing = stack.isna().any(axis=1)
+    any_wet = any_wet.where(seen_wet | ~any_missing, np.nan)
     return any_wet.reindex(daily.index if len(daily) == len(any_wet) else any_wet.index)
 
 

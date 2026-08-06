@@ -14,40 +14,46 @@ const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
 
 const F_T = {
   en: {
-    no: '01', title: 'The risk board',
-    lead: 'Punjab’s first open district-level flood risk board.',
-    intro: 'An XGBoost model, trained on a decade of satellite-derived flood labels (2015–24). Open, reproducible, and running live this monsoon, in a state that had zero official flood-forecast stations.',
-    explain: 'Every 6 hours it ranks all 20 districts by current flood risk. It is a ranking, not a probability, and it does not claim to see 10 days ahead.',
-    boardNote: 'Risk tracks the monsoon: in a quiet window every district reads near zero, and it climbs as flood conditions build. The held-out 2025 run below shows what the board looked like during the real event.',
+    no: '01', title: 'The forecast',
+    lead: 'A three-day flood forecast for every district in Punjab.',
+    intro: 'Gradient boosting over a decade of daily satellite flood observations, with history features that carry recent flooding across neighbouring districts. Open, reproducible, running live this monsoon, in a state whose reviewed CWC station table listed no flood-forecast station.',
+    explain: 'Every 6 hours it asks one question of each district: will the satellite see flooding here within the next three days? It uses only what is known on the day it runs.',
+    boardNote: 'Tested on seasons it had never seen, with the alert level set from earlier seasons only, it raised about 28 alerts a season and roughly one in three was followed by real flooding within three days. It catches about one flood onset in four, so a quiet board is not a guarantee of safety, and a district the satellite did not image is shown as unknown rather than dry.',
     liveHead: 'Live risk · this window',
     districtCol: 'District',
-    riskCol: 'flood risk',
+    unknown: 'not imaged',
+    unavailable: 'Forecast unavailable for this cycle: the satellite coverage needed to make it was missing or too old. This is NOT an all-clear.',
+    riskCol: 'risk score',
     waterCol: 'water now',
-    summary: 'The table on the left ranks each district by flood risk. Trained only on 2015 to 2024 and held out to 2025, it put the worst-hit districts near the top. A one-line baseline that simply carries forward last window’s flooding does at least as well, and when the model is chosen without seeing the year it is judged on, nothing beats that baseline. So the baseline is what we operate on, and this model is experimental. We also found a leak in our own evaluation and published the fix and the result it produced. The full audit, and how the satellite map compares to the government’s ground survey, is below.',
+    summary: 'Every season is forecast using only the seasons before it, so the model never sees its own future. On that test its ranking beat a persistence baseline in each of the four seasons that contained flooding, and in 2025, the season with the most flood days in the record, average precision reached 0.549 against 0.096. Much of that comes from history features that carry recent flooding across neighbouring districts, decaying over about three days. The ranking is the solid result and the alerting is modest: this is a selective trigger, not a comprehensive warning system. All of it is retrospective; the 2026 monsoon is the real test. The full audit, including an earlier number we had to retract, is below.',
     seeProof: 'See how it did in 2025, and the full validation →',
   },
   hi: {
-    no: '01', title: 'जोखिम बोर्ड',
-    lead: 'पंजाब का पहला खुला ज़िला-स्तरीय बाढ़ जोखिम बोर्ड।',
+    no: '01', title: 'पूर्वानुमान',
+    lead: 'पंजाब के हर ज़िले के लिए तीन दिन का बाढ़ पूर्वानुमान।',
     intro: 'एक XGBoost मॉडल, दशक भर के सैटेलाइट-आधारित बाढ़ लेबल (2015–24) पर प्रशिक्षित। खुला, पुनरुत्पाद्य और इस मानसून लाइव — उस राज्य में जहाँ शून्य आधिकारिक बाढ़-पूर्वानुमान स्टेशन थे।',
-    explain: 'हर 6 घंटे यह सभी 20 ज़िलों को मौजूदा बाढ़ जोखिम के अनुसार क्रमबद्ध करता है। यह एक रैंकिंग है, संभावना नहीं, और यह 10 दिन आगे देखने का दावा नहीं करता।',
+    explain: 'हर 6 घंटे यह हर ज़िले से एक सवाल पूछता है: क्या अगले तीन दिनों में सैटेलाइट यहाँ बाढ़ देखेगा? यह केवल उसी दिन तक की जानकारी का उपयोग करता है।',
     boardNote: 'जोखिम मानसून के साथ चलता है: शांत विंडो में हर ज़िला लगभग शून्य दिखाता है, और बाढ़ की स्थिति बनते ही यह बढ़ता है। नीचे 2025 का होल्ड-आउट रन दिखाता है कि असली घटना के दौरान बोर्ड कैसा दिखता था।',
     liveHead: 'लाइव जोखिम · यह विंडो',
     districtCol: 'ज़िला',
-    riskCol: 'बाढ़ जोखिम',
+    unknown: 'चित्र नहीं',
+    unavailable: 'इस चक्र के लिए पूर्वानुमान उपलब्ध नहीं: इसे बनाने के लिए ज़रूरी सैटेलाइट कवरेज नहीं थी या बहुत पुरानी थी। यह सुरक्षा की सूचना नहीं है।',
+    riskCol: 'जोखिम स्कोर',
     waterCol: 'अभी जल',
     summary: 'बाईं ओर की तालिका हर ज़िले के बाढ़ जोखिम की मॉडल की लाइव रैंकिंग है। केवल 2015 से 2024 पर प्रशिक्षित और 2025 पर होल्ड-आउट, इसने सबसे ज़्यादा प्रभावित ज़िलों को शीर्ष के पास रखा। एक सरल बेसलाइन जो पिछली विंडो की बाढ़ को आगे बढ़ाता है, इसके लगभग बराबर है, इसलिए इसे एक ईमानदार खुली रैंकिंग समझें, कोई सटीक भविष्यवक्ता नहीं। पूरा होल्ड-आउट सत्यापन, और सैटेलाइट नक्शा सरकार के ज़मीनी सर्वे से कैसे मेल खाता है, नीचे है।',
     seeProof: 'देखें 2025 में यह कैसा रहा, और पूरा सत्यापन →',
   },
   pa: {
-    no: '01', title: 'ਖ਼ਤਰਾ ਬੋਰਡ',
-    lead: 'ਪੰਜਾਬ ਦਾ ਪਹਿਲਾ ਖੁੱਲ੍ਹਾ ਜ਼ਿਲ੍ਹਾ-ਪੱਧਰੀ ਹੜ੍ਹ ਖ਼ਤਰਾ ਬੋਰਡ।',
+    no: '01', title: 'ਭਵਿੱਖਬਾਣੀ',
+    lead: 'ਪੰਜਾਬ ਦੇ ਹਰ ਜ਼ਿਲ੍ਹੇ ਲਈ ਤਿੰਨ ਦਿਨਾਂ ਦੀ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ।',
     intro: 'ਇੱਕ XGBoost ਮਾਡਲ, ਦਹਾਕੇ ਭਰ ਦੇ ਸੈਟੇਲਾਈਟ-ਆਧਾਰਿਤ ਹੜ੍ਹ ਲੇਬਲਾਂ (2015–24) ਉੱਤੇ ਸਿਖਲਾਈ। ਖੁੱਲ੍ਹਾ, ਮੁੜ-ਪੈਦਾ ਕਰਨਯੋਗ ਅਤੇ ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ — ਉਸ ਸੂਬੇ ਵਿੱਚ ਜਿੱਥੇ ਜ਼ੀਰੋ ਸਰਕਾਰੀ ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਸਟੇਸ਼ਨ ਸਨ।',
-    explain: 'ਹਰ 6 ਘੰਟੇ ਇਹ ਸਾਰੇ 20 ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਮੌਜੂਦਾ ਹੜ੍ਹ ਖ਼ਤਰੇ ਅਨੁਸਾਰ ਕ੍ਰਮਬੱਧ ਕਰਦਾ ਹੈ। ਇਹ ਇੱਕ ਰੈਂਕਿੰਗ ਹੈ, ਸੰਭਾਵਨਾ ਨਹੀਂ, ਅਤੇ ਇਹ 10 ਦਿਨ ਅੱਗੇ ਵੇਖਣ ਦਾ ਦਾਅਵਾ ਨਹੀਂ ਕਰਦਾ।',
+    explain: 'ਹਰ 6 ਘੰਟੇ ਇਹ ਹਰ ਜ਼ਿਲ੍ਹੇ ਤੋਂ ਇੱਕ ਸਵਾਲ ਪੁੱਛਦਾ ਹੈ: ਕੀ ਅਗਲੇ ਤਿੰਨ ਦਿਨਾਂ ਵਿੱਚ ਸੈਟੇਲਾਈਟ ਇੱਥੇ ਹੜ੍ਹ ਵੇਖੇਗਾ? ਇਹ ਸਿਰਿਫ਼ ਉਸੇ ਦਿਨ ਤੱਕ ਦੀ ਜਾਣਕਾਰੀ ਵਰਤਦਾ ਹੈ।',
     boardNote: 'ਖ਼ਤਰਾ ਮਾਨਸੂਨ ਨਾਲ ਚੱਲਦਾ ਹੈ: ਸ਼ਾਂਤ ਵਿੰਡੋ ਵਿੱਚ ਹਰ ਜ਼ਿਲ੍ਹਾ ਲਗਭਗ ਜ਼ੀਰੋ ਦਿਖਾਉਂਦਾ ਹੈ, ਅਤੇ ਹੜ੍ਹ ਦੀਆਂ ਹਾਲਤਾਂ ਬਣਦਿਆਂ ਹੀ ਇਹ ਵਧਦਾ ਹੈ। ਹੇਠਾਂ 2025 ਦਾ ਹੋਲਡ-ਆਊਟ ਰਨ ਦਿਖਾਉਂਦਾ ਹੈ ਕਿ ਅਸਲ ਘਟਨਾ ਦੌਰਾਨ ਬੋਰਡ ਕਿਹੋ ਜਿਹਾ ਦਿਖਦਾ ਸੀ।',
     liveHead: 'ਲਾਈਵ ਖ਼ਤਰਾ · ਇਹ ਵਿੰਡੋ',
     districtCol: 'ਜ਼ਿਲ੍ਹਾ',
-    riskCol: 'ਹੜ੍ਹ ਖ਼ਤਰਾ',
+    unknown: 'ਤਸਵੀਰ ਨਹੀਂ',
+    unavailable: 'ਇਸ ਚੱਕਰ ਲਈ ਭਵਿੱਖਬਾਣੀ ਉਪਲਬਧ ਨਹੀਂ: ਇਸ ਨੂੰ ਬਣਾਉਣ ਲਈ ਲੋੜੀਂਦੀ ਸੈਟੇਲਾਈਟ ਕਵਰੇਜ ਨਹੀਂ ਸੀ ਜਾਂ ਬਹੁਤ ਪੁਰਾਣੀ ਸੀ। ਇਹ ਸੁਰੱਖਿਆ ਦੀ ਸੂਚਨਾ ਨਹੀਂ ਹੈ।',
+    riskCol: 'ਖ਼ਤਰਾ ਸਕੋਰ',
     waterCol: 'ਹੁਣ ਪਾਣੀ',
     summary: 'ਖੱਬੇ ਪਾਸੇ ਦੀ ਸਾਰਣੀ ਹਰ ਜ਼ਿਲ੍ਹੇ ਦੇ ਹੜ੍ਹ ਖ਼ਤਰੇ ਦੀ ਮਾਡਲ ਦੀ ਲਾਈਵ ਰੈਂਕਿੰਗ ਹੈ। ਸਿਰਫ਼ 2015 ਤੋਂ 2024 ਉੱਤੇ ਸਿਖਲਾਈ ਅਤੇ 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ, ਇਸ ਨੇ ਸਭ ਤੋਂ ਵੱਧ ਪ੍ਰਭਾਵਿਤ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ਦੇ ਨੇੜੇ ਰੱਖਿਆ। ਇੱਕ ਸਰਲ ਬੇਸਲਾਈਨ ਜੋ ਪਿਛਲੀ ਵਿੰਡੋ ਦੇ ਹੜ੍ਹ ਨੂੰ ਅੱਗੇ ਲੈ ਜਾਂਦਾ ਹੈ, ਇਸ ਦੇ ਲਗਭਗ ਬਰਾਬਰ ਹੈ, ਇਸ ਲਈ ਇਸ ਨੂੰ ਇੱਕ ਇਮਾਨਦਾਰ ਖੁੱਲ੍ਹੀ ਰੈਂਕਿੰਗ ਸਮਝੋ, ਕੋਈ ਸਟੀਕ ਭਵਿੱਖਬਾਣੀਕਾਰ ਨਹੀਂ। ਪੂਰਾ ਹੋਲਡ-ਆਊਟ ਸਤਿਆਪਨ, ਅਤੇ ਸੈਟੇਲਾਈਟ ਨਕਸ਼ਾ ਸਰਕਾਰ ਦੇ ਜ਼ਮੀਨੀ ਸਰਵੇ ਨਾਲ ਕਿਵੇਂ ਮੇਲ ਖਾਂਦਾ ਹੈ, ਹੇਠਾਂ ਹੈ।',
     seeProof: 'ਵੇਖੋ 2025 ਵਿੱਚ ਇਹ ਕਿਵੇਂ ਰਿਹਾ, ਅਤੇ ਪੂਰਾ ਸਤਿਆਪਨ →',
@@ -86,6 +92,13 @@ export default function ForecastSection({lang}) {
             <Text color="secondary">{t.boardNote}</Text>
           </VStack>
 
+          {nc && nc.forecast && nc.forecast.status === 'unavailable' && (
+            <VStack maxWidth={780} gap={2}>
+              <StatusDot variant="warning" label="unavailable" />
+              <Text type="large">{t.unavailable}</Text>
+            </VStack>
+          )}
+
           {rows.length > 0 && (
             <Grid columns={{minWidth: 300, max: 2}} gap={6} align="start" width="100%">
               <VStack width="100%" maxWidth={460} gap={3}>
@@ -102,9 +115,14 @@ export default function ForecastSection({lang}) {
                     </HStack>
                   </HStack>
                   {rows.map((d) => {
-                    const pct = (+d.p_event || 0) * 100;
-                    const risk = pct >= 0.1 ? pct.toFixed(1) + '%' : '<0.1%';
-                    const water = (+d.observed_km2 || 0).toFixed(1) + ' km²';
+                    // A null score means the forecast could not be made for this
+                    // district. Coercing it to zero would print a reassuring
+                    // number for a district nobody looked at.
+                    const known = d.p_event !== null && d.p_event !== undefined;
+                    const risk = known ? (+d.p_event).toFixed(3) : t.unknown;
+                    const water = d.covered === false || d.observed_km2 === null
+                      ? t.unknown
+                      : (+d.observed_km2 || 0).toFixed(1) + ' km²';
                     return (
                       <React.Fragment key={d.district}>
                         <Divider />

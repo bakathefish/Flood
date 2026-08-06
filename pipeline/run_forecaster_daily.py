@@ -104,18 +104,28 @@ def _logreg(C=0.1):
     )
 
 
-def build_frame() -> pd.DataFrame:
-    """Issue-time feature frame: one row per district per monsoon day."""
+def build_frame(with_rain: bool = True) -> pd.DataFrame:
+    """Issue-time feature frame: one row per district per monsoon day.
+
+    ``with_rain=False`` skips the 65-year rainfall climatology, which is by
+    far the most expensive step and which the selected model does not use,
+    since rainfall added no measurable incremental skill. The rain columns
+    are still present but empty, so callers that name them do not break.
+    """
     flood = pd.read_csv(FLOOD_DAILY, parse_dates=["date"])
     flood["year"] = flood["date"].dt.year
 
     rain = pd.read_csv(RAIN_DAILY, parse_dates=["date"])
     rain = trailing_sums(rain, windows=(1, 3, 7, 14))
 
-    print("building 65-year district rainfall climatology ...")
-    climo_daily = pd.read_csv(RAIN_CLIMO, parse_dates=["date"])
-    climo = build_climatology(climo_daily, windows=(3, 7), halfwidth=10)
-    rain = climatology_percentile(rain, climo, windows=(3, 7))
+    if with_rain:
+        print("building 65-year district rainfall climatology ...")
+        climo_daily = pd.read_csv(RAIN_CLIMO, parse_dates=["date"])
+        climo = build_climatology(climo_daily, windows=(3, 7), halfwidth=10)
+        rain = climatology_percentile(rain, climo, windows=(3, 7))
+    else:
+        for c in PCTL_F:
+            rain[c] = np.nan
 
     boxes = pd.read_csv(BOXES, parse_dates=["date"]).sort_values("date")
     for w in (1, 3, 7):

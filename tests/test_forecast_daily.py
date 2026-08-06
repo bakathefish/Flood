@@ -132,10 +132,14 @@ def test_forward_event_ignores_crossings_beyond_the_horizon():
 
 
 def test_forward_event_does_not_cross_seasons():
+    """The end of one monsoon must never borrow the start of the next. The
+    horizon there runs off the end of the record, so the honest label is
+    censored rather than a negative the data cannot support."""
     a = _target([0.0, 0.0], year=2020, start="2020-09-29")
     b = _target([0.9, 0.9], year=2021, start="2021-06-15")
     y = forward_event(pd.concat([a, b], ignore_index=True), threshold=0.5, horizon=3)
-    assert y.iloc[0] == 0.0  # end of 2020 cannot borrow 2021
+    assert y.iloc[0] != 1.0
+    assert np.isnan(y.iloc[0])
 
 
 def test_forward_event_nan_when_horizon_runs_off_the_record():
@@ -235,3 +239,23 @@ def test_seasonal_onset_rate_is_per_district_and_week():
     out = seasonal_onset_rate(tr)
     assert out[out.district == "A"]["season_climo"].iloc[0] == pytest.approx(1.0)
     assert out[out.district == "B"]["season_climo"].iloc[0] == pytest.approx(0.0)
+
+
+def test_partially_observed_horizon_is_censored_not_negative():
+    """A horizon with an unobserved day and no observed flooding is unknown.
+    Calling it a negative credits the model for floods nobody could have seen."""
+    df = _target([0.0, np.nan, 0.0, 0.0])
+    y = forward_event(df, threshold=0.5, horizon=2)
+    assert np.isnan(y.iloc[0])  # day+1 unobserved, day+2 dry -> censored
+
+
+def test_a_flood_inside_a_partially_observed_horizon_is_still_positive():
+    df = _target([0.0, np.nan, 0.9, 0.0])
+    y = forward_event(df, threshold=0.5, horizon=2)
+    assert y.iloc[0] == 1.0  # seeing the flood settles it regardless of gaps
+
+
+def test_a_fully_observed_dry_horizon_is_a_real_negative():
+    df = _target([0.0, 0.0, 0.0, 0.0])
+    y = forward_event(df, threshold=0.5, horizon=2)
+    assert y.iloc[0] == 0.0

@@ -1,209 +1,231 @@
-# District flood-risk forecaster — pre-declared bands, paddy decision, actuals
+# The Sailaab flood forecaster
 
-The last AI piece of the pipeline. A district x window flood-risk forecaster whose
-**training labels the pipeline manufactured itself** (the GFM decade atlas,
-`data/gfm_district_window_fractions_2015_2025.csv`). Assembly reuses
-`sailaab.dataset` (antecedent + week-of-season + event labels), modelling reuses
-`sailaab.model` (LOYO splits + XGBoost); new pure helpers live in
-`sailaab.forecast_features` (reservoir pivot, core-season mask, district prior,
-metric wrappers), TDD'd in `tests/test_forecast_features.py`. Driver:
-`pipeline/run_forecaster.py`.
+For every district in Punjab, on every day of the monsoon, using only what is
+known when the forecast is issued: will Copernicus GFM observe flooding above
+0.5% of that district's area within the next three days?
 
-## Inputs (all committed CSVs, no network)
+In retrospective, post-selection 2019 to 2025 walk-forward tests, the selected
+gradient-boosting model had the best pooled ranking among the reported
+candidates, with average precision 0.249 against a 3.07% base rate. **Season
+level performance was heterogeneous and it did not lead every comparator in
+every flood season**: it wins decisively in 2025, the largest, and trails other
+candidates in 2019, 2022 and 2023. At the deployed alert setting it raised about
+24 alerts a season, about a third of which were followed by flooding within
+three days, while catching about one recorded onset in four.
 
-- **Target** `gfm_district_window_fractions_2015_2025.csv` — 2,420 rows =
-  11 years x 11 monsoon windows x 20 districts; `fraction` (regression target) and
-  `flooded_ha`. `fraction > config.FLOOD_EVENT_FRACTION (0.02)` = event label.
-- **Rain** `rain_windows_2015_2025.csv` — statewide two-box IMD 0.25 deg means:
-  `punjab_mm`, `upstream_mm`, each with `_lag1`, `_lag2` (already window-lagged).
-  Joined on (year, window_start); identical across the 20 districts of a window.
-- **Reservoirs** `reservoir_windows.csv` — per-dam (Bhakra, Pong, Ranjit Sagar)
-  `mean_storage` + `delta_storage`; pivoted wide to 6 features per window.
-- **District prior** `flood_frequency_districts_late_season.csv` — the calibrated
-  (post-paddy) repeat-victim table; `mean_annual_flooded_ha` +
-  `seasons_with_fraction_gt2pct` merged per district as `prior_*`.
+**The ranking is the solid result. The alerting is modest and is reported as
+such.** Episode-clean verification and prospective validation both remain
+outstanding, and every estimate below is retrospective and post-selection. The
+2026 monsoon, now in progress, is the prospective test and the protocol is
+frozen.
 
-Feature vector (~15): 6 rain (current + 2 lags, both boxes) + 6 reservoir
-(3 dams x storage/delta) + `antecedent_fraction` (lag-1 of the target) +
-`week_of_season` + 2 district-prior columns.
+An earlier draft of this note claimed 96% alert precision at four alerts a
+season. That was an artifact of taking the alert threshold from the model's own
+training predictions, which it had already fitted and therefore scores too
+highly. Recomputed from out-of-fold scores the figure is about a third, and the
+lower number is the one that stands.
 
-## PADDY DECISION (never silently train on contaminated labels)
+Code: `sailaab/hazard.py`, `sailaab/forecast_daily.py`, `sailaab/forecast_live.py`.
+Evaluation: `pipeline/run_forecaster_benchmark.py` (the architecture bake-off),
+`pipeline/run_forecaster_walkforward.py`, `pipeline/run_forecaster_daily_audit*.py`.
+Training: `pipeline/train_daily_forecaster.py`. Live: `pipeline/nowcast.py`.
 
-`docs/notes/gfm-decade.md` quantified it: statewide mean flooded-ha per window is
-Jun-15 150,848 / Jun-25 172,684 / Jul-05 78,774 / Jul-15 38,441 ha, then a ~20x
-**collapse** once rice transplanting ends — Jul-25 8,997 / Aug-04 4,705 /
-Aug-14 9,366 / Aug-24 8,974 / Sep-03 7,589 / Sep-13 3,042 / Sep-23 1,820 ha. The
-four windows starting Jun-15..Jul-15 are agronomic inundation (fields deliberately
-flooded for paddy), not floods; on those windows the event base rate is a
-manufactured **30%**, versus **1.75%** on the seven Jul-25+ windows that carry the
-real flood climatology.
+## 1. What the design is, and where each piece comes from
 
-**Decision:** train *and* evaluate the event classifier **and** the fraction
-regressor only on **core-season windows** (`window_start` month-day >= `07-25`, i.e.
-the 7 post-transplant windows). `week_of_season` is computed over the full 11-window
-season *before* the core filter (so it carries absolute seasonal position 4..10, and
-`antecedent_fraction` of the first core window is the real Jul-15 antecedent), then
-the paddy windows are dropped from the modelling frame. No paddy-manufactured
-positive ever enters a fit. The 2025 event (Aug 22 – Sep 6) lies entirely inside the
-core season, so nothing of interest is lost.
+The architecture was chosen after reading what operational flood forecasting
+actually uses, not by trying models until one worked.
 
-**Alternatives considered & rejected:**
-- *Train on all windows, evaluate only on core* (the lighter mission option): still
-  fits the positive class to agronomic water and lets June "floods" shape the tree
-  splits — rejected as still training on contaminated labels.
-- *Substitute a calibrated late-season target for the early windows*: gfm-decade.md's
-  calibration exists only at the **season-union** level, not per district x early
-  window, so per-cell early-window "flood" fractions would be fabricated — rejected.
+**Local LSTM training is unsupported at this sample size.** Google's operational
+model is an encoder-decoder LSTM trained on about 5,680 gauges in the 2024 Nature
+work and closer to 16,000 in the later operational update. This problem has 96
+distinct flood onsets. That is not a claim that LSTMs cannot forecast floods,
+which they plainly can; it is that nothing of that class can be trained here.
 
-`week_of_season` is retained as a feature (mission requirement and a genuine
-within-core-season signal: late-Jul vs Sep base rates differ).
+**Hawkes-like history features.** The recent flood literature routes water over a
+river graph with a graph neural network, which is the right idea for Punjab,
+where floods travel district to district along the Sutlej, Beas and Ravi. What is
+implemented here is much weaker and should be described precisely: features
+inspired by the self-exciting point-process family, not a fitted Hawkes process,
+not a substitute for a GNN, and not a causal routing model. The graph is
+undirected polygon adjacency rather than a directed river network, and most of
+the weight sits on a district's own history rather than on propagation from its
+neighbours. Past flood days are summed with exponential decay in time and by ring
+in graph distance:
 
-**Leakage note (district prior).** The `prior_*` columns come from the all-years
-late-season frequency table, so a held-out year contributes <= 1/11 to its own
-district's prior. Because the prior is a single per-district constant (identical
-across every window and year of a district) it cannot discriminate *within* a
-held-out year — it only shifts a district's baseline — so the residual leakage
-cannot inflate the within-year window ranking that PR-AUC and the 2025 rank-flag
-measure. Reported honestly; SHAP is checked to confirm the prior is not the
-dominant feature.
+    excite_h<k>(district, day) = sum over districts exactly k hops away,
+                                 and over earlier days t',
+                                 of exp(-(day - t') / tau)
 
-## PRE-DECLARED bands (written BEFORE any model was fit)
+with `tau = 3` days, matched to the routing time from upstream catchment rain and
+dam release to the plains, and rings 0, 1 and 2. Two interpretable constants
+instead of a learned branching structure.
 
-Base rate is a property of the target, not a model output: core-season
-(`window_start >= 07-25`) event prevalence = **27 / 1540 = 1.75%**.
+**Rare-event corrections, kept as tested diagnostics.** Firth's penalised
+likelihood and the King and Zeng prior correction are implemented in
+`sailaab/hazard.py` with tests, including the classic check that Firth stays
+finite under perfect separation. Firth improved the linear model, both still lost
+to boosting, so neither is in production and neither is claimed to make the
+scores quotable as probabilities. That would require a calibration assessment
+which has not been done. The deployed number is a ranking score.
 
-**(a) LOYO event-classification usable signal.** Headline = pooled out-of-fold
-**PR-AUC** (average precision; threshold-free, robust to the 1.75% imbalance).
-Secondary = pooled OOF ROC-AUC and F1/precision/recall at a **declared threshold of
-0.50**. Per-year metrics reported where the test year has >= 1 core-season event
-(0-event years -> AUC undefined = NaN, exactly as `sailaab.model` handles it).
-Bands:
-- **USABLE** iff pooled PR-AUC >= **0.10** (> 5x the 0.018 base rate) **and** pooled
-  ROC-AUC >= **0.75**.
-- **STRONG** iff pooled PR-AUC >= **0.30** **and** pooled ROC-AUC >= **0.85**.
-- Regression (fraction): **USABLE** iff pooled Spearman >= **0.30**; MAE reported
-  (no hard band — fractions are small so absolute MAE will be tiny).
+**The metrics an operational service actually uses.** Average precision is a
+machine-learning score. Flood warning is verified with probability of detection,
+false alarm ratio and critical success index from a contingency table. Those are
+now what the headline reports.
 
-**(b) 2025 holdout — train 2015-2024, predict every 2025 window.** Target windows =
-`window_start` month-day in **{08-14, 08-24, 09-03}** (the three 10-day windows
-spanning the Aug 22 – Sep 6 event). Named flood set (the RF/GFM 2025 top districts) =
-**{Firozpur, Gurdaspur, Kapurthala, Tarn Taran, Amritsar}**. A district is
-**FLAGGED** iff, in >= 1 target window, its predicted P(event) ranks in the **top-5
-of 20** districts for that window **OR** P(event) >= **0.50**.
-- **PASS** iff **>= 3 of 5** named districts flagged; **STRONG** iff **>= 4 of 5**.
-- A miss (< 3 flagged) is reported openly as *hindcast skill under the most extreme
-  event in the record* — 2025 is the +10-sigma year the model never trained on, and
-  its reservoir readings are largely missing (BBMB stopped reporting to CWC on
-  2025-07-11), so rain must carry the 2025 signal.
-- **Early-warning readout:** in the first target window `[08-14, 08-24)` (Aug 14-24,
-  *before* the Aug 26-27 dam-release peak), report the model's risk **rank**
-  (1 = highest of 20) for each named district.
+## 2. The forecast, stated precisely
 
-**(c) SHAP.** Expectation (declared): the top-3 mean-|SHAP| features include >= 1
-upstream-rain feature (`upstream_mm` / `_lag1` / `_lag2`) **and** >= 1 reservoir
-feature (`*_storage` / `*_delta`). The **actual** top-3 is reported verbatim below
-regardless of whether the expectation holds.
+On every monsoon day from 25 July, for every district not already flooded, using
+only quantities known by the end of that day, predict whether that district's
+observed flooded fraction crosses the threshold on any of the next three days.
 
-## ACTUALS (run 2026-07-21, `python -m pipeline.run_forecaster`)
+Every feature is a trailing quantity ending on the issue date, and the label is
+strictly forward and strictly excludes the issue day, so it can never be
+satisfied by water already visible when the forecast is made. Tests pin both
+properties, including one that adds a flood on the day *after* issue and asserts
+no feature moves.
 
-Core-season modelling frame: 1,540 rows (7 windows x 20 districts x 11 years),
-27 events, base rate **1.75%**. XGBoost mirrors `sailaab.model._make_model`
-(300 trees, depth 4, lr 0.05, subsample 0.9); classifier + regressor share the
-same LOYO folds from `sailaab.model.loyo_splits`. Only 3 of 11 seasons carry any
-core-season event (2019, 2023, 2025) — the real Punjab flood years — so per-year
-classification AUCs exist only for those; the **pooled OOF** metric is the honest
-aggregate.
+Two constants, both fixed before fitting, with the full four-by-four grid
+reported rather than searched:
 
-**LOYO (leave-one-year-out) — `data/forecaster_loyo_metrics.csv`:**
+**Threshold 0.5% of district area.** The project's earlier 2% threshold was set
+for a product that unions ten days of observations before computing a fraction.
+For a single-day snapshot, 2% demands 40 to 100 square kilometres of standing
+water in one satellite pass, which is an extreme reading rather than a warning
+level. 0.5% is 10 to 25 square kilometres, still thousands of acres.
 
-| year | events | PR-AUC | ROC-AUC | Spearman | MAE |
-|---|---|---|---|---|---|
-| 2019 | 2 | 0.052 | 0.781 | 0.442 | 0.0022 |
-| 2023 | 11 | 0.592 | 0.930 | 0.862 | 0.0040 |
-| 2025 | 14 | 0.512 | 0.897 | 0.256 | 0.0072 |
-| *(8 zero-event yrs)* | 0 | n/a | n/a | 0.21–0.62 | <0.0017 |
-| **POOLED** | **27** | **0.269** | **0.946** | **0.522** | **0.0017** |
+**Horizon 3 days**, matching the routing time.
 
-Pooled F1@0.50 = 0.235 (precision 0.571, recall 0.148) — precise but low recall at
-the conservative 0.5 cut, as expected at a 1.75% base rate; PR-AUC/ROC/rank are the
-threshold-free headline. **Cross-check:** `sailaab.model.fit_eval` per-year ROC-AUC
-= 2019 **0.781**, 2023 **0.930**, 2025 **0.897** — identical to the OOF loop above,
-confirming the loop reproduces the module's LOYO exactly (0-event years are the
-single-class years `fit_eval` skips).
+## 3. Features
 
-**Prior-leakage robustness (test-before-ship).** Re-running LOYO **and** the 2025
-hindcast with the district prior recomputed **fold-safe** (per-district mean
-core-season fraction + count of >2% seasons, from *training years only*, excluding
-the held-out/2025 year) gives pooled PR-AUC **0.215**, ROC **0.923**, Spearman
-**0.525**, and the **same 5/5** 2025 flags at the **same ranks** (Kapurthala 1,
-Firozpur 2, Tarn Taran 2, Gurdaspur 4, Amritsar 5). The <=1/11 prior self-leak
-therefore does **not** drive any verdict — the prior encodes stable river-corridor
-geography, not the 2025 outcome. Headline numbers below use the committed
-all-years late-season prior table as specified; the fold-safe run is the honesty
-check.
+District susceptibility rebuilt inside each fold from training seasons only;
+observed water now and its three-day maximum; day of season; water in adjacent
+districts; the seasonal onset climatology for that district and week; and the
+three self-excitation rings.
 
-**2025 showcase hindcast (train 2015-2024 core season, predict every 2025 window).**
-2025 per-year classification: ROC-AUC **0.897**, PR-AUC **0.512**. Verbatim flag
-readout on the target windows {08-14, 08-24, 09-03}:
+**No rainfall.** Rain added no measurable incremental skill under this model and
+protocol, and degraded average precision when included, even though onsets are
+genuinely rain-driven (three-day antecedent rainfall is 1.87 times higher before
+an onset, Mann-Whitney p = 8e-9). The association is real but too noisy at
+district scale to rank on. A useful side effect is that the live path depends on
+no rain feed at all, so one fewer external service can fail.
 
-| district | best rank (of 20) | best P(event) | flagged |
-|---|---|---|---|
-| Kapurthala | **1** | 0.721 | yes |
-| Firozpur | **2** | 0.502 | yes |
-| Tarn Taran | **2** | 0.434 | yes |
-| Gurdaspur | **4** | 0.131 | yes |
-| Amritsar | **5** | 0.019 | yes |
+## 4. The architecture bake-off
 
-**5 of 5 named districts flagged.** Every one lands in the top-5 of its worst
-window; Kapurthala and Firozpur also clear P>=0.50. (Ground truth confirms all five
-are genuine 2025 core-season events, `fraction` 0.022-0.057; the only non-named
-top-6 district by actual fraction is Jalandhar.)
+Walk-forward, seasons 2019 to 2025, 8,863 candidate district-days, 272 positive
+district-days, base rate 3.07%. Rows whose three-day horizon was only partly
+observed are censored out rather than counted as quiet, so a flood on a day the
+satellite missed can never be scored as a correct negative.
 
-**Early-warning readout** — window `[08-14, 08-24)` (Aug 14-24, ~10 days *before*
-the Aug 26-27 dam-release peak): risk ranks Kapurthala **#1**, Firozpur **#2**,
-Tarn Taran **#3**, Gurdaspur **#5**, Amritsar #9. As of that window **4 of the 5
-eventual flood districts were already in the model's top-5 risk ranks** — a real
-lead-time signal built only from data available before the crest.
+| candidate | AP | lift | POD | FAR | CSI | Brier skill |
+| --- | --- | --- | --- | --- | --- | --- |
+| **gradient boosting + excitation** | **0.249** | **8.1x** | 0.460 | 0.944 | 0.052 | **+0.110** |
+| gradient boosting, no excitation | 0.138 | 4.5x | 0.673 | 0.918 | 0.079 | +0.032 |
+| Firth logistic + excitation | 0.092 | 3.0x | 0.426 | 0.948 | 0.048 | -0.042 |
+| balanced logistic, King-Zeng corrected | 0.084 | 2.7x | 0.327 | 0.960 | 0.037 | -0.125 |
+| balanced logistic | 0.075 | 2.4x | 0.426 | 0.948 | 0.048 | - |
+| transparent rule | 0.040 | 1.3x | 0.474 | 0.942 | 0.054 | - |
+| persistence | 0.037 | 1.2x | 0.114 | 0.986 | 0.012 | - |
 
-**SHAP (mean-|value| on the 2015-2024 fit) — `atlas/forecaster_shap.png`,
-verbatim top features:**
-1. **antecedent_fraction** — 1.232 (flood persistence: last window's observed extent)
-2. **prior_seasons_with_fraction_gt2pct** — 1.082 (district repeat-victim propensity)
-3. **bhakra_storage** — 0.837 (Gobind Sagar / Sutlej live storage)
-4. punjab_mm_lag2 — 0.821 · 5. ranjit_sagar_storage — 0.359 · 6. pong_delta — 0.346
-· 7. upstream_mm_lag1 — 0.29 · 8. upstream_mm — 0.28
+The POD and FAR columns above are at a five-alerts-every-day operating point,
+which is why they look so poor for every method: warning five districts daily,
+straight through quiet weeks, sends almost every alert into an empty sky.
+Section 5 replaces it with a threshold.
 
-## VERDICTS (actual vs pre-declared band)
+Per season, average precision:
 
-- **(a) LOYO usable signal — PASS (usable; verges on strong).** Pooled ROC-AUC
-  **0.946** clears the STRONG bar (>=0.85); pooled PR-AUC **0.269** is ~15x the 1.75%
-  base rate and clears USABLE (>=0.10) but sits just under the STRONG line (0.30);
-  regression Spearman **0.522** clears USABLE (>=0.30). Fold-safe prior confirms
-  (PR-AUC 0.215, ROC 0.923). Verdict: **usable flood signal confirmed decisively**,
-  a hair short of the (arbitrary) STRONG PR-AUC cut.
+| season | boosting | boosting, no excite | logistic | transparent | persistence | positives |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2019 | 0.020 | **0.023** | 0.022 | 0.015 | 0.019 | 24 |
+| 2022 | 0.003 | 0.002 | **0.006** | 0.002 | 0.002 | 3 |
+| 2023 | 0.145 | **0.243** | 0.150 | 0.151 | 0.113 | 131 |
+| 2025 | **0.536** | 0.367 | 0.298 | 0.145 | 0.100 | 114 |
 
-- **(b) 2025 holdout — STRONG PASS.** 5 of 5 named districts flagged (band: PASS >=3,
-  STRONG >=4), all in the top-5 of their worst window; identical under the fold-safe
-  prior. This is **hindcast skill under the most extreme event in the 11-year
-  record** — 2025 was held out entirely, is the +10-sigma rain year the model never
-  trained on, and its reservoir readings are largely missing post-2025-07-11, so
-  rain + antecedent + susceptibility carried a clean 5/5 detection with a genuine
-  ~10-day early-warning lead (4/5 in top-5 before the crest).
+Read that table honestly. The deployed model leads only in 2025, and 2025 is
+large enough to carry the pooled figure on its own. In 2023 the same model
+without the excitation features scores 0.243 against its 0.145, so the
+excitation is not uniformly helpful; in 2019 and 2022, where positives are few,
+several candidates are within noise of each other and boosting is not the best.
+The pooled ranking result is real, and a claim that it beats everything
+everywhere would not be.
 
-- **(c) SHAP — expectation PARTIALLY met, reported verbatim.** Reservoir storage in
-  the top-3 as expected (**bhakra_storage #3**); the *upstream-rain* half was **not**
-  met — the top rain feature is **punjab_mm_lag2 at #4** (local box, 2-window lag),
-  with upstream rain at #7-#8. The two strongest features are flood persistence
-  (antecedent fraction) and district repeat-victim propensity (the prior). Physically
-  coherent: within the clean flood season, *where it flooded last window* and *which
-  districts chronically flood* dominate, with Bhakra/Sutlej storage and antecedent
-  Punjab-plains rain as the top dynamic drivers.
+**Matched ablation**, identical learner, excitation removed: 0.249 falls to
+0.138. This is a model-feature interaction rather than a universal result, since
+the same features do nothing for the balanced logistic model (0.074 to 0.072),
+and boosting without any excitation already beats logistic, so the learner
+reversal is not purely an excitation artifact. XGBoost split-gain importance puts
+excite_h0 at 0.42 and the three rings together above half the total, but split
+gain is not a share of predictive skill and is not quoted as one.
 
-**Bottom line.** On the pipeline's own manufactured GFM labels, once the
-rice-transplant windows are removed, the forecaster shows a genuine, leakage-checked
-flood signal (ROC-AUC 0.95 pooled) and cleanly hindcasts the 2025 disaster it never
-saw — flagging all five real flood districts, four of them with ~10 days of lead.
+**A correction to an earlier finding.** An earlier note in this project reported
+that logistic regression beat gradient boosting. That was an artifact of working
+at ten-day window resolution, where there were only 27 positives. At daily
+resolution with 272 positives the usual result from the flood-susceptibility
+literature holds and boosting wins clearly. The earlier claim was wrong and is
+withdrawn here.
 
-Citations: n/a (all inputs are this repo's committed CSVs; sources documented in
-`docs/notes/{gfm-decade,imd-rain,reservoirs}.md`).
+## 5. The operating point, which is where the system becomes usable
 
+Warning five districts every single day, the operating point this project used
+before, produces a false alarm ratio near 0.94 for every method, because it warns
+straight through quiet weeks. The fix is to alert on a score threshold so that a
+calm day produces no alert at all.
+
+Threshold taken from **training scores only**, never from the season being
+judged:
+
+The threshold comes from an inner walk-forward inside the training seasons, so it
+is taken from scores each inner model never saw. Because the later seasons flood
+more than the seasons the threshold was derived from, the REALIZED alert volume
+runs well above the nominal quantile, and only the realized number describes what
+an operator would live with:
+
+Every target-derived feature, the district priors and the seasonal climatology,
+is rebuilt inside each inner fold, so an inner validation season cannot shape its
+own features and later seasons cannot reach back into earlier folds.
+
+| nominal | realized alerts/season | onsets warned | alert precision | FAR |
+| --- | --- | --- | --- | --- |
+| 0.02% | 20.6 | 22 of 91 (24.2%) | **0.375** | 0.625 |
+| 0.05% | 23.0 | 22 of 91 (24.2%) | 0.342 | 0.658 |
+| **0.1%** | **24.1** | 23 of 91 (25.3%) | **0.331** | 0.669 |
+| 0.2% | 29.3 | 25 of 91 (27.5%) | 0.293 | 0.707 |
+| 0.5% | 41.4 | 25 of 91 (27.5%) | 0.248 | 0.752 |
+| 2.0% | 67.7 | 30 of 91 (33.0%) | 0.173 | 0.827 |
+
+At the deployed setting the system raises roughly 24 alerts a season, about three
+a week through the monsoon, and roughly one alert in three is followed by
+flooding within three days while about one onset in four is caught.
+
+That is a modest operational product and it is stated as one. **This is a
+selective trigger for recorded GFM threshold crossings, not a comprehensive
+flood-warning system.**
+
+## 6. What it is not
+
+It forecasts **what the satellite will observe**, not physical flooding directly.
+A flood GFM never imaged is not in the record. Metrics are evaluated against
+recorded GFM labels and may be biased by unverified district-level acquisition
+coverage; the observation-cadence null in `forecaster-daily.md` bounds how much of
+the signal the satellite schedule can explain but does not eliminate the question.
+
+It is **not a rainfall-runoff model** and does not claim to have learned
+hydrology. It learns an empirical hazard: which districts, at which point in the
+season, with what recent flooding nearby, are about to be seen flooding.
+
+**All numbers are retrospective and post-selection**, because aggregate results
+on these seasons informed the choice of feature family. Four seasons contain
+floods and one of those contains three positive district-days. The 2026 monsoon
+is the prospective test.
+
+## 7. Live
+
+The 6-hourly monitor fetches 21 days of GFM district observations, builds the
+issue-time features, scores every district, and publishes a self-describing
+payload to `monitor/nowcast.json` carrying the horizon, the threshold, the alert
+level and the definition of the number, so the feed cannot be misread as a
+calibrated percentage chance.
+
+Districts absent from a satellite pass are published as `covered: false` with a
+null fraction. Not imaged and imaged-and-dry are different facts, and a warning
+system must never render the first as the second.

@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import io
 import time
+from datetime import datetime, timedelta
 
 import numpy as np
 import requests
@@ -290,6 +291,71 @@ def _union_over_days(days, bounds, size, pause):
         union |= m
         time.sleep(pause)
     return union, fetched, active
+
+
+def fetch_gfm_recent(
+    issue_iso, days_back: int = 3, size: int = GFM_SIZE, pause: float = REQUEST_PAUSE_S
+):
+    """Per-day, per-district observed flooded fraction for the last ``days_back``
+    days up to and including ``issue_iso``.
+
+    This is what the daily forecaster scores on: the district's own recent water
+    and, through the adjacency map, its neighbours'. Returns a tidy
+    ``date, district, fraction`` frame plus metadata.
+
+    A day whose request FAILS is omitted entirely rather than recorded as zero,
+    so a network problem can never be read as an all-clear. A day that is
+    fetched successfully but carries no flood pixels is a real zero, which is
+    exactly how the training labels were built.
+    """
+    import pandas as pd
+
+    bounds = bbox_3857()
+    labels, names = _district_labels(bounds, size)
+    issue = datetime.strptime(issue_iso, "%Y-%m-%d")
+    days = [
+        (issue - timedelta(days=k)).strftime("%Y-%m-%d")
+        for k in range(days_back - 1, -1, -1)
+    ]
+
+    try:
+        refwater = ref_water_mask(_wms_rgba(REFWATER_LAYER, days[-1], bounds, size))
+        time.sleep(pause)
+        ref_ok = True
+    except Exception:
+        refwater = np.zeros((size, size), dtype=bool)
+        ref_ok = False
+
+    rows, fetched, active = [], 0, 0
+    for day in days:
+        try:
+            mask = flood_mask(_wms_rgba(FLOOD_LAYER, day, bounds, size))
+        except Exception:
+            continue  # unknown day, not a dry day
+        fetched += 1
+        if mask.any():
+            active += 1
+        stats = nowcast.district_flood_stats(
+            mask, labels, names, bounds, refwater=refwater
+        )
+        for n in names:
+            st = stats[n]
+            if not st["covered"]:
+                continue  # district absent from the grid: unknown, not dry
+            rows.append(
+                {"date": day, "district": n, "fraction": st["observed_fraction"]}
+            )
+        time.sleep(pause)
+
+    meta = {
+        "names": names,
+        "days_requested": len(days),
+        "days_fetched": fetched,
+        "days_with_flood": active,
+        "refwater_ok": ref_ok,
+        "wms_requests": fetched + (1 if ref_ok else 0),
+    }
+    return pd.DataFrame(rows, columns=["date", "district", "fraction"]), meta
 
 
 def fetch_gfm_observed(
