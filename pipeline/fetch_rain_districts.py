@@ -45,6 +45,11 @@ IMD_DIR = DATA / "rasters" / "imd"
 DISTRICTS = DATA / "punjab_districts.geojson"
 
 DAILY_CSV = DATA / "rain_district_daily_2015_2025.csv"
+# Full IMD record. The long series exists only to give each district its own
+# rainfall climatology, so "200 mm in three days" can be expressed as a
+# percentile of what that district actually sees at that point in the season.
+CLIMO_CSV = DATA / "rain_district_daily_1961_2025.csv"
+CLIMO_YEARS = range(1961, 2026)
 WINDOWS_CSV = DATA / "rain_district_windows_2015_2025.csv"
 
 API_K = 0.90  # daily retention; mid of the 0.85/0.90/0.95 range in the notes
@@ -125,8 +130,8 @@ def _window_extremes(daily: pd.DataFrame, windows) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def main() -> None:
-    years = config.YEARS
+def main(years=None, out_daily=None, windows_too=True) -> None:
+    years = list(years or config.YEARS)
     polys = load_polygons()
     print(f"districts: {len(polys)}")
 
@@ -148,8 +153,11 @@ def main() -> None:
     daily = add_api(daily, k=API_K)
     daily["rain_mm"] = daily["rain_mm"].round(3)
     daily["api_mm"] = daily["api_mm"].round(3)
-    daily.sort_values(["district", "date"]).to_csv(DAILY_CSV, index=False)
-    print(f"wrote {DAILY_CSV} ({len(daily)} rows)")
+    target = out_daily or DAILY_CSV
+    daily.sort_values(["district", "date"]).to_csv(target, index=False)
+    print(f"wrote {target} ({len(daily)} rows)")
+    if not windows_too:
+        return
 
     # Same windows as the decade grid, so this table joins 1:1 on
     # (year, window_start, district).
@@ -179,4 +187,11 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--climatology" in sys.argv:
+        # 65-year district series; no window products, they are only
+        # defined on the decade grid.
+        main(years=CLIMO_YEARS, out_daily=CLIMO_CSV, windows_too=False)
+    else:
+        main()
