@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-08-05T19:43:20Z",
+ "generated_utc": "2026-08-06T02:57:35Z",
  "window_start": "2026-08-04",
  "window_end": "2026-08-14",
  "core_season": true,
@@ -151,5 +151,5 @@
    "observed_km2": 0.0
   }
  ],
- "notes": "Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are not identically calibrated (treat rain features as a consistent proxy). Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows; XGBoost ingests the missing values natively. Current-window rain summed over 2/2 elapsed days. GFM observed extent: 0 S1-active of 2 current-window days and 3/10 antecedent-window days (~900 px grid, permanent water removed)."
+ "notes": "Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are not identically calibrated (treat rain features as a consistent proxy). Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows; XGBoost ingests the missing values natively. Current-window rain summed over 3/3 elapsed days. GFM observed extent: 0 S1-active of 3 current-window days and 3/10 antecedent-window days (~900 px grid, permanent water removed)."
 }
