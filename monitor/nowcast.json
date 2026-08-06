@@ -24,7 +24,7 @@
   ],
   "validation": "walk-forward, each season forecast using only earlier seasons, with the alert threshold taken from inner out-of-fold scores. At this operating point back-testing raised about 24 alerts a season, roughly one in three followed by flooding within three days, catching about one onset in four. Season-level performance is heterogeneous. Retrospective and post-selection; the 2026 monsoon is the prospective test."
  },
- "generated_utc": "2026-08-06T14:21:29Z",
+ "generated_utc": "2026-08-06T15:24:07Z",
  "window_start": "2026-08-04",
  "window_end": "2026-08-14",
  "core_season": true,
@@ -40,202 +40,202 @@
    "district": "Firozpur",
    "p_event": 0.0405,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 1,
    "tier": "elevated",
-   "transparent_score": 1.875
+   "transparent_score": 1.875,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Jalandhar",
    "p_event": 0.0367,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 2,
    "tier": "elevated",
-   "transparent_score": 1.775
+   "transparent_score": 1.775,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Kapurthala",
    "p_event": 0.0035,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 3,
    "tier": "elevated",
-   "transparent_score": 2.025
+   "transparent_score": 2.025,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Muktsar",
    "p_event": 0.0028,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 4,
    "tier": "elevated",
-   "transparent_score": 1.8250000000000002
+   "transparent_score": 1.8250000000000002,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Sangrur",
    "p_event": 0.0027,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 5,
    "tier": "elevated",
-   "transparent_score": 1.925
+   "transparent_score": 1.925,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Patiala",
    "p_event": 0.0026,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 6,
    "tier": "low",
-   "transparent_score": 1.725
+   "transparent_score": 1.725,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Tarn Taran",
    "p_event": 0.0015,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 7,
    "tier": "low",
-   "transparent_score": 1.975
+   "transparent_score": 1.975,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Hoshiarpur",
    "p_event": 0.0011,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 8,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Amritsar",
    "p_event": 0.0004,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 9,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Barnala",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 16,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Bathinda",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 15,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Faridkot",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 11,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Fatehgarh Sahib",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 14,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Ludhiana",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 17,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Mansa",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 18,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Moga",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 19,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Nawanshahr",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 10,
    "tier": "low",
-   "transparent_score": 1.875
+   "transparent_score": 1.875,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Rupnagar",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 13,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Sahibzada Ajit Singh Nagar",
    "p_event": 0.0003,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 12,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   },
   {
    "district": "Gurdaspur",
    "p_event": 0.0002,
    "covered": true,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0,
    "rank": 20,
    "tier": "low",
-   "transparent_score": 1.375
+   "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
   }
  ],
- "notes": "No district is above the alert threshold today. The score is a ranking score, not a calibrated probability: it has not been fitted to a reliability curve, so compare districts against each other and read the tier, rather than reading the number as a chance of flooding. Rain shown alongside is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0) and is page context, not a model input. Forecast inputs are satellite flood history only: district priors, observed extent now and over three days, position in the season, neighbouring districts, the district-week climatology, and recent flooding decaying across the district graph. Rainfall was tested as a feature family and did not improve the forecast, so it is not an input; reservoir storage is not an input either. Both appear below as context only and do not move the score. Reservoir context is unavailable: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows. Rain context summed over 3/3 elapsed days of the window. GFM: 3 of 3 current-window days returned data, 0 of those carried flood pixels; antecedent window 10/10 returned (~900 px grid, permanent water removed). A day with no flood pixels may be a dry day or a day with no pass; only the returned-data count establishes coverage."
+ "notes": "No district is above the alert threshold today. The score is a ranking score, not a calibrated probability: it has not been fitted to a reliability curve, so compare districts against each other and read the tier, rather than reading the number as a chance of flooding. Rain shown alongside is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0) and is page context, not a model input. Forecast inputs are satellite flood history only: district priors, observed extent now and over three days, position in the season, neighbouring districts, the district-week climatology, and recent flooding decaying across the district graph. Rainfall was tested as a feature family and did not improve the forecast, so it is not an input; reservoir storage is not an input either. Both appear below as context only and do not move the score. Reservoir context is unavailable: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows. Rain context summed over 3/3 elapsed days of the window. GFM: 3 of 3 current-window days returned data, 0 of those carried flood pixels; antecedent window 10/10 returned (~900 px grid, permanent water removed). Caveat on all of this: the count is of successful service responses, not of Sentinel-1 acquisitions. A tile that returns cleanly but empty still cannot separate a dry day from a day with no pass, so coverage here is an upper bound on what was actually observed."
 }

@@ -144,8 +144,10 @@ def _build_notes(
         f"pixels; antecedent window "
         f"{gfm_meta.get('prev_days_fetched', 0)}/{gfm_meta.get('prev_days', 0)} "
         f"returned (~{gfm_meta.get('grid_px')} px grid, permanent water removed). "
-        f"A day with no flood pixels may be a dry day or a day with no pass; "
-        f"only the returned-data count establishes coverage."
+        f"Caveat on all of this: the count is of successful service responses, "
+        f"not of Sentinel-1 acquisitions. A tile that returns cleanly but empty "
+        f"still cannot separate a dry day from a day with no pass, so coverage "
+        f"here is an upper bound on what was actually observed."
     )
     return " ".join(parts)
 
@@ -216,8 +218,10 @@ def _print_summary(payload, window, rain, reservoirs, res_source, gfm_meta) -> N
                     k: gfm_meta.get(k)
                     for k in (
                         "current_days",
+                        "current_days_fetched",
                         "current_days_with_flood",
                         "prev_days",
+                        "prev_days_fetched",
                         "prev_days_with_flood",
                         "wms_requests",
                     )

@@ -360,6 +360,14 @@ def build_nowcast_json(
                 "district": name,
                 "p_event": pe,
                 "covered": covered,
+                # Every row states every operational field, null when it has
+                # none. Omitting a key is not the same as saying null: it
+                # leaves a consumer to guess whether the producer had nothing
+                # to report or never considered the question, and a consumer
+                # that guesses "nothing to report" prints reassurance.
+                "rank": None,
+                "tier": None,
+                "transparent_score": None,
                 "observed_fraction_window": (
                     None if frac is None else round(float(frac), 4)
                 ),

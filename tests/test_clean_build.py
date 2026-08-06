@@ -47,12 +47,28 @@ def test_every_requested_asset_ships_in_the_vite_public_dir():
     )
 
 
-def test_retired_feeds_are_not_shipped():
-    assert not (PUBLIC / "forecaster_2025_hindcast.csv").exists(), (
-        "the superseded hindcast feed is still in the public dir"
-    )
-    stale = ROOT / "docs" / "assets" / "data" / "forecaster_2025_hindcast.csv"
-    assert not stale.exists(), "docs/assets/data still carries the superseded feed"
+RETIRED_FEEDS = ("forecaster_2025_hindcast.csv",)
+
+
+def test_retired_feeds_are_not_shipped_anywhere():
+    """Check every served directory, not one of them.
+
+    The previous version of this test looked only in docs/assets/data and
+    passed while the retired feed sat in docs/assets, which is a path the site
+    actually serves. Enumerate the directories instead of naming one.
+    """
+    served = [
+        PUBLIC,
+        ROOT / "docs" / "assets",
+        ROOT / "docs" / "assets" / "data",
+        WEBAPP / "dist" / "assets",
+    ]
+    offenders = [
+        str((d / name).relative_to(ROOT))
+        for d in served if d.exists()
+        for name in RETIRED_FEEDS if (d / name).exists()
+    ]
+    assert not offenders, f"retired feed still served from {offenders}"
 
 
 def test_walkforward_feed_is_identical_everywhere_it_ships():

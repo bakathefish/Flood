@@ -16,9 +16,6 @@
 
 export const TIERS = ['watch', 'elevated', 'low'];
 
-// p_event and observed_fraction_window are published via round(x, 4).
-export const SCORE_QUANTUM = 1e-4;
-
 /** Strictly a JSON number. `+x` turns null, "" and false into 0 and true into
  *  1, so coercing before a finite check lets a malformed field arrive as a
  *  confident zero. */
@@ -48,18 +45,21 @@ function rowShapeOk(d) {
       return false;
     }
   }
-  if (d.transparent_score !== null && d.transparent_score !== undefined
-      && num(d.transparent_score) === null) {
-    return false;
-  }
+  if (!('transparent_score' in d)) return false;
+  if (d.transparent_score !== null && num(d.transparent_score) === null) return false;
   return true;
 }
 
-/** An uncovered district must carry no operational output at all. */
+/** An uncovered district must carry no operational output at all, and must say
+ *  so explicitly. A missing key is not the same as a null: it means the
+ *  producer never spoke to the question, and a consumer that treats silence as
+ *  "nothing to report" is the failure this whole file exists to prevent. */
 function uncoveredRowOk(d) {
-  return d.p_event === null && (d.rank === null || d.rank === undefined)
-    && (d.tier === null || d.tier === undefined)
-    && (d.observed_km2 === null || d.observed_km2 === undefined);
+  for (const field of ['p_event', 'rank', 'tier', 'observed_km2', 'transparent_score']) {
+    if (!(field in d)) return false;
+    if (d[field] !== null) return false;
+  }
+  return true;
 }
 
 /** A covered, scored district must carry a complete, legal operational set. */
@@ -85,11 +85,15 @@ export function districtsAreValid(districts) {
     if (!rowShapeOk(d)) return false;
     if (names.has(d.district)) return false; // duplicate district
     names.add(d.district);
+    // every row must state its score, even to say it has none
+    if (!('p_event' in d)) return false;
     if (!d.covered) {
       if (!uncoveredRowOk(d)) return false;
-    } else if (d.p_event === null || d.p_event === undefined) {
-      // covered but unscored: allowed, but it must not claim a rank or tier
-      if (!uncoveredRowOk({...d, p_event: null, observed_km2: null})) return false;
+    } else if (d.p_event === null) {
+      // covered but unscored: allowed, but it must claim no operational output
+      for (const field of ['rank', 'tier', 'transparent_score']) {
+        if (!(field in d) || d[field] !== null) return false;
+      }
     } else if (!scoredRowOk(d)) {
       return false;
     }
@@ -110,11 +114,13 @@ export function rankingIsCoherent(scored) {
   const sorted = [...ranks].sort((a, b) => a - b);
   for (let i = 0; i < n; i += 1) if (sorted[i] !== i + 1) return false;
 
+  // Rounding is monotonic: if the true score of rank i-1 is at least that of
+  // rank i, the published values cannot invert. Ties therefore need no
+  // tolerance, and allowing one was fail-open — it accepted a published score
+  // of 0.0004 at rank 2 behind 0.0003 at rank 1, a real inversion.
   const byRank = [...scored].sort((a, b) => num(a.rank) - num(b.rank));
   for (let i = 1; i < n; i += 1) {
-    const prev = num(byRank[i - 1].p_event);
-    const cur = num(byRank[i].p_event);
-    if (cur > prev + SCORE_QUANTUM) return false;
+    if (num(byRank[i].p_event) > num(byRank[i - 1].p_event)) return false;
   }
   return true;
 }

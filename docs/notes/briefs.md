@@ -22,7 +22,7 @@ committed.
 
 - `data/district_flood_stats_2025.csv` — Tier-A / RF / cropland flooded ha, fraction, crop value ₹
 - `data/flood_frequency_districts_late_season.csv` — decade seasons >1% / >2%, worst season, mean annual ha
-- `data/forecaster_2025_hindcast.csv` — per-window `p_event`; the brief shows the district's **peak** P and its statewide rank
+- `data/forecaster_2025_walkforward.csv` — per-day walk-forward `score` for 2025; the brief shows the district's **peak ranking score** and its statewide rank. It is an uncalibrated score, not a probability.
 - `data/pop_exposure_2025.csv` — population exposed, RF and GFM brackets
 - `data/tehsil_flood_stats_2025.csv` + `data/tehsil_repeat_victims.csv` — the per-district tehsils table (2025 ha + decade ≥1% seasons), joined on `(district, tehsil)` and sorted worst-first
 - `data/punjab_districts.geojson` + `data/punjab_tehsils.geojson` — mini-map polygons
@@ -40,7 +40,7 @@ committed.
   labelled. A slim legend gives the flood-fraction ramp.
 - **Right column** — the stat block: 2025 RF + Tier-A flooded ha, cropland
   flooded ha, ₹ value-at-risk (crore), population exposed (RF & GFM); decade
-  seasons >1% / >2%, worst-season share, mean annual ha, forecaster peak P +
+  seasons >1% / >2%, worst-season share, mean annual ha, forecaster peak ranking score +
   statewide rank; then the tehsils table (2025 ha, decade ≥1%-season badges).
 - **Footer** — one-line method, "Open data: github.com/bakathefish/Flood ·
   validated vs Copernicus GFM & ISRO NDEM", and the generation date (2026-07-22).

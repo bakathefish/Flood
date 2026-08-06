@@ -123,7 +123,7 @@ test('an uncovered row keeps no operational output', () => {
   assert.equal(districtsAreValid([
     row({district: 'A', rank: 1}),
     row({district: 'B', p_event: null, covered: false, rank: null, tier: null,
-         observed_km2: null, observed_fraction_window: null}),
+         transparent_score: null, observed_km2: null, observed_fraction_window: null}),
   ]), true);
 });
 
@@ -181,10 +181,55 @@ test('uncovered districts are surfaced alongside a valid board', () => {
     row({district: 'A', rank: 1}),
     row({district: 'B', rank: 2, p_event: 0.001}),
     row({district: 'C', p_event: null, covered: false, rank: null, tier: null,
-         observed_km2: null, observed_fraction_window: null}),
+         transparent_score: null, observed_km2: null, observed_fraction_window: null}),
   ]);
   const {state, scored, unimaged} = resolveForecastState(nc);
   assert.equal(state, 'board');
   assert.equal(scored.length, 2);
   assert.deepEqual(unimaged.map((d) => d.district), ['C']);
+});
+
+// --------------------------------------------------------------------------
+// rules added after round 16
+// --------------------------------------------------------------------------
+test('a one-quantum ranking inversion is rejected, ties are not', () => {
+  // rounding is monotonic, so a published inversion is a real inversion
+  assert.equal(rankingIsCoherent([
+    row({district: 'A', p_event: 0.0003, rank: 1}),
+    row({district: 'B', p_event: 0.0004, rank: 2}),
+  ]), false, 'one-quantum inversion must fail');
+  assert.equal(rankingIsCoherent([
+    row({district: 'A', p_event: 0.0003, rank: 1}),
+    row({district: 'B', p_event: 0.0003, rank: 2}),
+  ]), true, 'an exact tie is legal');
+});
+
+test('a missing operational key is rejected, not read as null', () => {
+  for (const drop of ['p_event', 'rank', 'tier', 'transparent_score']) {
+    const bad = row({district: 'B', rank: 2});
+    delete bad[drop];
+    assert.equal(districtsAreValid([row({district: 'A', rank: 1}), bad]), false,
+                 `missing ${drop} must fail`);
+  }
+});
+
+test('an uncovered row holding a transparent_score is rejected', () => {
+  assert.equal(districtsAreValid([
+    row({district: 'A', rank: 1}),
+    row({district: 'B', p_event: null, covered: false, rank: null, tier: null,
+         transparent_score: 1.4, observed_km2: null, observed_fraction_window: null}),
+  ]), false);
+});
+
+test('a covered but unscored row must claim no operational output', () => {
+  const base = {district: 'B', p_event: null, covered: true, observed_km2: 0.0,
+                observed_fraction_window: 0.0};
+  assert.equal(districtsAreValid([
+    row({district: 'A', rank: 1}),
+    {...base, rank: null, tier: null, transparent_score: null},
+  ]), true);
+  assert.equal(districtsAreValid([
+    row({district: 'A', rank: 1}),
+    {...base, rank: 2, tier: null, transparent_score: null},
+  ]), false, 'an unscored row must not claim a rank');
 });
