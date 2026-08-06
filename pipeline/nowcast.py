@@ -38,9 +38,11 @@ class ForecastUnavailable(RuntimeError):
 
 
 CALIBRATION_NOTE = (
-    "Rain is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0); the "
-    "forecaster trained on IMD 0.25deg gauge rain, so absolute rain magnitudes are "
-    "not identically calibrated (treat rain features as a consistent proxy)."
+    "The score is a ranking score, not a calibrated probability: it has not been "
+    "fitted to a reliability curve, so compare districts against each other and "
+    "read the tier, rather than reading the number as a chance of flooding. Rain "
+    "shown alongside is Open-Meteo (ERA5 archive + forecast model, keyless, "
+    "CC-BY 4.0) and is page context, not a model input."
 )
 
 
@@ -99,11 +101,28 @@ def _build_notes(
     if model_note:
         parts.append(model_note)
     parts.append(CALIBRATION_NOTE)
+    # The deployed forecaster reads satellite flood history only: prior-season
+    # district behaviour, what the satellite sees now and over three days,
+    # position in the season, neighbouring districts, the district-week
+    # climatology, and flood activity decaying across the district graph.
+    # Rainfall was tested as a feature family and measurably did not help, so
+    # it is not an input. Reservoir storage is not an input either. Both are
+    # still fetched and shown on the page as context for a reader, and saying
+    # so plainly is the point: nothing below drives the score above.
+    parts.append(
+        "Forecast inputs are satellite flood history only: district priors, "
+        "observed extent now and over three days, position in the season, "
+        "neighbouring districts, the district-week climatology, and recent "
+        "flooding decaying across the district graph. Rainfall was tested as a "
+        "feature family and did not improve the forecast, so it is not an "
+        "input; reservoir storage is not an input either. Both appear below as "
+        "context only and do not move the score."
+    )
     if res_source != "cwc":
         parts.append(
-            "Reservoir storage/delta features are NaN: the BBMB dams (Bhakra, Pong, "
-            "Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 "
-            "and carry no 2026 rows; XGBoost ingests the missing values natively."
+            "Reservoir context is unavailable: the BBMB dams (Bhakra, Pong, "
+            "Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in "
+            "Jul 2025 and carry no 2026 rows."
         )
     if rain_source == "open-meteo":
         cd, ct = (
@@ -111,11 +130,11 @@ def _build_notes(
             rain_meta.get("current_days_total"),
         )
         if cd is not None:
-            parts.append(f"Current-window rain summed over {cd}/{ct} elapsed days.")
+            parts.append(
+                f"Rain context summed over {cd}/{ct} elapsed days of the window."
+            )
     else:
-        parts.append(
-            "Rain source degraded (Open-Meteo unreachable); rain features NaN."
-        )
+        parts.append("Rain context unavailable (Open-Meteo unreachable).")
     parts.append(
         f"GFM observed extent: {gfm_meta.get('current_days_active', 0)} S1-active of "
         f"{gfm_meta.get('current_days', 0)} current-window days and "
@@ -316,7 +335,12 @@ def main() -> int:
         payload = nowcast.build_nowcast_json(
             generated_utc=generated,
             window=window,
-            sources={"rain": rain_source, "reservoirs": res_source, "labels": "gfm"},
+            sources={
+                "forecast_inputs": "gfm",
+                "labels": "gfm",
+                "context_rain": rain_source,
+                "context_reservoirs": res_source,
+            },
             districts=districts,
             observed=observed,
             p_event=p_event,

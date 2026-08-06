@@ -5,13 +5,17 @@ known when the forecast is issued: will Copernicus GFM observe flooding above
 0.5% of that district's area within the next three days?
 
 In retrospective, post-selection 2019 to 2025 walk-forward tests, the selected
-gradient-boosting model had the best pooled ranking among the reported
-candidates, with average precision 0.249 against a 3.07% base rate. **Season
-level performance was heterogeneous and it did not lead every comparator in
-every flood season**: it wins decisively in 2025, the largest, and trails other
-candidates in 2019, 2022 and 2023. At the deployed alert setting it raised about
-24 alerts a season, about a third of which were followed by flooding within
-three days, while catching about one recorded onset in four.
+gradient-boosting model had the best **pooled** ranking among the reported
+candidates: average precision 0.249 against a 3.07% base rate. That figure is
+micro-pooled over district-days, so it is dominated by the seasons that carry
+the most positives, and it is not evidence of season-robust performance.
+Averaged over the four seasons that contained flooding instead, mean seasonal
+average precision is **0.176** and the median is **0.083**. **Season-level
+performance is heterogeneous and the model did not lead every comparator in
+every flood season**: it wins decisively in 2025 and trails other candidates in
+2019, 2022 and 2023. At the deployed alert setting it raised about 24 alerts a
+season, about a third of which were followed by flooding within three days,
+while catching about one recorded onset in four.
 
 **The ranking is the solid result. The alerting is modest and is reported as
 such.** Episode-clean verification and prospective validation both remain
@@ -141,13 +145,17 @@ Per season, average precision:
 | 2023 | 0.145 | **0.243** | 0.150 | 0.151 | 0.113 | 131 |
 | 2025 | **0.536** | 0.367 | 0.298 | 0.145 | 0.100 | 114 |
 
-Read that table honestly. The deployed model leads only in 2025, and 2025 is
-large enough to carry the pooled figure on its own. In 2023 the same model
-without the excitation features scores 0.243 against its 0.145, so the
-excitation is not uniformly helpful; in 2019 and 2022, where positives are few,
-several candidates are within noise of each other and boosting is not the best.
-The pooled ranking result is real, and a claim that it beats everything
-everywhere would not be.
+Read that table honestly. The deployed model leads only in 2025. 2023 actually
+carries more positive district-days (131 against 114), so 2025 is not the
+biggest season by volume; it is the one where the learned score separates best,
+and its scores are high enough to dominate a micro-pooled average. In 2023 the
+same model without the excitation features scores 0.243 against its 0.145, so
+the excitation is not uniformly helpful; in 2019 and 2022, where positives are
+few, several candidates are within noise of each other and boosting is not the
+best. Quote the pooled figure as a pooled figure, next to the seasonal mean of
+0.176 and median of 0.083. A claim that it beats everything everywhere would be
+false, and a claim that pooled 0.249 is the model's typical seasonal behaviour
+would be misleading.
 
 **Matched ablation**, identical learner, excitation removed: 0.249 falls to
 0.138. This is a model-feature interaction rather than a universal result, since

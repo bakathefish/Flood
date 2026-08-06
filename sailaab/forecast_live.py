@@ -178,12 +178,13 @@ def rank_and_tier(
     """Per-district rows ordered by the learned score, with an operating tier.
 
     ``watch``    the learned score is at or above ``alert_threshold``, the
-                 operating point the benchmark measured. At that point the model
-                 issued roughly seven alerts a season and four in five were
-                 followed by a flood within three days, which is why the alert
-                 is a threshold rather than a fixed number of districts: warning
-                 five districts every day, including through quiet weeks, sends
-                 almost every alert into an empty sky;
+                 operating point the benchmark measured. Under fold-safe
+                 back-testing that point issued roughly 24 alerts a season and
+                 about one in three was followed by a flood within three days,
+                 which is why the alert is a threshold rather than a fixed
+                 number of districts: warning five districts every day,
+                 including through quiet weeks, sends almost every alert into
+                 an empty sky;
     ``elevated`` inside the learned model's top ``k`` but below the threshold,
                  so it leads the ranking on a day that carries no real signal;
     ``low``      neither.

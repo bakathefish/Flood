@@ -300,10 +300,14 @@ def build_nowcast_json(
     """Shape the locked ``monitor/nowcast.json`` payload.
 
     ``observed`` maps ``district -> {observed_fraction, observed_km2}`` (missing
-    districts default to 0.0). ``p_event`` maps ``district -> probability`` when
-    the window is core-season, or is ``None`` (pre-core / out-of-domain) in which
-    case every ``p_event`` is emitted as ``null``. Rows carry all supplied
-    districts, sorted by ``p_event`` (core) or ``observed_km2`` (pre-core), desc.
+    districts default to 0.0). ``p_event`` maps ``district -> score`` when the
+    window is core-season, or is ``None`` (pre-core / out-of-domain) in which
+    case every ``p_event`` is emitted as ``null``. Despite the name, the value
+    is an uncalibrated ranking score, not a probability: it has never been
+    fitted to a reliability curve, so it orders districts against each other
+    and nothing more. The field name is kept because the published schema is
+    locked. Rows carry all supplied districts, sorted by ``p_event`` (core) or
+    ``observed_km2`` (pre-core), desc.
 
     ``forecast`` is an optional block describing what the score MEANS: the
     horizon, the threshold and the fact that it is a ranking rather than a
