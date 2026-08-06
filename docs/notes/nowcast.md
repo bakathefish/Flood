@@ -94,12 +94,24 @@ every surface that renders it must present it as a ranking score.
    endpoint is also slow and geo-restricted from CI. Reservoir storage is not a
    model input either, so this costs the forecast nothing.
    `sources.context_reservoirs = "unavailable"`.
-4. **Coverage decides publication.** A district the satellite could not see
-   gets `covered: false` and then `p_event`, `rank` and `tier` all `null`: the
-   model would happily score it from priors and climatology alone, and that
-   number is indistinguishable from a real one. If statewide coverage or
-   freshness falls below the gate, no forecast is published at all and the
-   payload carries `forecast.status = "unavailable"`.
+4. **Coverage comes from the acquisition footprint.** `gfm_sentinel_1_footprint`
+   is the boundary of the Sentinel-1 imagery each product was built from. It is
+   intersected with every district, and the share imaged decides the state:
+   `observed` (at least half the district), `partial`, `not_observed`, or
+   `unknown` when the layer itself could not be retrieved.
+
+   This matters more than any other line in this file. Sentinel-1 images a
+   strip, not a state, and most days there is no pass over most of Punjab. On
+   2026-07-25 the acquisition covered 14% of the Punjab bounding box and **19
+   of 20 districts were never imaged**; before the footprint was wired in, all
+   twenty published as observed with 0.0 km2 of water. An empty flood mask over
+   a district nobody photographed is not a dry district.
+
+   A district that is not `observed` gets `covered: false`, and then `p_event`,
+   `rank` and `tier` all `null`: the model would happily score it from priors
+   and climatology alone, and that number is indistinguishable from a real one.
+   If statewide coverage or freshness falls below the gate, no forecast is
+   published at all and the payload carries `forecast.status = "unavailable"`.
    No fragile scraping is done in CI.
 4. **Coarse observed grid.** The nowcast reduces GFM at ~380 m (single tile/day)
    vs the decade atlas's ~100 m, to stay within the WMS request budget — small

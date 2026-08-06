@@ -39,6 +39,7 @@ from rasterio.warp import transform_geom
 
 from pipeline.fetch_gfm import (
     FLOOD_LAYER,
+    FOOTPRINT_LAYER,
     REFWATER_LAYER,
     REQUEST_PAUSE_S,
     _get,
@@ -276,6 +277,29 @@ def _district_labels(bounds, size):
     return labels, names
 
 
+def _footprint_union(days, bounds, size, pause):
+    """Union of the Sentinel-1 acquisition footprints over ``days``.
+
+    This is the layer that answers "was this district imaged at all", which no
+    amount of staring at a flood mask can. Returns ``(union, fetched)``; a
+    ``union`` of ``None`` means not one day's footprint could be retrieved, and
+    the caller must treat coverage as unknown rather than assume anything.
+    """
+    union = np.zeros((size, size), dtype=bool)
+    fetched = 0
+    for d in days:
+        try:
+            arr = _wms_rgba(FOOTPRINT_LAYER, d, bounds, size)
+        except Exception:
+            continue
+        fetched += 1
+        # the service paints the imaged strip and leaves the rest transparent,
+        # so any non-transparent pixel is inside an acquisition
+        union |= arr[..., 3] > 0
+        time.sleep(pause)
+    return (union if fetched else None), fetched
+
+
 def _union_over_days(days, bounds, size, pause):
     """OR of the daily GFM flood masks over ``days``.
 
@@ -401,16 +425,28 @@ def fetch_gfm_observed(
     # An all-zero union means one of two very different things: the satellite
     # imaged Punjab and saw no water, or every request to the service failed.
     # Only the fetch counters can tell them apart, so they decide coverage.
+    # Which districts an acquisition actually covered. This is the real answer
+    # to coverage; the fetch counts below only stand in when the layer itself
+    # cannot be reached.
+    cur_fp, cur_fp_fetched = _footprint_union(cur_days, bounds, size, pause)
+    prev_fp, prev_fp_fetched = _footprint_union(prev_days, bounds, size, pause)
+    cur_acq = nowcast.district_acquisition(labels, names, cur_fp)
+    prev_acq = nowcast.district_acquisition(labels, names, prev_fp)
+
     cur_stats = nowcast.district_flood_stats(
-        cur_union, labels, names, bounds, refwater=refwater, sensed=cur_fetched > 0
+        cur_union, labels, names, bounds, refwater=refwater,
+        sensed=cur_fetched > 0, acquisition=cur_acq if cur_fp is not None else None,
     )
     prev_stats = nowcast.district_flood_stats(
-        prev_union, labels, names, bounds, refwater=refwater, sensed=prev_fetched > 0
+        prev_union, labels, names, bounds, refwater=refwater,
+        sensed=prev_fetched > 0, acquisition=prev_acq if prev_fp is not None else None,
     )
 
     observed = {
         n: {
             "covered": cur_stats[n]["covered"],
+            "acquisition_state": cur_stats[n]["acquisition_state"],
+            "acquisition_fraction": cur_stats[n]["acquisition_fraction"],
             "observed_fraction": cur_stats[n]["observed_fraction"],
             "observed_km2": cur_stats[n]["observed_km2"],
         }
@@ -423,6 +459,11 @@ def fetch_gfm_observed(
         "current_days": len(cur_days),
         # days the service actually answered for: the only coverage evidence
         "current_days_fetched": cur_fetched,
+        "footprint_days_fetched": cur_fp_fetched,
+        "footprint_available": cur_fp is not None,
+        "districts_observed": sum(
+            1 for n in names if cur_stats[n]["acquisition_state"] == "observed"
+        ),
         "current_days_with_flood": cur_active,
         "prev_days": len(prev_days),
         "prev_days_fetched": prev_fetched,

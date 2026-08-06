@@ -252,8 +252,51 @@ def _areas_ha(mask, labels, row_ha, n_labels: int) -> np.ndarray:
     )
 
 
+def district_acquisition(labels, names, footprint, min_fraction: float = 0.5) -> dict:
+    """What share of each district a Sentinel-1 acquisition actually covered.
+
+    ``footprint`` is the union of GFM's ``gfm_sentinel_1_footprint`` layer over
+    the days in question: the boundaries of the imagery the product was made
+    from. Intersecting it with the district labels answers the question the
+    flood mask cannot, because an empty flood mask over a district looks the
+    same whether the satellite imaged it and found nothing or never flew.
+
+    Returns ``district -> {acquisition_fraction, state}`` where state is
+    ``observed`` (at least ``min_fraction`` of the district imaged),
+    ``partial`` (some imagery, but not enough to stand behind a district-wide
+    number) or ``not_observed``. ``footprint=None`` means the layer could not
+    be retrieved at all, which is ``unknown`` for every district: different
+    from not observed, and both different from dry.
+    """
+    n = len(names)
+    if footprint is None:
+        return {
+            name: {"acquisition_fraction": None, "state": "unknown"}
+            for name in names
+        }
+    fp = np.asarray(footprint, dtype=bool)
+    lab = np.asarray(labels)
+    out = {}
+    for i, name in enumerate(names, start=1):
+        in_district = lab == i
+        total = int(in_district.sum())
+        if total == 0:
+            out[name] = {"acquisition_fraction": None, "state": "unknown"}
+            continue
+        frac = float((in_district & fp).sum()) / total
+        if frac >= min_fraction:
+            state = "observed"
+        elif frac > 0.0:
+            state = "partial"
+        else:
+            state = "not_observed"
+        out[name] = {"acquisition_fraction": round(frac, 4), "state": state}
+    return out
+
+
 def district_flood_stats(
-    mask, labels, names, bounds, refwater=None, *, sensed: bool = True
+    mask, labels, names, bounds, refwater=None, *, sensed: bool = True,
+    acquisition: dict | None = None
 ) -> dict:
     """Per-district observed flood fraction and km² from a boolean flood ``mask``.
 
@@ -284,13 +327,32 @@ def district_flood_stats(
         # Coverage is earned by an observation, not by the district polygon
         # having pixels: district_ha is computed from a constant raster, so on
         # its own it is true for every district on every run, imagery or not.
-        covered = sensed and d_ha > 0
+        #
+        # When the acquisition footprint is available it decides, per district,
+        # and that is the honest answer: a district the satellite did not fly
+        # over is not covered no matter how many other tiles came back. The
+        # fetch-count fallback below is an upper bound and is only used when
+        # the footprint layer could not be retrieved.
+        if acquisition is not None:
+            covered = acquisition.get(name, {}).get("state") == "observed"
+        else:
+            covered = sensed and d_ha > 0
         out[name] = {
             # A district absent from this pass has no pixels at all. Reporting
             # 0.0 there would be a false all-clear: each Sentinel-1 pass images
             # a strip, not the whole state, so "not imaged" and "imaged and dry"
             # must stay distinguishable all the way to the site.
             "covered": covered,
+            "acquisition_state": (
+                acquisition.get(name, {}).get("state")
+                if acquisition is not None
+                else ("sensed" if sensed else "unknown")
+            ),
+            "acquisition_fraction": (
+                acquisition.get(name, {}).get("acquisition_fraction")
+                if acquisition is not None
+                else None
+            ),
             "observed_fraction": (f_ha / d_ha) if covered else None,
             "observed_km2": (f_ha / 100.0) if covered else None,
             "flooded_ha": f_ha,

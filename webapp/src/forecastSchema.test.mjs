@@ -233,3 +233,64 @@ test('a covered but unscored row must claim no operational output', () => {
     {...base, rank: 2, tier: null, transparent_score: null},
   ]), false, 'an unscored row must not claim a rank');
 });
+
+// --------------------------------------------------------------------------
+// rules added after the contract review
+// --------------------------------------------------------------------------
+test('a tier that disagrees with the threshold fails the board', () => {
+  // score clears 0.79 but claims a quiet tier: the feed contradicts itself and
+  // the quieter statement is the one a reader believes
+  const nc = feed([row({district: 'A', p_event: 0.95, rank: 1, tier: 'elevated'})]);
+  assert.equal(resolveForecastState(nc).state, 'unavailable');
+
+  const nc2 = feed([row({district: 'A', p_event: 0.95, rank: 1, tier: 'watch'})]);
+  assert.equal(resolveForecastState(nc2).state, 'board');
+});
+
+test('a below-threshold row claiming watch also fails', () => {
+  const nc = feed([row({district: 'A', p_event: 0.01, rank: 1, tier: 'watch'})]);
+  assert.equal(resolveForecastState(nc).state, 'unavailable');
+});
+
+test('a covered but unscored district is surfaced, never dropped', () => {
+  const nc = feed([
+    row({district: 'A', rank: 1}),
+    {district: 'B', p_event: null, covered: true, rank: null, tier: null,
+     transparent_score: null, observed_km2: 3.2, observed_fraction_window: 0.01},
+  ]);
+  const {state, scored, unimaged, unscored} = resolveForecastState(nc);
+  assert.equal(state, 'board');
+  assert.deepEqual(scored.map((d) => d.district), ['A']);
+  assert.deepEqual(unimaged.map((d) => d.district), []);
+  assert.deepEqual(unscored.map((d) => d.district), ['B'],
+                   'an imaged district with no score must not vanish');
+});
+
+test('every district lands in exactly one group', () => {
+  const nc = feed([
+    row({district: 'A', rank: 1}),
+    {district: 'B', p_event: null, covered: true, rank: null, tier: null,
+     transparent_score: null, observed_km2: 1.0, observed_fraction_window: 0.0},
+    row({district: 'C', p_event: null, covered: false, rank: null, tier: null,
+         transparent_score: null, observed_km2: null, observed_fraction_window: null}),
+  ]);
+  const r = resolveForecastState(nc);
+  const seen = [...r.scored, ...r.unimaged, ...r.unscored].map((d) => d.district);
+  assert.equal(seen.length, 3, 'no district counted twice or lost');
+  assert.deepEqual([...seen].sort(), ['A', 'B', 'C']);
+});
+
+test('a stale feed does not sit under a live board', () => {
+  const nc = feed([row({district: 'A', rank: 1})],
+                  {generated_utc: '2026-08-06T00:00:00Z'});
+  const fresh = Date.parse('2026-08-06T03:00:00Z');
+  const stale = Date.parse('2026-08-07T12:00:00Z');
+  assert.equal(resolveForecastState(nc, {nowMs: fresh}).state, 'board');
+  assert.equal(resolveForecastState(nc, {nowMs: stale}).state, 'unavailable');
+});
+
+test('staleness is not enforced when no clock is supplied', () => {
+  const nc = feed([row({district: 'A', rank: 1})],
+                  {generated_utc: '2020-01-01T00:00:00Z'});
+  assert.equal(resolveForecastState(nc).state, 'board');
+});

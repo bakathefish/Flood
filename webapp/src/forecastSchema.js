@@ -16,6 +16,9 @@
 
 export const TIERS = ['watch', 'elevated', 'low'];
 
+// A cycle runs every 6 hours; twice that means something has stopped.
+export const MAX_FEED_AGE_MS = 12 * 60 * 60 * 1000;
+
 /** Strictly a JSON number. `+x` turns null, "" and false into 0 and true into
  *  1, so coercing before a finite check lets a malformed field arrive as a
  *  confident zero. */
@@ -133,8 +136,9 @@ export function rankingIsCoherent(scored) {
  * Returns {state, scored, unimaged, threshold} where state is one of
  * 'loading' | 'inactive' | 'unavailable' | 'board'.
  */
-export function resolveForecastState(nc, {fetchFailed = false} = {}) {
-  const out = {state: 'unavailable', scored: [], unimaged: [], threshold: null};
+export function resolveForecastState(nc, {fetchFailed = false, nowMs = null} = {}) {
+  const out = {state: 'unavailable', scored: [], unimaged: [], unscored: [],
+               threshold: null};
   if (fetchFailed) return out;
   if (!nc || typeof nc !== 'object') {
     out.state = 'loading';
@@ -157,21 +161,50 @@ export function resolveForecastState(nc, {fetchFailed = false} = {}) {
 
   const scored = nc.districts.filter(hasScore)
     .sort((a, b) => num(a.rank) - num(b.rank));
+  // Three groups, and every district lands in exactly one. A district that was
+  // imaged but could not be scored used to be in neither the board nor the
+  // unimaged list, so it simply disappeared from the page: the quietest
+  // possible failure.
   const unimaged = nc.districts.filter((d) => d.covered === false);
+  const unscored = nc.districts.filter((d) => d.covered === true && !hasScore(d));
   if (scored.length === 0 || !rankingIsCoherent(scored)) {
     out.unimaged = unimaged;
+    out.unscored = unscored;
     return out;
   }
 
   const threshold = fc && typeof fc === 'object' ? inRange(fc.alert_threshold, 0, 1) : null;
   if (threshold === null) {
     out.unimaged = unimaged;
+    out.unscored = unscored;
     return out;
+  }
+
+  // The tier is supposed to BE the threshold comparison. If a row crosses the
+  // alert level and still says anything other than watch, the feed's own two
+  // statements disagree and the quieter one is the one a reader believes.
+  for (const d of scored) {
+    if ((d.tier === 'watch') !== (num(d.p_event) >= threshold)) {
+      out.unimaged = unimaged;
+      out.unscored = unscored;
+      return out;
+    }
+  }
+
+  // A run that stopped hours ago must not sit under a pulsing live dot.
+  if (nowMs !== null && typeof nc.generated_utc === 'string') {
+    const age = nowMs - Date.parse(nc.generated_utc);
+    if (!Number.isFinite(age) || age > MAX_FEED_AGE_MS) {
+      out.unimaged = unimaged;
+      out.unscored = unscored;
+      return out;
+    }
   }
 
   out.state = 'board';
   out.scored = scored;
   out.unimaged = unimaged;
+  out.unscored = unscored;
   out.threshold = threshold;
   return out;
 }

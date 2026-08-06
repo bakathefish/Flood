@@ -27,10 +27,13 @@ const F_T = {
     waterCol: 'water now',
     tierWatch: 'watch',
     tierElevated: 'elevated',
-    tierLow: 'low',
+    tierLow: 'not flagged',
     legend: 'Tiers, not probabilities. "watch" means the score cleared the alert level measured in back-testing; "elevated" means the district leads today\'s ranking without clearing it. The number beside each row is a ranking score with no calibration behind it: use it to compare districts against each other, never as a chance of flooding.',
     thresholdIs: 'Alert level',
     unknownHead: 'Not imaged this cycle',
+    notScoredHead: 'Imaged, but no forecast',
+    notScoredNote: 'The satellite saw these districts, but a forecast could not be produced for them this cycle. They are not ranked and they are not an all-clear.',
+    hiddenNote: 'Showing the top 8 of',
     unknownNote: 'The satellite did not return usable coverage for these districts, so no forecast could be made for them. Unknown is not the same as dry.',
     unavailable: 'Forecast unavailable for this cycle: the satellite coverage needed to make it was missing or too old, so no district ranking is shown. This is NOT an all-clear. Absence of imagery is absence of information.',
     inactive: 'The forecaster is outside its season. It is trained and verified on the core monsoon only, and it activates on',
@@ -50,10 +53,13 @@ const F_T = {
     waterCol: 'अभी जल',
     tierWatch: 'निगरानी',
     tierElevated: 'बढ़ा हुआ',
-    tierLow: 'कम',
+    tierLow: 'चिह्नित नहीं',
     legend: 'ये स्तर हैं, संभावनाएँ नहीं। "निगरानी" का अर्थ है कि स्कोर बैक-टेस्टिंग में मापे गए चेतावनी स्तर से ऊपर गया; "बढ़ा हुआ" का अर्थ है कि ज़िला आज की रैंकिंग में आगे है पर उस स्तर तक नहीं पहुँचा। हर पंक्ति के साथ दी गई संख्या एक रैंकिंग स्कोर है जिसका कोई अंशांकन नहीं है: इससे ज़िलों की आपस में तुलना करें, इसे बाढ़ की संभावना कभी न समझें।',
     thresholdIs: 'चेतावनी स्तर',
     unknownHead: 'इस चक्र में तस्वीर नहीं',
+    notScoredHead: 'तस्वीर मिली, पर पूर्वानुमान नहीं',
+    notScoredNote: 'सैटेलाइट ने इन ज़िलों को देखा, पर इस चक्र में इनका पूर्वानुमान नहीं बन सका। ये रैंक में नहीं हैं और यह सुरक्षा की सूचना नहीं है।',
+    hiddenNote: 'शीर्ष 8 दिखाए जा रहे हैं, कुल',
     unknownNote: 'इन ज़िलों के लिए सैटेलाइट से उपयोगी कवरेज नहीं मिली, इसलिए इनका पूर्वानुमान नहीं बनाया जा सका। अज्ञात होना सूखा होना नहीं है।',
     unavailable: 'इस चक्र के लिए पूर्वानुमान उपलब्ध नहीं: इसे बनाने के लिए ज़रूरी सैटेलाइट कवरेज नहीं थी या बहुत पुरानी थी, इसलिए कोई ज़िला रैंकिंग नहीं दिखाई गई। यह सुरक्षा की सूचना नहीं है। तस्वीर का न होना जानकारी का न होना है।',
     inactive: 'पूर्वानुमानक अपने मौसम से बाहर है। यह केवल मुख्य मानसून पर प्रशिक्षित और सत्यापित है, और यह सक्रिय होता है',
@@ -73,10 +79,13 @@ const F_T = {
     waterCol: 'ਹੁਣ ਪਾਣੀ',
     tierWatch: 'ਨਿਗਰਾਨੀ',
     tierElevated: 'ਵਧਿਆ ਹੋਇਆ',
-    tierLow: 'ਘੱਟ',
+    tierLow: 'ਨਿਸ਼ਾਨਬੱਧ ਨਹੀਂ',
     legend: 'ਇਹ ਪੱਧਰ ਹਨ, ਸੰਭਾਵਨਾਵਾਂ ਨਹੀਂ। "ਨਿਗਰਾਨੀ" ਦਾ ਮਤਲਬ ਹੈ ਕਿ ਸਕੋਰ ਬੈਕ-ਟੈਸਟਿੰਗ ਵਿੱਚ ਮਾਪੇ ਗਏ ਚੇਤਾਵਨੀ ਪੱਧਰ ਤੋਂ ਉੱਤੇ ਗਿਆ; "ਵਧਿਆ ਹੋਇਆ" ਦਾ ਮਤਲਬ ਹੈ ਕਿ ਜ਼ਿਲ੍ਹਾ ਅੱਜ ਦੀ ਰੈਂਕਿੰਗ ਵਿੱਚ ਅੱਗੇ ਹੈ ਪਰ ਉਸ ਪੱਧਰ ਤੱਕ ਨਹੀਂ ਪਹੁੰਚਿਆ। ਹਰ ਕਤਾਰ ਨਾਲ ਦਿੱਤਾ ਨੰਬਰ ਇੱਕ ਰੈਂਕਿੰਗ ਸਕੋਰ ਹੈ ਜਿਸ ਦਾ ਕੋਈ ਅੰਸ਼ਾਂਕਣ ਨਹੀਂ: ਇਸ ਨਾਲ ਜ਼ਿਲ੍ਹਿਆਂ ਦੀ ਆਪਸ ਵਿੱਚ ਤੁਲਨਾ ਕਰੋ, ਇਸ ਨੂੰ ਹੜ੍ਹ ਦੀ ਸੰਭਾਵਨਾ ਕਦੇ ਨਾ ਸਮਝੋ।',
     thresholdIs: 'ਚੇਤਾਵਨੀ ਪੱਧਰ',
     unknownHead: 'ਇਸ ਚੱਕਰ ਵਿੱਚ ਤਸਵੀਰ ਨਹੀਂ',
+    notScoredHead: 'ਤਸਵੀਰ ਮਿਲੀ, ਪਰ ਭਵਿੱਖਬਾਣੀ ਨਹੀਂ',
+    notScoredNote: 'ਸੈਟੇਲਾਈਟ ਨੇ ਇਹ ਜ਼ਿਲ੍ਹੇ ਵੇਖੇ, ਪਰ ਇਸ ਚੱਕਰ ਵਿੱਚ ਇਨ੍ਹਾਂ ਦੀ ਭਵਿੱਖਬਾਣੀ ਨਹੀਂ ਬਣ ਸਕੀ। ਇਹ ਰੈਂਕ ਵਿੱਚ ਨਹੀਂ ਹਨ ਅਤੇ ਇਹ ਸੁਰੱਖਿਆ ਦੀ ਸੂਚਨਾ ਨਹੀਂ ਹੈ।',
+    hiddenNote: 'ਸਿਖਰਲੇ 8 ਦਿਖਾਏ ਜਾ ਰਹੇ ਹਨ, ਕੁੱਲ',
     unknownNote: 'ਇਨ੍ਹਾਂ ਜ਼ਿਲ੍ਹਿਆਂ ਲਈ ਸੈਟੇਲਾਈਟ ਤੋਂ ਵਰਤੋਂਯੋਗ ਕਵਰੇਜ ਨਹੀਂ ਮਿਲੀ, ਇਸ ਲਈ ਇਨ੍ਹਾਂ ਦੀ ਭਵਿੱਖਬਾਣੀ ਨਹੀਂ ਬਣਾਈ ਜਾ ਸਕੀ। ਅਣਜਾਣ ਹੋਣਾ ਸੁੱਕਾ ਹੋਣਾ ਨਹੀਂ ਹੈ।',
     unavailable: 'ਇਸ ਚੱਕਰ ਲਈ ਭਵਿੱਖਬਾਣੀ ਉਪਲਬਧ ਨਹੀਂ: ਇਸ ਨੂੰ ਬਣਾਉਣ ਲਈ ਲੋੜੀਂਦੀ ਸੈਟੇਲਾਈਟ ਕਵਰੇਜ ਨਹੀਂ ਸੀ ਜਾਂ ਬਹੁਤ ਪੁਰਾਣੀ ਸੀ, ਇਸ ਲਈ ਕੋਈ ਜ਼ਿਲ੍ਹਾ ਰੈਂਕਿੰਗ ਨਹੀਂ ਦਿਖਾਈ ਗਈ। ਇਹ ਸੁਰੱਖਿਆ ਦੀ ਸੂਚਨਾ ਨਹੀਂ ਹੈ। ਤਸਵੀਰ ਦਾ ਨਾ ਹੋਣਾ ਜਾਣਕਾਰੀ ਦਾ ਨਾ ਹੋਣਾ ਹੈ।',
     inactive: 'ਭਵਿੱਖਬਾਣੀਕਾਰ ਆਪਣੇ ਮੌਸਮ ਤੋਂ ਬਾਹਰ ਹੈ। ਇਹ ਸਿਰਫ਼ ਮੁੱਖ ਮਾਨਸੂਨ ਉੱਤੇ ਸਿਖਲਾਈ ਅਤੇ ਸਤਿਆਪਿਤ ਹੈ, ਅਤੇ ਇਹ ਸਰਗਰਮ ਹੁੰਦਾ ਹੈ',
@@ -105,8 +114,8 @@ export default function ForecastSection({lang}) {
     return () => { on = false; };
   }, []);
 
-  const {state, scored, unimaged, threshold: rawThreshold} =
-    resolveForecastState(nc, {fetchFailed: failed});
+  const {state, scored, unimaged, unscored, threshold: rawThreshold} =
+    resolveForecastState(nc, {fetchFailed: failed, nowMs: Date.now()});
   const rows = scored.slice(0, 8);
   const preCore = state === 'inactive';
   const unavailable = state === 'unavailable';
@@ -200,6 +209,11 @@ export default function ForecastSection({lang}) {
                   <Divider />
                 </VStack>
                 <VStack gap={1}>
+                  {scored.length > rows.length && (
+                    <Text type="supporting" color="secondary">
+                      {t.hiddenNote} {scored.length}.
+                    </Text>
+                  )}
                   <Text type="supporting" color="secondary">{t.legend}</Text>
                   {threshold && (
                     <Text type="supporting" color="secondary" hasTabularNumbers>{t.thresholdIs}: {threshold}</Text>
@@ -210,6 +224,17 @@ export default function ForecastSection({lang}) {
                 <Text type="large" color="secondary">{t.summary}</Text>
               </VStack>
             </Grid>
+          )}
+
+          {unscored.length > 0 && (
+            <VStack maxWidth={780} gap={2}>
+              <HStack gap={2} vAlign="center" wrap="wrap">
+                <StatusDot variant="warning" label="no forecast" />
+                <Text type="label" color="secondary">{t.notScoredHead}</Text>
+              </HStack>
+              <Text color="secondary">{t.notScoredNote}</Text>
+              <Text>{unscored.map((d) => d.district).join(' · ')}</Text>
+            </VStack>
           )}
 
           {unimaged.length > 0 && (

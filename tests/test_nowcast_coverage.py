@@ -154,3 +154,88 @@ def test_sensed_defaults_true_only_for_pure_callers():
     mask[0, 0] = True
     out = nc.district_flood_stats(mask, labels, ["A"], (0.0, 0.0, 1000.0, 1000.0))
     assert out["A"]["covered"] is True
+
+
+# --------------------------------------------------------------------------- #
+# real acquisition footprints, the thing that actually answers "was it imaged"
+# --------------------------------------------------------------------------- #
+def _strip_labels(size=20):
+    """Two districts side by side, both fully rasterized as production does."""
+    import numpy as np
+
+    labels = np.zeros((size, size), dtype=int)
+    labels[:, : size // 2] = 1
+    labels[:, size // 2 :] = 2
+    return labels, ["west", "east"]
+
+
+def test_footprint_covering_one_district_leaves_the_other_not_observed():
+    """The shape a Sentinel-1 pass actually makes: a strip, not the whole state.
+
+    Verified against the live layer on 2026-07-25, where the acquisition
+    covered 14% of the Punjab bbox and 19 of 20 districts were never imaged.
+    The pre-footprint code published all 20 as observed with 0.0 km2 of water.
+    """
+    import numpy as np
+
+    from sailaab import nowcast as nc
+
+    labels, names = _strip_labels()
+    footprint = np.zeros(labels.shape, dtype=bool)
+    footprint[:, : labels.shape[1] // 2] = True  # west only
+
+    acq = nc.district_acquisition(labels, names, footprint)
+    assert acq["west"]["state"] == "observed"
+    assert acq["west"]["acquisition_fraction"] == 1.0
+    assert acq["east"]["state"] == "not_observed"
+    assert acq["east"]["acquisition_fraction"] == 0.0
+
+
+def test_partial_acquisition_is_its_own_state_not_rounded_to_observed():
+    """Half a district imaged cannot stand behind a district-wide number."""
+    import numpy as np
+
+    from sailaab import nowcast as nc
+
+    labels, names = _strip_labels(size=20)
+    footprint = np.zeros(labels.shape, dtype=bool)
+    footprint[:5, :] = True  # a quarter of each district
+
+    acq = nc.district_acquisition(labels, names, footprint)
+    for n in names:
+        assert acq[n]["state"] == "partial"
+        assert acq[n]["acquisition_fraction"] == 0.25
+
+
+def test_unavailable_footprint_is_unknown_for_everyone_not_not_observed():
+    """Failing to fetch the layer is different from knowing nothing was imaged."""
+    from sailaab import nowcast as nc
+
+    labels, names = _strip_labels()
+    acq = nc.district_acquisition(labels, names, None)
+    for n in names:
+        assert acq[n]["state"] == "unknown"
+        assert acq[n]["acquisition_fraction"] is None
+
+
+def test_an_unimaged_district_gets_no_flood_number_even_from_a_clean_mask():
+    """The whole point: an empty mask over an unimaged district is not zero."""
+    import numpy as np
+
+    from sailaab import nowcast as nc
+
+    labels, names = _strip_labels()
+    bounds = (8220944.0, 3443277.0, 8566034.0, 3842330.0)
+    empty = np.zeros(labels.shape, dtype=bool)
+    footprint = np.zeros(labels.shape, dtype=bool)
+    footprint[:, : labels.shape[1] // 2] = True
+
+    acq = nc.district_acquisition(labels, names, footprint)
+    stats = nc.district_flood_stats(
+        empty, labels, names, bounds, sensed=True, acquisition=acq
+    )
+    assert stats["west"]["covered"] is True
+    assert stats["west"]["observed_km2"] == 0.0     # imaged, and genuinely dry
+    assert stats["east"]["covered"] is False
+    assert stats["east"]["observed_km2"] is None    # never looked at
+    assert stats["east"]["acquisition_state"] == "not_observed"
