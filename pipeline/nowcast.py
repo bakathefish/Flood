@@ -1,14 +1,16 @@
 # pipeline/nowcast.py
-"""Live nowcast driver — every monitor cycle, predict the CURRENT 10-day window's
-per-district flood risk with the committed forecaster from keyless live inputs,
-and write ``monitor/nowcast.json`` (the locked schema the site is wired against).
+"""Live nowcast driver — every monitor cycle, score each district's chance of the
+satellite seeing flooding within three days, using the committed daily
+forecaster and keyless live inputs, and write ``monitor/nowcast.json`` (the
+locked schema the site is wired against).
 
 Flow: resolve the current monsoon window from today's date (``sailaab.nowcast``)
--> pull live GFM observed extent, Open-Meteo rain, and CWC reservoirs
-(``pipeline.fetch_live_inputs``) -> assemble the EXACT 16 training features
--> ``predict_proba`` for all 20 districts **iff** the window is core-season
-(``window_start`` >= Jul 25; pre-core windows are out-of-domain, so ``p_event`` is
-null and the ``activates`` countdown carries) -> shape + write JSON.
+-> pull live GFM observed extent plus recent history (``pipeline.fetch_live_inputs``)
+-> assemble the EXACT 10 training features, all derived from satellite flood
+observations; rain and reservoirs are fetched as page context only and are not
+model inputs -> ``predict_proba`` for all 20 districts **iff** the window is
+core-season AND coverage passes the publication gate -> shape + write JSON.
+Districts the satellite could not see carry null score, rank and tier.
 
 CI contract: this script must NEVER fail the monitor job. Every exception is
 caught, a valid nulls JSON is written, and the process exits 0.
@@ -168,9 +170,10 @@ def degraded(generated, today_iso, reason) -> dict:
         generated_utc=generated,
         window=window,
         sources={
-            "rain": "unavailable",
-            "reservoirs": "unavailable",
+            "forecast_inputs": "unavailable",
             "labels": "unavailable",
+            "context_rain": "unavailable",
+            "context_reservoirs": "unavailable",
         },
         districts=_fallback_districts(),
         observed={},

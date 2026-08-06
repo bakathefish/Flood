@@ -322,17 +322,27 @@ def build_nowcast_json(
         obs = observed.get(name) or {}
         frac = obs.get("observed_fraction")
         km2 = obs.get("observed_km2")
+        # Coverage defaults to False. Defaulting to True fails open: a caller
+        # that forgot to set it publishes a district as observed when nobody
+        # knows whether it was, and the consumer reads a number that has no
+        # imagery behind it.
+        covered = bool(obs.get("covered", False))
         pe = None
         if p_event is not None:
             pv = p_event.get(name)
             pe = None if pv is None else round(float(pv), 4)
+        # A district the satellite could not see gets no score, no rank and no
+        # tier. The model will happily return a number for it from priors and
+        # climatology alone, and that number looks exactly like a real one.
+        # Withholding it at the producer means no consumer can rank it, and
+        # surfacing it downstream is not a substitute for never emitting it.
+        if not covered:
+            pe = None
         rows.append(
             {
                 "district": name,
                 "p_event": pe,
-                # default True keeps older callers that pass only fraction/km2
-                # unchanged; the stats helper sets it explicitly
-                "covered": bool(obs.get("covered", True)),
+                "covered": covered,
                 "observed_fraction_window": (
                     None if frac is None else round(float(frac), 4)
                 ),
@@ -341,6 +351,14 @@ def build_nowcast_json(
         )
         if extras and name in extras:
             rows[-1].update(extras[name])
+            # Extras carry the operational fields. An uncovered district must
+            # not receive them either, or it re-enters the ranking through the
+            # side door with a rank and a reassuring tier.
+            if not covered:
+                for field in ("rank", "tier", "transparent_score"):
+                    if field in rows[-1]:
+                        rows[-1][field] = None
+                rows[-1]["p_event"] = None
 
     def _f(x, default):
         return default if x is None else x

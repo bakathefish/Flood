@@ -368,7 +368,12 @@ def test_build_nowcast_json_pre_core_p_event_null():
 
 def test_build_nowcast_json_core_season_ranks_by_p_event():
     districts = ["Kapurthala", "Firozpur", "Amritsar"]
-    observed = {d: {"observed_fraction": 0.0, "observed_km2": 0.0} for d in districts}
+    # Coverage is explicit now: an observation that does not say it was imaged
+    # is treated as unimaged, so a caller cannot publish a score by omission.
+    observed = {
+        d: {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True}
+        for d in districts
+    }
     p_event = {"Kapurthala": 0.72, "Firozpur": 0.50, "Amritsar": 0.02}
     payload = nowcast.build_nowcast_json(
         generated_utc="2026-08-05T00:00:00Z",
@@ -400,6 +405,12 @@ def test_degraded_payload_is_schema_valid_with_nulls():
 
     payload = pipeline_nowcast.degraded("2026-07-21T00:00:00Z", "2026-07-21", "boom")
     assert payload["forecast"]["status"] == "unavailable"
+    assert payload["sources"] == {
+        "forecast_inputs": "unavailable",
+        "labels": "unavailable",
+        "context_rain": "unavailable",
+        "context_reservoirs": "unavailable",
+    }
     assert set(payload) == {
         "forecast",
         "generated_utc",
@@ -410,11 +421,6 @@ def test_degraded_payload_is_schema_valid_with_nulls():
         "sources",
         "districts",
         "notes",
-    }
-    assert payload["sources"] == {
-        "rain": "unavailable",
-        "reservoirs": "unavailable",
-        "labels": "unavailable",
     }
     assert len(payload["districts"]) == 20
     for d in payload["districts"]:

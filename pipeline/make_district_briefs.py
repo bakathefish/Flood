@@ -35,7 +35,7 @@ Inputs (all committed, repo-relative)
     data/district_flood_stats_2025.csv
     data/district_var_v2.csv           (VaR v2, DES district yields — display value)
     data/flood_frequency_districts_late_season.csv
-    data/forecaster_2025_hindcast.csv
+    data/forecaster_2025_walkforward.csv
     data/tehsil_flood_stats_2025.csv
     data/tehsil_repeat_victims.csv
     data/pop_exposure_2025.csv
@@ -249,13 +249,15 @@ def load_tables() -> dict:
         for r in _read_csv(DATA / "pop_exposure_2025.csv")
     }
 
-    # forecaster: peak p_event per district + statewide rank
+    # forecaster: peak walk-forward score per district + statewide rank.
+    # 2025 is scored by a model fitted to earlier seasons only. The value is a
+    # ranking score, not a probability, so the brief labels it as one.
     peak: dict[str, tuple[float, str]] = {}
-    for r in _read_csv(DATA / "forecaster_2025_hindcast.csv"):
+    for r in _read_csv(DATA / "forecaster_2025_walkforward.csv"):
         d = canonical_name(r["district"])
-        p = _fnum(r["p_event"])
+        p = _fnum(r["score"])
         if d not in peak or p > peak[d][0]:
-            peak[d] = (p, r["window_start"])
+            peak[d] = (p, r["date"])
     order = sorted(peak.items(), key=lambda kv: (-kv[1][0], kv[0]))
     rank = {d: i for i, (d, _) in enumerate(order, start=1)}
 
@@ -826,12 +828,12 @@ def build_brief(name: str, tables: dict, geom: dict, guru_fp) -> plt.Figure:
         INK,
         sub="avg flooded / season",
     )
-    peak_txt = f"{peak_p:.2f}" if peak_p >= 0.01 else "<0.01"
+    peak_txt = f"{peak_p:.3f}" if peak_p >= 0.001 else "<0.001"
     _tile(
         fig,
         rx,
         d3,
-        "Forecast peak P",
+        "Peak ranking score",
         peak_txt,
         "",
         AMBER,

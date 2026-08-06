@@ -17,7 +17,10 @@ const SITE = import.meta.env.BASE_URL;
 const AXIS = '#8a93a0', GRID = '#2b313b', TIP_BG = '#1b2027', TIP_BD = '#3a414c', TIP_FG = '#e6e9ee', FLOODED = '#3ad0c0', DRY = '#565f6b';
 
 async function loadCsv(url) {
-  const text = await (await fetch(url)).text();
+  const res = await fetch(url);
+  // Without this a 404 parses as CSV and the chart vanishes with no trace.
+  if (!res.ok) throw new Error(url + ': ' + res.status);
+  const text = await res.text();
   return Papa.parse(text, {header: true, skipEmptyLines: true}).data;
 }
 
@@ -50,7 +53,7 @@ const P_T = {
     ],
   },
   hi: {
-    eyebrow: 'प्रमाण · 2025 पर होल्ड-आउट',
+    eyebrow: 'प्रमाण · 2025 पर मूल्यांकन',
     title: '1988 के बाद की सबसे भीषण बाढ़ ने परखा',
     intro: 'पूर्वानुमान और नक्शे 2015–24 पर प्रशिक्षित हुए, फिर 2025 — जो उन्होंने कभी नहीं देखा था — सौंपा गया और उसी ने परखा। हर सैटेलाइट दावा रन से पहले लिखी गई संख्या से बंधा है, PASS या FAIL दोनों प्रकाशित।',
     stats: [
@@ -71,7 +74,7 @@ const P_T = {
     ],
   },
   pa: {
-    eyebrow: 'ਪ੍ਰਮਾਣ · 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ',
+    eyebrow: 'ਪ੍ਰਮਾਣ · 2025 ਉੱਤੇ ਮੁਲਾਂਕਣ',
     title: '1988 ਤੋਂ ਬਾਅਦ ਦੀ ਸਭ ਤੋਂ ਭਿਆਨਕ ਹੜ੍ਹ ਨੇ ਪਰਖਿਆ',
     intro: 'ਭਵਿੱਖਬਾਣੀ ਤੇ ਨਕਸ਼ੇ 2015–24 ਉੱਤੇ ਸਿਖਲਾਈ ਹੋਏ, ਫਿਰ 2025 — ਜੋ ਉਨ੍ਹਾਂ ਕਦੇ ਨਹੀਂ ਵੇਖਿਆ ਸੀ — ਸੌਂਪਿਆ ਗਿਆ ਤੇ ਉਸੇ ਨੇ ਪਰਖਿਆ। ਹਰ ਸੈਟੇਲਾਈਟ ਦਾਅਵਾ ਰਨ ਤੋਂ ਪਹਿਲਾਂ ਲਿਖੀ ਸੰਖਿਆ ਨਾਲ ਬੱਝਾ ਹੈ, PASS ਜਾਂ FAIL ਦੋਵੇਂ ਪ੍ਰਕਾਸ਼ਿਤ।',
     stats: [

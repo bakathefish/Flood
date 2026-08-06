@@ -12,11 +12,13 @@ import {Divider} from '@astryxdesign/core/Divider';
 
 const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
 
+const TIERS = ['watch', 'elevated', 'low'];
+
 const F_T = {
   en: {
     no: '01', title: 'The forecast',
     lead: 'A three-day flood forecast for every district in Punjab.',
-    intro: 'Gradient boosting over a decade of daily satellite flood observations, with history features that carry recent flooding across neighbouring districts. Open, reproducible, running live this monsoon, in a state whose reviewed CWC station table listed no flood-forecast station.',
+    intro: 'Gradient boosting over a decade of daily satellite flood observations, with self-exciting features that carry recent flooding across neighbouring districts. Open, reproducible, running live this monsoon, in a state whose reviewed CWC station table listed no flood-forecast station.',
     explain: 'Every 6 hours it asks one question of each district: will the satellite see flooding here within the next three days? It uses only what is known on the day it runs.',
     boardNote: 'Tested on seasons it had never seen, with the alert level set from earlier seasons only, it raised about 24 alerts a season and roughly one in three was followed by real flooding within three days. It catches about one flood onset in four, so a quiet board is not a guarantee of safety. A district the satellite did not image is listed separately as unknown, never mixed into the ranking and never dropped from the page.',
     liveHead: 'Live risk · this window',
@@ -84,10 +86,24 @@ const F_T = {
   },
 };
 
+/** Strictly a JSON number. `+x` turns null, "" and false into 0 and true into
+ *  1, so coercing before the finite check lets a malformed field arrive as a
+ *  confident zero. Nothing is accepted here that was not already a number. */
+function num(x) {
+  return typeof x === 'number' && Number.isFinite(x) ? x : null;
+}
+
 /** A score is usable only if it is actually a finite number. Anything else,
  *  null included, means the forecast could not be made for that district. */
 function hasScore(d) {
-  return d.p_event !== null && d.p_event !== undefined && Number.isFinite(+d.p_event);
+  return num(d.p_event) !== null;
+}
+
+/** A row is renderable only if every operational field is valid. A broken rank
+ *  or an unrecognised tier is not a cosmetic problem: those two fields are the
+ *  output an officer reads. */
+function validRow(d) {
+  return hasScore(d) && TIERS.includes(d.tier) && num(d.rank) !== null;
 }
 
 /** Not imaged is a statement about coverage, not about the score. A district
@@ -97,8 +113,6 @@ function hasScore(d) {
 function notImaged(d) {
   return d.covered === false;
 }
-
-const TIERS = ['watch', 'elevated', 'low'];
 
 export default function ForecastSection({lang}) {
   const t = F_T[lang] || F_T.en;
@@ -123,7 +137,10 @@ export default function ForecastSection({lang}) {
   const districts = (nc && nc.districts) || [];
   // Districts with no score are never sorted against districts that have one,
   // and never fall off the end of a truncated list.
-  const scored = districts.filter(hasScore).sort((a, b) => (+b.p_event) - (+a.p_event));
+  const scored = districts.filter(hasScore).sort((a, b) => num(b.p_event) - num(a.p_event));
+  // Any row that is scored but structurally broken poisons the whole board:
+  // we cannot tell a real ranking from a corrupted one, so we do not show one.
+  const allRowsValid = scored.every(validRow);
   const rows = scored.slice(0, 8);
 
   const fc = nc && nc.forecast;
@@ -135,14 +152,14 @@ export default function ForecastSection({lang}) {
   // date can still emit core_season false, and rendering that as "resting
   // until the monsoon" would be an all-clear printed on the worst possible day.
   const preCore = !!nc && nc.core_season === false && !saysUnavailable && !feedFailed;
-  const threshold = fc && Number.isFinite(+fc.alert_threshold) ? (+fc.alert_threshold).toFixed(3) : null;
+  const threshold = fc && num(fc.alert_threshold) !== null ? num(fc.alert_threshold).toFixed(3) : null;
   // Fail closed. The board appears only when the feed is unambiguously in
   // season, said so itself, is not reporting failure, produced scores, and
   // gave us the operating point those scores are read against. Anything less
   // certain than that renders as unavailable, because the failure mode of
   // guessing is a page that looks calm.
   const showBoard = inSeason && !!fc && !saysUnavailable && !feedFailed
-    && scored.length > 0 && threshold !== null;
+    && scored.length > 0 && threshold !== null && allRowsValid;
   const unavailable = (!!nc && !preCore && !showBoard) || failed;
   // Coverage, not the score, decides what counts as unimaged, and the block is
   // meaningless outside the season when every score is null by design.
@@ -204,7 +221,9 @@ export default function ForecastSection({lang}) {
                     // An unrecognised tier is shown as unknown rather than
                     // quietly downgraded: defaulting a broken field to "low"
                     // would let the primary output manufacture reassurance.
-                    const tier = TIERS.includes(d.tier) ? d.tier : null;
+                    // Guaranteed valid: an invalid tier anywhere suppresses the
+                    // whole board rather than being rendered as unknown here.
+                    const tier = d.tier;
                     const water = d.covered === false || d.observed_km2 === null || d.observed_km2 === undefined
                       ? '—'
                       : (+d.observed_km2 || 0).toFixed(1) + ' km²';
@@ -215,16 +234,14 @@ export default function ForecastSection({lang}) {
                           <HStack gap={2} vAlign="baseline" wrap="wrap">
                             <Text color="secondary" hasTabularNumbers type="supporting">{d.rank}</Text>
                             <Text>{d.district}</Text>
-                            <Text type="supporting" color="secondary" hasTabularNumbers>{(+d.p_event).toFixed(3)}</Text>
+                            <Text type="supporting" color="secondary" hasTabularNumbers>{num(d.p_event).toFixed(3)}</Text>
                           </HStack>
                           <HStack gap={5} vAlign="center">
                             {tier === 'watch'
                               ? <Badge variant="error" label={tierLabel.watch} />
                               : tier === 'elevated'
                                 ? <Badge variant="orange" label={tierLabel.elevated} />
-                                : tier === 'low'
-                                  ? <Text type="supporting" color="secondary">{tierLabel.low}</Text>
-                                  : <Badge variant="warning" label={t.unknown} />}
+                                : <Text type="supporting" color="secondary">{tierLabel.low}</Text>}
                             <Text color="secondary" hasTabularNumbers>{water}</Text>
                           </HStack>
                         </HStack>

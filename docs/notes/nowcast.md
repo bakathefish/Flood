@@ -78,18 +78,23 @@ every surface that renders it must present it as a ranking score.
    before Jul 25, **`p_event` is `null`** for all districts and `activates` carries
    the countdown date (`<year>-07-25`); the observed GFM fractions are still
    reported. The model is only evaluated once the window is core-season.
-2. **Open-Meteo ≠ IMD calibration.** The model trained on IMD 0.25° gauge-based
-   rain; Open-Meteo serves ERA5 (reanalysis) + a forecast blend. Absolute rain
-   magnitudes are **not identically calibrated** — the rain features are a
-   consistent proxy, not a like-for-like reproduction of the training rain. (If a
-   fast IMD 2026 NRT path via `imdlib` becomes available, prefer it and record
-   `"rain": "imd"`.)
-3. **Reservoirs unavailable → NaN.** The three BBMB dams (Bhakra, Pong, Ranjit
-   Sagar) **stopped reporting to the CWC data.gov.in feed on 2025-07-11**
-   (`docs/notes/reservoirs.md`) and carry no 2026 rows; the endpoint is also
-   slow/geo-restricted from CI. The 6 reservoir features are therefore set to
-   `NaN`, which the XGBoost model ingests natively (it already trained with the
-   2025 post-Jul-11 reservoir gap missing). `sources.reservoirs = "unavailable"`.
+2. **Rain is context, not an input.** Open-Meteo rain is fetched and published
+   under `sources.context_rain` so a reader can see the weather beside the
+   board. It does not enter the model. Rainfall was tested as a feature family
+   during the daily rebuild and measurably did not improve the forecast, so it
+   was dropped; nothing about the rain feed being degraded changes a score.
+3. **Reservoirs are context, and currently dark.** The three BBMB dams (Bhakra,
+   Pong, Ranjit Sagar) **stopped reporting to the CWC data.gov.in feed on
+   2025-07-11** (`docs/notes/reservoirs.md`) and carry no 2026 rows; the
+   endpoint is also slow and geo-restricted from CI. Reservoir storage is not a
+   model input either, so this costs the forecast nothing.
+   `sources.context_reservoirs = "unavailable"`.
+4. **Coverage decides publication.** A district the satellite could not see
+   gets `covered: false` and then `p_event`, `rank` and `tier` all `null`: the
+   model would happily score it from priors and climatology alone, and that
+   number is indistinguishable from a real one. If statewide coverage or
+   freshness falls below the gate, no forecast is published at all and the
+   payload carries `forecast.status = "unavailable"`.
    No fragile scraping is done in CI.
 4. **Coarse observed grid.** The nowcast reduces GFM at ~380 m (single tile/day)
    vs the decade atlas's ~100 m, to stay within the WMS request budget — small
@@ -129,4 +134,4 @@ Runtime ≈ 2 min (dominated by the ~18 paced WMS tiles).
 | Open-Meteo | ERA5 archive + forecast `precipitation_sum` | **CC-BY 4.0**, free for non-commercial use, keyless (`open-meteo.com`) |
 | Copernicus EMS | Global Flood Monitoring (GFM) observed flood extent, GloFAS Open WMS | Copernicus EMS, free & open, keyless (`ows.globalfloods.eu`) |
 | CWC / data.gov.in | Daily reservoir level of Central Water Commission | Government Open Data Licence – India (GODL), public sample key (dark for BBMB dams since 2025-07-11) |
-| Model / labels / prior | this repo's committed `forecaster_2025.joblib`, GFM decade atlas, late-season frequency table | see `docs/notes/{forecaster,gfm-decade,reservoirs}.md` |
+| Model / labels / prior | this repo's committed `forecaster_daily.joblib`, GFM decade atlas, late-season frequency table | see `docs/notes/{forecaster,gfm-decade,reservoirs}.md` |

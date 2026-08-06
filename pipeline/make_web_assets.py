@@ -63,7 +63,7 @@ FIGURES = [
 CSVS = [
     "data/district_flood_stats_2025.csv",
     "data/flood_frequency_districts_late_season.csv",
-    "data/forecaster_2025_hindcast.csv",
+    "data/forecaster_2025_walkforward.csv",
     "data/official_relief_2025.csv",
 ]
 
