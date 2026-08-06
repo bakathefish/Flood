@@ -419,7 +419,7 @@ def main() -> None:
         ("gradient_boosting", "persistence"),
         ("boosting_no_excite", "persistence"),
     ):
-        dd = delta_ci(boot, a, b)
+        dd = delta_ci(boot, a, b, observed=pooled[a] - pooled[b])
         print(
             f"  {a} - {b}: {dd['delta']:+.3f} "
             f"[{dd['lo']:+.3f}, {dd['hi']:+.3f}]  ahead in "
@@ -432,6 +432,7 @@ def main() -> None:
                 "ci_lo": dd["lo"],
                 "ci_hi": dd["hi"],
                 "p_better": dd["p_a_better"],
+                "boot_mean": dd["boot_mean"],
             }
         )
 

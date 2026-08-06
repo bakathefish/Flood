@@ -196,8 +196,13 @@ function LiveSection({t}) {
       on = false;
     };
   }, []);
-  const pct = live ? Math.round((live.coverage_fraction || 0) * 100) + '%' : '—';
-  const km2 = live ? (+live.total_flooded_km2 || 0).toLocaleString() + ' km²' : '—';
+  // `|| 0` printed a confident 0% coverage and 0 km² of water whenever the
+  // field was missing or malformed, which reads as "we looked, nothing there".
+  const numOrNull = (x) => (typeof x === 'number' && Number.isFinite(x) ? x : null);
+  const covFrac = live ? numOrNull(live.coverage_fraction) : null;
+  const totalKm2 = live ? numOrNull(live.total_flooded_km2) : null;
+  const pct = covFrac === null ? '—' : Math.round(covFrac * 100) + '%';
+  const km2 = totalKm2 === null ? '—' : totalKm2.toLocaleString() + ' km²';
   return (
     <Band dividers={['bottom']} paddingBlock={8}>
       <VStack gap={5} id="live">

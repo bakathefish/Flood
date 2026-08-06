@@ -94,15 +94,26 @@ def percentile_ci(values, lo=2.5, hi=97.5):
     return (float(np.percentile(v, lo)), float(np.percentile(v, hi)))
 
 
-def delta_ci(boot, a, b, lo=2.5, hi=97.5):
-    """Paired interval on AP(a) - AP(b), and the share of draws where a wins."""
+def delta_ci(boot, a, b, observed=None, lo=2.5, hi=97.5):
+    """Paired interval on AP(a) - AP(b), and the share of draws where a wins.
+
+    ``delta`` is the OBSERVED difference when ``observed`` is supplied, not the
+    mean of the bootstrap draws. Those are different quantities and reporting
+    the second under the name of the first quietly moves the point estimate:
+    the observed excitation gain is 0.111, while the bootstrap mean is 0.093.
+    The resampling is there to give the interval, not to restate the estimate.
+    ``boot_mean`` is returned alongside so the gap between them stays visible.
+    """
     d = np.asarray(boot[a], dtype=float) - np.asarray(boot[b], dtype=float)
     d = d[np.isfinite(d)]
     if d.size == 0:
-        return {"delta": float("nan"), "lo": float("nan"), "hi": float("nan"),
+        return {"delta": float("nan"), "boot_mean": float("nan"),
+                "lo": float("nan"), "hi": float("nan"),
                 "p_a_better": float("nan"), "n": 0}
+    boot_mean = float(d.mean())
     return {
-        "delta": float(d.mean()),
+        "delta": boot_mean if observed is None else float(observed),
+        "boot_mean": boot_mean,
         "lo": float(np.percentile(d, lo)),
         "hi": float(np.percentile(d, hi)),
         "p_a_better": float((d > 0).mean()),

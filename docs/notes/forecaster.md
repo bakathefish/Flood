@@ -27,8 +27,15 @@ same model with the excitation features removed has mean 0.159 and median
 **The excitation gain is probable, not established.** Compared on the same
 resampled rows, the deployed model beats the no-excitation variant by +0.093,
 interval **[-0.002, +0.268]**, ahead in 90% of draws. That is suggestive and it
-is not significance. Against persistence the gap is +0.191, [-0.000, +0.484],
+is not significance. Against persistence the gap is +0.211, [-0.000, +0.484],
 ahead in 97% of draws.
+
+(An earlier version of this note quoted the excitation gain as +0.093 and the
+persistence gap as +0.191. Those were the *means of the bootstrap draws*, not
+the observed differences, which are +0.111 and +0.211. The resampling is there
+to produce the interval; letting it silently restate the point estimate as well
+was a mistake, and the code now reports the observed value with the bootstrap
+interval around it.)
 
 At the deployed alert setting it raised about 24 alerts a season, about a third
 of which were followed by flooding within three days, while catching about one
@@ -42,10 +49,19 @@ the simpler variant instead. We are not swapping the model mid-season: the 2026
 run is frozen, and changing the thing being tested while the test is running
 would destroy the only prospective evidence this project will get. The
 selection rule for the next cycle is written down now, before seeing 2026:
-maximise median AP across seasons that contain flooding, with a guardrail that
-the winner may not lose by more than 20% of AP to any candidate in any such
-season, and pooled AP only as a tie-break. On current evidence that rule
-selects the no-excitation model.
+**maximise median AP across the seasons that contain flooding, with pooled AP
+only as a tie-break.** On current evidence that rule selects the no-excitation
+model, 0.133 against 0.083.
+
+An earlier version of this paragraph added a guardrail, that the winner may not
+lose more than 20% of AP to any candidate in any flood season, and claimed the
+rule still selected the no-excitation model. **That was arithmetically false and
+is withdrawn.** No-excitation loses 31.5% to the deployed model in 2025
+(0.367 against 0.536), and the deployed model loses 40.3% to it in 2023
+(0.145 against 0.243). A 20% relative guardrail rejects both candidates, so the
+rule as written selected nothing at all. A guardrail may return once it is
+calibrated against the season-to-season spread these four seasons actually
+show, rather than picked because 20% sounded strict.
 
 ### A limit that no amount of resampling fixes
 

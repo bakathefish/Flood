@@ -51,7 +51,13 @@ const RAMPS = {
   impact: {cols: ORANGE, stops: [0, 50, 150, 400, 900]},
   now: {cols: TEAL, stops: [0, 1, 3, 7, 15]},
 };
+// A district with no observation is drawn in its own hatched grey rather than
+// the ramp's lowest colour. The lowest colour means "we looked and there was
+// almost nothing", which is the opposite of what a null means.
+const NO_DATA_FILL = '#4a5058';
+
 const colorFor = (v, layer) => {
+  if (v === null || v === undefined) return NO_DATA_FILL;
   const {cols, stops} = RAMPS[layer];
   let c = cols[0];
   stops.forEach((s, i) => { if (v >= s && (v > 0 || i === 0)) c = cols[i]; });
@@ -123,9 +129,18 @@ export default function MapSection({lang}) {
     if (layer === 'year') return +((byYear[year] && byYear[year][name]) || 0);
     if (layer === 'freq') return +((freq[name] && freq[name].seasons_with_fraction_gt1pct) || 0);
     if (layer === 'impact') return +((stats[name] && (stats[name].crop_var_inr_v2 || stats[name].crop_var_inr)) || 0) / 1e7;
-    return +((now[name] && now[name].observed_km2) || 0);
+    // The live layer is the one place a null must survive. A district the
+    // satellite never imaged has no water figure, and `|| 0` was painting it
+    // the same colour as a district that was imaged and found dry. null here
+    // means unknown, and every caller below has to handle it.
+    const row = now[name];
+    if (!row) return null;
+    if (row.covered === false) return null;
+    const km2 = row.observed_km2;
+    return typeof km2 === 'number' && Number.isFinite(km2) ? km2 : null;
   };
   const fmt = (v) => {
+    if (v === null) return 'not imaged';
     if (layer === 'year') return `${Math.round(v).toLocaleString()} ha`;
     if (layer === 'freq') return `${v} / 11`;
     if (layer === 'impact') return `₹ ${Math.round(v).toLocaleString()} cr`;
@@ -135,6 +150,9 @@ export default function MapSection({lang}) {
 
   const styleFn = (f) => ({
     fillColor: colorFor(valueOf(f.properties.district), layer),
+    // dashed outline so an unobserved district reads as unknown at a glance,
+    // not merely as a slightly different shade of calm
+    dashArray: valueOf(f.properties.district) === null ? '4 3' : undefined,
     fillOpacity: 0.88, color: '#39424e', weight: 1,
   });
   const onEach = (f, lyr) => {

@@ -422,6 +422,12 @@ def build_nowcast_json(
                 "district": name,
                 "p_event": pe,
                 "covered": covered,
+                # `covered` is a boolean summary of a four-state answer. Publish
+                # the state too, or a consumer cannot tell "half the district
+                # was imaged" from "none of it was" from "the footprint layer
+                # was unreachable", and all three collapse into one grey.
+                "acquisition_state": (obs.get("acquisition_state") or "unknown"),
+                "acquisition_fraction": obs.get("acquisition_fraction"),
                 # Every row states every operational field, null when it has
                 # none. Omitting a key is not the same as saying null: it
                 # leaves a consumer to guess whether the producer had nothing
