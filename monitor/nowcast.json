@@ -24,7 +24,7 @@
   ],
   "validation": "walk-forward, each season forecast using only earlier seasons, with the alert threshold taken from inner out-of-fold scores. At this operating point back-testing raised about 24 alerts a season, roughly one in three followed by flooding within three days, catching about one onset in four. Season-level performance is heterogeneous. Retrospective and post-selection; the 2026 monsoon is the prospective test."
  },
- "generated_utc": "2026-08-06T06:29:47Z",
+ "generated_utc": "2026-08-06T08:46:11Z",
  "window_start": "2026-08-04",
  "window_end": "2026-08-14",
  "core_season": true,
