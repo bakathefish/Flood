@@ -1,50 +1,30 @@
 {
- "generated_utc": "2026-08-04T02:58:03Z",
+ "generated_utc": "2026-08-06T14:25:02Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-08-01",
- "latest_pass_utc": "2026-08-01T00:59:53.977678Z",
+ "latest_pass": "2026-08-06",
+ "latest_pass_utc": "2026-08-06T01:07:58.041195Z",
  "new_scenes": 3,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.867,
- "total_flooded_km2": 1.4,
+ "coverage_fraction": 0.018,
+ "total_flooded_km2": 0.0,
  "passes": [
   {
-   "date": "2026-08-01",
+   "date": "2026-08-06",
    "scenes": 3,
-   "total_flooded_km2": 1.4,
+   "total_flooded_km2": 0.0,
    "flagged": 0,
-   "coverage_fraction": 0.867
+   "coverage_fraction": 0.018
   }
  ],
  "districts": [
   {
-   "district": "Firozpur",
-   "flooded_km2": 0.4,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Gurdaspur",
-   "flooded_km2": 0.4,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Rupnagar",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0002
-  },
-  {
-   "district": "Kapurthala",
-   "flooded_km2": 0.2,
-   "flooded_fraction": 0.0001
-  },
-  {
    "district": "Amritsar",
-   "flooded_km2": 0.1,
-   "flooded_fraction": 0.0001
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
   },
   {
    "district": "Barnala",
@@ -67,12 +47,27 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Firozpur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Gurdaspur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Hoshiarpur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
   {
    "district": "Jalandhar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Kapurthala",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
@@ -103,6 +98,11 @@
   },
   {
    "district": "Patiala",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Rupnagar",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
