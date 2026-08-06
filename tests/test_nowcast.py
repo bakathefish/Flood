@@ -231,7 +231,12 @@ def test_district_flood_stats_km2_matches_web_mercator_helper():
     labels = np.ones((n, n), dtype=np.int32)
     rng = np.random.default_rng(0)
     mask = rng.random((n, n)) < 0.25
-    stats = nowcast.district_flood_stats(mask, labels, ["D"], PUNJAB_BOUNDS_3857)
+    # coverage now has to be asserted by an acquisition footprint; the area
+    # arithmetic under test is unchanged by that
+    acq = nowcast.district_acquisition(labels, ["D"], np.ones_like(labels, dtype=bool))
+    stats = nowcast.district_flood_stats(
+        mask, labels, ["D"], PUNJAB_BOUNDS_3857, acquisition=acq
+    )
     expected_km2 = web_mercator_area_km2(mask, PUNJAB_BOUNDS_3857)
     assert stats["D"]["observed_km2"] == pytest.approx(expected_km2, rel=1e-9)
     # fraction = flooded_ha / district_ha
@@ -242,15 +247,23 @@ def test_district_flood_stats_km2_matches_web_mercator_helper():
 
 def test_district_with_no_imaged_pixels_is_unknown_not_dry():
     # A Sentinel-1 pass images a strip, not the whole state, so a district can
-    # be absent from the raster entirely. Reporting that as fraction 0.0 is a
+    # sit entirely outside the acquisition. Reporting that as fraction 0.0 is a
     # false all-clear: "not imaged" must never render as "no water".
+    #
+    # The earlier version of this test simulated that by leaving a district out
+    # of the label raster, which production never does: every polygon is
+    # rasterized on every run. The footprint is what actually varies.
     n = 20
     labels = np.zeros((n, n), dtype=np.int32)
-    labels[:, : n // 2] = 1  # only the west district is covered by this pass
+    labels[:, : n // 2] = 1
+    labels[:, n // 2 :] = 2
     mask = np.zeros((n, n), dtype=bool)
+    footprint = np.zeros((n, n), dtype=bool)
+    footprint[:, : n // 2] = True  # the pass covered only the west district
 
+    acq = nowcast.district_acquisition(labels, ["west", "east"], footprint)
     stats = nowcast.district_flood_stats(
-        mask, labels, ["west", "east"], PUNJAB_BOUNDS_3857
+        mask, labels, ["west", "east"], PUNJAB_BOUNDS_3857, acquisition=acq
     )
     assert stats["east"]["covered"] is False
     assert stats["east"]["observed_fraction"] is None
@@ -298,10 +311,15 @@ def test_district_flood_stats_two_districts_and_refwater():
     refwater = np.zeros((n, n), dtype=bool)
     refwater[0, : n // 2] = True  # one permanent-water row inside west
 
-    stats = nowcast.district_flood_stats(
-        mask, labels, ["west", "east"], PUNJAB_BOUNDS_3857, refwater=refwater
+    # both districts were imaged by this pass, so both carry real numbers
+    acq = nowcast.district_acquisition(
+        labels, ["west", "east"], np.ones((n, n), dtype=bool)
     )
-    # east has no flood
+    stats = nowcast.district_flood_stats(
+        mask, labels, ["west", "east"], PUNJAB_BOUNDS_3857, refwater=refwater,
+        acquisition=acq,
+    )
+    # east was imaged and has no flood: a real zero, not a missing one
     assert stats["east"]["observed_fraction"] == 0.0
     assert stats["east"]["observed_km2"] == 0.0
     # west = whole district minus the one permanent-water row; fraction and km²

@@ -277,27 +277,60 @@ def _district_labels(bounds, size):
     return labels, names
 
 
-def _footprint_union(days, bounds, size, pause):
-    """Union of the Sentinel-1 acquisition footprints over ``days``.
+def _paired_union(days, bounds, size, pause):
+    """Fetch footprint and flood together, per day, and keep them paired.
 
-    This is the layer that answers "was this district imaged at all", which no
-    amount of staring at a flood mask can. Returns ``(union, fetched)``; a
-    ``union`` of ``None`` means not one day's footprint could be retrieved, and
-    the caller must treat coverage as unknown rather than assume anything.
+    Fetching the two products independently is how a district ends up
+    published as observed and dry: the footprint says the satellite was there,
+    the flood request fails and is skipped, the union stays empty, and the
+    empty union is read as no water. The two only mean something together.
+
+    Returns ``(footprint, flood, unresolved, stats)``:
+
+    ``footprint``   union of acquisitions on days where BOTH products arrived
+    ``flood``       union of flood pixels on those same days
+    ``unresolved``  acquisitions whose flood product could NOT be retrieved.
+                    Any district this touches has an unanswered question over
+                    it and cannot be called observed.
+    ``footprint`` is ``None`` when not one day's footprint could be retrieved,
+    which is coverage unknown rather than coverage absent.
     """
-    union = np.zeros((size, size), dtype=bool)
-    fetched = 0
+    fp = np.zeros((size, size), dtype=bool)
+    fl = np.zeros((size, size), dtype=bool)
+    unresolved = np.zeros((size, size), dtype=bool)
+    fp_days = paired_days = with_flood = 0
+
     for d in days:
         try:
             arr = _wms_rgba(FOOTPRINT_LAYER, d, bounds, size)
         except Exception:
+            continue  # no footprint: this day tells us nothing either way
+        fp_days += 1
+        # the service paints the imaged strip and leaves the rest transparent
+        acq = arr[..., 3] > 0
+        if not acq.any():
+            time.sleep(pause)
+            continue  # no pass over the box at all: nothing to resolve
+        try:
+            m = flood_mask(_wms_rgba(FLOOD_LAYER, d, bounds, size))
+        except Exception:
+            # imaged, but we could not find out what was under it
+            unresolved |= acq
+            time.sleep(pause)
             continue
-        fetched += 1
-        # the service paints the imaged strip and leaves the rest transparent,
-        # so any non-transparent pixel is inside an acquisition
-        union |= arr[..., 3] > 0
+        paired_days += 1
+        fp |= acq
+        fl |= m
+        if m.any():
+            with_flood += 1
         time.sleep(pause)
-    return (union if fetched else None), fetched
+
+    stats = {
+        "footprint_days": fp_days,
+        "paired_days": paired_days,
+        "days_with_flood": with_flood,
+    }
+    return (fp if fp_days else None), fl, unresolved, stats
 
 
 def _union_over_days(days, bounds, size, pause):
@@ -360,22 +393,36 @@ def fetch_gfm_recent(
         refwater = np.zeros((size, size), dtype=bool)
         ref_ok = False
 
-    rows, fetched, active = [], 0, 0
+    # The feature history has to obey the same rule as the board. These rows
+    # become frac_now, frac_max3d and every excitation term, so a day recorded
+    # here as dry when nobody flew over it puts a false calm into the model's
+    # memory of the last three weeks, and the score built on it looks ordinary.
+    rows, fetched, active, no_pass = [], 0, 0, 0
     for day in days:
+        try:
+            acq = _wms_rgba(FOOTPRINT_LAYER, day, bounds, size)[..., 3] > 0
+        except Exception:
+            continue  # coverage unknown for this day: contribute nothing
+        if not acq.any():
+            no_pass += 1
+            time.sleep(pause)
+            continue  # no acquisition anywhere: not a dry day, an absent one
         try:
             mask = flood_mask(_wms_rgba(FLOOD_LAYER, day, bounds, size))
         except Exception:
-            continue  # unknown day, not a dry day
+            time.sleep(pause)
+            continue  # imaged, but what was under it is unknown
         fetched += 1
         if mask.any():
             active += 1
+        day_acq = nowcast.district_acquisition(labels, names, acq)
         stats = nowcast.district_flood_stats(
-            mask, labels, names, bounds, refwater=refwater
+            mask, labels, names, bounds, refwater=refwater, acquisition=day_acq
         )
         for n in names:
             st = stats[n]
             if not st["covered"]:
-                continue  # district absent from the grid: unknown, not dry
+                continue  # this district was not imaged today: unknown, not dry
             rows.append(
                 {"date": day, "district": n, "fraction": st["observed_fraction"]}
             )
@@ -385,6 +432,7 @@ def fetch_gfm_recent(
         "names": names,
         "days_requested": len(days),
         "days_fetched": fetched,
+        "days_no_acquisition": no_pass,
         "days_with_flood": active,
         "refwater_ok": ref_ok,
         "wms_requests": fetched + (1 if ref_ok else 0),
@@ -417,10 +465,6 @@ def fetch_gfm_observed(
         refwater = np.zeros((size, size), dtype=bool)
         ref_ok = False
 
-    cur_union, cur_fetched, cur_active = _union_over_days(cur_days, bounds, size, pause)
-    prev_union, prev_fetched, prev_active = _union_over_days(
-        prev_days, bounds, size, pause
-    )
 
     # An all-zero union means one of two very different things: the satellite
     # imaged Punjab and saw no water, or every request to the service failed.
@@ -428,18 +472,20 @@ def fetch_gfm_observed(
     # Which districts an acquisition actually covered. This is the real answer
     # to coverage; the fetch counts below only stand in when the layer itself
     # cannot be reached.
-    cur_fp, cur_fp_fetched = _footprint_union(cur_days, bounds, size, pause)
-    prev_fp, prev_fp_fetched = _footprint_union(prev_days, bounds, size, pause)
-    cur_acq = nowcast.district_acquisition(labels, names, cur_fp)
-    prev_acq = nowcast.district_acquisition(labels, names, prev_fp)
+    cur_fp, cur_fl, cur_un, cur_pstats = _paired_union(cur_days, bounds, size, pause)
+    prev_fp, prev_fl, prev_un, prev_pstats = _paired_union(
+        prev_days, bounds, size, pause
+    )
+    cur_acq = nowcast.district_acquisition(labels, names, cur_fp, unresolved=cur_un)
+    prev_acq = nowcast.district_acquisition(labels, names, prev_fp, unresolved=prev_un)
 
     cur_stats = nowcast.district_flood_stats(
-        cur_union, labels, names, bounds, refwater=refwater,
-        sensed=cur_fetched > 0, acquisition=cur_acq if cur_fp is not None else None,
+        cur_fl, labels, names, bounds, refwater=refwater,
+        acquisition=cur_acq if cur_fp is not None else None,
     )
     prev_stats = nowcast.district_flood_stats(
-        prev_union, labels, names, bounds, refwater=refwater,
-        sensed=prev_fetched > 0, acquisition=prev_acq if prev_fp is not None else None,
+        prev_fl, labels, names, bounds, refwater=refwater,
+        acquisition=prev_acq if prev_fp is not None else None,
     )
 
     observed = {
@@ -458,17 +504,23 @@ def fetch_gfm_observed(
         "grid_px": size,
         "current_days": len(cur_days),
         # days the service actually answered for: the only coverage evidence
-        "current_days_fetched": cur_fetched,
-        "footprint_days_fetched": cur_fp_fetched,
+        "current_days_fetched": cur_pstats["paired_days"],
+        "footprint_days_fetched": cur_pstats["footprint_days"],
         "footprint_available": cur_fp is not None,
+        "districts_unresolved": sum(
+            1 for n in names if cur_stats[n]["acquisition_state"] == "unresolved"
+        ),
         "districts_observed": sum(
             1 for n in names if cur_stats[n]["acquisition_state"] == "observed"
         ),
-        "current_days_with_flood": cur_active,
+        "current_days_with_flood": cur_pstats["days_with_flood"],
         "prev_days": len(prev_days),
-        "prev_days_fetched": prev_fetched,
-        "prev_days_with_flood": prev_active,
+        "prev_days_fetched": prev_pstats["paired_days"],
+        "prev_days_with_flood": prev_pstats["days_with_flood"],
         "refwater_ok": ref_ok,
-        "wms_requests": cur_fetched + prev_fetched + (1 if ref_ok else 0),
+        "wms_requests": (
+            2 * (cur_pstats["footprint_days"] + prev_pstats["footprint_days"])
+            + (1 if ref_ok else 0)
+        ),
     }
     return observed, antecedent, meta

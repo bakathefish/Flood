@@ -129,22 +129,29 @@ def test_sensed_false_covers_nothing_even_with_full_district_rasters():
     bounds = (8220944.0, 3443277.0, 8566034.0, 3842330.0)
     empty = np.zeros((size, size), dtype=bool)
 
-    imaged_and_dry = nc.district_flood_stats(empty, labels, names, bounds, sensed=True)
+    # Without acquisition information nothing is covered, in either direction.
+    # "Some request somewhere succeeded" used to grant coverage here, which is
+    # the defect the footprint work exists to remove.
+    for sensed in (True, False):
+        out = nc.district_flood_stats(empty, labels, names, bounds, sensed=sensed)
+        for n in names:
+            assert out[n]["covered"] is False
+            assert out[n]["observed_km2"] is None
+            assert out[n]["observed_fraction"] is None
+
+    # With a footprint saying the whole area was imaged, an empty mask IS dry.
+    full = np.ones(labels.shape, dtype=bool)
+    acq = nc.district_acquisition(labels, names, full)
+    imaged_and_dry = nc.district_flood_stats(
+        empty, labels, names, bounds, acquisition=acq
+    )
     for n in names:
         assert imaged_and_dry[n]["covered"] is True
         assert imaged_and_dry[n]["observed_km2"] == 0.0
 
-    nothing_came_back = nc.district_flood_stats(
-        empty, labels, names, bounds, sensed=False
-    )
-    for n in names:
-        assert nothing_came_back[n]["covered"] is False
-        assert nothing_came_back[n]["observed_km2"] is None
-        assert nothing_came_back[n]["observed_fraction"] is None
 
-
-def test_sensed_defaults_true_only_for_pure_callers():
-    """Analysis code passing a real mask keeps the old behaviour."""
+def test_no_acquisition_information_means_no_coverage():
+    """The fallback that granted coverage from a bare mask is gone."""
     import numpy as np
 
     from sailaab import nowcast as nc
@@ -153,7 +160,54 @@ def test_sensed_defaults_true_only_for_pure_callers():
     mask = np.zeros((4, 4), dtype=bool)
     mask[0, 0] = True
     out = nc.district_flood_stats(mask, labels, ["A"], (0.0, 0.0, 1000.0, 1000.0))
-    assert out["A"]["covered"] is True
+    assert out["A"]["covered"] is False
+    assert out["A"]["observed_km2"] is None
+
+
+def test_imaged_but_flood_product_missing_is_unresolved_not_dry():
+    """Footprint says the satellite was there; the flood request failed.
+
+    Both reviewers ranked this the most direct remaining false zero, and they
+    were right: coverage was being read from the footprint alone, so the
+    district published as observed with 0.0 km2 of water when what was under
+    the imagery had never been retrieved.
+    """
+    import numpy as np
+
+    from sailaab import nowcast as nc
+
+    labels, names = _strip_labels()
+    bounds = (8220944.0, 3443277.0, 8566034.0, 3842330.0)
+    empty = np.zeros(labels.shape, dtype=bool)
+    footprint = np.ones(labels.shape, dtype=bool)
+    unresolved = np.zeros(labels.shape, dtype=bool)
+    unresolved[:, labels.shape[1] // 2 :] = True  # east's flood fetch failed
+
+    acq = nc.district_acquisition(labels, names, footprint, unresolved=unresolved)
+    assert acq["west"]["state"] == "observed"
+    assert acq["east"]["state"] == "unresolved"
+
+    stats = nc.district_flood_stats(
+        empty, labels, names, bounds, acquisition=acq
+    )
+    assert stats["west"]["covered"] is True
+    assert stats["east"]["covered"] is False
+    assert stats["east"]["observed_km2"] is None
+
+
+def test_partial_coverage_no_longer_certifies_a_district_wide_zero():
+    """A district must be nearly fully imaged before it counts as observed."""
+    import numpy as np
+
+    from sailaab import nowcast as nc
+
+    labels, names = _strip_labels(size=20)
+    footprint = np.zeros(labels.shape, dtype=bool)
+    footprint[:12, :] = True  # 60% of each district
+
+    acq = nc.district_acquisition(labels, names, footprint)
+    for n in names:
+        assert acq[n]["state"] == "partial", "60% must not read as observed"
 
 
 # --------------------------------------------------------------------------- #

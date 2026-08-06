@@ -252,7 +252,16 @@ def _areas_ha(mask, labels, row_ha, n_labels: int) -> np.ndarray:
     )
 
 
-def district_acquisition(labels, names, footprint, min_fraction: float = 0.5) -> dict:
+# A district is only called observed when nearly all of it was imaged. Half was
+# a number I picked, and it certifies a district-wide zero while half the
+# district was never seen. Whole-district claims need whole-district imagery.
+MIN_OBSERVED_FRACTION = 0.95
+
+
+def district_acquisition(
+    labels, names, footprint, min_fraction: float = MIN_OBSERVED_FRACTION,
+    unresolved=None,
+) -> dict:
     """What share of each district a Sentinel-1 acquisition actually covered.
 
     ``footprint`` is the union of GFM's ``gfm_sentinel_1_footprint`` layer over
@@ -276,12 +285,24 @@ def district_acquisition(labels, names, footprint, min_fraction: float = 0.5) ->
         }
     fp = np.asarray(footprint, dtype=bool)
     lab = np.asarray(labels)
+    unres = None if unresolved is None else np.asarray(unresolved, dtype=bool)
     out = {}
     for i, name in enumerate(names, start=1):
         in_district = lab == i
         total = int(in_district.sum())
         if total == 0:
             out[name] = {"acquisition_fraction": None, "state": "unknown"}
+            continue
+        # The satellite imaged this district but we could not retrieve what was
+        # under the imagery. That is an open question, not an empty one, and it
+        # must not resolve to dry.
+        if unres is not None and bool((in_district & unres).any()):
+            out[name] = {
+                "acquisition_fraction": round(
+                    float((in_district & fp).sum()) / total, 4
+                ),
+                "state": "unresolved",
+            }
             continue
         frac = float((in_district & fp).sum()) / total
         if frac >= min_fraction:
@@ -336,7 +357,13 @@ def district_flood_stats(
         if acquisition is not None:
             covered = acquisition.get(name, {}).get("state") == "observed"
         else:
-            covered = sensed and d_ha > 0
+            # No acquisition information at all. The old behaviour here was to
+            # fall back on "some request somewhere succeeded", which is the
+            # exact defect the footprint work exists to remove: it grants
+            # coverage to every district after any single flood response.
+            # Calling it an upper bound in prose does not make publishing a
+            # zero on it safe, so nothing is covered when nothing is known.
+            covered = False
         out[name] = {
             # A district absent from this pass has no pixels at all. Reporting
             # 0.0 there would be a false all-clear: each Sentinel-1 pass images
