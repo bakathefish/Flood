@@ -154,3 +154,84 @@ def test_dry_at_issue_excludes_already_flooded_rows():
 def test_dry_at_issue_treats_unknown_as_candidate():
     df = _target([np.nan])
     assert dry_at_issue(df, threshold=0.5).iloc[0]
+
+
+# --- adjacency and neighbour water --------------------------------------------
+def _sq(x0, y0, x1, y1):
+    return {
+        "type": "Polygon",
+        "coordinates": [[[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]]],
+    }
+
+
+def _fc(**boxes):
+    return {
+        "type": "FeatureCollection",
+        "features": [
+            {"type": "Feature", "properties": {"district": k}, "geometry": v}
+            for k, v in boxes.items()
+        ],
+    }
+
+
+def test_adjacency_finds_touching_districts_only():
+    from sailaab.forecast_daily import build_adjacency
+
+    gj = _fc(
+        A=_sq(0, 0, 1, 1),
+        B=_sq(1, 0, 2, 1),  # shares an edge with A
+        C=_sq(5, 5, 6, 6),  # far away
+    )
+    adj = build_adjacency(gj)
+    assert adj["A"] == ["B"]
+    assert adj["B"] == ["A"]
+    assert adj["C"] == []
+
+
+def test_neighbour_water_excludes_the_district_itself():
+    from sailaab.forecast_daily import neighbour_water
+
+    daily = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2020-08-01"] * 2),
+            "district": ["A", "B"],
+            "fraction": [0.9, 0.0],
+        }
+    )
+    out = neighbour_water(daily, {"A": ["B"], "B": ["A"]}, days=1)
+    d = daily.assign(nbr=out.to_numpy())
+    # A is soaked but must not see its own water; B must see A's
+    assert d[d.district == "A"]["nbr"].iloc[0] == pytest.approx(0.0)
+    assert d[d.district == "B"]["nbr"].iloc[0] == pytest.approx(0.9)
+
+
+def test_neighbour_water_looks_back_over_the_window():
+    from sailaab.forecast_daily import neighbour_water
+
+    dates = pd.to_datetime(["2020-08-01", "2020-08-02"])
+    daily = pd.DataFrame(
+        {
+            "date": list(dates) * 2,
+            "district": ["A", "A", "B", "B"],
+            "fraction": [0.5, 0.0, 0.0, 0.0],
+        }
+    ).sort_values(["district", "date"])
+    out = neighbour_water(daily, {"A": ["B"], "B": ["A"]}, days=3)
+    d = daily.assign(nbr=out.to_numpy())
+    later = d[(d.district == "B") & (d.date == dates[1])]["nbr"].iloc[0]
+    assert later == pytest.approx(0.5)  # yesterday's flood next door still counts
+
+
+def test_seasonal_onset_rate_is_per_district_and_week():
+    from sailaab.forecast_daily import seasonal_onset_rate
+
+    tr = pd.DataFrame(
+        {
+            "district": ["A"] * 7 + ["B"] * 7,
+            "day_of_season": list(range(7)) * 2,
+            "y": [1.0] * 7 + [0.0] * 7,
+        }
+    )
+    out = seasonal_onset_rate(tr)
+    assert out[out.district == "A"]["season_climo"].iloc[0] == pytest.approx(1.0)
+    assert out[out.district == "B"]["season_climo"].iloc[0] == pytest.approx(0.0)

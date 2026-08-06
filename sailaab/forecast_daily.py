@@ -181,3 +181,67 @@ def dry_at_issue(
     """
     v = frame[value_col]
     return (v <= threshold) | v.isna()
+
+
+def build_adjacency(geojson: dict, key: str = "district") -> dict:
+    """District -> the districts whose polygons touch it.
+
+    Flooding propagates between neighbouring districts along the rivers, so
+    water already visible next door is genuine information about a district that
+    is still dry. Adjacency is derived from the boundary layer itself rather
+    than hand-listed, so it cannot drift out of step with the polygons.
+    """
+    from shapely.geometry import shape
+
+    geoms = {f["properties"][key]: shape(f["geometry"]) for f in geojson["features"]}
+    return {
+        a: [b for b, gb in geoms.items() if b != a and ga.buffer(1e-9).intersects(gb)]
+        for a, ga in geoms.items()
+    }
+
+
+def neighbour_water(
+    daily,
+    adjacency: dict,
+    days: int = 3,
+    value_col: str = "fraction",
+    key: str = "district",
+    date_col: str = "date",
+) -> "pd.Series":
+    """Max ``value_col`` over the last ``days`` in ADJACENT districts.
+
+    The target district is strictly excluded, so any skill this carries is skill
+    from the flood being visible somewhere else already, not a restatement of
+    the district's own state.
+    """
+    d = daily.copy()
+    d[date_col] = pd.to_datetime(d[date_col])
+    d["_roll"] = (
+        d.sort_values([key, date_col])
+        .groupby(key, sort=False)[value_col]
+        .transform(lambda s: s.rolling(days, min_periods=1).max())
+    )
+    wide = d.pivot_table(index=date_col, columns=key, values="_roll")
+    out = pd.DataFrame(index=wide.index)
+    for dist, nbrs in adjacency.items():
+        cols = [n for n in nbrs if n in wide.columns]
+        out[dist] = wide[cols].max(axis=1) if cols else np.nan
+    long = out.stack().rename("neighbour_water").reset_index()
+    long.columns = [date_col, key, "neighbour_water"]
+    merged = d.merge(long, on=[date_col, key], how="left")
+    return merged["neighbour_water"]
+
+
+def seasonal_onset_rate(
+    train, label_col: str = "y", key: str = "district", season_col: str = "day_of_season"
+):
+    """Onset rate per district per week of season, from training rows only.
+
+    This is the transparent hazard a learned model has to beat: it encodes which
+    districts flood and when in the season, and nothing else.
+    """
+    t = train.copy()
+    t["week"] = (t[season_col] // 7).astype(int)
+    return (
+        t.groupby([key, "week"])[label_col].mean().rename("season_climo").reset_index()
+    )
