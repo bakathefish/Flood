@@ -18,7 +18,7 @@ const F_T = {
     lead: 'A three-day flood forecast for every district in Punjab.',
     intro: 'Gradient boosting over a decade of daily satellite flood observations, with history features that carry recent flooding across neighbouring districts. Open, reproducible, running live this monsoon, in a state whose reviewed CWC station table listed no flood-forecast station.',
     explain: 'Every 6 hours it asks one question of each district: will the satellite see flooding here within the next three days? It uses only what is known on the day it runs.',
-    boardNote: 'Tested on seasons it had never seen, with the alert level set from earlier seasons only, it raised about 28 alerts a season and roughly one in three was followed by real flooding within three days. It catches about one flood onset in four, so a quiet board is not a guarantee of safety, and a district the satellite did not image is shown as unknown rather than dry.',
+    boardNote: 'Tested on seasons it had never seen, with the alert level set from earlier seasons only, it raised about 24 alerts a season and roughly one in three was followed by real flooding within three days. It catches about one flood onset in four, so a quiet board is not a guarantee of safety, and a district the satellite did not image is shown as unknown rather than dry.',
     liveHead: 'Live risk · this window',
     districtCol: 'District',
     unknown: 'not imaged',
