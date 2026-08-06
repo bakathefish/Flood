@@ -22,16 +22,16 @@ async function loadCsv(url) {
 }
 
 const PRED_T = {
-  en: {title: 'Predicted flood risk by district, held out to 2025', cap: 'Each bar is the district’s peak predicted probability across the 2025 windows, from a model trained only on 2015 to 2024. Teal flooded, grey did not. It ranked the flooded districts on top.'},
-  hi: {title: 'ज़िलेवार अनुमानित बाढ़ जोखिम, 2025 पर होल्ड-आउट', cap: 'हर पट्टी 2025 की विंडोज़ में ज़िले की उच्चतम अनुमानित संभावना है, केवल 2015 से 2024 पर प्रशिक्षित मॉडल से। टील डूबे, ग्रे नहीं। इसने डूबे ज़िलों को शीर्ष पर रखा।'},
-  pa: {title: 'ਜ਼ਿਲ੍ਹਾ-ਵਾਰ ਅਨੁਮਾਨਿਤ ਹੜ੍ਹ ਖ਼ਤਰਾ, 2025 ਉੱਤੇ ਹੋਲਡ-ਆਊਟ', cap: 'ਹਰ ਪੱਟੀ 2025 ਦੀਆਂ ਵਿੰਡੋਜ਼ ਵਿੱਚ ਜ਼ਿਲ੍ਹੇ ਦੀ ਸਭ ਤੋਂ ਵੱਧ ਅਨੁਮਾਨਿਤ ਸੰਭਾਵਨਾ ਹੈ, ਸਿਰਫ਼ 2015 ਤੋਂ 2024 ਉੱਤੇ ਸਿਖਲਾਈ ਮਾਡਲ ਤੋਂ। ਟੀਲ ਡੁੱਬੇ, ਸਲੇਟੀ ਨਹੀਂ। ਇਸ ਨੇ ਡੁੱਬੇ ਜ਼ਿਲ੍ਹਿਆਂ ਨੂੰ ਸਿਖਰ ’ਤੇ ਰੱਖਿਆ।'},
+  en: {title: 'Ranking score by district, 2025 forecast from earlier seasons only', cap: 'Each bar is the district’s highest daily score across the 2025 monsoon, from a walk-forward run in which 2025 was forecast by a model fitted only to earlier seasons. Teal flooded within three days at some point, grey never did. It put the flooded districts on top. The score is an uncalibrated ranking value, not a probability.'},
+  hi: {title: 'ज़िलेवार रैंकिंग स्कोर, 2025 का पूर्वानुमान केवल पहले के मौसमों से', cap: 'हर पट्टी 2025 के मानसून में ज़िले का सबसे ऊंचा दैनिक स्कोर है, एक वॉक-फ़ॉरवर्ड रन से जिसमें 2025 का पूर्वानुमान केवल पहले के मौसमों पर बने मॉडल ने किया। टील में कभी न कभी तीन दिनों के भीतर बाढ़ आई, ग्रे में कभी नहीं। यह स्कोर एक अनंशांकित रैंकिंग मान है, संभावना नहीं।'},
+  pa: {title: 'ਜ਼ਿਲ੍ਹਾ-ਵਾਰ ਰੈਂਕਿੰਗ ਸਕੋਰ, 2025 ਦੀ ਭਵਿਖਬਾਣੀ ਸਿਰਫ਼ ਪਿਛਲੇ ਮੌਸਮਾਂ ਤੋਂ', cap: 'ਹਰ ਪੱਟੀ 2025 ਦੇ ਮਾਨਸੂਨ ਵਿੱਚ ਜ਼ਿਲ੍ਹੇ ਦਾ ਸਭ ਤੋਂ ਵੱਧ ਰੋਜ਼ਾਨਾ ਸਕੋਰ ਹੈ, ਇੱਕ ਵਾਕ-ਫ਼ਾਰਵਰਡ ਰਨ ਤੋਂ ਜਿਸ ਵਿੱਚ 2025 ਦੀ ਭਵਿਖਬਾਣੀ ਸਿਰਫ਼ ਪਿਛਲੇ ਮੌਸਮਾਂ ਉੱਤੇ ਬਣੇ ਮਾਡਲ ਨੇ ਕੀਤੀ। ਟੀਲ ਵਿੱਚ ਕਦੇ ਨਾ ਕਦੇ ਤਿੰਨ ਦਿਨਾਂ ਅੰਦਰ ਹੜ੍ਹ ਆਇਆ, ਸਲੇਟੀ ਵਿੱਚ ਕਦੇ ਨਹੀਂ। ਇਹ ਸਕੋਰ ਇੱਕ ਅੰਸਾਂਕਿਤ ਰੈਂਕਿੰਗ ਮੁੱਲ ਹੈ, ਸੰਭਾਵਨਾ ਨਹੀਂ।'},
 };
 
 const P_T = {
   en: {
-    eyebrow: 'Proof · held out to 2025',
+    eyebrow: 'Proof · graded on 2025',
     title: 'Graded by the worst flood since 1988',
-    intro: 'The forecast and the maps were trained on 2015–24, then handed 2025, a year they had never seen, and let it grade them. Every satellite claim is gated by a number written down before the run, with PASS or FAIL shipped either way.',
+    intro: 'The maps were trained on 2015–24, then handed 2025, a year they had never seen, and let it grade them. The forecaster is tested a stricter way: every season is forecast using only the seasons before it, so 2025 is scored by a model fitted to earlier years alone. Every satellite claim is gated by a number written down before the run, with PASS or FAIL shipped either way.',
     stats: [
       {v: '81.7%', l: 'of mapped flood pixels confirmed by a different satellite (Sentinel-2 optical, 237 truth points). Pre-declared gate: 60%.'},
       {v: 'ρ = 0.72', l: 'rank agreement between our 2025 satellite damage map and the government’s Special Girdawari survey across all 20 districts (0.56 over the 16 named).'},
@@ -100,19 +100,24 @@ export default function ProofSection({lang}) {
 
   useEffect(() => {
     let on = true;
-    loadCsv('assets/forecaster_2025_hindcast.csv').then((data) => {
+    loadCsv('assets/forecaster_2025_walkforward.csv').then((data) => {
       if (!on) return;
       const peak = {};
       data.forEach((d) => {
         const name = d.district;
         if (!name) return;
-        const p = +d.p_event || 0;
-        const flooded = String(d.flood_event) === '1' || parseFloat(d.flood_event) >= 0.5;
-        if (!(name in peak)) peak[name] = {district: name, p: 0, flooded: false};
-        peak[name].p = Math.max(peak[name].p, p);
+        // A row with no score carries no information. Reading it as zero would
+        // quietly pull a district's peak down and rank it as calm.
+        const raw = Number.parseFloat(d.score);
+        if (!Number.isFinite(raw)) return;
+        const flooded = String(d.flooded_within_3d) === '1'
+          || Number.parseFloat(d.flooded_within_3d) >= 0.5;
+        if (!(name in peak)) peak[name] = {district: name, p: raw, flooded: false};
+        peak[name].p = Math.max(peak[name].p, raw);
         peak[name].flooded = peak[name].flooded || flooded;
       });
-      setPreds(Object.values(peak).sort((a, b) => b.p - a.p).slice(0, 8).map((d) => ({district: d.district, pct: Math.round(d.p * 100), flooded: d.flooded})));
+      setPreds(Object.values(peak).sort((a, b) => b.p - a.p).slice(0, 8)
+        .map((d) => ({district: d.district, score: +d.p.toFixed(3), flooded: d.flooded})));
     }).catch(() => {});
     return () => { on = false; };
   }, []);
@@ -150,11 +155,11 @@ export default function ProofSection({lang}) {
                   <BarChart data={preds} margin={{top: 18, right: 12, left: 0, bottom: 8}}>
                     <CartesianGrid stroke={GRID} vertical={false} />
                     <XAxis dataKey="district" interval={0} angle={-30} textAnchor="end" height={72} tick={{fill: AXIS, fontSize: 11}} axisLine={{stroke: GRID}} tickLine={false} />
-                    <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{fill: AXIS, fontSize: 12}} axisLine={false} tickLine={false} width={44} />
-                    <Tooltip formatter={(v) => [`${v}%`, 'flood risk']} contentStyle={{background: TIP_BG, border: `1px solid ${TIP_BD}`, borderRadius: 6, color: TIP_FG, fontSize: 13}} labelStyle={{color: AXIS}} cursor={{fill: '#ffffff0a'}} />
-                    <Bar dataKey="pct" radius={[3, 3, 0, 0]} maxBarSize={48}>
+                    <YAxis domain={[0, 1]} tick={{fill: AXIS, fontSize: 12}} axisLine={false} tickLine={false} width={44} />
+                    <Tooltip formatter={(v) => [v, 'ranking score']} contentStyle={{background: TIP_BG, border: `1px solid ${TIP_BD}`, borderRadius: 6, color: TIP_FG, fontSize: 13}} labelStyle={{color: AXIS}} cursor={{fill: '#ffffff0a'}} />
+                    <Bar dataKey="score" radius={[3, 3, 0, 0]} maxBarSize={48}>
                       {preds.map((d, i) => (<Cell key={i} fill={d.flooded ? FLOODED : DRY} />))}
-                      <LabelList dataKey="pct" position="top" formatter={(v) => `${v}%`} fill={AXIS} fontSize={11} />
+                      <LabelList dataKey="score" position="top" fill={AXIS} fontSize={11} />
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>

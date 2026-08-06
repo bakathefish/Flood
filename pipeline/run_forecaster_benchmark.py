@@ -74,6 +74,11 @@ from sailaab.hazard import (
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OUT = DATA / "forecaster_benchmark.csv"
+# Per-district walk-forward scores for the most recent flood season, published
+# so the public proof chart shows the deployed model rather than a superseded
+# one. Written from the same fold that the benchmark scores, so the chart and
+# the table can never drift apart.
+OUT_SEASON = DATA / "forecaster_2025_walkforward.csv"
 
 FIRST_TEST_YEAR = 2019
 ALERT_K = 5
@@ -374,6 +379,14 @@ def main() -> None:
 
     pd.DataFrame(rows).to_csv(OUT, index=False)
     print(f"\nwrote {OUT}")
+
+    # Per-district scores for the latest flood season, straight out of the
+    # walk-forward fold: 2025 is forecast by a model that saw only 2015-2024.
+    season = s[s["year"] == s["year"].max()]
+    season[["district", "date", "gradient_boosting", "y"]].rename(
+        columns={"gradient_boosting": "score", "y": "flooded_within_3d"}
+    ).to_csv(OUT_SEASON, index=False)
+    print(f"wrote {OUT_SEASON}  ({len(season)} district-days)")
 
 
 if __name__ == "__main__":

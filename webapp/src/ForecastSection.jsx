@@ -33,7 +33,7 @@ const F_T = {
     unknownNote: 'The satellite did not return usable coverage for these districts, so no forecast could be made for them. Unknown is not the same as dry.',
     unavailable: 'Forecast unavailable for this cycle: the satellite coverage needed to make it was missing or too old, so no district ranking is shown. This is NOT an all-clear. Absence of imagery is absence of information.',
     inactive: 'The forecaster is outside its season. It is trained and verified on the core monsoon only, and it activates on',
-    summary: 'Every season is forecast using only the seasons before it, so the model never sees its own future. Pooled over all district-days its average precision is 0.249 against a 3.07% base rate, but that pooled figure is not its typical season: averaged season by season the mean is 0.176 and the median 0.083. Performance is uneven. It wins clearly in 2025, and in 2023 the same model without the history features beats it, 0.243 to 0.145. The ranking is the useful output and the alerting is modest: this is a selective trigger, not a comprehensive warning system. All of it is retrospective and chosen after seeing these seasons; the 2026 monsoon is the real test. The full audit, including a headline number we had to retract, is below.',
+    summary: 'Every season is forecast using only the seasons before it, so the model never sees its own future. Pooled over all district-days its average precision is 0.249 against a 3.07% base rate, but that pooled figure is not its typical season: averaged season by season the mean is 0.176 and the median 0.083. Performance is uneven. It wins clearly in 2025, and in 2023 the same model without the excitation features beats it, 0.243 to 0.145. The ranking is the useful output and the alerting is modest: this is a selective trigger, not a comprehensive warning system. All of it is retrospective and chosen after seeing these seasons; the 2026 monsoon is the real test. The full audit, including a headline number we had to retract, is below.',
     seeProof: 'See how it did in 2025, and the full validation →',
   },
   hi: {
@@ -56,7 +56,7 @@ const F_T = {
     unknownNote: 'इन ज़िलों के लिए सैटेलाइट से उपयोगी कवरेज नहीं मिली, इसलिए इनका पूर्वानुमान नहीं बनाया जा सका। अज्ञात होना सूखा होना नहीं है।',
     unavailable: 'इस चक्र के लिए पूर्वानुमान उपलब्ध नहीं: इसे बनाने के लिए ज़रूरी सैटेलाइट कवरेज नहीं थी या बहुत पुरानी थी, इसलिए कोई ज़िला रैंकिंग नहीं दिखाई गई। यह सुरक्षा की सूचना नहीं है। तस्वीर का न होना जानकारी का न होना है।',
     inactive: 'पूर्वानुमानक अपने मौसम से बाहर है। यह केवल मुख्य मानसून पर प्रशिक्षित और सत्यापित है, और यह सक्रिय होता है',
-    summary: 'हर मौसम का पूर्वानुमान केवल उससे पहले के मौसमों से बनाया जाता है, इसलिए मॉडल कभी अपना भविष्य नहीं देखता। सभी ज़िला-दिनों को मिलाकर इसकी औसत परिशुद्धता 0.249 है, जबकि आधार दर 3.07% है — पर यह सम्मिलित आँकड़ा इसका सामान्य मौसम नहीं है: मौसम-दर-मौसम औसत 0.176 और माध्यिका 0.083 है। प्रदर्शन असमान है। 2025 में यह स्पष्ट रूप से जीतता है, और 2023 में इतिहास-विशेषताओं के बिना वही मॉडल इसे 0.243 बनाम 0.145 से हरा देता है। रैंकिंग ही उपयोगी परिणाम है और चेतावनी सीमित है: यह एक चयनात्मक ट्रिगर है, पूर्ण चेतावनी प्रणाली नहीं। यह सब पूर्वव्यापी है और इन्हीं मौसमों को देखकर चुना गया है; असली परीक्षा 2026 का मानसून है। पूरा ऑडिट, उस मुख्य आँकड़े सहित जिसे हमें वापस लेना पड़ा, नीचे है।',
+    summary: 'हर मौसम का पूर्वानुमान केवल उससे पहले के मौसमों से बनाया जाता है, इसलिए मॉडल कभी अपना भविष्य नहीं देखता। सभी ज़िला-दिनों को मिलाकर इसकी औसत परिशुद्धता 0.249 है, जबकि आधार दर 3.07% है — पर यह सम्मिलित आँकड़ा इसका सामान्य मौसम नहीं है: मौसम-दर-मौसम औसत 0.176 और माध्यिका 0.083 है। प्रदर्शन असमान है। 2025 में यह स्पष्ट रूप से जीतता है, और 2023 में उत्तेजना-विशेषताओं के बिना वही मॉडल इसे 0.243 बनाम 0.145 से हरा देता है। रैंकिंग ही उपयोगी परिणाम है और चेतावनी सीमित है: यह एक चयनात्मक ट्रिगर है, पूर्ण चेतावनी प्रणाली नहीं। यह सब पूर्वव्यापी है और इन्हीं मौसमों को देखकर चुना गया है; असली परीक्षा 2026 का मानसून है। पूरा ऑडिट, उस मुख्य आँकड़े सहित जिसे हमें वापस लेना पड़ा, नीचे है।',
     seeProof: 'देखें 2025 में यह कैसा रहा, और पूरा सत्यापन →',
   },
   pa: {
@@ -79,7 +79,7 @@ const F_T = {
     unknownNote: 'ਇਨ੍ਹਾਂ ਜ਼ਿਲ੍ਹਿਆਂ ਲਈ ਸੈਟੇਲਾਈਟ ਤੋਂ ਵਰਤੋਂਯੋਗ ਕਵਰੇਜ ਨਹੀਂ ਮਿਲੀ, ਇਸ ਲਈ ਇਨ੍ਹਾਂ ਦੀ ਭਵਿੱਖਬਾਣੀ ਨਹੀਂ ਬਣਾਈ ਜਾ ਸਕੀ। ਅਣਜਾਣ ਹੋਣਾ ਸੁੱਕਾ ਹੋਣਾ ਨਹੀਂ ਹੈ।',
     unavailable: 'ਇਸ ਚੱਕਰ ਲਈ ਭਵਿੱਖਬਾਣੀ ਉਪਲਬਧ ਨਹੀਂ: ਇਸ ਨੂੰ ਬਣਾਉਣ ਲਈ ਲੋੜੀਂਦੀ ਸੈਟੇਲਾਈਟ ਕਵਰੇਜ ਨਹੀਂ ਸੀ ਜਾਂ ਬਹੁਤ ਪੁਰਾਣੀ ਸੀ, ਇਸ ਲਈ ਕੋਈ ਜ਼ਿਲ੍ਹਾ ਰੈਂਕਿੰਗ ਨਹੀਂ ਦਿਖਾਈ ਗਈ। ਇਹ ਸੁਰੱਖਿਆ ਦੀ ਸੂਚਨਾ ਨਹੀਂ ਹੈ। ਤਸਵੀਰ ਦਾ ਨਾ ਹੋਣਾ ਜਾਣਕਾਰੀ ਦਾ ਨਾ ਹੋਣਾ ਹੈ।',
     inactive: 'ਭਵਿੱਖਬਾਣੀਕਾਰ ਆਪਣੇ ਮੌਸਮ ਤੋਂ ਬਾਹਰ ਹੈ। ਇਹ ਸਿਰਫ਼ ਮੁੱਖ ਮਾਨਸੂਨ ਉੱਤੇ ਸਿਖਲਾਈ ਅਤੇ ਸਤਿਆਪਿਤ ਹੈ, ਅਤੇ ਇਹ ਸਰਗਰਮ ਹੁੰਦਾ ਹੈ',
-    summary: 'ਹਰ ਮੌਸਮ ਦੀ ਭਵਿੱਖਬਾਣੀ ਸਿਰਫ਼ ਉਸ ਤੋਂ ਪਹਿਲੇ ਮੌਸਮਾਂ ਤੋਂ ਬਣਾਈ ਜਾਂਦੀ ਹੈ, ਇਸ ਲਈ ਮਾਡਲ ਕਦੇ ਆਪਣਾ ਭਵਿੱਖ ਨਹੀਂ ਵੇਖਦਾ। ਸਾਰੇ ਜ਼ਿਲ੍ਹਾ-ਦਿਨਾਂ ਨੂੰ ਮਿਲਾ ਕੇ ਇਸ ਦੀ ਔਸਤ ਸ਼ੁੱਧਤਾ 0.249 ਹੈ, ਜਦਕਿ ਆਧਾਰ ਦਰ 3.07% ਹੈ — ਪਰ ਇਹ ਮਿਲਿਆ-ਜੁਲਿਆ ਅੰਕੜਾ ਇਸ ਦਾ ਆਮ ਮੌਸਮ ਨਹੀਂ ਹੈ: ਮੌਸਮ-ਦਰ-ਮੌਸਮ ਔਸਤ 0.176 ਅਤੇ ਮੱਧਕ 0.083 ਹੈ। ਪ੍ਰਦਰਸ਼ਨ ਅਸਮਾਨ ਹੈ। 2025 ਵਿੱਚ ਇਹ ਸਾਫ਼ ਤੌਰ ਤੇ ਜਿੱਤਦਾ ਹੈ, ਅਤੇ 2023 ਵਿੱਚ ਇਤਿਹਾਸ-ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ ਤੋਂ ਬਿਨਾਂ ਉਹੀ ਮਾਡਲ ਇਸ ਨੂੰ 0.243 ਬਨਾਮ 0.145 ਨਾਲ ਹਰਾ ਦਿੰਦਾ ਹੈ। ਰੈਂਕਿੰਗ ਹੀ ਲਾਭਦਾਇਕ ਨਤੀਜਾ ਹੈ ਅਤੇ ਚੇਤਾਵਨੀ ਸੀਮਤ ਹੈ: ਇਹ ਇੱਕ ਚੋਣਵਾਂ ਟ੍ਰਿਗਰ ਹੈ, ਪੂਰੀ ਚੇਤਾਵਨੀ ਪ੍ਰਣਾਲੀ ਨਹੀਂ। ਇਹ ਸਭ ਪਿਛਲਖੁਰੀ ਹੈ ਅਤੇ ਇਨ੍ਹਾਂ ਹੀ ਮੌਸਮਾਂ ਨੂੰ ਵੇਖ ਕੇ ਚੁਣਿਆ ਗਿਆ ਹੈ; ਅਸਲ ਪਰਖ 2026 ਦਾ ਮਾਨਸੂਨ ਹੈ। ਪੂਰਾ ਆਡਿਟ, ਉਸ ਮੁੱਖ ਅੰਕੜੇ ਸਮੇਤ ਜੋ ਸਾਨੂੰ ਵਾਪਸ ਲੈਣਾ ਪਿਆ, ਹੇਠਾਂ ਹੈ।',
+    summary: 'ਹਰ ਮੌਸਮ ਦੀ ਭਵਿੱਖਬਾਣੀ ਸਿਰਫ਼ ਉਸ ਤੋਂ ਪਹਿਲੇ ਮੌਸਮਾਂ ਤੋਂ ਬਣਾਈ ਜਾਂਦੀ ਹੈ, ਇਸ ਲਈ ਮਾਡਲ ਕਦੇ ਆਪਣਾ ਭਵਿੱਖ ਨਹੀਂ ਵੇਖਦਾ। ਸਾਰੇ ਜ਼ਿਲ੍ਹਾ-ਦਿਨਾਂ ਨੂੰ ਮਿਲਾ ਕੇ ਇਸ ਦੀ ਔਸਤ ਸ਼ੁੱਧਤਾ 0.249 ਹੈ, ਜਦਕਿ ਆਧਾਰ ਦਰ 3.07% ਹੈ — ਪਰ ਇਹ ਮਿਲਿਆ-ਜੁਲਿਆ ਅੰਕੜਾ ਇਸ ਦਾ ਆਮ ਮੌਸਮ ਨਹੀਂ ਹੈ: ਮੌਸਮ-ਦਰ-ਮੌਸਮ ਔਸਤ 0.176 ਅਤੇ ਮੱਧਕ 0.083 ਹੈ। ਪ੍ਰਦਰਸ਼ਨ ਅਸਮਾਨ ਹੈ। 2025 ਵਿੱਚ ਇਹ ਸਾਫ਼ ਤੌਰ ਤੇ ਜਿੱਤਦਾ ਹੈ, ਅਤੇ 2023 ਵਿੱਚ ਉਤੇਜਨਾ-ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ ਤੋਂ ਬਿਨਾਂ ਉਹੀ ਮਾਡਲ ਇਸ ਨੂੰ 0.243 ਬਨਾਮ 0.145 ਨਾਲ ਹਰਾ ਦਿੰਦਾ ਹੈ। ਰੈਂਕਿੰਗ ਹੀ ਲਾਭਦਾਇਕ ਨਤੀਜਾ ਹੈ ਅਤੇ ਚੇਤਾਵਨੀ ਸੀਮਤ ਹੈ: ਇਹ ਇੱਕ ਚੋਣਵਾਂ ਟ੍ਰਿਗਰ ਹੈ, ਪੂਰੀ ਚੇਤਾਵਨੀ ਪ੍ਰਣਾਲੀ ਨਹੀਂ। ਇਹ ਸਭ ਪਿਛਲਖੁਰੀ ਹੈ ਅਤੇ ਇਨ੍ਹਾਂ ਹੀ ਮੌਸਮਾਂ ਨੂੰ ਵੇਖ ਕੇ ਚੁਣਿਆ ਗਿਆ ਹੈ; ਅਸਲ ਪਰਖ 2026 ਦਾ ਮਾਨਸੂਨ ਹੈ। ਪੂਰਾ ਆਡਿਟ, ਉਸ ਮੁੱਖ ਅੰਕੜੇ ਸਮੇਤ ਜੋ ਸਾਨੂੰ ਵਾਪਸ ਲੈਣਾ ਪਿਆ, ਹੇਠਾਂ ਹੈ।',
     seeProof: 'ਵੇਖੋ 2025 ਵਿੱਚ ਇਹ ਕਿਵੇਂ ਰਿਹਾ, ਅਤੇ ਪੂਰਾ ਸਤਿਆਪਨ →',
   },
 };
@@ -90,40 +90,63 @@ function hasScore(d) {
   return d.p_event !== null && d.p_event !== undefined && Number.isFinite(+d.p_event);
 }
 
+/** Not imaged is a statement about coverage, not about the score. A district
+ *  can carry a finite score with no usable imagery behind it, and outside the
+ *  season every score is null without anything being unimaged. Conflating the
+ *  two either hides a blind district or invents twenty of them. */
+function notImaged(d) {
+  return d.covered === false;
+}
+
+const TIERS = ['watch', 'elevated', 'low'];
+
 export default function ForecastSection({lang}) {
   const t = F_T[lang] || F_T.en;
   const [nc, setNc] = useState(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let on = true;
-    fetch(RAW + 'monitor/nowcast.json').then((r) => r.json()).then((j) => on && setNc(j)).catch(() => {});
+    fetch(RAW + 'monitor/nowcast.json')
+      .then((r) => {
+        if (!r.ok) throw new Error(String(r.status));
+        return r.json();
+      })
+      .then((j) => { if (on) { setNc(j); setFailed(false); } })
+      // Swallowing this left the section blank, which reads as nothing to
+      // report. If we cannot reach the feed we do not know anything, and the
+      // page has to say so.
+      .catch(() => { if (on) { setNc(null); setFailed(true); } });
     return () => { on = false; };
   }, []);
 
   const districts = (nc && nc.districts) || [];
   // Districts with no score are never sorted against districts that have one,
-  // and never fall off the end of a truncated list. They get their own block.
+  // and never fall off the end of a truncated list.
   const scored = districts.filter(hasScore).sort((a, b) => (+b.p_event) - (+a.p_event));
-  const unscored = districts.filter((d) => !hasScore(d));
   const rows = scored.slice(0, 8);
 
-  // Explicit states. A missing forecast block during the core season is not
-  // "no news": it means the forecast could not be made, and it must read the
-  // same as an explicit unavailable rather than silently showing a board.
   const fc = nc && nc.forecast;
   const saysUnavailable = !!fc && fc.status === 'unavailable';
   const feedFailed = !!nc && typeof nc.notes === 'string' && nc.notes.startsWith('DEGRADED');
+  const inSeason = !!nc && nc.core_season === true;
   // Out of season is a benign state, so it must never be inferred from a feed
   // that is reporting its own failure. A run that broke while working out the
   // date can still emit core_season false, and rendering that as "resting
-  // until the monsoon" would be an all-clear printed on the worst possible
-  // day. A null core_season means unknown and is not treated as off-season
-  // either.
+  // until the monsoon" would be an all-clear printed on the worst possible day.
   const preCore = !!nc && nc.core_season === false && !saysUnavailable && !feedFailed;
-  const unavailable = !!nc && !preCore
-    && (saysUnavailable || feedFailed || !fc || scored.length === 0);
-  const showBoard = !!nc && !preCore && !unavailable;
   const threshold = fc && Number.isFinite(+fc.alert_threshold) ? (+fc.alert_threshold).toFixed(3) : null;
+  // Fail closed. The board appears only when the feed is unambiguously in
+  // season, said so itself, is not reporting failure, produced scores, and
+  // gave us the operating point those scores are read against. Anything less
+  // certain than that renders as unavailable, because the failure mode of
+  // guessing is a page that looks calm.
+  const showBoard = inSeason && !!fc && !saysUnavailable && !feedFailed
+    && scored.length > 0 && threshold !== null;
+  const unavailable = (!!nc && !preCore && !showBoard) || failed;
+  // Coverage, not the score, decides what counts as unimaged, and the block is
+  // meaningless outside the season when every score is null by design.
+  const unimaged = preCore ? [] : districts.filter(notImaged);
 
   const tierLabel = {watch: t.tierWatch, elevated: t.tierElevated, low: t.tierLow};
 
@@ -178,7 +201,10 @@ export default function ForecastSection({lang}) {
                     // Tier and rank are the operational output. The raw score
                     // sits beside the name as secondary text, because a bare
                     // decimal reads as a percentage to anyone in a hurry.
-                    const tier = d.tier || 'low';
+                    // An unrecognised tier is shown as unknown rather than
+                    // quietly downgraded: defaulting a broken field to "low"
+                    // would let the primary output manufacture reassurance.
+                    const tier = TIERS.includes(d.tier) ? d.tier : null;
                     const water = d.covered === false || d.observed_km2 === null || d.observed_km2 === undefined
                       ? '—'
                       : (+d.observed_km2 || 0).toFixed(1) + ' km²';
@@ -196,7 +222,9 @@ export default function ForecastSection({lang}) {
                               ? <Badge variant="error" label={tierLabel.watch} />
                               : tier === 'elevated'
                                 ? <Badge variant="orange" label={tierLabel.elevated} />
-                                : <Text type="supporting" color="secondary">{tierLabel.low}</Text>}
+                                : tier === 'low'
+                                  ? <Text type="supporting" color="secondary">{tierLabel.low}</Text>
+                                  : <Badge variant="warning" label={t.unknown} />}
                             <Text color="secondary" hasTabularNumbers>{water}</Text>
                           </HStack>
                         </HStack>
@@ -218,14 +246,14 @@ export default function ForecastSection({lang}) {
             </Grid>
           )}
 
-          {unscored.length > 0 && (
+          {unimaged.length > 0 && (
             <VStack maxWidth={780} gap={2}>
               <HStack gap={2} vAlign="center" wrap="wrap">
                 <StatusDot variant="warning" label="unknown" />
                 <Text type="label" color="secondary">{t.unknownHead}</Text>
               </HStack>
               <Text color="secondary">{t.unknownNote}</Text>
-              <Text>{unscored.map((d) => d.district).join(' · ')}</Text>
+              <Text>{unimaged.map((d) => d.district).join(' · ')}</Text>
             </VStack>
           )}
 

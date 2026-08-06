@@ -16,21 +16,37 @@ after the `live_monitor` step).
 
 ## What it computes
 
-The forecaster consumes **exactly 16 features in training order** (verified against
-the committed joblib by `tests/test_nowcast.py::test_feature_order_matches_committed_model`):
+The deployed forecaster consumes **exactly 10 features in training order**, all
+of them derived from satellite flood observations. The order is asserted against
+the committed bundle at load time and by `tests/test_forecast_live.py`.
 
 | group | features | live source |
 |---|---|---|
-| rain (6) | `punjab_mm`, `upstream_mm`, + `_lag1`, `_lag2` for both boxes | Open-Meteo (archive + forecast) |
-| reservoirs (6) | `{bhakra,pong,ranjit_sagar}_{storage,delta}` | CWC data.gov.in → **NaN** (feed dark, see below) |
-| antecedent (1) | `antecedent_fraction` | GFM observed extent, previous window |
-| season (1) | `week_of_season` | window index in the season grid |
-| prior (2) | `prior_mean_annual_flooded_ha`, `prior_seasons_with_fraction_gt2pct` | `data/flood_frequency_districts_late_season.csv` |
+| prior (2) | `prior_wet_days`, `prior_max_fraction` | rebuilt per fold from earlier seasons only |
+| observed (2) | `frac_now`, `frac_max3d` | GFM observed extent, issue day and trailing 3 days |
+| season (1) | `day_of_season` | position in the monsoon grid |
+| neighbour (1) | `neighbour` | flooded fraction in adjacent districts |
+| climatology (1) | `season_climo` | district-week rate from earlier seasons only |
+| excitation (3) | `excite_h0`, `excite_h1`, `excite_h2` | past flood days decayed at τ = 3 d, by graph hop |
 
-Output per district: `p_event` (model probability, or **null** pre-core),
-`observed_fraction_window` (current window flooded fraction so far),
-`observed_km2`. Plus `window_start/end`, `core_season`, `activates`, `sources`,
-free-text `notes`.
+**Rainfall is not an input.** It was tested as a feature family and measurably
+did not improve the forecast, so it was dropped; reservoir storage was never in
+the daily model. Both are still fetched and published as page context, under the
+`context_rain` and `context_reservoirs` source keys, and neither moves the score.
+The earlier 16-feature rain-and-reservoir model this file used to document is
+superseded; see `docs/notes/forecaster.md`.
+
+Output per district: `p_event` (an **uncalibrated ranking score**, or **null**
+pre-core and wherever the forecast could not be made), `covered` (whether the
+satellite returned usable imagery for that district), `observed_fraction_window`,
+`observed_km2`, `rank`, `tier`, `transparent_score`. Plus `window_start/end`,
+`core_season` (**null** when the run could not determine it), `activates`,
+`sources`, an optional `forecast` block carrying the horizon, threshold,
+operating point and an explicit `status` when unavailable, and free-text `notes`.
+
+Despite the field name, `p_event` is not a probability. It has never been fitted
+to a reliability curve. The name is kept because the published schema is locked;
+every surface that renders it must present it as a ranking score.
 
 ## Sources
 
