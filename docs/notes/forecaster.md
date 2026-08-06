@@ -6,16 +6,56 @@ known when the forecast is issued: will Copernicus GFM observe flooding above
 
 In retrospective, post-selection 2019 to 2025 walk-forward tests, the selected
 gradient-boosting model had the best **pooled** ranking among the reported
-candidates: average precision 0.249 against a 3.07% base rate. That figure is
-micro-pooled over district-days, so it is dominated by the seasons that carry
-the most positives, and it is not evidence of season-robust performance.
-Averaged over the four seasons that contained flooding instead, mean seasonal
-average precision is **0.176** and the median is **0.083**. **Season-level
-performance is heterogeneous and the model did not lead every comparator in
-every flood season**: it wins decisively in 2025 and trails other candidates in
-2019, 2022 and 2023. At the deployed alert setting it raised about 24 alerts a
-season, about a third of which were followed by flooding within three days,
-while catching about one recorded onset in four.
+candidates: average precision 0.249 against a 3.07% base rate. Read on before
+quoting that number, because resampling takes most of it away.
+
+**The pooled figure is very largely a 2025 result.** Remove that one season and
+it falls from 0.249 to **0.042**. Every candidate falls too, so the model still
+leads its baselines without 2025, but the headline is a statement about one
+monsoon rather than about seven.
+
+**The interval is enormous.** A two-stage block bootstrap, resampling seasons
+and then seven-day blocks of whole days inside them, puts a 95% interval of
+**[0.004, 0.521]** around it. Four seasons contained flooding; nothing measured
+on four seasons is precise.
+
+**By typical season the simpler model is better.** Averaged across the flood
+seasons, the deployed model's mean AP is 0.176 and its median is **0.083**. The
+same model with the excitation features removed has mean 0.159 and median
+**0.133**. Pooled, excitation wins; in the median season, it loses.
+
+**The excitation gain is probable, not established.** Compared on the same
+resampled rows, the deployed model beats the no-excitation variant by +0.093,
+interval **[-0.002, +0.268]**, ahead in 90% of draws. That is suggestive and it
+is not significance. Against persistence the gap is +0.191, [-0.000, +0.484],
+ahead in 97% of draws.
+
+At the deployed alert setting it raised about 24 alerts a season, about a third
+of which were followed by flooding within three days, while catching about one
+recorded onset in four.
+
+### What we are doing about the excitation question
+
+The honest reading is that the deployed model is selected on pooled average
+precision, and that a criterion built on the typical season would have chosen
+the simpler variant instead. We are not swapping the model mid-season: the 2026
+run is frozen, and changing the thing being tested while the test is running
+would destroy the only prospective evidence this project will get. The
+selection rule for the next cycle is written down now, before seeing 2026:
+maximise median AP across seasons that contain flooding, with a guardrail that
+the winner may not lose by more than 20% of AP to any candidate in any such
+season, and pooled AP only as a tie-break. On current evidence that rule
+selects the no-excitation model.
+
+### A limit that no amount of resampling fixes
+
+The target is defined by the same Copernicus GFM product the features are built
+from. Predicting whether GFM will observe flooding, using GFM's own history, is
+same-sensor autoregression rather than forecasting against independent
+hydrological truth. There is no label leakage, since the future is never used
+to build a feature, but the skill measured here is partly skill at predicting a
+sensor. Performance against ground observations of flooding could be lower, and
+this project has no independent daily ground truth to check that with.
 
 **The ranking is the solid result. The alerting is modest and is reported as
 such.** Episode-clean verification and prospective validation both remain

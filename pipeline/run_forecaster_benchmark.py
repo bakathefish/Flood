@@ -79,6 +79,7 @@ OUT = DATA / "forecaster_benchmark.csv"
 # one. Written from the same fold that the benchmark scores, so the chart and
 # the table can never drift apart.
 OUT_SEASON = DATA / "forecaster_2025_walkforward.csv"
+N_BOOT = 2000  # enough for a stable 95% percentile interval at this size
 
 FIRST_TEST_YEAR = 2019
 ALERT_K = 5
@@ -376,6 +377,94 @@ def main() -> None:
                      "events_warned": warned, "n_events": len(ev_set),
                      "event_pod": warned / len(ev_set), "alert_precision": prec,
                      "far": cs["far"]})
+
+
+    # ---- how much of this could be luck -------------------------------- #
+    # Pooled AP over correlated district-days looks far more certain than it
+    # is: the target spans three days so consecutive rows share outcomes, and
+    # neighbouring districts flood together. Resample seasons, then blocks of
+    # whole days inside them, and score every candidate on the same drawn rows
+    # so the deltas between them are paired.
+    from sailaab.uncertainty import (
+        BLOCK_DAYS, delete_one_season, delta_ci, percentile_ci, season_summary,
+        two_stage_bootstrap,
+    )
+
+    cand = {c: s[c].to_numpy(float) for c in cols}
+    yv = s["y"].to_numpy(float)
+    sv = s["year"].to_numpy()
+    dv = pd.to_datetime(s["date"]).dt.dayofyear.to_numpy()
+    pooled = {c: average_precision_score(s["y"], s[c]) for c in cols}
+
+    print("")
+    print("=" * 86)
+    print(
+        f"UNCERTAINTY  two-stage block bootstrap (seasons, then "
+        f"{BLOCK_DAYS}-day blocks), B={N_BOOT}"
+    )
+    print("=" * 86)
+    boot = two_stage_bootstrap(yv, cand, sv, dv, n_boot=N_BOOT, seed=0)
+    print(f"{'candidate':20s} {'AP':>7} {'95% CI':>20}")
+    for c in cols:
+        lo, hi = percentile_ci(boot[c])
+        print(f"{c:20s} {pooled[c]:7.3f}  [{lo:6.3f}, {hi:6.3f}]")
+        rows.append(
+            {"candidate": f"ci@{c}", "ap": pooled[c], "ci_lo": lo, "ci_hi": hi}
+        )
+
+    print("")
+    print("paired deltas on the same resampled rows:")
+    for a, b in (
+        ("gradient_boosting", "boosting_no_excite"),
+        ("gradient_boosting", "persistence"),
+        ("boosting_no_excite", "persistence"),
+    ):
+        dd = delta_ci(boot, a, b)
+        print(
+            f"  {a} - {b}: {dd['delta']:+.3f} "
+            f"[{dd['lo']:+.3f}, {dd['hi']:+.3f}]  ahead in "
+            f"{dd['p_a_better']:.0%} of draws"
+        )
+        rows.append(
+            {
+                "candidate": f"delta@{a}-{b}",
+                "ap": dd["delta"],
+                "ci_lo": dd["lo"],
+                "ci_hi": dd["hi"],
+                "p_better": dd["p_a_better"],
+            }
+        )
+
+    per, agg = season_summary(yv, cand, sv)
+    print("")
+    print("pooled against the typical season:")
+    print(f"{'candidate':20s} {'pooled':>7} {'mean':>7} {'median':>7}")
+    for c in cols:
+        print(
+            f"{c:20s} {pooled[c]:7.3f} {agg[c]['mean']:7.3f} "
+            f"{agg[c]['median']:7.3f}"
+        )
+        rows.append(
+            {
+                "candidate": f"seasonal@{c}",
+                "ap": pooled[c],
+                "season_mean": agg[c]["mean"],
+                "season_median": agg[c]["median"],
+            }
+        )
+
+    print("")
+    print("delete-one-season sensitivity (AP with that season removed):")
+    d1 = delete_one_season(yv, cand, sv)
+    order = sorted(d1)
+    print(f"{'candidate':20s} " + "  ".join(f"{int(y):>7}" for y in order))
+    for c in cols:
+        print(f"{c:20s} " + "  ".join(f"{d1[y][c]:7.3f}" for y in order))
+        for y in order:
+            rows.append(
+                {"candidate": f"drop{int(y)}@{c}", "ap": d1[y][c], "year": int(y)}
+            )
+
 
     pd.DataFrame(rows).to_csv(OUT, index=False)
     print(f"\nwrote {OUT}")

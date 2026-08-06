@@ -50,11 +50,27 @@ def test_retired_claim_absent_from_every_chunk(needle, why):
 
 
 def test_current_headline_numbers_present_in_all_three_languages():
-    """The corrected figures ship once per language, not just in English."""
+    """The corrected figures ship once per language, not just in English.
+
+    The pooled number may never travel alone. Resampling showed it is very
+    largely a 2025 result, so the figures that qualify it ship with it: drop
+    that season and 0.249 becomes 0.042, and by median season the variant
+    without excitation is better, 0.133 against 0.083.
+    """
     joined = "\n".join(body for _, body in _chunks())
-    for value, expect in (("0.249", 3), ("0.176", 3), ("0.083", 3)):
+    for value, expect in (("0.249", 3), ("0.042", 3), ("0.133", 3), ("0.083", 3)):
         got = joined.count(value)
         assert got >= expect, f"{value} appears {got} times, expected >= {expect}"
+
+
+def test_pooled_headline_never_ships_without_its_qualifier():
+    """0.249 on its own overstates; it must sit beside the delete-2025 figure."""
+    for name, body in _chunks():
+        if "0.249" in body:
+            assert "0.042" in body, (
+                f"{name} publishes the pooled figure without the delete-2025 "
+                "figure that qualifies it"
+            )
 
 
 def test_uncalibrated_wording_ships():
