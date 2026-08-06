@@ -847,7 +847,7 @@ def build_brief(name: str, tables: dict, geom: dict, guru_fp) -> plt.Figure:
         f"#{rank}",
         f"/ {n_rank}",
         AMBER,
-        sub="by forecast peak P",
+        sub="by peak ranking score",
     )
 
     # ---- tehsil table ----------------------------------------------------- #

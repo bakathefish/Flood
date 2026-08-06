@@ -35,7 +35,7 @@ GEOJSON_BUDGET_BYTES = 150_000     # simplified district boundaries
 DATA_CSVS = {
     "district_flood_stats_2025.csv": ["district", "tierA_flooded_ha", "rf_flooded_ha"],
     "flood_frequency_districts_late_season.csv": ["district", "max_season_fraction"],
-    "forecaster_2025_hindcast.csv": ["district", "window_start", "p_event"],
+    "forecaster_2025_walkforward.csv": ["district", "date", "score"],
     "gfm_district_window_fractions_2015_2025.csv": ["year", "window_start", "district"],
 }
 

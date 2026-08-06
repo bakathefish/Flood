@@ -10,9 +10,11 @@ data.gov.in CWC reservoirs) and the committed-joblib load live in
   date, reusing the ``sailaab.windows`` grid and the ``sailaab.frequency``
   half-open window rule — so ``week_of_season`` and the core-season flag are the
   *same* definitions the forecaster trained on;
-* assembles the EXACT 16 training features in training order
-  (:data:`FEATURE_ORDER`, verified against ``data/models/forecaster_2025.joblib``
-  by ``tests/test_nowcast.py``);
+* assembles the retired 16-feature vector (:data:`FEATURE_ORDER`) that the
+  superseded 10-day-window model consumed. That model is no longer deployed;
+  the live forecaster reads ten satellite-only features declared in
+  ``sailaab/forecast_live.py``. The assembly below is kept only so the
+  historical tests that pin the old bundle keep running;
 * reduces a GFM flood mask to per-district observed fraction / km² with the same
   cos²(lat) Web-Mercator area physics as the decade atlas that made the labels
   (``pipeline/fetch_gfm_decade.py``), so a live ``antecedent_fraction`` is
@@ -23,6 +25,9 @@ The paddy decision (``docs/notes/forecaster.md``) is honoured here: the model wa
 trained ONLY on core-season windows (``window_start`` month-day >= ``07-25``).
 Pre-core windows are out-of-domain, so :func:`build_nowcast_json` emits
 ``p_event = null`` for them and the ``activates`` countdown target instead.
+
+Despite its name, ``p_event`` is an uncalibrated ranking score, not a
+probability. The field name is kept because the published schema is locked.
 """
 
 from __future__ import annotations
@@ -247,13 +252,22 @@ def _areas_ha(mask, labels, row_ha, n_labels: int) -> np.ndarray:
     )
 
 
-def district_flood_stats(mask, labels, names, bounds, refwater=None) -> dict:
+def district_flood_stats(
+    mask, labels, names, bounds, refwater=None, *, sensed: bool = True
+) -> dict:
     """Per-district observed flood fraction and km² from a boolean flood ``mask``.
 
     ``refwater`` (permanent water) is subtracted first, exactly as the decade
-    atlas did. Returns ``district -> {observed_fraction, observed_km2,
-    flooded_ha, district_ha}``; ``observed_fraction`` is
-    ``flooded_ha / district_ha`` (0.0 for an empty district).
+    atlas did. Returns ``district -> {covered, observed_fraction, observed_km2,
+    flooded_ha, district_ha}``.
+
+    ``sensed`` says whether any satellite observation actually came back for
+    this window. It has to be passed in, because an all-zero flood mask is
+    ambiguous on its own: it looks identical whether the satellite imaged
+    Punjab and found no water, or every request to the service failed. Reading
+    the second case as the first publishes a state-wide all-clear built on no
+    imagery at all, which is the single worst thing this file can do. When
+    ``sensed`` is False no district is covered and every value is null.
     """
     m = np.asarray(mask, dtype=bool)
     if refwater is not None:
@@ -267,7 +281,10 @@ def district_flood_stats(mask, labels, names, bounds, refwater=None) -> dict:
     for i, name in enumerate(names, start=1):
         d_ha = float(district_ha[i])
         f_ha = float(flooded_ha[i])
-        covered = d_ha > 0
+        # Coverage is earned by an observation, not by the district polygon
+        # having pixels: district_ha is computed from a constant raster, so on
+        # its own it is true for every district on every run, imagery or not.
+        covered = sensed and d_ha > 0
         out[name] = {
             # A district absent from this pass has no pixels at all. Reporting
             # 0.0 there would be a false all-clear: each Sentinel-1 pass images

@@ -292,6 +292,13 @@ def main() -> int:
             )[:, 1]
             model_score = pd.Series(proba, index=X.index)
             trans = forecast_live.transparent_score(X)
+            # Drop the districts the satellite could not see BEFORE ranking.
+            # Ranking them and nulling afterwards leaves the survivors holding
+            # positions that were decided partly by rows nobody observed, and
+            # leaves the alert count in the note including them.
+            seen = [n for n in X.index if observed.get(n, {}).get("covered")]
+            model_score = model_score.loc[seen]
+            trans = trans.loc[seen]
             ranked = forecast_live.rank_and_tier(
                 model_score, trans, alert_threshold=bundle["alert_threshold"]
             )
@@ -336,10 +343,22 @@ def main() -> int:
                 ),
             }
             n_watch = sum(1 for r in ranked if r["tier"] == "watch")
+            n_seen, n_all = len(ranked), len(X.index)
+            scope = (
+                ""
+                if n_seen == n_all
+                else (
+                    f" Ranks are among the {n_seen} of {n_all} districts the "
+                    f"satellite imaged this cycle; the rest carry no score."
+                )
+            )
             model_note = (
-                f"{n_watch} district(s) above the alert threshold."
-                if n_watch
-                else "No district is above the alert threshold today."
+                (
+                    f"{n_watch} district(s) above the alert threshold."
+                    if n_watch
+                    else "No district is above the alert threshold today."
+                )
+                + scope
             )
         else:
             model_note = (
@@ -378,7 +397,12 @@ def main() -> int:
             payload = nowcast.build_nowcast_json(
                 generated_utc=generated,
                 window=nowcast.resolve_window(today_iso),
-                sources={"labels": "gfm"},
+                sources={
+                    "forecast_inputs": "gfm",
+                    "labels": "gfm",
+                    "context_rain": "unavailable",
+                    "context_reservoirs": "unavailable",
+                },
                 districts=_fallback_districts(),
                 observed={},
                 p_event=None,

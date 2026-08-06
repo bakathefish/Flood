@@ -388,11 +388,14 @@ def fetch_gfm_observed(
         prev_days, bounds, size, pause
     )
 
+    # An all-zero union means one of two very different things: the satellite
+    # imaged Punjab and saw no water, or every request to the service failed.
+    # Only the fetch counters can tell them apart, so they decide coverage.
     cur_stats = nowcast.district_flood_stats(
-        cur_union, labels, names, bounds, refwater=refwater
+        cur_union, labels, names, bounds, refwater=refwater, sensed=cur_fetched > 0
     )
     prev_stats = nowcast.district_flood_stats(
-        prev_union, labels, names, bounds, refwater=refwater
+        prev_union, labels, names, bounds, refwater=refwater, sensed=prev_fetched > 0
     )
 
     observed = {

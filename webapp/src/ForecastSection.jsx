@@ -93,17 +93,47 @@ function num(x) {
   return typeof x === 'number' && Number.isFinite(x) ? x : null;
 }
 
-/** A score is usable only if it is actually a finite number. Anything else,
- *  null included, means the forecast could not be made for that district. */
-function hasScore(d) {
-  return num(d.p_event) !== null;
+/** A number inside an inclusive range, or null. */
+function inRange(x, lo, hi) {
+  const v = num(x);
+  return v !== null && v >= lo && v <= hi ? v : null;
 }
 
-/** A row is renderable only if every operational field is valid. A broken rank
- *  or an unrecognised tier is not a cosmetic problem: those two fields are the
- *  output an officer reads. */
+function isRow(d) {
+  return !!d && typeof d === 'object' && typeof d.district === 'string' && d.district !== '';
+}
+
+/** A score is usable only if it is actually a finite number in range. Anything
+ *  else, null included, means the forecast could not be made for that district. */
+function hasScore(d) {
+  return isRow(d) && inRange(d.p_event, 0, 1) !== null;
+}
+
+/** A row is renderable only if every operational field is individually valid.
+ *  Rank and tier are what an officer reads, so a broken one is not cosmetic. */
 function validRow(d) {
-  return hasScore(d) && TIERS.includes(d.tier) && num(d.rank) !== null;
+  if (!hasScore(d)) return false;
+  if (!TIERS.includes(d.tier)) return false;
+  const r = num(d.rank);
+  // ranks are 1-based positive integers
+  if (r === null || !Number.isInteger(r) || r < 1) return false;
+  // a score on a district nobody imaged is exactly what the producer withholds;
+  // if one arrives anyway the feed disagrees with itself and is not trustworthy
+  if (d.covered === false) return false;
+  return true;
+}
+
+/** The board as a whole: ranks must be unique and must agree with the score
+ *  order they claim to describe. A ranking that contradicts its own numbers is
+ *  worse than no ranking, because it looks authoritative. */
+function boardIsCoherent(rows) {
+  const ranks = rows.map((d) => num(d.rank));
+  if (new Set(ranks).size !== ranks.length) return false;
+  for (let i = 1; i < rows.length; i += 1) {
+    if (num(rows[i].p_event) > num(rows[i - 1].p_event)) return false;
+    if (num(rows[i].rank) < num(rows[i - 1].rank)) return false;
+  }
+  return true;
 }
 
 /** Not imaged is a statement about coverage, not about the score. A district
@@ -134,13 +164,14 @@ export default function ForecastSection({lang}) {
     return () => { on = false; };
   }, []);
 
-  const districts = (nc && nc.districts) || [];
+  // A malformed container must fail closed, never throw on render.
+  const districts = nc && Array.isArray(nc.districts) ? nc.districts.filter(isRow) : [];
   // Districts with no score are never sorted against districts that have one,
   // and never fall off the end of a truncated list.
   const scored = districts.filter(hasScore).sort((a, b) => num(b.p_event) - num(a.p_event));
   // Any row that is scored but structurally broken poisons the whole board:
   // we cannot tell a real ranking from a corrupted one, so we do not show one.
-  const allRowsValid = scored.every(validRow);
+  const allRowsValid = scored.every(validRow) && boardIsCoherent(scored);
   const rows = scored.slice(0, 8);
 
   const fc = nc && nc.forecast;
@@ -152,7 +183,9 @@ export default function ForecastSection({lang}) {
   // date can still emit core_season false, and rendering that as "resting
   // until the monsoon" would be an all-clear printed on the worst possible day.
   const preCore = !!nc && nc.core_season === false && !saysUnavailable && !feedFailed;
-  const threshold = fc && num(fc.alert_threshold) !== null ? num(fc.alert_threshold).toFixed(3) : null;
+  const threshold = fc && inRange(fc.alert_threshold, 0, 1) !== null
+    ? inRange(fc.alert_threshold, 0, 1).toFixed(3)
+    : null;
   // Fail closed. The board appears only when the feed is unambiguously in
   // season, said so itself, is not reporting failure, produced scores, and
   // gave us the operating point those scores are read against. Anything less
@@ -224,9 +257,10 @@ export default function ForecastSection({lang}) {
                     // Guaranteed valid: an invalid tier anywhere suppresses the
                     // whole board rather than being rendered as unknown here.
                     const tier = d.tier;
-                    const water = d.covered === false || d.observed_km2 === null || d.observed_km2 === undefined
-                      ? '—'
-                      : (+d.observed_km2 || 0).toFixed(1) + ' km²';
+                    // `+x || 0` printed a confident 0.0 km² for a malformed
+                    // value, which reads as "imaged, and dry".
+                    const km2 = d.covered === false ? null : num(d.observed_km2);
+                    const water = km2 === null ? '—' : km2.toFixed(1) + ' km²';
                     return (
                       <React.Fragment key={d.district}>
                         <Divider />

@@ -1,13 +1,18 @@
-# Live nowcast — current-window district flood risk from keyless inputs
+# Live nowcast — daily district flood-onset ranking from keyless inputs
 
-The last live layer: every monitor cycle, predict the **current** 10-day monsoon
-window's per-district flood risk with the committed forecaster
-(`data/models/forecaster_2025.joblib`), from live, no-login, no-secret inputs, and
-write `monitor/nowcast.json` (the locked schema the site reads).
+The last live layer: every monitor cycle, score each district's chance of the
+satellite seeing flooding within the next three days, using the committed daily
+forecaster (`data/models/forecaster_daily.joblib`) and live, no-login,
+no-secret inputs, then write `monitor/nowcast.json` (the locked schema the site
+reads).
 
-Pure logic (window resolution, the exact-16 feature assembly, the cos²(lat)
-mask→district reduction, JSON shaping) lives in `sailaab/nowcast.py`, TDD'd in
-`tests/test_nowcast.py` (21 tests). All network / model IO lives in
+The earlier 10-day-window model with rainfall and reservoir predictors
+(`forecaster_2025.joblib`) is superseded and no longer deployed; see
+`docs/notes/forecaster.md` for why and for the numbers that were retracted with
+it.
+
+Pure logic (window resolution, the cos²(lat) mask→district reduction, coverage,
+JSON shaping) lives in `sailaab/nowcast.py`, TDD'd in `tests/test_nowcast.py`. All network / model IO lives in
 `pipeline/fetch_live_inputs.py` (fetchers) + `pipeline/nowcast.py` (driver) — the
 same pure/IO split as `sailaab.gfm` vs `pipeline.fetch_gfm`.
 
@@ -117,8 +122,9 @@ Window `2026-07-15 – 2026-07-25` — **pre-core** (`core_season=false`,
 
 - Rain (Open-Meteo): Punjab **48.3 mm** so far (7/7 elapsed days), upstream
   **54.4 mm**; antecedent window (Jul 5–15) Punjab 43.2 / upstream 65.5 mm.
-- Reservoirs: **no 2026 data** (CWC feed dark) → 6 features NaN,
-  `reservoirs=unavailable`.
+- Reservoirs: **no 2026 data** (CWC feed dark) → `context_reservoirs=unavailable`.
+  (Historical run, made under the superseded model, which did consume six
+  reservoir features. The deployed model consumes none.)
 - GFM observed (permanent water removed): 3 S1-active of 7 current-window days,
   4/10 antecedent-window days, 18 WMS requests. Top current-window observed
   extent: **Patiala 15.1 km² (0.45%)**, Firozpur 6.9, Tarn Taran 4.6,

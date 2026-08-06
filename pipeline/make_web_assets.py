@@ -167,7 +167,14 @@ def main() -> None:
     print(f"{gj_dst.relative_to(ROOT)}  {gj_dst.stat().st_size:,} B")
 
     for rel in CSVS:
-        shutil.copyfile(ROOT / rel, DATA_OUT / Path(rel).name)
+        name = Path(rel).name
+        shutil.copyfile(ROOT / rel, DATA_OUT / name)
+        # The SPA requests these at assets/<name>, and a clean `vite build`
+        # only ships what is in webapp/public. Writing one copy and not the
+        # other is how the proof chart came to 404 on a fresh checkout.
+        for extra in (ROOT / "docs" / "assets", ROOT / "webapp" / "public" / "assets"):
+            extra.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / rel, extra / name)
 
     seed_latest_jpg()
     jpg = ROOT / "monitor/latest.jpg"
