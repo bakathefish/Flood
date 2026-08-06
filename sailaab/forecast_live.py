@@ -232,6 +232,70 @@ MIN_COVERAGE = 0.5
 MAX_STALENESS_DAYS = 3
 
 
+def eligible_districts(recent, issue_date) -> dict:
+    """The one set of districts whose imagery is fresh enough to act on.
+
+    This exists because there used to be two answers to "was this district
+    observed", built from two separate fetches over two different day ranges.
+    The statewide gate ran on the recent history with a three-day freshness
+    rule; ranking eligibility ran on the cumulative monsoon-window union. A
+    district imaged on window day one and never again passed the second and was
+    never examined by the first, so it could be ranked, tiered and published on
+    imagery nine days old, with its stated observation and its score derived
+    from different observation sets. Nothing enforced that the two agreed.
+
+    ``recent`` only carries rows for districts whose footprint cleared the
+    coverage threshold on that date, so membership here already means "imaged,
+    properly, on that day". Freshness is the only extra condition.
+
+    Returns ``district -> {"latest": date, "age_days": int}`` for the eligible
+    districts only. Callers use this identical set for the gate and for
+    ranking, and publish the age beside every score so a reader can see how old
+    the evidence is.
+    """
+    if recent is None or len(recent) == 0:
+        return {}
+    issue = pd.Timestamp(issue_date)
+    r = recent.copy()
+    r["date"] = pd.to_datetime(r["date"])
+    r = r[(r["date"] <= issue) & (r["date"] >= issue - pd.Timedelta(days=MAX_STALENESS_DAYS))]
+    if r.empty:
+        return {}
+    out = {}
+    for name, latest in r.groupby("district")["date"].max().items():
+        out[name] = {
+            "latest": latest.strftime("%Y-%m-%d"),
+            "age_days": int((issue - latest).days),
+        }
+    return out
+
+
+def latest_observation(recent, issue_date) -> dict:
+    """Newest observation per district at issue time, fresh or not.
+
+    Eligibility hides the districts whose imagery is too old to act on, which
+    is right for scoring and wrong for the reader. "No score" and "last seen
+    nine days ago" are different messages, and the second is the one that
+    explains the first. Every district that was ever imaged in the window
+    carries its date and age, and only the score is withheld.
+    """
+    if recent is None or len(recent) == 0:
+        return {}
+    issue = pd.Timestamp(issue_date)
+    r = recent.copy()
+    r["date"] = pd.to_datetime(r["date"])
+    r = r[r["date"] <= issue]
+    if r.empty:
+        return {}
+    return {
+        name: {
+            "latest": latest.strftime("%Y-%m-%d"),
+            "age_days": int((issue - latest).days),
+        }
+        for name, latest in r.groupby("district")["date"].max().items()
+    }
+
+
 def forecast_is_publishable(recent, issue_date, districts) -> tuple[bool, str]:
     """Whether the observations support publishing a forecast at all.
 
@@ -259,8 +323,8 @@ def forecast_is_publishable(recent, issue_date, districts) -> tuple[bool, str]:
             f"({newest.date()}), limit {MAX_STALENESS_DAYS}"
         )
 
-    fresh = r[r["date"] >= issue - pd.Timedelta(days=MAX_STALENESS_DAYS)]
-    covered = fresh["district"].nunique()
+    # Same predicate the ranking uses, so the two cannot drift apart.
+    covered = len(eligible_districts(recent, issue_date))
     total = len(list(districts)) or 1
     if covered / total < MIN_COVERAGE:
         return False, (

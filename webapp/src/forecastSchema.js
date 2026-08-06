@@ -43,10 +43,15 @@ function rowShapeOk(d) {
   // coverage must be a real boolean: missing, null, "" or 0 previously slipped
   // through as "not literally false", i.e. treated as covered.
   if (typeof d.covered !== 'boolean') return false;
+  // The rule is presence, not just legal-if-present. `!== undefined` here meant
+  // a COVERED row could omit both observation fields entirely: the "a missing
+  // key is not a null" principle stated below was being applied to uncovered
+  // rows and to operational fields, and not to observation fields on covered
+  // rows. Same generalisation gap, one row-type over. The producer always emits
+  // these, so their absence means the feed is not the feed we think it is.
   for (const [field, hi] of [['observed_fraction_window', 1], ['observed_km2', 1e6]]) {
-    if (d[field] !== null && d[field] !== undefined && inRange(d[field], 0, hi) === null) {
-      return false;
-    }
+    if (!(field in d)) return false;
+    if (d[field] !== null && inRange(d[field], 0, hi) === null) return false;
   }
   if (!('transparent_score' in d)) return false;
   if (d.transparent_score !== null && num(d.transparent_score) === null) return false;
@@ -77,6 +82,10 @@ function uncoveredRowOk(d) {
 /** How the producer describes what the satellite actually saw. */
 const ACQ_STATES = ['observed', 'partial', 'not_observed', 'unresolved', 'unknown'];
 
+/** Mirrors MIN_OBSERVED_FRACTION in sailaab/nowcast.py, the footprint share a
+ *  district needs before it counts as imaged. */
+const MIN_OBSERVED_FRACTION = 0.95;
+
 /** Every row must state its acquisition, and it must agree with `covered`.
  *
  *  These two fields arrived after the validator was written and went
@@ -86,12 +95,63 @@ const ACQ_STATES = ['observed', 'partial', 'not_observed', 'unresolved', 'unknow
  *  so the two can be cross-checked, and a disagreement means one of them is
  *  lying about the same fact. */
 function acquisitionOk(d) {
-  if (!ACQ_STATES.includes(d.acquisition_state)) return false;
+  const state = d.acquisition_state;
+  if (!ACQ_STATES.includes(state)) return false;
   if (!('acquisition_fraction' in d)) return false;
-  if (d.acquisition_fraction !== null && inRange(d.acquisition_fraction, 0, 1) === null) {
+  const frac = d.acquisition_fraction;
+  if (frac !== null && inRange(frac, 0, 1) === null) return false;
+  if (d.covered !== (state === 'observed')) return false;
+
+  // The producer DERIVES the state from the fraction (sailaab/nowcast.py):
+  // >= 0.95 observed, > 0 partial, == 0 not_observed, and a null fraction only
+  // when there is no footprint at all. Cross-checking `covered` against the
+  // state while leaving this pair unchecked was the same omission one field
+  // over: a row could claim it was fully imaged with a footprint of 0.0. Any
+  // two published fields the producer computes from each other get checked
+  // against each other.
+  if (state === 'unknown') return frac === null;
+  if (frac === null) return false;              // every other state measured one
+  if (state === 'observed') return frac >= MIN_OBSERVED_FRACTION;
+  if (state === 'partial') return frac > 0 && frac < MIN_OBSERVED_FRACTION;
+  if (state === 'not_observed') return frac === 0;
+  return true;  // 'unresolved': imaged, but the flood product did not resolve
+}
+
+/** Matches MAX_STALENESS_DAYS in sailaab/forecast_live.py. A SCORED row older
+ *  than this should never have existed, so seeing one means the producer's
+ *  eligibility rule and this validator disagree, and the feed fails closed. */
+const MAX_INPUT_AGE_DAYS = 3;
+
+/** Freshness must be stated, and must agree with the rest of the row.
+ *
+ *  Added with the fields themselves rather than after the fact. The previous
+ *  two additions to this payload arrived unvalidated and each one opened a hole
+ *  of exactly the shape this file exists to close, so new operational fields
+ *  now get their rule in the same change that introduces them.
+ *
+ *  Three legal shapes, because "no score" and "last seen nine days ago" are
+ *  different messages and the second explains the first:
+ *    - never imaged      -> both null
+ *    - imaged but stale  -> date and age present, age deliberately over the
+ *                           limit; that is precisely why it has no score
+ *    - scored            -> date and age present, age within the limit */
+function freshnessOk(d) {
+  if (!('latest_input' in d) || !('input_age_days' in d)) return false;
+  if (!d.covered) {
+    return d.latest_input === null && d.input_age_days === null;
+  }
+  if (d.latest_input === null && d.input_age_days === null) {
+    // covered by the window union but absent from the recent history
+    return true;
+  }
+  if (typeof d.latest_input !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.latest_input)) {
     return false;
   }
-  return d.covered === (d.acquisition_state === 'observed');
+  const age = num(d.input_age_days);
+  if (age === null || !Number.isInteger(age) || age < 0) return false;
+  const scored = d.p_event !== null && d.p_event !== undefined;
+  // a stale row may carry any age; a scored one may not be stale at all
+  return scored ? age <= MAX_INPUT_AGE_DAYS : true;
 }
 
 /** A covered, scored district must carry a complete, legal operational set. */
@@ -118,6 +178,7 @@ export function districtsAreValid(districts) {
     if (names.has(d.district)) return false; // duplicate district
     names.add(d.district);
     if (!acquisitionOk(d)) return false;
+    if (!freshnessOk(d)) return false;
     // every row must state its score, even to say it has none
     if (!('p_event' in d)) return false;
     if (!d.covered) {
@@ -185,7 +246,18 @@ export function resolveForecastState(nc, {fetchFailed = false, nowMs = null} = {
     out.state = 'inactive';
     return out;
   }
-  if (nc.core_season !== true || saysUnavailable || feedFailed) return out;
+  if (nc.core_season !== true || saysUnavailable || feedFailed) {
+    // No board, but silence is not the same as no information. When the
+    // districts themselves are sound we still know exactly which ones nobody
+    // imaged, and that list is the whole explanation for why there is no
+    // forecast. Returning empty here meant the page said nothing at all on the
+    // one cycle a reader most needs to be told the satellite did not look.
+    if (districtsAreValid(nc.districts)) {
+      out.unimaged = nc.districts.filter((d) => d.covered === false);
+      out.unscored = nc.districts.filter((d) => d.covered === true && !hasScore(d));
+    }
+    return out;
+  }
 
   if (!districtsAreValid(nc.districts)) return out;
 

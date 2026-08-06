@@ -370,10 +370,18 @@ def district_flood_stats(
             # a strip, not the whole state, so "not imaged" and "imaged and dry"
             # must stay distinguishable all the way to the site.
             "covered": covered,
+            # "unknown", not "sensed". The old fallback word survived the
+            # footprint change and became a vocabulary the consumer does not
+            # know, so on a footprint-outage cycle the whole feed was rejected
+            # as malformed and the page listed nothing at all, where it used to
+            # name every unimaged district. Failing closed is right; losing the
+            # disclosure while doing it is the exact quiet failure this module
+            # keeps warning about. Without a footprint there is no evidence of
+            # acquisition, and "unknown" is the honest word for that.
             "acquisition_state": (
                 acquisition.get(name, {}).get("state")
                 if acquisition is not None
-                else ("sensed" if sensed else "unknown")
+                else "unknown"
             ),
             "acquisition_fraction": (
                 acquisition.get(name, {}).get("acquisition_fraction")
@@ -402,6 +410,7 @@ def build_nowcast_json(
     notes: str = "",
     forecast: dict | None = None,
     extras: dict | None = None,
+    last_seen: dict | None = None,
 ) -> dict:
     """Shape the locked ``monitor/nowcast.json`` payload.
 
@@ -463,6 +472,18 @@ def build_nowcast_json(
                 "rank": None,
                 "tier": None,
                 "transparent_score": None,
+                # How old the imagery behind this row is. A score with no
+                # visible age reads as current, and the whole reason this row
+                # can exist without a score is that freshness is a separate
+                # question from coverage. A district imaged nine days ago and
+                # not since gets no score, and says so with a date rather than
+                # by going blank.
+                "latest_input": (
+                    (last_seen or {}).get(name, {}).get("latest") if covered else None
+                ),
+                "input_age_days": (
+                    (last_seen or {}).get(name, {}).get("age_days") if covered else None
+                ),
                 "observed_fraction_window": (
                     None if frac is None else round(float(frac), 4)
                 ),

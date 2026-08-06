@@ -294,6 +294,7 @@ def main() -> int:
 
         p_event = None
         extras = None
+        last_seen = {}
         forecast_block = None
         model_note = ""
         if window["core_season"]:
@@ -331,7 +332,20 @@ def main() -> int:
             # Ranking them and nulling afterwards leaves the survivors holding
             # positions that were decided partly by rows nobody observed, and
             # leaves the alert count in the note including them.
-            seen = [n for n in X.index if observed.get(n, {}).get("covered")]
+            #
+            # This uses the SAME set the publication gate just used, rather than
+            # the cumulative window union it used to consult. The union counted
+            # a district as covered on the strength of a single pass at the top
+            # of the monsoon window, which meant a district could be ranked on
+            # imagery nine days old that the gate's freshness rule never saw.
+            eligible = forecast_live.eligible_districts(recent, today_iso)
+            gfm_meta["eligible_districts"] = len(eligible)
+            seen = [n for n in X.index if n in eligible]
+            # Every district that was imaged at all carries its date and age,
+            # including the stale ones that eligibility just excluded. Hiding
+            # the age of a district we declined to score tells the reader
+            # nothing about why.
+            last_seen = forecast_live.latest_observation(recent, today_iso)
             model_score = model_score.loc[seen]
             trans = trans.loc[seen]
             ranked = forecast_live.rank_and_tier(
@@ -343,6 +357,8 @@ def main() -> int:
                     "rank": r["rank"],
                     "tier": r["tier"],
                     "transparent_score": r["transparent_score"],
+                    "latest_input": last_seen.get(r["district"], {}).get("latest"),
+                    "input_age_days": last_seen.get(r["district"], {}).get("age_days"),
                 }
                 for r in ranked
             }
@@ -387,14 +403,29 @@ def main() -> int:
                     f"satellite imaged this cycle; the rest carry no score."
                 )
             )
-            model_note = (
-                (
-                    f"{n_watch} district(s) above the alert threshold."
-                    if n_watch
-                    else "No district is above the alert threshold today."
+            if n_seen == 0:
+                # Never open with an all-clear that nothing was looked at.
+                # "No district is above the alert threshold today" led the note
+                # even when the satellite had imaged nobody, and the correction
+                # arrived several sentences later, where a reader who has
+                # already taken the first sentence as reassurance will not
+                # reach it. With no imagery there is no threshold statement to
+                # make at all, so it is not made.
+                model_note = (
+                    f"No district was imaged this cycle, so no district is "
+                    f"scored. This is not an all-clear: the satellite did not "
+                    f"look, and an empty flood mask over unimaged ground says "
+                    f"nothing about whether there is water."
                 )
-                + scope
-            )
+            else:
+                model_note = (
+                    (
+                        f"{n_watch} district(s) above the alert threshold."
+                        if n_watch
+                        else "No district is above the alert threshold today."
+                    )
+                    + scope
+                )
         else:
             model_note = (
                 f"Current window {window['window_start']} is pre-core-season "
@@ -407,6 +438,7 @@ def main() -> int:
             window, rain_source, rain_meta, res_source, gfm_meta, model_note
         )
         payload = nowcast.build_nowcast_json(
+            last_seen=last_seen,
             generated_utc=generated,
             window=window,
             sources={
@@ -447,8 +479,17 @@ def main() -> int:
                     "this is NOT an all-clear. Absence of satellite imagery is "
                     "absence of information."
                 ),
+                # The disclaimer travels inside the forecast block, not only in
+                # the surrounding notes. A consumer that reads the block alone
+                # sees "unavailable" plus a reason, and "the imagery is stale"
+                # is not self-evidently different from "nothing is happening".
                 forecast={"kind": "district flood onset", "status": "unavailable",
-                          "reason": str(unavailable)},
+                          "reason": str(unavailable),
+                          "note": (
+                              "No forecast was produced this cycle. This is not "
+                              "an all-clear: absence of a forecast is absence of "
+                              "information, not evidence of calm."
+                          )},
             )
             _write(payload)
         except Exception:

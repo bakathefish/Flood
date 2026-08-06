@@ -18,4 +18,8 @@ pyproj>=3.7
 shapely>=2.0
 requests>=2.31
 # data-fetch extras (pipeline/fetch_rain.py only): pip install imdlib xarray
-# NDEM validation figure (pipeline/make_ndem_panel.py only): pip install pypdfium2
+# Reads the shipped PDFs so tests/test_pdf_parity.py can gate them. This was a
+# comment rather than a dependency, so the whole PDF gate skipped silently on
+# both runners: 18 assertions locally, 1 skip in CI, which is exactly the hole
+# the gate was written to close. Also used by pipeline/make_ndem_panel.py.
+pypdfium2>=4.30

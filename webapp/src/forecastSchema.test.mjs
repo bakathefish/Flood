@@ -33,6 +33,8 @@ function row(over = {}) {
     rank: 1,
     tier: 'elevated',
     transparent_score: 1.5,
+    latest_input: '2025-08-19',
+    input_age_days: 1,
     ...over,
   };
 }
@@ -50,6 +52,8 @@ function uncoveredRow(over = {}) {
     observed_km2: null,
     observed_fraction_window: null,
     transparent_score: null,
+    latest_input: null,
+    input_age_days: null,
     ...over,
   });
 }
@@ -67,16 +71,28 @@ function feed(districts, over = {}) {
 // --------------------------------------------------------------------------
 // the real committed payload must render
 // --------------------------------------------------------------------------
-test('the committed live feed produces a board', () => {
+test('the committed live feed resolves to a state it has earned', () => {
   const nc = JSON.parse(readFileSync(ARTIFACT, 'utf8'));
   const {state} = resolveForecastState(nc);
-  // This used to return early whenever the artifact was not board-shaped, which
-  // meant a feed that failed the schema passed the test that exists to catch
-  // exactly that. Assert the state we resolved to instead of skipping: an
-  // out-of-season artifact is legitimately 'inactive', but a validation failure
-  // is 'unavailable' and must never pass silently.
+
+  // This used to return early whenever the artifact was not board-shaped, so a
+  // feed that failed the schema passed the test that exists to catch exactly
+  // that. The fix is not to demand a board: an out-of-season feed is properly
+  // 'inactive', and an in-season feed whose imagery has gone stale is properly
+  // 'unavailable' — that is the publication gate working, not a defect.
+  //
+  // What must never pass silently is 'unavailable' caused by the DISTRICTS
+  // failing validation, which looks identical from the outside. So the two are
+  // told apart directly: a gate decision keeps a valid district list and states
+  // a reason; a schema failure does not.
   if (nc.core_season !== true) {
     assert.equal(state, 'inactive', 'out-of-season feed should resolve to inactive');
+    return;
+  }
+  if (nc.forecast && nc.forecast.status === 'unavailable') {
+    assert.ok(nc.forecast.reason, 'an unavailable forecast must say why');
+    assert.equal(districtsAreValid(nc.districts), true,
+                 'unavailable must be the gate refusing, not the schema failing');
     return;
   }
   assert.equal(state, 'board', 'the committed in-season feed must not fail closed');
@@ -374,4 +390,112 @@ test('staleness is not enforced when no clock is supplied', () => {
   const nc = feed([row({district: 'A', rank: 1})],
                   {generated_utc: '2020-01-01T00:00:00Z'});
   assert.equal(resolveForecastState(nc).state, 'board');
+});
+
+
+// --------------------------------------------------------------------------
+// freshness: added with the fields, not after a defect report
+// --------------------------------------------------------------------------
+test('a scored row must state how old its imagery is', () => {
+  for (const bad of [{latest_input: null}, {input_age_days: null},
+                     {latest_input: '19-08-2025'}, {input_age_days: -1},
+                     {input_age_days: 9}, {input_age_days: 1.5}]) {
+    assert.equal(districtsAreValid([row(bad)]), false, JSON.stringify(bad));
+  }
+  const missing = row();
+  delete missing.latest_input;
+  assert.equal(districtsAreValid([missing]), false, 'omitting latest_input must fail');
+});
+
+test('an unscored row must not claim an imagery age', () => {
+  // An age beside a null score asserts evidence the producer declined to act
+  // on, which is the same confusion between "unseen" and "seen and calm" that
+  // this whole file exists to prevent.
+  assert.equal(
+    districtsAreValid([uncoveredRow({latest_input: '2025-08-19', input_age_days: 1})]),
+    false,
+  );
+  assert.equal(districtsAreValid([uncoveredRow()]), true);
+});
+
+test('a stale score fails the board closed', () => {
+  // 3 days is the producer's own eligibility limit. A scored row older than
+  // that means the producer and this validator disagree about eligibility.
+  assert.equal(districtsAreValid([row({input_age_days: 3})]), true);
+  assert.equal(districtsAreValid([row({input_age_days: 4})]), false);
+});
+
+// --------------------------------------------------------------------------
+// H5: the same class one row-type and one field-pair over. Fixing the specific
+// pair that was reported, twice, is what let these survive both times.
+// --------------------------------------------------------------------------
+test('a covered row may not omit its observation fields', () => {
+  // The missing-key rule was enforced for uncovered rows and for operational
+  // fields, and not here, so a covered row could simply leave these out.
+  for (const field of ['observed_km2', 'observed_fraction_window']) {
+    const scored = row();
+    delete scored[field];
+    assert.equal(districtsAreValid([scored]), false, `covered+scored omitting ${field}`);
+
+    const unscored = row({p_event: null, rank: null, tier: null, transparent_score: null});
+    delete unscored[field];
+    assert.equal(districtsAreValid([unscored]), false, `covered+unscored omitting ${field}`);
+  }
+});
+
+test('the acquisition state must agree with the fraction it was derived from', () => {
+  // The producer computes the state FROM the fraction: >=0.95 observed,
+  // >0 partial, ==0 not_observed, null only when there is no footprint. Two
+  // published fields that derive from each other get checked against each
+  // other, which is the rule the covered/state check was one instance of.
+  const bad = [
+    {acquisition_state: 'observed', acquisition_fraction: 0.0, covered: true},
+    {acquisition_state: 'observed', acquisition_fraction: 0.4, covered: true},
+    {acquisition_state: 'not_observed', acquisition_fraction: 1.0, covered: false},
+    {acquisition_state: 'partial', acquisition_fraction: 0.0, covered: false},
+    {acquisition_state: 'partial', acquisition_fraction: 0.99, covered: false},
+    {acquisition_state: 'unknown', acquisition_fraction: 0.99, covered: false},
+    {acquisition_state: 'observed', acquisition_fraction: null, covered: true},
+  ];
+  for (const over of bad) {
+    const d = over.covered
+      ? row(over)
+      : uncoveredRow({...over, p_event: null, rank: null, tier: null,
+                      transparent_score: null});
+    assert.equal(districtsAreValid([d]), false, JSON.stringify(over));
+  }
+});
+
+test('the legal state and fraction combinations are accepted', () => {
+  // Strictness that also rejects the producer is just a broken board.
+  const ok = [
+    {acquisition_state: 'observed', acquisition_fraction: 1.0, covered: true},
+    {acquisition_state: 'observed', acquisition_fraction: 0.95, covered: true},
+    {acquisition_state: 'partial', acquisition_fraction: 0.4, covered: false},
+    {acquisition_state: 'not_observed', acquisition_fraction: 0.0, covered: false},
+    {acquisition_state: 'unresolved', acquisition_fraction: 0.6, covered: false},
+    {acquisition_state: 'unknown', acquisition_fraction: null, covered: false},
+  ];
+  for (const over of ok) {
+    const d = over.covered
+      ? row(over)
+      : uncoveredRow({...over, p_event: null, rank: null, tier: null,
+                      transparent_score: null});
+    assert.equal(districtsAreValid([d]), true, JSON.stringify(over));
+  }
+});
+
+test('a footprint outage still discloses every unimaged district', () => {
+  // The regression this guards: the producer emitted a state word the
+  // validator did not know, so the whole feed was rejected as malformed and
+  // the page listed nothing on exactly the cycle a reader needs the list. The
+  // outage shape must validate and every district must surface as unimaged.
+  const outage = ['A', 'B', 'C'].map((district) => uncoveredRow({
+    district, acquisition_state: 'unknown', acquisition_fraction: null,
+  }));
+  assert.equal(districtsAreValid(outage), true, 'the outage payload must validate');
+  const {unimaged} = resolveForecastState(feed(outage, {
+    forecast: {status: 'unavailable', reason: 'footprint layer unreachable'},
+  }));
+  assert.equal(unimaged.length, 3, 'every unimaged district must still be named');
 });
