@@ -143,12 +143,32 @@ def _build_notes(
         f"{gfm_meta.get('current_days_with_flood', 0)} of those carried flood "
         f"pixels; antecedent window "
         f"{gfm_meta.get('prev_days_fetched', 0)}/{gfm_meta.get('prev_days', 0)} "
-        f"returned (~{gfm_meta.get('grid_px')} px grid, permanent water removed). "
-        f"Caveat on all of this: the count is of successful service responses, "
-        f"not of Sentinel-1 acquisitions. A tile that returns cleanly but empty "
-        f"still cannot separate a dry day from a day with no pass, so coverage "
-        f"here is an upper bound on what was actually observed."
+        f"returned (~{gfm_meta.get('grid_px')} px grid, permanent water removed)."
     )
+    # This sentence used to warn that the counts above were service responses
+    # rather than acquisitions, and that coverage was therefore an upper bound.
+    # That was true until coverage started coming from the Sentinel-1 footprint
+    # layer. Leaving it in place made the prose contradict the data sitting
+    # beside it in the same file, which is worse than the original overclaim:
+    # a reader who believed the note would discount rows that are now sound.
+    n_names = len(gfm_meta.get("names") or ()) or None
+    if gfm_meta.get("footprint_available"):
+        obs = gfm_meta.get("districts_observed", 0)
+        unres = gfm_meta.get("districts_unresolved", 0)
+        parts.append(
+            f"Coverage is decided by the Sentinel-1 acquisition footprint, not by "
+            f"whether a tile returned: {obs}"
+            f"{f' of {n_names}' if n_names else ''} districts were imaged across "
+            f"at least 95% of their area over the window"
+            f"{f', {unres} were imaged but their flood product did not resolve' if unres else ''}. "
+            f"Districts with no pass are published without a score rather than as dry."
+        )
+    else:
+        parts.append(
+            "The Sentinel-1 footprint layer was unreachable this run, so no "
+            "district can be shown to have been imaged and none are scored. "
+            "An empty flood mask over unimaged ground is not a dry day."
+        )
     return " ".join(parts)
 
 
@@ -220,6 +240,13 @@ def _print_summary(payload, window, rain, reservoirs, res_source, gfm_meta) -> N
                         "current_days",
                         "current_days_fetched",
                         "current_days_with_flood",
+                        # the acquisition counters decide who gets scored at
+                        # all, so they belong in the run summary beside the
+                        # response counts rather than only inside the rows
+                        "footprint_days_fetched",
+                        "footprint_available",
+                        "districts_observed",
+                        "districts_unresolved",
                         "prev_days",
                         "prev_days_fetched",
                         "prev_days_with_flood",

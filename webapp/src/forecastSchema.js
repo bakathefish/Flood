@@ -56,13 +56,42 @@ function rowShapeOk(d) {
 /** An uncovered district must carry no operational output at all, and must say
  *  so explicitly. A missing key is not the same as a null: it means the
  *  producer never spoke to the question, and a consumer that treats silence as
- *  "nothing to report" is the failure this whole file exists to prevent. */
+ *  "nothing to report" is the failure this whole file exists to prevent.
+ *
+ *  `observed_fraction_window` belongs on this list and was left off it once.
+ *  With it missing, a district nobody imaged could publish a flood fraction of
+ *  0.87 and pass: the row said "not observed" and "87% under water" at the same
+ *  time, and the map drew the second. It is the same defect as `observed_km2`,
+ *  which was fixed while its sibling was not. */
 function uncoveredRowOk(d) {
-  for (const field of ['p_event', 'rank', 'tier', 'observed_km2', 'transparent_score']) {
+  for (const field of [
+    'p_event', 'rank', 'tier',
+    'observed_km2', 'observed_fraction_window', 'transparent_score',
+  ]) {
     if (!(field in d)) return false;
     if (d[field] !== null) return false;
   }
   return true;
+}
+
+/** How the producer describes what the satellite actually saw. */
+const ACQ_STATES = ['observed', 'partial', 'not_observed', 'unresolved', 'unknown'];
+
+/** Every row must state its acquisition, and it must agree with `covered`.
+ *
+ *  These two fields arrived after the validator was written and went
+ *  unchecked, so a feed could assert `covered: true` beside
+ *  `acquisition_state: "not_observed"` and still render a board. `covered` is
+ *  defined by the producer as exactly "the footprint covered this district",
+ *  so the two can be cross-checked, and a disagreement means one of them is
+ *  lying about the same fact. */
+function acquisitionOk(d) {
+  if (!ACQ_STATES.includes(d.acquisition_state)) return false;
+  if (!('acquisition_fraction' in d)) return false;
+  if (d.acquisition_fraction !== null && inRange(d.acquisition_fraction, 0, 1) === null) {
+    return false;
+  }
+  return d.covered === (d.acquisition_state === 'observed');
 }
 
 /** A covered, scored district must carry a complete, legal operational set. */
@@ -88,6 +117,7 @@ export function districtsAreValid(districts) {
     if (!rowShapeOk(d)) return false;
     if (names.has(d.district)) return false; // duplicate district
     names.add(d.district);
+    if (!acquisitionOk(d)) return false;
     // every row must state its score, even to say it has none
     if (!('p_event' in d)) return false;
     if (!d.covered) {

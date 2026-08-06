@@ -51,15 +51,21 @@ def test_notes_do_not_claim_rain_or_reservoirs_are_model_features(payload):
         assert banned not in n, f"{banned!r} still published in notes"
 
 
+ACQ_STATES = {"observed", "partial", "not_observed", "unresolved", "unknown"}
+
+
 def test_every_district_row_is_internally_consistent(payload):
     for d in payload["districts"]:
         assert isinstance(d.get("district"), str) and d["district"]
         assert isinstance(d.get("covered"), bool), d["district"]
         if not d["covered"]:
-            # a district nobody imaged must carry no operational output at all
-            for field in ("p_event", "rank", "tier"):
+            # A district nobody imaged must carry no operational output at all.
+            # observed_fraction_window and transparent_score belong on this list
+            # and were left off it: an unimaged district could publish a flood
+            # fraction, which is a measurement of imagery that does not exist.
+            for field in ("p_event", "rank", "tier", "observed_km2",
+                          "observed_fraction_window", "transparent_score"):
                 assert d.get(field) is None, f"{d['district']} has {field} uncovered"
-            assert d.get("observed_km2") is None
         else:
             p = d.get("p_event")
             if p is not None:
@@ -67,6 +73,23 @@ def test_every_district_row_is_internally_consistent(payload):
                 assert d.get("tier") in TIERS, d["district"]
                 r = d.get("rank")
                 assert isinstance(r, int) and r >= 1, d["district"]
+
+
+def test_every_row_states_its_acquisition_and_agrees_with_covered(payload):
+    """`covered` is defined as "the footprint covered this district", so the two
+    fields describe one fact and must not disagree. They arrived after this file
+    was written and went unchecked, which let a row claim coverage it did not
+    have."""
+    for d in payload["districts"]:
+        state = d.get("acquisition_state")
+        assert state in ACQ_STATES, f"{d['district']} has acquisition_state {state!r}"
+        frac = d.get("acquisition_fraction")
+        assert frac is None or (isinstance(frac, (int, float)) and 0.0 <= frac <= 1.0), (
+            f"{d['district']} has acquisition_fraction {frac!r}"
+        )
+        assert d["covered"] == (state == "observed"), (
+            f"{d['district']} says covered={d['covered']} beside state={state!r}"
+        )
 
 
 def test_ranks_are_unique_and_agree_with_the_scores(payload):

@@ -62,13 +62,17 @@ def test_retired_feeds_are_not_shipped_anywhere():
         ROOT / "docs" / "assets",
         ROOT / "docs" / "assets" / "data",
         WEBAPP / "dist" / "assets",
+        # `data/` is not served by the site, but a retired feed kept there is a
+        # loaded gun: it is the copy `make_web_assets.py` would republish, and
+        # it sat in the tree with no consumer after the model was retired.
+        ROOT / "data",
     ]
     offenders = [
         str((d / name).relative_to(ROOT))
         for d in served if d.exists()
         for name in RETIRED_FEEDS if (d / name).exists()
     ]
-    assert not offenders, f"retired feed still served from {offenders}"
+    assert not offenders, f"retired feed still present at {offenders}"
 
 
 def test_walkforward_feed_is_identical_everywhere_it_ships():

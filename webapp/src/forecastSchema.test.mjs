@@ -26,6 +26,8 @@ function row(over = {}) {
     district: 'Firozpur',
     p_event: 0.0405,
     covered: true,
+    acquisition_state: 'observed',
+    acquisition_fraction: 1.0,
     observed_fraction_window: 0.0,
     observed_km2: 0.0,
     rank: 1,
@@ -33,6 +35,23 @@ function row(over = {}) {
     transparent_score: 1.5,
     ...over,
   };
+}
+
+/** An uncovered row as the producer actually emits it: every operational field
+ *  present and null, with the acquisition state that explains why. */
+function uncoveredRow(over = {}) {
+  return row({
+    covered: false,
+    acquisition_state: 'not_observed',
+    acquisition_fraction: 0.0,
+    p_event: null,
+    rank: null,
+    tier: null,
+    observed_km2: null,
+    observed_fraction_window: null,
+    transparent_score: null,
+    ...over,
+  });
 }
 
 function feed(districts, over = {}) {
@@ -50,11 +69,77 @@ function feed(districts, over = {}) {
 // --------------------------------------------------------------------------
 test('the committed live feed produces a board', () => {
   const nc = JSON.parse(readFileSync(ARTIFACT, 'utf8'));
-  if (nc.core_season !== true || !nc.forecast || nc.forecast.status === 'unavailable') {
-    return; // artifact is legitimately in a non-board state
-  }
   const {state} = resolveForecastState(nc);
-  assert.equal(state, 'board', 'the committed feed must not fail closed');
+  // This used to return early whenever the artifact was not board-shaped, which
+  // meant a feed that failed the schema passed the test that exists to catch
+  // exactly that. Assert the state we resolved to instead of skipping: an
+  // out-of-season artifact is legitimately 'inactive', but a validation failure
+  // is 'unavailable' and must never pass silently.
+  if (nc.core_season !== true) {
+    assert.equal(state, 'inactive', 'out-of-season feed should resolve to inactive');
+    return;
+  }
+  assert.equal(state, 'board', 'the committed in-season feed must not fail closed');
+});
+
+// --------------------------------------------------------------------------
+// acquisition fields: they arrived after this validator was written and went
+// unchecked, so a feed could contradict itself and still render
+// --------------------------------------------------------------------------
+test('an uncovered row cannot publish an observed flood fraction', () => {
+  // The defect: observed_km2 was on the null-required list, its sibling
+  // observed_fraction_window was not, so "nobody imaged this" and "87% of it
+  // is under water" could ship on the same row and the map drew the second.
+  assert.equal(
+    districtsAreValid([uncoveredRow({observed_fraction_window: 0.87})]), false,
+  );
+});
+
+test('covered must agree with the acquisition state', () => {
+  assert.equal(
+    districtsAreValid([row({covered: true, acquisition_state: 'not_observed'})]), false,
+    'covered:true beside not_observed is a row lying about its own coverage',
+  );
+  assert.equal(
+    districtsAreValid([uncoveredRow({acquisition_state: 'observed'})]), false,
+    'covered:false beside observed is the same contradiction the other way',
+  );
+});
+
+test('a row must state its acquisition at all', () => {
+  const bare = row();
+  delete bare.acquisition_state;
+  assert.equal(districtsAreValid([bare]), false, 'missing acquisition_state must fail');
+
+  const noFrac = row();
+  delete noFrac.acquisition_fraction;
+  assert.equal(districtsAreValid([noFrac]), false, 'missing acquisition_fraction must fail');
+
+  assert.equal(
+    districtsAreValid([row({acquisition_state: 'sort-of'})]), false,
+    'an unknown acquisition state must fail rather than be trusted',
+  );
+  assert.equal(
+    districtsAreValid([row({acquisition_fraction: 1.4})]), false,
+    'a fraction outside [0,1] must fail',
+  );
+});
+
+test('an uncovered row omitting a key is not the same as nulling it', () => {
+  for (const field of [
+    'p_event', 'rank', 'tier',
+    'observed_km2', 'observed_fraction_window', 'transparent_score',
+  ]) {
+    const d = uncoveredRow();
+    delete d[field];
+    assert.equal(districtsAreValid([d]), false, `omitting ${field} must fail`);
+  }
+});
+
+test('the producer-shaped uncovered row is accepted', () => {
+  // The strictness above is worthless if it also rejects the real feed. This is
+  // the shape sailaab/nowcast.py actually emits for a district nobody imaged.
+  assert.equal(districtsAreValid([uncoveredRow()]), true);
 });
 
 test('tied rounded scores with valid ranks stay coherent', () => {
@@ -115,22 +200,21 @@ test('an unscored row carrying a rank or tier is rejected', () => {
   // this row renders nowhere, but it means the feed disagrees with itself
   assert.equal(districtsAreValid([
     row({district: 'A', rank: 1}),
-    row({district: 'B', p_event: null, covered: false, rank: 2, tier: 'low', observed_km2: null}),
+    uncoveredRow({district: 'B', rank: 2, tier: 'low'}),
   ]), false);
 });
 
 test('an uncovered row keeps no operational output', () => {
   assert.equal(districtsAreValid([
     row({district: 'A', rank: 1}),
-    row({district: 'B', p_event: null, covered: false, rank: null, tier: null,
-         transparent_score: null, observed_km2: null, observed_fraction_window: null}),
+    uncoveredRow({district: 'B'}),
   ]), true);
 });
 
 test('a scored row marked uncovered is rejected', () => {
   assert.equal(districtsAreValid([
     row({district: 'A', rank: 1}),
-    row({district: 'B', rank: 2, covered: false}),
+    uncoveredRow({district: 'B', rank: 2, p_event: 0.02, tier: 'low'}),
   ]), false);
 });
 
@@ -180,8 +264,7 @@ test('uncovered districts are surfaced alongside a valid board', () => {
   const nc = feed([
     row({district: 'A', rank: 1}),
     row({district: 'B', rank: 2, p_event: 0.001}),
-    row({district: 'C', p_event: null, covered: false, rank: null, tier: null,
-         transparent_score: null, observed_km2: null, observed_fraction_window: null}),
+    uncoveredRow({district: 'C'}),
   ]);
   const {state, scored, unimaged} = resolveForecastState(nc);
   assert.equal(state, 'board');
@@ -216,14 +299,13 @@ test('a missing operational key is rejected, not read as null', () => {
 test('an uncovered row holding a transparent_score is rejected', () => {
   assert.equal(districtsAreValid([
     row({district: 'A', rank: 1}),
-    row({district: 'B', p_event: null, covered: false, rank: null, tier: null,
-         transparent_score: 1.4, observed_km2: null, observed_fraction_window: null}),
+    uncoveredRow({district: 'B', transparent_score: 1.4}),
   ]), false);
 });
 
 test('a covered but unscored row must claim no operational output', () => {
-  const base = {district: 'B', p_event: null, covered: true, observed_km2: 0.0,
-                observed_fraction_window: 0.0};
+  const base = row({district: 'B', p_event: null, observed_km2: 0.0,
+                    observed_fraction_window: 0.0});
   assert.equal(districtsAreValid([
     row({district: 'A', rank: 1}),
     {...base, rank: null, tier: null, transparent_score: null},
@@ -255,8 +337,8 @@ test('a below-threshold row claiming watch also fails', () => {
 test('a covered but unscored district is surfaced, never dropped', () => {
   const nc = feed([
     row({district: 'A', rank: 1}),
-    {district: 'B', p_event: null, covered: true, rank: null, tier: null,
-     transparent_score: null, observed_km2: 3.2, observed_fraction_window: 0.01},
+    row({district: 'B', p_event: null, rank: null, tier: null,
+         transparent_score: null, observed_km2: 3.2, observed_fraction_window: 0.01}),
   ]);
   const {state, scored, unimaged, unscored} = resolveForecastState(nc);
   assert.equal(state, 'board');
@@ -269,10 +351,9 @@ test('a covered but unscored district is surfaced, never dropped', () => {
 test('every district lands in exactly one group', () => {
   const nc = feed([
     row({district: 'A', rank: 1}),
-    {district: 'B', p_event: null, covered: true, rank: null, tier: null,
-     transparent_score: null, observed_km2: 1.0, observed_fraction_window: 0.0},
-    row({district: 'C', p_event: null, covered: false, rank: null, tier: null,
-         transparent_score: null, observed_km2: null, observed_fraction_window: null}),
+    row({district: 'B', p_event: null, rank: null, tier: null,
+         transparent_score: null, observed_km2: 1.0, observed_fraction_window: 0.0}),
+    uncoveredRow({district: 'C'}),
   ]);
   const r = resolveForecastState(nc);
   const seen = [...r.scored, ...r.unimaged, ...r.unscored].map((d) => d.district);

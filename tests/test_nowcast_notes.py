@@ -16,19 +16,30 @@ import pipeline.nowcast as pn
 from sailaab import forecast_live
 
 
-def _notes(rain_source="open-meteo", res_source="unavailable"):
+def _notes(rain_source="open-meteo", res_source="unavailable", **gfm):
+    meta = {
+        "current_days_active": 2,
+        "current_days": 3,
+        "prev_days_active": 1,
+        "prev_days": 3,
+        "grid_px": 512,
+        # The fixture used to omit every footprint key, so the sentence that
+        # describes coverage was never exercised by any test. It then went on
+        # publishing a caveat that had become false. Coverage keys belong in
+        # the default fixture for the same reason they belong in the artifact.
+        "names": [f"D{i}" for i in range(20)],
+        "footprint_available": True,
+        "footprint_days_fetched": 3,
+        "districts_observed": 14,
+        "districts_unresolved": 1,
+    }
+    meta.update(gfm)
     return pn._build_notes(
         window={"core_season": True},
         rain_source=rain_source,
         rain_meta={"current_days_counted": 3, "current_days_total": 5},
         res_source=res_source,
-        gfm_meta={
-            "current_days_active": 2,
-            "current_days": 3,
-            "prev_days_active": 1,
-            "prev_days": 3,
-            "grid_px": 512,
-        },
+        gfm_meta=meta,
         model_note="",
     )
 
@@ -89,3 +100,30 @@ def test_declared_inputs_match_the_deployed_feature_order():
     )
     for feature, phrase in described.items():
         assert phrase in note, f"{feature} not described in the published note"
+
+
+def test_note_describes_footprint_coverage_not_service_responses():
+    """The caveat has to match the mechanism actually in use.
+
+    It once warned that the counts were successful service responses rather
+    than acquisitions, and that coverage was therefore an upper bound. That was
+    true until coverage started coming from the Sentinel-1 footprint layer, and
+    then it survived the change: the prose told readers to discount rows that
+    the same file had already made sound.
+    """
+    note = _notes()
+    assert "Sentinel-1 acquisition footprint" in note
+    assert "14 of 20 districts were imaged" in note
+    assert "1 were imaged but their flood product did not resolve" in note
+    assert "without a score rather than as dry" in note
+    # the superseded caveat must not survive alongside the mechanism it denies
+    assert "upper bound on what was actually observed" not in note
+    assert "count is of successful service responses" not in note
+
+
+def test_note_fails_loud_when_the_footprint_layer_is_unreachable():
+    """No footprint means nobody can be shown to have been imaged."""
+    note = _notes(footprint_available=False)
+    assert "footprint layer was unreachable" in note
+    assert "none are scored" in note
+    assert "not a dry day" in note
