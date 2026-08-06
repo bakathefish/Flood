@@ -1,0 +1,59 @@
+name: sailaab-build
+
+# A clean-checkout build gate.
+#
+# The 6-hourly monitor job runs pytest against the committed docs/ output, which
+# is the right thing for it to do: it must publish flood state on time and it has
+# no npm. But that means nothing ever proved a fresh clone could BUILD the site.
+# It could not, for a while: the proof chart requested a data file that existed
+# only in docs/ and had never been written to Vite's public directory, so a clean
+# build shipped a page whose chart silently 404'd.
+#
+# This job installs from the lockfile and builds, on every push and PR.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      # `npm ci` deletes node_modules and installs exactly the lockfile, so this
+      # is a genuinely clean dependency tree, not whatever happened to be around.
+      - name: install from lockfile
+        working-directory: webapp
+        run: npm ci
+
+      - name: build the site
+        working-directory: webapp
+        run: npm run build
+
+      - name: feed-validator suite
+        run: node --test webapp/src/forecastSchema.test.mjs
+
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - run: pip install -r requirements.txt
+
+      # With node and node_modules both present the clean-build tests do not
+      # skip, so this is the run where they actually execute.
+      - name: build and schema gates
+        run: python -m pytest -q tests/test_clean_build.py tests/test_frontend_schema.py tests/test_site.py tests/test_site_claims.py tests/test_monitor_artifact.py
+
+      - name: full suite
+        run: python -m pytest -q
