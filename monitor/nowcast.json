@@ -3,7 +3,7 @@
   "kind": "district flood onset",
   "horizon_days": 3,
   "threshold_fraction": 0.005,
-  "issued_for": "2026-08-06",
+  "issued_for": "2026-08-07",
   "definition": "model score for Copernicus GFM observing flooding above 0.5% of district area on any of the next 3 days, using only what was known on the issue day",
   "calibration": "a ranking score, not a calibrated probability: it has not been fitted to a reliability curve, so read the tier and the rank rather than the number",
   "coverage": "20 of 20 districts observed within 0 day(s)",
@@ -24,7 +24,7 @@
   ],
   "validation": "walk-forward, each season forecast using only earlier seasons, with the alert threshold taken from inner out-of-fold scores. At this operating point back-testing raised about 24 alerts a season, roughly one in three followed by flooding within three days, catching about one onset in four. Season-level performance is heterogeneous. Retrospective and post-selection; the 2026 monsoon is the prospective test."
  },
- "generated_utc": "2026-08-06T20:25:44Z",
+ "generated_utc": "2026-08-07T00:07:40Z",
  "window_start": "2026-08-04",
  "window_end": "2026-08-14",
  "core_season": true,
@@ -38,7 +38,7 @@
  "districts": [
   {
    "district": "Firozpur",
-   "p_event": 0.1639,
+   "p_event": 0.1632,
    "covered": true,
    "acquisition_state": "observed",
    "acquisition_fraction": 1.0,
@@ -50,7 +50,7 @@
   },
   {
    "district": "Jalandhar",
-   "p_event": 0.1503,
+   "p_event": 0.1496,
    "covered": true,
    "acquisition_state": "observed",
    "acquisition_fraction": 1.0,
@@ -62,7 +62,7 @@
   },
   {
    "district": "Kapurthala",
-   "p_event": 0.0083,
+   "p_event": 0.006,
    "covered": true,
    "acquisition_state": "observed",
    "acquisition_fraction": 1.0,
@@ -73,24 +73,12 @@
    "observed_km2": 0.0
   },
   {
-   "district": "Tarn Taran",
-   "p_event": 0.0037,
-   "covered": true,
-   "acquisition_state": "observed",
-   "acquisition_fraction": 1.0,
-   "rank": 4,
-   "tier": "elevated",
-   "transparent_score": 1.975,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
    "district": "Muktsar",
    "p_event": 0.0028,
    "covered": true,
    "acquisition_state": "observed",
    "acquisition_fraction": 1.0,
-   "rank": 5,
+   "rank": 4,
    "tier": "elevated",
    "transparent_score": 1.8250000000000002,
    "observed_fraction_window": 0.0,
@@ -102,9 +90,21 @@
    "covered": true,
    "acquisition_state": "observed",
    "acquisition_fraction": 1.0,
+   "rank": 5,
+   "tier": "elevated",
+   "transparent_score": 1.925,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
+   "district": "Tarn Taran",
+   "p_event": 0.0027,
+   "covered": true,
+   "acquisition_state": "observed",
+   "acquisition_fraction": 1.0,
    "rank": 6,
    "tier": "low",
-   "transparent_score": 1.925,
+   "transparent_score": 1.975,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -122,7 +122,7 @@
   },
   {
    "district": "Amritsar",
-   "p_event": 0.0024,
+   "p_event": 0.002,
    "covered": true,
    "acquisition_state": "observed",
    "acquisition_fraction": 1.0,
@@ -141,6 +141,18 @@
    "rank": 9,
    "tier": "low",
    "transparent_score": 1.375,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
+   "district": "Nawanshahr",
+   "p_event": 0.0004,
+   "covered": true,
+   "acquisition_state": "observed",
+   "acquisition_fraction": 1.0,
+   "rank": 10,
+   "tier": "low",
+   "transparent_score": 1.875,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -241,18 +253,6 @@
    "observed_km2": 0.0
   },
   {
-   "district": "Nawanshahr",
-   "p_event": 0.0003,
-   "covered": true,
-   "acquisition_state": "observed",
-   "acquisition_fraction": 1.0,
-   "rank": 10,
-   "tier": "low",
-   "transparent_score": 1.875,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
-  },
-  {
    "district": "Rupnagar",
    "p_event": 0.0003,
    "covered": true,
@@ -277,5 +277,5 @@
    "observed_km2": 0.0
   }
  ],
- "notes": "No district is above the alert threshold today. The score is a ranking score, not a calibrated probability: it has not been fitted to a reliability curve, so compare districts against each other and read the tier, rather than reading the number as a chance of flooding. Rain shown alongside is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0) and is page context, not a model input. Forecast inputs are satellite flood history only: district priors, observed extent now and over three days, position in the season, neighbouring districts, the district-week climatology, and recent flooding decaying across the district graph. Rainfall was tested as a feature family and did not improve the forecast, so it is not an input; reservoir storage is not an input either. Both appear below as context only and do not move the score. Reservoir context is unavailable: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows. Rain context summed over 3/3 elapsed days of the window. GFM: 1 of 3 current-window days returned data, 0 of those carried flood pixels; antecedent window 5/10 returned (~900 px grid, permanent water removed). Caveat on all of this: the count is of successful service responses, not of Sentinel-1 acquisitions. A tile that returns cleanly but empty still cannot separate a dry day from a day with no pass, so coverage here is an upper bound on what was actually observed."
+ "notes": "No district is above the alert threshold today. The score is a ranking score, not a calibrated probability: it has not been fitted to a reliability curve, so compare districts against each other and read the tier, rather than reading the number as a chance of flooding. Rain shown alongside is Open-Meteo (ERA5 archive + forecast model, keyless, CC-BY 4.0) and is page context, not a model input. Forecast inputs are satellite flood history only: district priors, observed extent now and over three days, position in the season, neighbouring districts, the district-week climatology, and recent flooding decaying across the district graph. Rainfall was tested as a feature family and did not improve the forecast, so it is not an input; reservoir storage is not an input either. Both appear below as context only and do not move the score. Reservoir context is unavailable: the BBMB dams (Bhakra, Pong, Ranjit Sagar) stopped reporting to the CWC data.gov.in feed in Jul 2025 and carry no 2026 rows. Rain context summed over 4/4 elapsed days of the window. GFM: 2 of 4 current-window days returned data, 1 of those carried flood pixels; antecedent window 5/10 returned (~900 px grid, permanent water removed). Caveat on all of this: the count is of successful service responses, not of Sentinel-1 acquisitions. A tile that returns cleanly but empty still cannot separate a dry day from a day with no pass, so coverage here is an upper bound on what was actually observed."
 }
