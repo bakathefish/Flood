@@ -177,14 +177,31 @@ def forward_event(
 
 
 def dry_at_issue(
-    frame: pd.DataFrame, threshold: float, value_col: str = "fraction"
+    frame: pd.DataFrame, threshold: float, value_col: str = "fraction",
+    *, require_observed: bool = False,
 ) -> pd.Series:
     """Rows where the district is not already flooded when the forecast is made.
 
     Restricting to these is what separates forecasting an onset from noticing
     water that is already on the ground.
+
+    ``require_observed`` decides what happens when the issue day was never
+    imaged. The old behaviour, which is retained only as the default so the
+    historical results stay reproducible, counted an unobserved issue day as a
+    candidate: `v.isna()` was ORed in and a test asserted it approvingly. That
+    is the same inference that made 86.8% of the negative labels fabricated,
+    one layer further in. A district whose issue day nobody looked at cannot
+    support the claim "this was an onset rather than water already present",
+    because whether the water was already present is exactly what is unknown.
+
+    Any evaluation of the cold-start population must pass ``require_observed=
+    True``. With it, the strict population over the reliable era is 110 rows
+    carrying 3 positives, all in 2023, which is the measurement that establishes
+    this record cannot validate a forecast claim at all.
     """
     v = frame[value_col]
+    if require_observed:
+        return v <= threshold
     return (v <= threshold) | v.isna()
 
 

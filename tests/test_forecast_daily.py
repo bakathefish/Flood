@@ -156,8 +156,27 @@ def test_dry_at_issue_excludes_already_flooded_rows():
 
 
 def test_dry_at_issue_treats_unknown_as_candidate():
+    """Default keeps the historical behaviour so old results reproduce."""
     df = _target([np.nan])
     assert dry_at_issue(df, threshold=0.5).iloc[0]
+
+
+def test_dry_at_issue_strict_refuses_an_unobserved_issue_day():
+    """An unimaged issue day cannot support an onset claim.
+
+    Cold start exists to separate forecasting an onset from noticing water
+    already on the ground. If nobody looked on the issue day, whether the water
+    was already there is precisely what is unknown, so the row cannot serve
+    that purpose. Counting it anyway is the same "unknown means dry" inference
+    that made 86.8% of the negative labels fabricated, one layer further in,
+    and the default above was pinned by a test that named it approvingly.
+    """
+    df = _target([np.nan])
+    assert not dry_at_issue(df, threshold=0.5, require_observed=True).iloc[0]
+
+    wet_and_dry = _target([0.0, 0.9])
+    strict = dry_at_issue(wet_and_dry, threshold=0.5, require_observed=True)
+    assert strict.tolist() == [True, False], "observed rows behave unchanged"
 
 
 # --- adjacency and neighbour water --------------------------------------------
