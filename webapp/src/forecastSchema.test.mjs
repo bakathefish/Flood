@@ -378,7 +378,10 @@ test('every district lands in exactly one group', () => {
 });
 
 test('a stale feed does not sit under a live board', () => {
-  const nc = feed([row({district: 'A', rank: 1})],
+  // dates inside the row must agree with the feed's own issue time; a real
+  // producer computes one from the other
+  const nc = feed([row({district: 'A', rank: 1,
+                        latest_input: '2026-08-05', input_age_days: 1})],
                   {generated_utc: '2026-08-06T00:00:00Z'});
   const fresh = Date.parse('2026-08-06T03:00:00Z');
   const stale = Date.parse('2026-08-07T12:00:00Z');
@@ -387,7 +390,8 @@ test('a stale feed does not sit under a live board', () => {
 });
 
 test('staleness is not enforced when no clock is supplied', () => {
-  const nc = feed([row({district: 'A', rank: 1})],
+  const nc = feed([row({district: 'A', rank: 1,
+                        latest_input: '2019-12-31', input_age_days: 1})],
                   {generated_utc: '2020-01-01T00:00:00Z'});
   assert.equal(resolveForecastState(nc).state, 'board');
 });
@@ -498,4 +502,49 @@ test('a footprint outage still discloses every unimaged district', () => {
     forecast: {status: 'unavailable', reason: 'footprint layer unreachable'},
   }));
   assert.equal(unimaged.length, 3, 'every unimaged district must still be named');
+});
+
+// --------------------------------------------------------------------------
+// H6: derived pairs. Three rounds each closed the named pair and left the rule
+// unstated, so the next pair was open again. The rule is now a table.
+// --------------------------------------------------------------------------
+test('the two observation fields are null together or numeric together', () => {
+  // Both come from one `if covered` branch in the producer, so one of each is
+  // not a shape the producer can emit.
+  assert.equal(districtsAreValid([row({observed_km2: 5.0, observed_fraction_window: null})]),
+               false, 'km2 without a fraction');
+  assert.equal(districtsAreValid([row({observed_km2: null, observed_fraction_window: 0.3})]),
+               false, 'fraction without km2');
+});
+
+test('a scored row must carry a transparent score', () => {
+  assert.equal(districtsAreValid([row({transparent_score: null})]), false);
+});
+
+test('a coverage claim must have an observation behind it', () => {
+  // The union path could certify a district-wide reading from partial passes
+  // taken on different days, publishing covered:true with no latest_input at
+  // all. That is what the 95% single-pass rule exists to forbid.
+  assert.equal(districtsAreValid([row({latest_input: null, input_age_days: null})]),
+               false, 'covered with no observation behind it');
+});
+
+test('a claimed age must match the date it was derived from', () => {
+  // The defect: freshness was validated on the claimed age alone, so a
+  // 17-day-old observation could present as age 0 and render a live board.
+  const ctx = {issued: '2026-08-06T00:00:00Z'};
+  assert.equal(
+    districtsAreValid([row({latest_input: '2026-07-20', input_age_days: 0})], ctx),
+    false, 'a 17-day-old observation may not claim to be same-day',
+  );
+  assert.equal(
+    districtsAreValid([row({latest_input: '2026-08-05', input_age_days: 1})], ctx),
+    true, 'an honestly-aged row is accepted',
+  );
+  // without an issue time there is nothing to recompute against, and inventing
+  // a clock here would reject correct feeds
+  assert.equal(
+    districtsAreValid([row({latest_input: '2026-07-20', input_age_days: 0})]),
+    true, 'no issue time supplied: the derivation is not checkable',
+  );
 });

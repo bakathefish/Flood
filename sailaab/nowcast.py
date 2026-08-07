@@ -316,7 +316,7 @@ def district_acquisition(
 
 
 def district_flood_stats(
-    mask, labels, names, bounds, refwater=None, *, sensed: bool = True,
+    mask, labels, names, bounds, refwater=None, *,
     acquisition: dict | None = None
 ) -> dict:
     """Per-district observed flood fraction and km² from a boolean flood ``mask``.
@@ -325,13 +325,18 @@ def district_flood_stats(
     atlas did. Returns ``district -> {covered, observed_fraction, observed_km2,
     flooded_ha, district_ha}``.
 
-    ``sensed`` says whether any satellite observation actually came back for
-    this window. It has to be passed in, because an all-zero flood mask is
-    ambiguous on its own: it looks identical whether the satellite imaged
-    Punjab and found no water, or every request to the service failed. Reading
-    the second case as the first publishes a state-wide all-clear built on no
-    imagery at all, which is the single worst thing this file can do. When
-    ``sensed`` is False no district is covered and every value is null.
+    Coverage comes from ``acquisition`` and from nothing else. An all-zero
+    flood mask is ambiguous on its own: it looks identical whether the
+    satellite imaged Punjab and found no water or every request failed, and
+    reading the second as the first publishes a state-wide all-clear built on
+    no imagery, which is the worst thing this file can do. Without an
+    acquisition argument no district is covered and every value is null.
+
+    There used to be a ``sensed`` flag here meaning "some request somewhere
+    succeeded". It was never the right question — a successful response says
+    nothing about whether this district was under the pass — and once the
+    footprint layer arrived it stopped being read at all while its docstring
+    went on describing behaviour that no longer happened.
     """
     m = np.asarray(mask, dtype=bool)
     if refwater is not None:
@@ -442,6 +447,25 @@ def build_nowcast_json(
         # knows whether it was, and the consumer reads a number that has no
         # imagery behind it.
         covered = bool(obs.get("covered", False))
+        # ...but coverage from the window union alone is not enough to publish.
+        #
+        # The union combines partial passes taken on different days. Two passes
+        # each imaging half a district, on opposite halves, union to "100%
+        # covered" and can then certify a district-wide zero, which is exactly
+        # what MIN_OBSERVED_FRACTION exists to forbid: a single pass must cover
+        # the district, not a temporal mosaic. Such a row published
+        # `covered: true` with a 0.0 flood fraction and no observation date at
+        # all, and the map drew the zero.
+        #
+        # So a coverage claim needs an observation to point at. When the recent
+        # history was fetched and this district is not in it, the claim is
+        # withdrawn rather than published without evidence.
+        if last_seen is not None and covered and name not in last_seen:
+            covered = False
+            # The measurement goes with the claim. Leaving the fraction behind
+            # would republish the mosaic reading under an uncovered row, which
+            # is the same zero the map drew before, just relabelled.
+            frac = km2 = None
         pe = None
         if p_event is not None:
             pv = p_event.get(name)

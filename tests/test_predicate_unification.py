@@ -49,9 +49,11 @@ def test_a_day_one_only_district_is_not_eligible():
 def test_gate_membership_equals_ranked_membership():
     """The two predicates must be the same set, not merely similar.
 
-    This is the property that was never enforced. It is checked by construction
-    rather than by comparing counts, because equal counts over different sets
-    was exactly the shape of the old bug.
+    The real guarantee is structural and lives in the code: the gate calls
+    eligible_districts() rather than walking the frame a second time, so the
+    two cannot diverge. This test can only observe the count the gate reports,
+    which is weaker than the guarantee; it is here to catch a regression that
+    reintroduces a parallel walk, not to establish set equality by itself.
     """
     recent = _recent([
         ("2025-08-11", "Amritsar", 0.0),
@@ -98,3 +100,63 @@ def test_age_is_zero_for_same_day_imagery():
     e = forecast_live.eligible_districts(recent, ISSUE)
     assert e["Amritsar"]["age_days"] == 0
     assert e["Amritsar"]["latest"] == ISSUE
+
+
+def test_a_temporal_mosaic_cannot_certify_a_district_wide_reading():
+    """Union coverage is not the same observation the 95% rule requires.
+
+    Two passes each imaging half a district, on opposite halves and different
+    days, union to "100% covered". That row then published covered=True with a
+    0.0 flood fraction and no observation date at all, and the map drew the
+    zero. MIN_OBSERVED_FRACTION exists precisely to stop a district-wide
+    certification from a partial pass; the union path re-admitted it through
+    the back door.
+    """
+    from sailaab import nowcast as nc
+
+    payload = nc.build_nowcast_json(
+        generated_utc="2026-08-06T00:00:00Z",
+        window={"core_season": True, "window_start": "2026-08-01",
+                "window_end": "2026-08-10", "activates": "2026-07-01"},
+        sources={},
+        districts=["west", "east"],
+        # what the window union reports: both fully covered, both dry
+        observed={
+            "west": {"covered": True, "observed_fraction": 0.0, "observed_km2": 0.0,
+                     "acquisition_state": "observed", "acquisition_fraction": 1.0},
+            "east": {"covered": True, "observed_fraction": 0.0, "observed_km2": 0.0,
+                     "acquisition_state": "observed", "acquisition_fraction": 1.0},
+        },
+        # ...but the recent history has no qualifying observation for either
+        last_seen={},
+    )
+    for row in payload["districts"]:
+        assert row["covered"] is False, (
+            f"{row['district']} certified as covered with nothing to point at"
+        )
+        assert row["observed_fraction_window"] is None, (
+            f"{row['district']} published a district-wide fraction from a mosaic"
+        )
+        assert row["observed_km2"] is None
+
+
+def test_a_district_with_a_recent_observation_keeps_its_coverage():
+    """The rule above must not blank districts that genuinely were imaged."""
+    from sailaab import nowcast as nc
+
+    payload = nc.build_nowcast_json(
+        generated_utc="2026-08-06T00:00:00Z",
+        window={"core_season": True, "window_start": "2026-08-01",
+                "window_end": "2026-08-10", "activates": "2026-07-01"},
+        sources={},
+        districts=["west"],
+        observed={
+            "west": {"covered": True, "observed_fraction": 0.02, "observed_km2": 5.0,
+                     "acquisition_state": "observed", "acquisition_fraction": 1.0},
+        },
+        last_seen={"west": {"latest": "2026-08-05", "age_days": 1}},
+    )
+    row = payload["districts"][0]
+    assert row["covered"] is True
+    assert row["observed_fraction_window"] == 0.02
+    assert row["latest_input"] == "2026-08-05"

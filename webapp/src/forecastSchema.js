@@ -154,11 +154,69 @@ function freshnessOk(d) {
   return scored ? age <= MAX_INPUT_AGE_DAYS : true;
 }
 
+/** Fields the producer emits on every row without exception. Absence means the
+ *  feed is not the feed this consumer was written against, whatever else it
+ *  looks like, so absence fails rather than defaulting. */
+const ALWAYS_EMITTED = [
+  'district', 'covered', 'p_event', 'rank', 'tier', 'transparent_score',
+  'observed_km2', 'observed_fraction_window',
+  'acquisition_state', 'acquisition_fraction',
+  'latest_input', 'input_age_days',
+];
+
+/** Pairs of published fields the producer computes from one another.
+ *
+ *  Stated as a table rather than as more branches, because the enumeration is
+ *  what keeps missing one. Three review rounds each closed the specific pair
+ *  that had been named and left the rule unstated, so the next pair was open
+ *  again: covered/acquisition_state, then acquisition_state/acquisition_fraction,
+ *  then observed_km2/observed_fraction_window, then latest_input/input_age_days.
+ *  Adding a derived field now means adding a row here, and a row that is not
+ *  added is a row that fails closed the first time the pair disagrees.
+ *
+ *  `ctx.issued` is the feed's generated_utc, needed for the one derivation that
+ *  reaches outside the row. */
+const DERIVATIONS = [
+  ['observed_km2 / observed_fraction_window', (d) =>
+    // both come from the same `if covered` branch in sailaab/nowcast.py, so
+    // they are null together or numeric together, never one of each
+    (d.observed_km2 === null) === (d.observed_fraction_window === null)],
+
+  ['covered => latest_input', (d) =>
+    // A row claiming coverage with no observation behind it is the union path
+    // certifying a district-wide reading from partial passes taken on
+    // different days. That is exactly what the 95% rule exists to forbid, so
+    // a coverage claim requires an observation to point at.
+    !d.covered || d.latest_input !== null],
+
+  ['input_age_days == issued - latest_input', (d, ctx) => {
+    // The producer computes the age FROM the date. Validating the age on its
+    // own let a 17-day-old observation present as age 0 and render a live
+    // board: the freshness gate trusted the claimed age instead of recomputing
+    // it. Both anchors are already on the payload.
+    if (d.latest_input === null || !ctx || !ctx.issued) return true;
+    const latest = Date.parse(`${d.latest_input}T00:00:00Z`);
+    const issued = Date.parse(ctx.issued);
+    if (Number.isNaN(latest) || Number.isNaN(issued)) return true;
+    const days = Math.floor((issued - latest) / 86400000);
+    return Math.abs(days - num(d.input_age_days)) <= 1;  // one day for UTC edges
+  }],
+];
+
+function derivationsOk(d, ctx) {
+  for (const field of ALWAYS_EMITTED) if (!(field in d)) return false;
+  for (const [, check] of DERIVATIONS) if (!check(d, ctx)) return false;
+  return true;
+}
+
 /** A covered, scored district must carry a complete, legal operational set. */
 function scoredRowOk(d) {
   return inRange(d.p_event, 0, 1) !== null
     && TIERS.includes(d.tier)
-    && isPositiveInt(d.rank);
+    && isPositiveInt(d.rank)
+    // the producer emits all four together from rank_and_tier; a scored row
+    // with a null transparent_score is the same derived-pair gap one field over
+    && num(d.transparent_score) !== null;
 }
 
 export function hasScore(d) {
@@ -170,7 +228,7 @@ export function hasScore(d) {
  * including rows with no score, which used to be skipped and could therefore
  * smuggle an illegal tier or rank into a feed we then trusted.
  */
-export function districtsAreValid(districts) {
+export function districtsAreValid(districts, ctx = null) {
   if (!Array.isArray(districts) || districts.length === 0) return false;
   const names = new Set();
   for (const d of districts) {
@@ -179,6 +237,7 @@ export function districtsAreValid(districts) {
     names.add(d.district);
     if (!acquisitionOk(d)) return false;
     if (!freshnessOk(d)) return false;
+    if (!derivationsOk(d, ctx)) return false;
     // every row must state its score, even to say it has none
     if (!('p_event' in d)) return false;
     if (!d.covered) {
@@ -252,14 +311,14 @@ export function resolveForecastState(nc, {fetchFailed = false, nowMs = null} = {
     // imaged, and that list is the whole explanation for why there is no
     // forecast. Returning empty here meant the page said nothing at all on the
     // one cycle a reader most needs to be told the satellite did not look.
-    if (districtsAreValid(nc.districts)) {
+    if (districtsAreValid(nc.districts, {issued: nc.generated_utc})) {
       out.unimaged = nc.districts.filter((d) => d.covered === false);
       out.unscored = nc.districts.filter((d) => d.covered === true && !hasScore(d));
     }
     return out;
   }
 
-  if (!districtsAreValid(nc.districts)) return out;
+  if (!districtsAreValid(nc.districts, {issued: nc.generated_utc})) return out;
 
   const scored = nc.districts.filter(hasScore)
     .sort((a, b) => num(a.rank) - num(b.rank));

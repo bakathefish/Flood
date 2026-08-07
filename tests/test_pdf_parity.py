@@ -66,52 +66,86 @@ RETIRED = [
 # operational use." 300 characters from an unrelated withdrawal sentence: the
 # gate passed it, and passed nothing when the same sentence sat elsewhere.
 #
-# The fix is to scope the exemption to the SENTENCE containing the number. A
-# review suggested requiring the withdrawal word to precede it, but the document
-# does the opposite: "An early claim of 96% alert precision at four alerts a
-# season was withdrawn". The trigger trails the number there and leads it
-# elsewhere, so direction is the wrong axis. Sentence scope covers both and
-# still closes the bypass, because a planted assertion stands in a sentence of
-# its own and that sentence contains no withdrawal word.
-WITHDRAWN_NEAR = ("withdraw", "retract", "superseded", "no longer", "was wrong", "corrected")
-_BOUNDARY = re.compile(r"(?<=[.!?])[\s\r\n]+")
+# Scoping the exemption to the containing SENTENCE closed the distance bypass
+# and immediately opened three cheaper ones, because the exemption is granted to
+# the whole sentence while the question is whether THIS occurrence is the thing
+# being withdrawn. Four words defeated it:
+#
+#   "The forecaster achieves 96% alert precision in operational use, a figure
+#    no longer disputed."
+#
+# and a document with no sentence punctuation becomes one sentence, so a single
+# trigger word anywhere immunises everything. A rule general enough to be
+# bypassed that cheaply is doing more work than the problem needs.
+#
+# Exactly two sentences in this document need the exemption, so they are named.
+# Rephrasing one breaks the build, which is the correct outcome: someone should
+# look at a changed disclosure rather than have a pattern quietly re-approve it.
+DISCLOSURES = (
+    "an early claim of 96% alert precision at four alerts a season was withdrawn",
+    "a retracted 96% precision headline",
+)
 
 
-def _sentence_around(text: str, i: int) -> str:
-    """The sentence containing offset `i`."""
-    starts = [m.end() for m in _BOUNDARY.finditer(text, 0, i)]
-    start = starts[-1] if starts else 0
-    nxt = _BOUNDARY.search(text, i)
-    return text[start: nxt.start() if nxt else len(text)]
+def _norm(s: str) -> str:
+    return re.sub(r"\s+", " ", s).lower()
 
 
 def _asserted(text: str, needle: str) -> list[str]:
-    """Occurrences of `needle` whose own sentence does not withdraw it."""
+    """Occurrences of `needle` outside a named disclosure sentence."""
+    flat = _norm(text)
+    spans = []
+    for phrase in DISCLOSURES:
+        j = flat.find(phrase)
+        while j != -1:
+            spans.append((j, j + len(phrase)))
+            j = flat.find(phrase, j + 1)
+
     bare, start = [], 0
-    while (i := text.find(needle, start)) != -1:
-        if not any(w in _sentence_around(text, i).lower() for w in WITHDRAWN_NEAR):
-            bare.append(text[max(0, i - 90): i + 90].replace("\n", " "))
-        start = i + len(needle)
+    nn = needle.lower()
+    while (i := flat.find(nn, start)) != -1:
+        if not any(lo <= i < hi for lo, hi in spans):
+            bare.append(flat[max(0, i - 90): i + 90])
+        start = i + len(nn)
     return bare
 
 
-def test_the_withdrawal_exemption_cannot_be_borrowed_from_a_distance():
-    """The exemption must not immunise a whole region of the document.
+ATTACKS = [
+    ("distance planting",
+     "The 96% alert precision claim was withdrawn after review. "
+     + "Filler about coverage and districts. " * 4
+     + "The forecaster achieves 96% alert precision in operational use."),
+    ("subordinate clause",
+     "Although an earlier estimate was corrected, the forecaster achieves "
+     "96% alert precision in operational use."),
+    ("trailing tack-on",
+     "The forecaster achieves 96% alert precision in operational use, a "
+     "figure no longer disputed."),
+    ("conjoined clause",
+     "The dam ablation claim was withdrawn, and separately the model "
+     "delivers 96% alert precision today."),
+    ("no sentence punctuation",
+     "an early claim was withdrawn 96% alert precision is achieved "
+     "operationally 96% again"),
+]
 
-    Guards the rule itself rather than the PDF: a planted overclaim placed a
-    few sentences from an unrelated withdrawal note used to pass.
+
+@pytest.mark.parametrize("name,planted", ATTACKS, ids=[a[0] for a in ATTACKS])
+def test_the_withdrawal_exemption_resists_rephrasing(name, planted):
+    """Every one of these defeated an earlier version of the rule.
+
+    The first defeated the 400-character window; the next three defeated
+    sentence scope with a single clause; the last defeated it by removing
+    sentence boundaries entirely, which made the whole document one sentence.
     """
-    planted = (
-        "The 96% alert precision claim was withdrawn after review. "
-        + "Filler sentence about coverage and districts. " * 4
-        + "The forecaster achieves 96% alert precision in operational use."
-    )
-    found = _asserted(planted, "96%")
-    assert len(found) == 1, (
-        "the disclosed mention should be exempt and the planted assertion caught, "
-        f"got {len(found)} flagged"
-    )
-    assert "operational use" in found[0]
+    assert _asserted(planted, "96%"), f"{name} was not caught"
+
+
+def test_the_real_disclosures_are_still_exempt():
+    """Strictness that flags the honest sentences just gets itself deleted."""
+    text = _pdf_text("SAILAAB-synopsis.pdf")
+    assert "96%" in text, "the synopsis should still disclose the retracted claim"
+    assert not _asserted(text, "96%"), "a genuine disclosure was flagged as an assertion"
 
 
 @pytest.mark.parametrize("pdf", [p for _, p in PAIRS])
@@ -151,7 +185,16 @@ def test_pooled_figure_never_travels_alone_in_the_pdf():
 
 
 def _visible_text(html: str) -> str:
-    body = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", html)
+    # <head> is not rendered, and Chrome prints with --no-pdf-header-footer, so
+    # the <title> never reaches the PDF; a version number there would become a
+    # required token and fail this gate for no reason. Hidden elements go for
+    # the same reason: the function is named for what a reader actually sees.
+    body = re.sub(r"(?is)<head[^>]*>.*?</head>", " ", html)
+    body = re.sub(
+        r'(?is)<([a-z]+)[^>]*style="[^"]*display\s*:\s*none[^"]*"[^>]*>.*?</\1>',
+        " ", body,
+    )
+    body = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", body)
     body = re.sub(r"(?s)<[^>]+>", " ", body)
     body = (body.replace("&amp;", "&").replace("&nbsp;", " ")
                 .replace("&lt;", "<").replace("&gt;", ">"))
@@ -214,3 +257,32 @@ def test_headline_claims_survived_the_render():
     assert len(text) > 5_000, "synopsis PDF has almost no extractable text"
     for needle in ("block bootstrap", "0.042", "Sailaab"):
         assert needle in text, f"{needle!r} missing from the rendered synopsis"
+
+
+def _words(s: str) -> list[str]:
+    return re.findall(r"[a-z]{3,}", s.lower())
+
+
+@pytest.mark.parametrize("html,pdf", PAIRS, ids=[p for _, p in PAIRS])
+def test_the_pdf_still_says_what_its_page_says(html, pdf):
+    """Word-level parity, because numeric parity only covers half the class.
+
+    The drift that shipped had two halves. The numbers ("0.042", "[0.004,
+    0.521]") are caught structurally by the token check above. The words
+    ("hindcast risk", "hindcast P") contain no digits and were caught only by
+    the RETIRED denylist, which was written after the incident by naming the
+    strings already known to have shipped. A future textual correction with no
+    numbers in it would be caught by neither.
+
+    A similarity floor closes that. Measured today: 0.965 for the synopsis and
+    0.936 for the business plan, so 0.90 sits clear of the noise from
+    hyphenation and ligatures while a rewritten paragraph drops well below it.
+    """
+    page = set(_words(_visible_text((DOCS / html).read_text(encoding="utf-8"))))
+    doc = set(_words(_pdf_text(pdf)))
+    assert page, "no readable text in the source page"
+    shared = len(page & doc) / len(page)
+    assert shared >= 0.90, (
+        f"{pdf} shares only {shared:.1%} of its page's vocabulary; "
+        f"missing e.g. {sorted(page - doc)[:12]}; run python -m pipeline.render_pdfs"
+    )

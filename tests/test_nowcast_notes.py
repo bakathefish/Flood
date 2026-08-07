@@ -123,7 +123,23 @@ def test_note_describes_footprint_coverage_not_service_responses():
 
 def test_note_fails_loud_when_the_footprint_layer_is_unreachable():
     """No footprint means nobody can be shown to have been imaged."""
-    note = _notes(footprint_available=False)
+    note = _notes(footprint_available=False, eligible_districts=0)
     assert "footprint layer was unreachable" in note
-    assert "none are scored" in note
+    assert "No district is scored." in note
     assert "not a dry day" in note
+
+
+def test_note_never_claims_nothing_was_imaged_while_districts_are_scored():
+    """The two came from different fetches and could contradict each other.
+
+    Scoring eligibility moved to the rolling history when the coverage
+    predicate was unified; this sentence stayed keyed to the current-window
+    fetch. At a window boundary the note could report districts above the alert
+    threshold and then say nothing had been imaged.
+    """
+    note = _notes(footprint_available=False, eligible_districts=7)
+    assert "No district is scored." not in note, (
+        "the note denies scoring while seven districts were scored"
+    )
+    assert "7 district(s) with a recent acquisition" in note
+    assert "cannot be shown" in note, "the genuine outage must still be stated"

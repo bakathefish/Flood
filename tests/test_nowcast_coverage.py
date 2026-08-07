@@ -105,9 +105,9 @@ def test_every_district_covered_behaves_normally():
 
 
 # --------------------------------------------------------------------------- #
-# the sensed flag: the mechanism production actually uses
+# coverage without acquisition information: the mechanism production uses
 # --------------------------------------------------------------------------- #
-def test_sensed_false_covers_nothing_even_with_full_district_rasters():
+def test_no_acquisition_covers_nothing_even_with_full_district_rasters():
     """The real false-dry shape: every district rasterized, no imagery returned.
 
     The earlier coverage test simulated missing imagery by deleting district
@@ -132,12 +132,11 @@ def test_sensed_false_covers_nothing_even_with_full_district_rasters():
     # Without acquisition information nothing is covered, in either direction.
     # "Some request somewhere succeeded" used to grant coverage here, which is
     # the defect the footprint work exists to remove.
-    for sensed in (True, False):
-        out = nc.district_flood_stats(empty, labels, names, bounds, sensed=sensed)
-        for n in names:
-            assert out[n]["covered"] is False
-            assert out[n]["observed_km2"] is None
-            assert out[n]["observed_fraction"] is None
+    out = nc.district_flood_stats(empty, labels, names, bounds)
+    for n in names:
+        assert out[n]["covered"] is False
+        assert out[n]["observed_km2"] is None
+        assert out[n]["observed_fraction"] is None
 
     # With a footprint saying the whole area was imaged, an empty mask IS dry.
     full = np.ones(labels.shape, dtype=bool)
@@ -286,7 +285,7 @@ def test_an_unimaged_district_gets_no_flood_number_even_from_a_clean_mask():
 
     acq = nc.district_acquisition(labels, names, footprint)
     stats = nc.district_flood_stats(
-        empty, labels, names, bounds, sensed=True, acquisition=acq
+        empty, labels, names, bounds, acquisition=acq
     )
     assert stats["west"]["covered"] is True
     assert stats["west"]["observed_km2"] == 0.0     # imaged, and genuinely dry

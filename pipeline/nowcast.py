@@ -164,10 +164,24 @@ def _build_notes(
             f"Districts with no pass are published without a score rather than as dry."
         )
     else:
+        # "none are scored" used to be guaranteed because scoring eligibility
+        # and this flag came from the same fetch. Unifying the predicate on the
+        # recent history moved eligibility and left this sentence keyed to the
+        # current-window fetch, so at a window boundary the note could report
+        # districts above the alert threshold and, a sentence later, that
+        # nothing had been imaged. The claim is now made only when it is true.
+        scored = gfm_meta.get("eligible_districts")
         parts.append(
-            "The Sentinel-1 footprint layer was unreachable this run, so no "
-            "district can be shown to have been imaged and none are scored. "
+            "The Sentinel-1 footprint layer was unreachable for the current "
+            "window, so district coverage over the window cannot be shown. "
             "An empty flood mask over unimaged ground is not a dry day."
+            + (
+                " No district is scored."
+                if not scored
+                else f" Scoring used the {scored} district(s) with a recent "
+                     f"acquisition in the rolling history, which is fetched "
+                     f"separately and did resolve."
+            )
         )
     return " ".join(parts)
 
@@ -294,7 +308,11 @@ def main() -> int:
 
         p_event = None
         extras = None
-        last_seen = {}
+        # None, not {}: outside core season the recent history is never
+        # fetched, so there is no observation set to test coverage against.
+        # An empty dict means "fetched, and nobody qualified", which correctly
+        # withdraws every coverage claim; None means "not applicable".
+        last_seen = None
         forecast_block = None
         model_note = ""
         if window["core_season"]:
