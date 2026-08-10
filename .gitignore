@@ -35,3 +35,9 @@ webapp/*.png
 webapp/*.jpg
 # local-only planning notes
 *-PLAN.md
+# Sachet capture scratch. The archive and the manifest under data/sachet/ ARE
+# committed evidence; only the staged write and the run lock are transient, and
+# a SIGKILL mid-replace must not leave something `git add data/sachet/` picks up.
+data/sachet/*.tmp
+data/sachet/*.lock
+data/sachet/.lock

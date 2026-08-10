@@ -23,3 +23,7 @@ requests>=2.31
 # both runners: 18 assertions locally, 1 skip in CI, which is exactly the hole
 # the gate was written to close. Also used by pipeline/make_ndem_panel.py.
 pypdfium2>=4.30
+# Read by tests/test_ci_wiring.py so the workflow's own wiring is gated. Listed
+# as a real dependency rather than guarded with importorskip: the pypdfium2 line
+# above is here because a "comment dependency" made a whole gate skip silently.
+PyYAML>=6.0

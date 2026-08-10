@@ -20,6 +20,15 @@ jobs:
       - run: python -m pytest -q          # never publish from a red tree
       - run: python -m pipeline.live_monitor   # secretless: anonymous Planetary Computer STAC
       - run: python -m pipeline.nowcast        # live forecaster nowcast -> monitor/nowcast.json (never fails the job)
+      # Every date parameter tried on the Sachet endpoint returns the identical
+      # current set, so no backfill route is known and history exists only if we
+      # keep it from now on. A missed run is a window nobody can recover; a
+      # Sachet outage must still never block the publish, so the step both
+      # tolerates failure and is bounded, and the manifest under data/sachet/
+      # records the failure rather than leaving it invisible.
+      - run: python pipeline/fetch_sachet.py   # keyless CAP alert archive -> data/sachet/alerts.jsonl
+        continue-on-error: true
+        timeout-minutes: 10
       - name: cache current-timelapse daily masks   # git-ignored data/gfm/, so only new days are fetched each run
         uses: actions/cache@v4
         with:
@@ -34,6 +43,7 @@ jobs:
           git config user.name "bakathefish"
           git config user.email "bakathefish@gmail.com"
           git add monitor/
+          git add data/sachet/
           git add atlas/web/timelapse_current.gif atlas/web/timelapse_current_still.png
           git diff --cached --quiet || git commit -m "monitor: update latest flood pass"
           git push
