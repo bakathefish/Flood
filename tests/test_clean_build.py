@@ -25,6 +25,15 @@ WEBAPP = ROOT / "webapp"
 PUBLIC = WEBAPP / "public" / "assets"
 SRC = WEBAPP / "src"
 
+# Resolved once, and passed as the executable rather than relying on a shell.
+# `shell=True` with an argument LIST is not portable: on POSIX only the first
+# element becomes the command and the rest are handed to the shell as $0 and $1,
+# so `["npm", "run", "build"]` ran a bare `npm`, which prints its usage and
+# exits 1. On Windows the list is joined instead, so the same line passed here
+# and failed on the runner. The full path also covers Windows, where npm is a
+# `.CMD` shim that bare-name resolution misses.
+NPM = shutil.which("npm")
+
 
 def _requested_assets() -> set[str]:
     """Every `assets/<file>` a component fetches at runtime."""
@@ -87,13 +96,13 @@ def test_walkforward_feed_is_identical_everywhere_it_ships():
 
 
 @pytest.mark.skipif(
-    shutil.which("npm") is None or not (WEBAPP / "node_modules").exists(),
+    NPM is None or not (WEBAPP / "node_modules").exists(),
     reason="npm or node_modules unavailable",
 )
 def test_clean_vite_build_succeeds_and_emits_the_assets():
     proc = subprocess.run(
-        ["npm", "run", "build"], cwd=WEBAPP,
-        capture_output=True, text=True, timeout=600, shell=True,
+        [NPM, "run", "build"], cwd=WEBAPP,
+        capture_output=True, text=True, timeout=600,
     )
     assert proc.returncode == 0, proc.stdout + proc.stderr
     dist = WEBAPP / "dist"
