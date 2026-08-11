@@ -1,11 +1,11 @@
 {
- "generated_utc": "2026-08-10T17:54:29Z",
+ "generated_utc": "2026-08-11T07:04:28Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-08-08",
- "latest_pass_utc": "2026-08-08T00:50:31.951753Z",
+ "latest_pass": "2026-08-10",
+ "latest_pass_utc": "2026-08-10T13:11:57.725211Z",
  "new_scenes": 1,
  "backlog_skipped": false,
  "skipped_dates": [],
@@ -13,7 +13,7 @@
  "total_flooded_km2": 0.0,
  "passes": [
   {
-   "date": "2026-08-08",
+   "date": "2026-08-10",
    "scenes": 1,
    "total_flooded_km2": 0.0,
    "flagged": 0,
