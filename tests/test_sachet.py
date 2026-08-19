@@ -2144,3 +2144,52 @@ def test_a_kill_between_staging_a_manifest_row_and_publishing_it_is_recoverable(
         "the killed poll never recorded what it saw, so membership cannot be known"
     )
     assert fs.uncovered_hashes(fs.read_archive(d / "alerts.jsonl"), after) == set()
+
+
+# --- the three held-back lock/manifest fixes ---------------------------------
+def test_a_heartbeat_whose_lock_vanishes_mid_touch_is_not_a_capture_failure(sach, monkeypatch):
+    """The ownership check and the touch are two operations, and this runs inside
+    every fetch retry, so a lock broken in the gap must not become the error a poll
+    reports."""
+    fs.acquire_lock(fs.LOCK, poll_id="holder-1111")
+    real_utime = os.utime
+
+    def vanishing_utime(path, times=None):
+        fs.LOCK.unlink()          # another run breaks it in the gap
+        return real_utime(path, times)
+
+    monkeypatch.setattr(fs.os, "utime", vanishing_utime)
+    fs.heartbeat(fs.LOCK, poll_id="holder-1111")   # must not raise
+    monkeypatch.setattr(fs.os, "utime", real_utime)
+    assert not fs.LOCK.exists()
+
+
+def test_releasing_on_behalf_of_another_attempt_leaves_our_own_claim_intact(sach):
+    """The registry is the fallback for callers that pass no id, so it must survive a
+    release attempt made on behalf of a different attempt."""
+    fs.acquire_lock(fs.LOCK, poll_id="holder-1111")
+    assert fs.release_lock(fs.LOCK, poll_id="someone-else-9999") is False
+    assert fs.LOCK.exists(), "a release for another attempt deleted the lock"
+
+    # The holder can still release it with no argument, through the registry.
+    assert fs.release_lock(fs.LOCK) is True
+    assert not fs.LOCK.exists()
+
+
+def test_appending_to_a_crlf_manifest_does_not_rewrite_its_line_endings(sach):
+    """The live manifest is CRLF, and the promise is that earlier rows are untouched.
+
+    `test_rewriting_the_manifest_preserves_earlier_rows_byte_for_byte` cannot see
+    this, because a fixture it writes itself is never CRLF: the property was checked
+    only on the input shape that cannot break it.
+    """
+    fs.POLLS.parent.mkdir(parents=True, exist_ok=True)
+    first = b'{"kind": "started", "poll_id": "a", "utc": "t"}\r\n'
+    fs.POLLS.write_bytes(first)
+
+    fs.append_manifest({"kind": "started", "poll_id": "b", "utc": "t"}, fs.POLLS)
+
+    raw = fs.POLLS.read_bytes()
+    assert raw.startswith(first), "an earlier row's line ending was rewritten"
+    assert raw.count(b"\r\n") == 1, f"line endings were normalised: {raw!r}"
+    assert [r["poll_id"] for r in fs.read_manifest(fs.POLLS)] == ["a", "b"]

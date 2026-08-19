@@ -292,21 +292,28 @@ def _atomic_write_text(path: Path, text: str) -> None:
 def append_manifest(row: dict, path: Path | None = None) -> None:
     """Add one manifest row, durably, without ever writing into the live file.
 
-    Existing rows are carried over as they are read rather than re-serialised. The
-    manifest is a provenance record: re-encoding an old row would change bytes a
-    later reader may already have quoted, and would quietly normalise away a line
-    somebody repaired by hand.
+    Existing rows are carried over VERBATIM, byte for byte, rather than
+    re-serialised. The manifest is a provenance record: re-encoding an old row
+    would change bytes a later reader may already have quoted, and would quietly
+    normalise away a line somebody repaired by hand.
 
-    ONE STATED LIMIT. The read goes through text mode, so a file written with CRLF
-    line endings comes back with them normalised and is written out that way. The
-    rows are preserved, their line endings are not, and every row of the live
-    manifest is CRLF because the in-place append this replaced ran on Windows. It
-    costs nothing that can be measured downstream, since `core.autocrlf` normalises
-    the committed blob either way and the runner appends LF, but the honest wording
-    is "as they are read" and not "verbatim".
+    That promise was weaker here until the read stopped going through text mode.
+    Universal-newline translation rewrote the line endings of every earlier row,
+    and every row of the live manifest is CRLF because the in-place append this
+    replaced ran on Windows, so the one file whose whole point is that it is not
+    reformatted was reformatted on its first atomic rewrite. The wording is
+    restored to "verbatim" in the same change that makes it true, and
+    `test_appending_to_a_crlf_manifest_does_not_rewrite_its_line_endings` is the
+    fixture that can falsify it.
     """
     path = POLLS if path is None else Path(path)
-    existing = path.read_text(encoding="utf-8") if path.exists() else ""
+    # Read as BYTES and decode, because universal-newline translation would rewrite
+    # the line endings of rows written earlier. The live manifest is CRLF throughout:
+    # the in-place append this replaced ran on Windows, where text mode turns every
+    # newline into a carriage-return pair. Reading it with `read_text` strips the CR,
+    # so the first atomic rewrite would silently reformat every historical row in the
+    # one file whose promise is that it does not.
+    existing = path.read_bytes().decode("utf-8") if path.exists() else ""
     if existing and not existing.endswith("\n"):
         # A kill landed after a row's bytes and before its newline. That file
         # still reads correctly, so nothing complains, and appending to it would
@@ -373,8 +380,16 @@ def heartbeat(path: Path | None = None, poll_id: str | None = None) -> None:
     contender's own death invisible, which inverts the one thing it is for.
     """
     path = LOCK if path is None else Path(path)
-    if _holds(path, poll_id):
+    if not _holds(path, poll_id):
+        return
+    try:
         os.utime(path, None)
+    except FileNotFoundError:
+        # The lock was removed between the ownership check and the touch. Nothing
+        # to refresh, and it must not become the error a poll reports: this runs
+        # inside every fetch retry, so an unguarded raise here would surface as a
+        # capture failure whose message says nothing about the lock.
+        pass
 
 
 def break_stale_lock(path: Path, observed: os.stat_result, age: float) -> None:
@@ -480,9 +495,13 @@ def release_lock(path: Path | None = None, poll_id: str | None = None) -> bool:
     """
     path = LOCK if path is None else Path(path)
     if not _holds(path, poll_id):
-        # Our claim on this path, if we had one, is void: someone else's name is
-        # in the file, or there is no file.
-        _HELD.pop(os.fspath(path), None)
+        # A claim of OURS on this path is void when the file no longer names it,
+        # and only then. Dropping it unconditionally would let a release attempt
+        # made on behalf of some other attempt id discard this process's own live
+        # registration, so the holder's later no-argument release would find
+        # nothing to check itself against.
+        if lock_holder(path) != _HELD.get(os.fspath(path)):
+            _HELD.pop(os.fspath(path), None)
         return False
     path.unlink(missing_ok=True)
     _HELD.pop(os.fspath(path), None)
