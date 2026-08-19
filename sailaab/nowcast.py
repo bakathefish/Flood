@@ -511,12 +511,29 @@ def build_nowcast_json(
         # So a coverage claim needs an observation to point at. When the recent
         # history was fetched and this district is not in it, the claim is
         # withdrawn rather than published without evidence.
+        acq_state = obs.get("acquisition_state") or "unknown"
         if last_seen is not None and covered and name not in last_seen:
             covered = False
             # The measurement goes with the claim. Leaving the fraction behind
             # would republish the mosaic reading under an uncovered row, which
             # is the same zero the map drew before, just relabelled.
             frac = km2 = None
+            # ...and so does the STATE, which is the half this guard forgot.
+            # `covered` is defined to the consumer as exactly
+            # `acquisition_state == "observed"`, so withdrawing one and leaving
+            # the other publishes a row that contradicts itself on the single
+            # fact both fields describe, and the whole feed fails validation on
+            # it. That is the same defect this guard was written to fix,
+            # committed by the fix.
+            #
+            # "unresolved" is the honest word and the only legal one. The
+            # footprint really did image this district, so the fraction stands
+            # and neither "not_observed" (which demands 0.0) nor "unknown"
+            # (which demands no fraction at all) can carry it; what could not
+            # be resolved is what was under the imagery, which is precisely
+            # what "unresolved" means everywhere else in this file.
+            if acq_state == "observed":
+                acq_state = "unresolved"
         pe = None
         if p_event is not None:
             pv = p_event.get(name)
@@ -530,7 +547,7 @@ def build_nowcast_json(
                 # the state too, or a consumer cannot tell "half the district
                 # was imaged" from "none of it was" from "the footprint layer
                 # was unreachable", and all three collapse into one grey.
-                "acquisition_state": (obs.get("acquisition_state") or "unknown"),
+                "acquisition_state": acq_state,
                 "acquisition_fraction": obs.get("acquisition_fraction"),
                 # Every row states every operational field, null when it has
                 # none. Omitting a key is not the same as saying null: it

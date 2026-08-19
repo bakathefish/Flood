@@ -199,7 +199,14 @@ def rank_and_tier(
     if alert_threshold is None:
         watch = set(t.dropna().sort_values(ascending=False).head(k).index)
     else:
-        watch = set(m.dropna()[m.dropna() >= alert_threshold].index)
+        # Decided on the number that gets PUBLISHED, not the one held here.
+        # p_event is serialised at four decimal places and the consumer
+        # re-derives the threshold comparison from that rounded value, so a raw
+        # score sitting inside the rounding window either side of the threshold
+        # ships a tier its own published score contradicts, and the board fails
+        # closed on the disagreement between the feed's two statements.
+        published = m.dropna().round(4)
+        watch = set(published[published >= alert_threshold].index)
     model_top = set(m.dropna().sort_values(ascending=False).head(k).index)
 
     order = m.sort_values(ascending=False, na_position="last").index

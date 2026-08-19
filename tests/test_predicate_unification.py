@@ -17,9 +17,14 @@ membership exactly.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
+import pytest
 
 from sailaab import forecast_live
+
+ROOT = Path(__file__).resolve().parents[1]
 
 DISTRICTS = ["Amritsar", "Barnala", "Bathinda"]
 ISSUE = "2025-08-20"
@@ -138,6 +143,18 @@ def test_a_temporal_mosaic_cannot_certify_a_district_wide_reading():
             f"{row['district']} published a district-wide fraction from a mosaic"
         )
         assert row["observed_km2"] is None
+        # The state is half of the same claim. This test used to stop one line
+        # above and so blessed a row the consumer refuses outright: `covered` is
+        # defined to it as exactly `acquisition_state == "observed"`, and a row
+        # withdrawing one while still asserting the other fails validation and
+        # takes the whole feed down with it.
+        assert row["acquisition_state"] != "observed", (
+            f"{row['district']} withdrew coverage but still says it was observed"
+        )
+        assert row["acquisition_state"] == "unresolved"
+        assert row["acquisition_fraction"] == 1.0, (
+            "the footprint reading itself is evidence and is not discarded"
+        )
 
 
 def test_a_district_with_a_recent_observation_keeps_its_coverage():
@@ -240,7 +257,20 @@ def test_the_uncovered_rule_covers_every_field_a_row_can_carry():
     """
     from sailaab import nowcast as nc
 
-    row = _window_boundary_payload()["districts"][0]
+    # Built through the EXTRAS path, because that path can put fields on a row
+    # that the base dict never mentions, and those are exactly the ones the
+    # rule missed last time. A sixth extras field added without a line in the
+    # constant now fails here rather than on a live cycle. The real extras
+    # shape is used rather than an invented sentinel: pinning a field the
+    # producer does not emit would be testing fiction.
+    row = _window_boundary_payload(
+        p_event={"Amritsar": 0.31, "Barnala": 0.12},
+        extras={
+            n: {"rank": 1, "tier": "elevated", "transparent_score": 1.5,
+                "latest_input": "2026-08-13", "input_age_days": 1}
+            for n in ("Amritsar", "Barnala")
+        },
+    )["districts"][0]
     structural = {"district", "covered", "acquisition_state", "acquisition_fraction"}
     assert set(nc.UNCOVERED_NULL_FIELDS) == set(row) - structural, (
         "every non-structural field must be on the uncovered-null list"
@@ -270,4 +300,104 @@ def test_the_window_boundary_leaves_nobody_publishable():
     assert nc.publishable_districts(order, eligible, observed) == [], (
         "a district the current window never imaged cannot carry a score, "
         "however fresh its last observation from the previous window was"
+    )
+
+
+# --- producer output judged by the consumer that actually reads it -----------
+def _districts_are_valid(payload) -> bool:
+    """Run a payload through the REAL validator the site ships.
+
+    Every check in this file up to here is producer-side, and producer-side
+    asserts are exactly how the mosaic guard shipped a row the consumer
+    refuses: the test enumerated the fields it remembered and the one it did
+    not remember was the one that broke the feed. Asking the shipped validator
+    removes the enumeration from the test entirely.
+    """
+    import json
+    import shutil
+    import subprocess
+
+    if shutil.which("node") is None:
+        pytest.skip("node not available")
+    script = (
+        "import {districtsAreValid} from './webapp/src/forecastSchema.js';"
+        "let raw='';"
+        "process.stdin.on('data', c => raw += c);"
+        "process.stdin.on('end', () => {"
+        "  const nc = JSON.parse(raw);"
+        "  process.stdout.write(String("
+        "    districtsAreValid(nc.districts, {issued: nc.generated_utc})));"
+        "});"
+    )
+    proc = subprocess.run(
+        ["node", "--input-type=module", "-e", script],
+        cwd=ROOT, input=json.dumps(payload), capture_output=True,
+        text=True, timeout=120,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    return proc.stdout.strip() == "true"
+
+
+def test_the_withdrawn_mosaic_row_is_accepted_by_the_shipped_validator():
+    """The guard's output must survive the consumer, not merely satisfy us.
+
+    It did not. `covered` was withdrawn and `acquisition_state` was left saying
+    "observed", and forecastSchema.js rejects that pair outright, so a single
+    district hitting this guard invalidated the entire published feed and the
+    board fell closed with no disclosure behind it. That is the same five-day
+    outage this file already documents, reachable by a second route.
+    """
+    from sailaab import nowcast as nc
+
+    payload = nc.build_nowcast_json(
+        generated_utc="2026-08-19T00:00:00Z",
+        window={"core_season": True, "window_start": "2026-08-14",
+                "window_end": "2026-08-24", "activates": "2026-07-25"},
+        sources={},
+        districts=["west", "east"],
+        observed={
+            "west": {"covered": True, "observed_fraction": 0.0,
+                     "observed_km2": 0.0, "acquisition_state": "observed",
+                     "acquisition_fraction": 1.0},
+            "east": {"covered": True, "observed_fraction": 0.01,
+                     "observed_km2": 3.0, "acquisition_state": "observed",
+                     "acquisition_fraction": 0.98},
+        },
+        # the recent history holds only `east`, so `west` loses its claim
+        last_seen={"east": {"latest": "2026-08-18", "age_days": 1}},
+    )
+    west = next(r for r in payload["districts"] if r["district"] == "west")
+    assert west["covered"] is False and west["acquisition_state"] == "unresolved"
+    assert _districts_are_valid(payload), (
+        "the producer emitted a feed its own consumer refuses"
+    )
+
+
+def test_a_tier_decided_on_the_raw_score_cannot_contradict_the_published_one():
+    """The feed's two statements about the same district must agree.
+
+    p_event ships rounded to four places and the consumer re-derives the
+    threshold comparison from that rounded value, so a raw score inside the
+    rounding window published a tier its own score contradicted and the board
+    was rejected. Picked to sit just below the threshold raw and just above it
+    once rounded, which is the only interval where the two disagree.
+    """
+    import pandas as pd
+
+    from sailaab import forecast_live
+
+    threshold = 0.7916666865348816
+    raw = 0.79166          # below the threshold; rounds to 0.7917, above it
+    assert raw < threshold < round(raw, 4), "fixture must sit in the window"
+
+    idx = ["a", "b"]
+    ranked = forecast_live.rank_and_tier(
+        pd.Series([raw, 0.1], index=idx),
+        pd.Series([1.0, 0.5], index=idx),
+        alert_threshold=threshold,
+    )
+    row = next(r for r in ranked if r["district"] == "a")
+    published = round(row["p_event"], 4)
+    assert (row["tier"] == "watch") == (published >= threshold), (
+        f"tier {row['tier']!r} contradicts published score {published}"
     )
