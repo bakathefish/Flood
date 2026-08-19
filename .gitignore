@@ -41,3 +41,8 @@ webapp/*.jpg
 data/sachet/*.tmp
 data/sachet/*.lock
 data/sachet/.lock
+# Output of a producer that was withdrawn. `fetch_hydro_drivers.py` was refuted
+# in review and never adopted, so committing its recorded output would publish a
+# measurement whose proposal no longer stands. The file itself is real and stays
+# on disk; it simply has no claim behind it, and nothing in the repo reads it.
+data/hydro_drivers_live.csv
