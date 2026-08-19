@@ -35,6 +35,7 @@ MODEL_PATH = DATA / "models" / "forecaster_daily.joblib"
 PRIOR_CSV = DATA / "flood_frequency_districts_late_season.csv"
 OUT = ROOT / "monitor" / "nowcast.json"
 
+
 class ForecastUnavailable(RuntimeError):
     """Raised when the observations cannot support publishing a forecast."""
 
@@ -179,8 +180,8 @@ def _build_notes(
                 " No district is scored."
                 if not scored
                 else f" Scoring used the {scored} district(s) with a recent "
-                     f"acquisition in the rolling history, which is fetched "
-                     f"separately and did resolve."
+                f"acquisition in the rolling history, which is fetched "
+                f"separately and did resolve."
             )
         )
     return " ".join(parts)
@@ -288,6 +289,14 @@ def main() -> int:
     generated_dt = datetime.now(timezone.utc)
     generated = generated_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
     today_iso = generated_dt.strftime("%Y-%m-%d")
+    # Bound up front so the unavailable handler can publish whatever was
+    # learned before the forecast was withheld, instead of a row of blanks.
+    # `last_seen` stays None until the recent history is actually fetched:
+    # None means "not applicable", {} means "fetched, and nobody qualified",
+    # and the two withdraw coverage claims very differently.
+    districts: list = []
+    observed: dict = {}
+    last_seen = None
     try:
         from pipeline.fetch_live_inputs import (
             fetch_gfm_observed,
@@ -321,6 +330,12 @@ def main() -> int:
                 today_iso, days_back=forecast_live.HISTORY_DAYS
             )
             gfm_meta["history_days_fetched"] = recent_meta["days_fetched"]
+            # Read before the gate, not after it. Every district that was
+            # imaged at all carries its date and age, including the stale ones
+            # eligibility excludes — and including on the cycles where the
+            # forecast is withheld, which are exactly the cycles where a reader
+            # most needs to see when each district was last looked at.
+            last_seen = forecast_live.latest_observation(recent, today_iso)
 
             # Safety gate. Scoring the model on priors and climatology alone
             # when the imagery is missing produces a board of low numbers and a
@@ -334,8 +349,12 @@ def main() -> int:
                 raise ForecastUnavailable(coverage_reason)
 
             X = forecast_live.build_live_features(
-                recent, today_iso, districts,
-                bundle["priors"], bundle["climatology"], bundle["adjacency"],
+                recent,
+                today_iso,
+                districts,
+                bundle["priors"],
+                bundle["climatology"],
+                bundle["adjacency"],
                 threshold=bundle["threshold"],
                 climo_fallback=bundle.get("climatology_fallback"),
                 tau=bundle.get("excite_tau_days", forecast_live.EXCITE_TAU_DAYS),
@@ -358,12 +377,33 @@ def main() -> int:
             # imagery nine days old that the gate's freshness rule never saw.
             eligible = forecast_live.eligible_districts(recent, today_iso)
             gfm_meta["eligible_districts"] = len(eligible)
-            seen = [n for n in X.index if n in eligible]
-            # Every district that was imaged at all carries its date and age,
-            # including the stale ones that eligibility just excluded. Hiding
-            # the age of a district we declined to score tells the reader
-            # nothing about why.
-            last_seen = forecast_live.latest_observation(recent, today_iso)
+            # ...and it is intersected with the window's acquisition footprint,
+            # because eligibility and coverage are still two questions.
+            #
+            # The rolling history and the current window are different day
+            # ranges, and on the first cycle of a new monsoon window they
+            # disagree completely: every district can hold a one-day-old
+            # observation from the window that just ended while the new
+            # window's footprint has recorded no pass at all. That is what
+            # happened on 14 Aug. The gate passed on the history, the rows were
+            # built from the footprint and said not_observed twenty times over,
+            # and the feed published a forecast block reporting "20 of 20
+            # districts observed" above them.
+            seen = nowcast.publishable_districts(X.index, eligible, observed)
+            gfm_meta["publishable_districts"] = len(seen)
+            if not seen:
+                # No row can carry a score, so there is no forecast — and
+                # saying so is not the same as publishing an empty one. A block
+                # with a threshold and a validation record, sitting over twenty
+                # unscored rows, reads as a forecast that found nothing rather
+                # than as no forecast at all.
+                raise ForecastUnavailable(
+                    f"{len(eligible)} of {len(districts)} districts hold a recent "
+                    f"observation, but the Sentinel-1 footprint records no pass "
+                    f"covering any of them in the current window "
+                    f"({window['window_start']} onwards), so no district can be "
+                    f"scored"
+                )
             model_score = model_score.loc[seen]
             trans = trans.loc[seen]
             ranked = forecast_live.rank_and_tier(
@@ -421,29 +461,21 @@ def main() -> int:
                     f"satellite imaged this cycle; the rest carry no score."
                 )
             )
-            if n_seen == 0:
-                # Never open with an all-clear that nothing was looked at.
-                # "No district is above the alert threshold today" led the note
-                # even when the satellite had imaged nobody, and the correction
-                # arrived several sentences later, where a reader who has
-                # already taken the first sentence as reassurance will not
-                # reach it. With no imagery there is no threshold statement to
-                # make at all, so it is not made.
-                model_note = (
-                    f"No district was imaged this cycle, so no district is "
-                    f"scored. This is not an all-clear: the satellite did not "
-                    f"look, and an empty flood mask over unimaged ground says "
-                    f"nothing about whether there is water."
-                )
-            else:
-                model_note = (
-                    (
-                        f"{n_watch} district(s) above the alert threshold."
-                        if n_watch
-                        else "No district is above the alert threshold today."
-                    )
-                    + scope
-                )
+            # Never open with an all-clear that nothing was looked at. "No
+            # district is above the alert threshold today" used to lead the
+            # note even when the satellite had imaged nobody, and the
+            # correction arrived several sentences later, where a reader who
+            # has already taken the first sentence as reassurance will not
+            # reach it. That case no longer reaches this line at all: a cycle
+            # with nothing to score raises ForecastUnavailable above and is
+            # published as an absent forecast rather than as an empty one, so
+            # the threshold statement below is only ever made about districts
+            # that were actually imaged.
+            model_note = (
+                f"{n_watch} district(s) above the alert threshold."
+                if n_watch
+                else "No district is above the alert threshold today."
+            ) + scope
         else:
             model_note = (
                 f"Current window {window['window_start']} is pre-core-season "
@@ -478,6 +510,14 @@ def main() -> int:
     except ForecastUnavailable as unavailable:
         # Publish the observations, withhold the forecast, and say why in the
         # notes. Never emit a board of low scores built on no imagery.
+        #
+        # It used to say that and then pass `observed={}`, so every row went
+        # out as acquisition_state "unknown" and the page could not name a
+        # single district the satellite had missed. The footprint had already
+        # been fetched and had already answered that question; throwing the
+        # answer away on the one cycle a reader most needs it is the quiet
+        # failure this file keeps warning about, committed by the handler
+        # whose comment promises the opposite.
         try:
             payload = nowcast.build_nowcast_json(
                 generated_utc=generated,
@@ -488,8 +528,9 @@ def main() -> int:
                     "context_rain": "unavailable",
                     "context_reservoirs": "unavailable",
                 },
-                districts=_fallback_districts(),
-                observed={},
+                districts=districts or _fallback_districts(),
+                observed=observed,
+                last_seen=last_seen,
                 p_event=None,
                 notes=(
                     "Forecast unavailable for this cycle: "
@@ -501,13 +542,16 @@ def main() -> int:
                 # the surrounding notes. A consumer that reads the block alone
                 # sees "unavailable" plus a reason, and "the imagery is stale"
                 # is not self-evidently different from "nothing is happening".
-                forecast={"kind": "district flood onset", "status": "unavailable",
-                          "reason": str(unavailable),
-                          "note": (
-                              "No forecast was produced this cycle. This is not "
-                              "an all-clear: absence of a forecast is absence of "
-                              "information, not evidence of calm."
-                          )},
+                forecast={
+                    "kind": "district flood onset",
+                    "status": "unavailable",
+                    "reason": str(unavailable),
+                    "note": (
+                        "No forecast was produced this cycle. This is not "
+                        "an all-clear: absence of a forecast is absence of "
+                        "information, not evidence of calm."
+                    ),
+                },
             )
             _write(payload)
         except Exception:

@@ -259,7 +259,10 @@ MIN_OBSERVED_FRACTION = 0.95
 
 
 def district_acquisition(
-    labels, names, footprint, min_fraction: float = MIN_OBSERVED_FRACTION,
+    labels,
+    names,
+    footprint,
+    min_fraction: float = MIN_OBSERVED_FRACTION,
     unresolved=None,
 ) -> dict:
     """What share of each district a Sentinel-1 acquisition actually covered.
@@ -280,8 +283,7 @@ def district_acquisition(
     n = len(names)
     if footprint is None:
         return {
-            name: {"acquisition_fraction": None, "state": "unknown"}
-            for name in names
+            name: {"acquisition_fraction": None, "state": "unknown"} for name in names
         }
     fp = np.asarray(footprint, dtype=bool)
     lab = np.asarray(labels)
@@ -316,8 +318,7 @@ def district_acquisition(
 
 
 def district_flood_stats(
-    mask, labels, names, bounds, refwater=None, *,
-    acquisition: dict | None = None
+    mask, labels, names, bounds, refwater=None, *, acquisition: dict | None = None
 ) -> dict:
     """Per-district observed flood fraction and km² from a boolean flood ``mask``.
 
@@ -404,6 +405,56 @@ def district_flood_stats(
 # --------------------------------------------------------------------------- #
 # locked JSON schema
 # --------------------------------------------------------------------------- #
+
+# Everything a row can say about a district beyond the bare fact that nobody
+# imaged it. An uncovered row carries none of them.
+#
+# This is the rule the cleanup below used to approximate by listing the three
+# fields that had gone wrong most recently. Each time a new operational field
+# was added the list was not, so the next field through was published on rows
+# that had no observation behind it: ``latest_input`` and ``input_age_days``
+# arrived after the list was written and were re-attached to uncovered rows by
+# the extras merge, which put a date and an age on twenty districts the
+# footprint said were never imaged. Stating the rule once means adding a field
+# to the payload cannot silently exempt it.
+UNCOVERED_NULL_FIELDS = (
+    "p_event",
+    "rank",
+    "tier",
+    "transparent_score",
+    "latest_input",
+    "input_age_days",
+    "observed_fraction_window",
+    "observed_km2",
+)
+
+
+def publishable_districts(order, eligible, observed: dict) -> list[str]:
+    """Districts that may carry a score, in ``order``.
+
+    Two separate things have to be true, and they are checked over two
+    different observation sets because they are two different questions.
+    ``eligible`` answers "is there a recent enough observation to score from",
+    computed by :mod:`sailaab.forecast_live` over the rolling history. The
+    acquisition state in ``observed`` answers "did a pass actually cover this
+    district in the window we are publishing", computed from the Sentinel-1
+    footprint. A score needs both, and the intersection is the only set the
+    feed may present as scored.
+
+    Taking the intersection here, before ranking, rather than letting
+    :func:`build_nowcast_json` null the scores afterwards, is what keeps the
+    forecast block's own coverage sentence describing the rows beside it. When
+    the two sets diverged, the block went on reporting the gate's count while
+    every row said not_observed, and the feed asserted both "20 of 20
+    districts observed" and "nobody was imaged" in the same document.
+    """
+    return [
+        name
+        for name in order
+        if name in eligible and (observed.get(name) or {}).get("covered") is True
+    ]
+
+
 def build_nowcast_json(
     *,
     generated_utc: str,
@@ -470,13 +521,6 @@ def build_nowcast_json(
         if p_event is not None:
             pv = p_event.get(name)
             pe = None if pv is None else round(float(pv), 4)
-        # A district the satellite could not see gets no score, no rank and no
-        # tier. The model will happily return a number for it from priors and
-        # climatology alone, and that number looks exactly like a real one.
-        # Withholding it at the producer means no consumer can rank it, and
-        # surfacing it downstream is not a substitute for never emitting it.
-        if not covered:
-            pe = None
         rows.append(
             {
                 "district": name,
@@ -502,12 +546,8 @@ def build_nowcast_json(
                 # question from coverage. A district imaged nine days ago and
                 # not since gets no score, and says so with a date rather than
                 # by going blank.
-                "latest_input": (
-                    (last_seen or {}).get(name, {}).get("latest") if covered else None
-                ),
-                "input_age_days": (
-                    (last_seen or {}).get(name, {}).get("age_days") if covered else None
-                ),
+                "latest_input": (last_seen or {}).get(name, {}).get("latest"),
+                "input_age_days": (last_seen or {}).get(name, {}).get("age_days"),
                 "observed_fraction_window": (
                     None if frac is None else round(float(frac), 4)
                 ),
@@ -516,14 +556,19 @@ def build_nowcast_json(
         )
         if extras and name in extras:
             rows[-1].update(extras[name])
-            # Extras carry the operational fields. An uncovered district must
-            # not receive them either, or it re-enters the ranking through the
-            # side door with a rank and a reassuring tier.
-            if not covered:
-                for field in ("rank", "tier", "transparent_score"):
-                    if field in rows[-1]:
-                        rows[-1][field] = None
-                rows[-1]["p_event"] = None
+
+        # The one place the uncovered rule is applied, and it is applied last.
+        #
+        # A district the satellite could not see gets no score, no rank, no
+        # tier, no measurement and no observation date. The model will happily
+        # return a number for it from priors and climatology alone, and that
+        # number looks exactly like a real one; the extras merge above will
+        # happily put it back after the row was built without it. So the rule
+        # runs after everything that can write to the row, over the whole field
+        # list rather than over the fields someone remembered.
+        if not covered:
+            for field in UNCOVERED_NULL_FIELDS:
+                rows[-1][field] = None
 
     def _f(x, default):
         return default if x is None else x
@@ -550,9 +595,7 @@ def build_nowcast_json(
         # what season it is" will render a failed run as a benign off-season
         # state, which is an all-clear by another name.
         "core_season": (
-            None
-            if window.get("core_season") is None
-            else bool(window["core_season"])
+            None if window.get("core_season") is None else bool(window["core_season"])
         ),
         "activates": window.get("activates"),
         "sources": sources,

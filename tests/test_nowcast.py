@@ -316,7 +316,11 @@ def test_district_flood_stats_two_districts_and_refwater():
         labels, ["west", "east"], np.ones((n, n), dtype=bool)
     )
     stats = nowcast.district_flood_stats(
-        mask, labels, ["west", "east"], PUNJAB_BOUNDS_3857, refwater=refwater,
+        mask,
+        labels,
+        ["west", "east"],
+        PUNJAB_BOUNDS_3857,
+        refwater=refwater,
         acquisition=acq,
     )
     # east was imaged and has no flood: a real zero, not a missing one
@@ -343,10 +347,33 @@ def _window(core):
 
 def test_build_nowcast_json_pre_core_p_event_null():
     districts = ["Kapurthala", "Firozpur", "Amritsar"]
+    # Each row states its coverage. The fixture used to omit it, which meant
+    # three uncovered districts published a flood measurement apiece and the
+    # sort below ordered them by it — the producer-side twin of the defect the
+    # consumer's uncoveredRowOk list exists to reject. The measurements are the
+    # point of this test, so the rows that carry them say they were imaged.
     observed = {
-        "Kapurthala": {"observed_fraction": 0.0031, "observed_km2": 8.2},
-        "Firozpur": {"observed_fraction": 0.0009, "observed_km2": 2.0},
-        "Amritsar": {"observed_fraction": 0.0, "observed_km2": 0.0},
+        "Kapurthala": {
+            "covered": True,
+            "observed_fraction": 0.0031,
+            "observed_km2": 8.2,
+            "acquisition_state": "observed",
+            "acquisition_fraction": 1.0,
+        },
+        "Firozpur": {
+            "covered": True,
+            "observed_fraction": 0.0009,
+            "observed_km2": 2.0,
+            "acquisition_state": "observed",
+            "acquisition_fraction": 1.0,
+        },
+        "Amritsar": {
+            "covered": True,
+            "observed_fraction": 0.0,
+            "observed_km2": 0.0,
+            "acquisition_state": "observed",
+            "acquisition_fraction": 1.0,
+        },
     }
     payload = nowcast.build_nowcast_json(
         generated_utc="2026-07-22T00:00:00Z",

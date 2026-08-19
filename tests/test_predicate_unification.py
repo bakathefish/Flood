@@ -160,3 +160,114 @@ def test_a_district_with_a_recent_observation_keeps_its_coverage():
     assert row["covered"] is True
     assert row["observed_fraction_window"] == 0.02
     assert row["latest_input"] == "2026-08-05"
+
+
+# --- the window boundary: the two predicates disagreeing completely -----------
+#
+# 14 Aug 2026 was the first day of a new monsoon window. Every district held an
+# observation from 13 Aug, one day old and comfortably inside the freshness
+# rule, so the publication gate passed on the rolling history and reported "20
+# of 20 districts observed within 1 day(s)". The current window's Sentinel-1
+# footprint had recorded no pass at all, so every row was built not_observed.
+# The feed went out asserting both. Every scheduled monitor run from that cycle
+# to the next fix failed on it, and the live site published nothing for five
+# days.
+
+
+def _window_boundary_payload(**over):
+    """A feed shaped exactly like the 14 Aug one: fresh history, empty window."""
+    from sailaab import nowcast as nc
+
+    kwargs = dict(
+        generated_utc="2026-08-14T07:22:11Z",
+        window={"core_season": True, "window_start": "2026-08-14",
+                "window_end": "2026-08-24", "activates": "2026-07-25"},
+        sources={},
+        districts=["Amritsar", "Barnala"],
+        # the new window's footprint has seen nobody yet
+        observed={
+            n: {"covered": False, "observed_fraction": None, "observed_km2": None,
+                "acquisition_state": "not_observed", "acquisition_fraction": 0.0}
+            for n in ("Amritsar", "Barnala")
+        },
+        # ...while yesterday's observation, from the window that just ended, is
+        # one day old for both
+        last_seen={
+            "Amritsar": {"latest": "2026-08-13", "age_days": 1},
+            "Barnala": {"latest": "2026-08-13", "age_days": 1},
+        },
+    )
+    kwargs.update(over)
+    return nc.build_nowcast_json(**kwargs)
+
+
+def test_an_uncovered_row_keeps_no_observation_date_from_extras():
+    """The leak that made the published feed invalid for five days.
+
+    The uncovered cleanup listed rank, tier and transparent_score, which were
+    the fields that had gone wrong the previous time. latest_input and
+    input_age_days were added to the payload afterwards, were not added to the
+    list, and so were re-attached by the extras merge to rows the footprint had
+    just declared never imaged. The consumer's rule is that an uncovered row
+    states no observation at all, so the whole feed failed validation and the
+    board fell closed with no disclosure behind it.
+    """
+    payload = _window_boundary_payload(
+        p_event={"Amritsar": 0.31, "Barnala": 0.12},
+        extras={
+            "Amritsar": {"rank": 1, "tier": "elevated", "transparent_score": 1.5,
+                         "latest_input": "2026-08-13", "input_age_days": 1},
+            "Barnala": {"rank": 2, "tier": "low", "transparent_score": 0.4,
+                        "latest_input": "2026-08-13", "input_age_days": 1},
+        },
+    )
+    for row in payload["districts"]:
+        assert row["covered"] is False
+        for field in ("p_event", "rank", "tier", "transparent_score",
+                      "latest_input", "input_age_days",
+                      "observed_fraction_window", "observed_km2"):
+            assert row[field] is None, (
+                f"{row['district']} published {field} with no acquisition behind it"
+            )
+
+
+def test_the_uncovered_rule_covers_every_field_a_row_can_carry():
+    """Stating the rule is only worth doing if the statement is complete.
+
+    Pinning the constant against the row itself means a field added to the
+    payload and forgotten here shows up as a failure now, rather than as an
+    invalid feed on the first cycle that publishes it.
+    """
+    from sailaab import nowcast as nc
+
+    row = _window_boundary_payload()["districts"][0]
+    structural = {"district", "covered", "acquisition_state", "acquisition_fraction"}
+    assert set(nc.UNCOVERED_NULL_FIELDS) == set(row) - structural, (
+        "every non-structural field must be on the uncovered-null list"
+    )
+
+
+def test_publishable_districts_is_the_intersection_not_either_side():
+    from sailaab import nowcast as nc
+
+    observed = {
+        "fresh_and_imaged": {"covered": True},
+        "fresh_not_imaged": {"covered": False},
+        "imaged_not_fresh": {"covered": True},
+    }
+    eligible = {"fresh_and_imaged": {}, "fresh_not_imaged": {}}
+    order = ["fresh_and_imaged", "fresh_not_imaged", "imaged_not_fresh"]
+    assert nc.publishable_districts(order, eligible, observed) == ["fresh_and_imaged"]
+
+
+def test_the_window_boundary_leaves_nobody_publishable():
+    """The precondition for withholding the forecast block entirely."""
+    from sailaab import nowcast as nc
+
+    order = ["Amritsar", "Barnala"]
+    observed = {n: {"covered": False} for n in order}
+    eligible = {n: {"latest": "2026-08-13", "age_days": 1} for n in order}
+    assert nc.publishable_districts(order, eligible, observed) == [], (
+        "a district the current window never imaged cannot carry a score, "
+        "however fresh its last observation from the previous window was"
+    )
