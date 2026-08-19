@@ -179,6 +179,46 @@ def test_dry_at_issue_strict_refuses_an_unobserved_issue_day():
     assert strict.tolist() == [True, False], "observed rows behave unchanged"
 
 
+def _issue_frame(fractions, md="08-01", year=2023):
+    """Minimal issue-day frame in the shape ``_candidates`` expects."""
+    return pd.DataFrame(
+        {
+            "district": [f"D{i}" for i in range(len(fractions))],
+            "year": year,
+            "md": md,
+            "fraction": np.asarray(fractions, dtype=float),
+        }
+    )
+
+
+@pytest.mark.parametrize("hysteresis", [False, True])
+def test_candidates_excludes_an_unobserved_issue_day(hysteresis):
+    """The evaluation path itself must refuse a day nobody imaged.
+
+    Having the strict rule available on ``dry_at_issue`` changed no published
+    number while every caller still passed the permissive default, so the
+    defect was named rather than fixed. This pins the caller, on both the plain
+    and the hysteresis branch, because a fix to one and not the other would
+    leave the loophole open under the setting that is meant to be stricter.
+    """
+    from pipeline.run_forecaster_daily import _candidates
+
+    df = _issue_frame([0.0, np.nan, 0.9])
+    kept = _candidates(df, threshold=0.5, hysteresis=hysteresis)
+    assert kept["district"].tolist() == ["D0"]
+    assert not kept["fraction"].isna().any()
+
+
+def test_candidates_can_still_reproduce_the_retracted_population():
+    """The pre-audit behaviour stays reachable so the retraction is
+    demonstrable, but only when asked for by name."""
+    from pipeline.run_forecaster_daily import _candidates
+
+    df = _issue_frame([0.0, np.nan, 0.9])
+    loose = _candidates(df, threshold=0.5, hysteresis=False, require_observed=False)
+    assert loose["district"].tolist() == ["D0", "D1"]
+
+
 # --- adjacency and neighbour water --------------------------------------------
 def _sq(x0, y0, x1, y1):
     return {

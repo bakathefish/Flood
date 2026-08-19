@@ -236,23 +236,39 @@ def _fit_predict(feats, tr, te, nested_years=None):
     return _logreg(best).fit(Xtr, ytr).predict_proba(Xte)[:, 1]
 
 
-def _candidates(d: pd.DataFrame, threshold: float, hysteresis: bool) -> pd.DataFrame:
+def _candidates(
+    d: pd.DataFrame, threshold: float, hysteresis: bool, *, require_observed: bool = True
+) -> pd.DataFrame:
     """Rows eligible to be forecast on their issue date.
 
-    Default: the district is not above the threshold today. With ``hysteresis``:
-    it has also been below it for the previous three days, and the label is
-    raised to three times the threshold. That closes the loophole where a
-    district oscillating either side of the line supplies cheap "onsets" that
-    are really the same standing water crossing back and forth.
+    The district must have been **imaged** on the issue day and found below the
+    threshold. With ``hysteresis`` it must also have been below it for the
+    previous three days, and the label is raised to three times the threshold.
+    That closes the loophole where a district oscillating either side of the
+    line supplies cheap "onsets" that are really the same standing water
+    crossing back and forth.
+
+    ``require_observed`` defaults to True here even though ``dry_at_issue``
+    itself still defaults to False. A district whose issue day nobody imaged
+    cannot support the claim "this was an onset rather than water already
+    present", because whether the water was already present is exactly what is
+    unknown. Admitting those rows is the same "not seen means not flooded"
+    inference that made 86.8% of the negative labels fabricated, one layer
+    further in.
+
+    Pass ``require_observed=False`` only to reproduce the retracted pre-audit
+    figures. It is kept reachable so the retraction can be demonstrated rather
+    than merely asserted; it is not a supported evaluation path.
     """
     d = d[d["md"] >= CORE_MD]
+    dry = dry_at_issue(d, threshold, require_observed=require_observed)
     if not hysteresis:
-        return d[dry_at_issue(d, threshold)]
+        return d[dry]
     g = d.groupby(["district", "year"], sort=False)["fraction"]
     recent_wet = pd.concat(
         [g.shift(i) > threshold for i in (1, 2, 3)], axis=1
     ).fillna(False).astype(bool).any(axis=1)
-    return d[dry_at_issue(d, threshold) & ~recent_wet]
+    return d[dry & ~recent_wet]
 
 
 def evaluate(
@@ -330,7 +346,7 @@ def run_ablation(df, threshold, horizon):
     d = df.copy()
     d["y"] = forward_event(d, threshold=threshold, horizon=horizon)
     d = d[d["md"] >= CORE_MD]
-    d = d[dry_at_issue(d, threshold)].dropna(subset=["y"])
+    d = d[dry_at_issue(d, threshold, require_observed=True)].dropna(subset=["y"])
     years = sorted(d["year"].unique())
     out = []
     for name, feats in ABLATION.items():
@@ -361,7 +377,7 @@ def run_selection(df, threshold, horizon):
     d = df.copy()
     d["y"] = forward_event(d, threshold=threshold, horizon=horizon)
     d = d[d["md"] >= CORE_MD]
-    d = d[dry_at_issue(d, threshold)].dropna(subset=["y"])
+    d = d[dry_at_issue(d, threshold, require_observed=True)].dropna(subset=["y"])
     years = sorted(d["year"].unique())
     parts, picks = [], []
     for ty in years:
