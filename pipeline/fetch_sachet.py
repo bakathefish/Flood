@@ -112,7 +112,14 @@ _HELD: dict[str, str] = {}
 REPLACE_RETRIES = 5
 REPLACE_PAUSE = 0.2
 
-MANIFEST_KINDS = ("started", "observed", "result", "reconciled", "bootstrap", "unattributed")
+MANIFEST_KINDS = (
+    "started",
+    "observed",
+    "result",
+    "reconciled",
+    "bootstrap",
+    "unattributed",
+)
 
 # Our own bookkeeping, stripped before hashing so a re-poll of an unchanged
 # alert does not look like a new one, and so stamping provenance onto a row
@@ -137,7 +144,9 @@ def utcnow() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def fetch(url: str = ENDPOINT, retries: int = RETRIES, backoff: float = BACKOFF) -> list:
+def fetch(
+    url: str = ENDPOINT, retries: int = RETRIES, backoff: float = BACKOFF
+) -> list:
     """The current alert window, or raise.
 
     Retries transient failures. Never returns [] to mean "the request failed":
@@ -159,7 +168,12 @@ def fetch(url: str = ENDPOINT, retries: int = RETRIES, backoff: float = BACKOFF)
             )
             with urllib.request.urlopen(req, timeout=60) as resp:
                 payload = json.loads(resp.read().decode("utf-8"))
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError) as exc:
+        except (
+            urllib.error.URLError,
+            TimeoutError,
+            json.JSONDecodeError,
+            OSError,
+        ) as exc:
             last = exc
             if attempt < retries - 1:
                 time.sleep(backoff * (attempt + 1))
@@ -428,7 +442,9 @@ def break_stale_lock(path: Path, observed: os.stat_result, age: float) -> None:
     try:
         fd = os.open(claim, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError:
-        raise LockHeld(f"{path}: another run is already taking over the dead lock") from None
+        raise LockHeld(
+            f"{path}: another run is already taking over the dead lock"
+        ) from None
     os.close(fd)
     try:
         try:
@@ -439,7 +455,9 @@ def break_stale_lock(path: Path, observed: os.stat_result, age: float) -> None:
             raise LockHeld(
                 f"{path} was re-taken while it was being examined, standing down"
             ) from None
-        print(f"sachet: breaking lock with no heartbeat for {age:.0f}s", file=sys.stderr)
+        print(
+            f"sachet: breaking lock with no heartbeat for {age:.0f}s", file=sys.stderr
+        )
         path.unlink()
     finally:
         if claim.exists():
@@ -557,10 +575,17 @@ def release_lock(path: Path | None = None, poll_id: str | None = None) -> bool:
         # width of that gap. That is recoverable by design: ownership is read
         # from disk on every check, so the holder discovers it no longer holds
         # rather than acting on a stale belief.
+        #
+        # A narrower cousin: the exclusive create and the content write below
+        # are two steps, so an OSError between them (ENOSPC, say) leaves an
+        # empty file at `path` instead of old-content-or-nothing. It cannot
+        # clobber a live claim — the create only succeeded because the path
+        # was vacant — and the same read-from-disk discipline means readers
+        # see an unparseable lock, not a wrong one.
         try:
             fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError:
-            pass                      # somebody else holds it now; leave them alone
+            pass  # somebody else holds it now; leave them alone
         except OSError:
             pass
         else:
@@ -577,7 +602,9 @@ def release_lock(path: Path | None = None, poll_id: str | None = None) -> bool:
     return True
 
 
-def merge(existing: list, incoming: list, seen_utc: str, poll_id: str | None = None) -> list:
+def merge(
+    existing: list, incoming: list, seen_utc: str, poll_id: str | None = None
+) -> list:
     """New alerts only, stamped with when we first saw them and which poll saw them.
 
     Identity is (identifier, content hash), so a reissue is kept and a re-poll
@@ -620,9 +647,9 @@ def covered_hashes(manifest: list) -> set:
 
 def uncovered_hashes(archive: list, manifest: list) -> set:
     """Archive hashes no manifest row accounts for. Empty is the invariant."""
-    return {r.get("_content_sha1") for r in archive if r.get("_content_sha1")} - covered_hashes(
-        manifest
-    )
+    return {
+        r.get("_content_sha1") for r in archive if r.get("_content_sha1")
+    } - covered_hashes(manifest)
 
 
 def bootstrap_manifest(archive: list, manifest: list, path: Path | None = None) -> list:
@@ -795,7 +822,9 @@ def poll(
 
     poll_id = poll_id or str(uuid.uuid4())
     started = time.monotonic()
-    append_manifest({"kind": "started", "poll_id": poll_id, "utc": utcnow()}, manifest_path)
+    append_manifest(
+        {"kind": "started", "poll_id": poll_id, "utc": utcnow()}, manifest_path
+    )
 
     # `archived` is assigned only AFTER the replace returns, and it is what the
     # terminal row reports. Reporting `fresh` instead let a replace that RAISED
@@ -871,7 +900,12 @@ def punjab_view(rows: list, names: list | None = None) -> list:
     for row in rows:
         hay = " ".join(
             str(row.get(f) or "")
-            for f in ("area_description", "alert_source", "warning_message", "area_covered")
+            for f in (
+                "area_description",
+                "alert_source",
+                "warning_message",
+                "area_covered",
+            )
         ).lower()
         if any(n in hay for n in needles):
             out.append(row)
@@ -899,7 +933,9 @@ def summarise(rows: list) -> dict:
 
 def main(argv: list | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--summary", action="store_true", help="report the archive, fetch nothing")
+    ap.add_argument(
+        "--summary", action="store_true", help="report the archive, fetch nothing"
+    )
     args = ap.parse_args(argv)
 
     try:
