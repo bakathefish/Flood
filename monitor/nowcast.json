@@ -5,7 +5,7 @@
   "reason": "only 9 of 20 districts have a recent observation, below the 50% floor",
   "note": "No forecast was produced this cycle. This is not an all-clear: absence of a forecast is absence of information, not evidence of calm."
  },
- "generated_utc": "2026-08-19T12:42:18Z",
+ "generated_utc": "2026-08-19T18:33:07Z",
  "window_start": "2026-08-14",
  "window_end": "2026-08-24",
  "core_season": true,
