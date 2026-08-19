@@ -7,14 +7,23 @@ import {HStack} from '@astryxdesign/core/HStack';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Text} from '@astryxdesign/core/Text';
 import {Heading} from '@astryxdesign/core/Heading';
-import {Card} from '@astryxdesign/core/Card';
+import {Divider} from '@astryxdesign/core/Divider';
 import {Link} from '@astryxdesign/core/Link';
+import {dataColors} from './theme';
 
 const REPO = 'https://github.com/bakathefish/Flood';
 // same-origin GitHub Pages base ('/Flood/') serves the committed docs/ PDFs as
 // application/pdf (opens inline), unlike raw.githubusercontent's octet-stream
 const SITE = import.meta.env.BASE_URL;
-const AXIS = '#8a93a0', GRID = '#2b313b', TIP_BG = '#1b2027', TIP_BD = '#3a414c', TIP_FG = '#e6e9ee', FLOODED = '#3ad0c0', DRY = '#565f6b';
+// Chart furniture reads off the shared data palette so the bars, the map
+// ramps and the interface accent cannot drift apart. The flooded/dry pair
+// was checked with the dataviz validator against the paper surface: dE 19.2
+// to normal vision, 14.8 under protanopia, and both clear 3:1 against the
+// page. The old pair was built for a dark ground and the dry bars landed at
+// 2.03:1 here, which is below the floor for a mark you are asked to compare.
+const AXIS = dataColors.axis, GRID = dataColors.grid;
+const TIP_BG = dataColors.tipBg, TIP_BD = dataColors.tipBorder, TIP_FG = dataColors.tipFg;
+const FLOODED = dataColors.floodedBar, DRY = dataColors.dryBar;
 
 async function loadCsv(url) {
   const res = await fetch(url);
@@ -128,24 +137,32 @@ export default function ProofSection({lang}) {
   return (
     <Section variant="transparent" padding={0} dividers={['top']}>
       <HStack justify="center" width="100%">
-        <VStack width="100%" maxWidth={1080} paddingInline={4} paddingBlock={9} gap={5} hAlign="center" id="proof">
-          <VStack gap={2}>
-            <Text type="label" color="accent">{t.eyebrow}</Text>
-            <Heading level={2}>{t.title}</Heading>
+        <VStack width="100%" maxWidth={1120} paddingInline={4} paddingBlock={9} gap={6} hAlign="start" id="proof">
+          <VStack width="100%" gap={3}>
+            <Divider />
+            <VStack gap={2} paddingBlock={1}>
+              <Text type="label" color="accent">{t.eyebrow}</Text>
+              <Heading level={2}>{t.title}</Heading>
+            </VStack>
           </VStack>
-          <VStack maxWidth={760}>
+          <VStack maxWidth={680}>
             <Text type="large" color="secondary">{t.intro}</Text>
           </VStack>
-          <Grid columns={{minWidth: 240, max: 4}} gap={4} width="100%">
-            {t.stats.map((s, i) => (
-              <Card key={i} padding={4}>
-                <VStack gap={2}>
-                  <Heading level={3} type="display-2" color="accent">{s.v}</Heading>
+          {/* Four headline figures as a ruled row, not four boxes. Boxing a
+              number adds a border and takes away the comparison; a shared
+              baseline under a shared rule is what a results table does. */}
+          <VStack width="100%" gap={0}>
+            <Divider />
+            <Grid columns={{minWidth: 200, max: 4}} gap={6} width="100%">
+              {t.stats.map((s, i) => (
+                <VStack key={i} gap={2} paddingBlock={5}>
+                  <Text type="figure" color="primary">{s.v}</Text>
                   <Text type="supporting" color="secondary">{s.l}</Text>
                 </VStack>
-              </Card>
-            ))}
-          </Grid>
+              ))}
+            </Grid>
+            <Divider />
+          </VStack>
           <VStack maxWidth={780}>
             <Text color="secondary">{t.honesty}</Text>
           </VStack>

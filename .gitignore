@@ -49,3 +49,4 @@ data/sachet/*.releasing-*
 # measurement whose proposal no longer stands. The file itself is real and stays
 # on disk; it simply has no claim behind it, and nothing in the repo reads it.
 data/hydro_drivers_live.csv
+.gitnexus/

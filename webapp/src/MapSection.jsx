@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import {MapContainer, TileLayer, GeoJSON} from 'react-leaflet';
+import {MapContainer, TileLayer, GeoJSON, useMap} from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {Section} from '@astryxdesign/core/Section';
 import {VStack} from '@astryxdesign/core/VStack';
@@ -8,9 +9,11 @@ import {Grid} from '@astryxdesign/core/Grid';
 import {Text} from '@astryxdesign/core/Text';
 import {Heading} from '@astryxdesign/core/Heading';
 import {Divider} from '@astryxdesign/core/Divider';
-import {Button} from '@astryxdesign/core/Button';
 import {Slider} from '@astryxdesign/core/Slider';
+import {SegmentedControl} from '@astryxdesign/core/SegmentedControl';
+import {SegmentedControlItem} from '@astryxdesign/core/SegmentedControl';
 import Papa from 'papaparse';
+import {dataColors} from './theme';
 
 const MAP_T = {
   en: {
@@ -42,19 +45,23 @@ const MAP_T = {
   },
 };
 
-const TEAL = ['#17211f', '#1b4340', '#20706a', '#289c90', '#3ad0c0'];
-const AMBER = ['#26200f', '#4d3b16', '#7d5f1f', '#ab8730', '#e2b955'];
-const ORANGE = ['#261612', '#4d2717', '#7d3a1c', '#b0542c', '#e07a45'];
+// Ramps run light to dark on paper, the reverse of the old dark-mode set.
+// Each was checked against the page surface with the dataviz validator: the
+// old pale ends sat at 1.12:1 here and would have vanished into the sheet.
 const RAMPS = {
-  year: {cols: TEAL, stops: [0, 500, 1500, 4000, 8000]},
-  freq: {cols: AMBER, stops: [0, 1, 2, 3, 4]},
-  impact: {cols: ORANGE, stops: [0, 50, 150, 400, 900]},
-  now: {cols: TEAL, stops: [0, 1, 3, 7, 15]},
+  year: {cols: dataColors.water, stops: [0, 500, 1500, 4000, 8000]},
+  freq: {cols: dataColors.recurrence, stops: [0, 1, 2, 3, 4]},
+  impact: {cols: dataColors.impact, stops: [0, 50, 150, 400, 900]},
+  now: {cols: dataColors.water, stops: [0, 1, 3, 7, 15]},
 };
-// A district with no observation is drawn in its own hatched grey rather than
-// the ramp's lowest colour. The lowest colour means "we looked and there was
-// almost nothing", which is the opposite of what a null means.
-const NO_DATA_FILL = '#4a5058';
+
+// A district with no observation is drawn as a hatch on bare paper, not as a
+// tint. The ramp's lowest colour would mean "we looked and there was almost
+// nothing", which is the opposite of what a null means — and a neutral grey
+// cannot be told apart from the ochre ramp by colour alone (dE 7.4, well
+// under the 15 floor), so the distinction has to be carried by texture.
+const NO_DATA_PATTERN_ID = 'sailaab-nodata';
+const NO_DATA_FILL = `url(#${NO_DATA_PATTERN_ID})`;
 
 const colorFor = (v, layer) => {
   if (v === null || v === undefined) return NO_DATA_FILL;
@@ -63,6 +70,64 @@ const colorFor = (v, layer) => {
   stops.forEach((s, i) => { if (v >= s && (v > 0 || i === 0)) c = cols[i]; });
   return c;
 };
+
+// Leaflet draws vectors into a single <svg> in the overlay pane. Dropping a
+// <defs> in there once gives every no-data district a real hatch fill, which
+// no amount of tinting could achieve legibly.
+function NoDataHatch() {
+  const map = useMap();
+  useEffect(() => {
+    const pane = map.getPane('overlayPane');
+    if (!pane) return;
+    let stop = false;
+    const install = () => {
+      if (stop) return;
+      const svg = pane.querySelector('svg');
+      if (!svg) { requestAnimationFrame(install); return; }
+      if (svg.querySelector(`#${NO_DATA_PATTERN_ID}`)) return;
+      const NS = 'http://www.w3.org/2000/svg';
+      const defs = document.createElementNS(NS, 'defs');
+      const pat = document.createElementNS(NS, 'pattern');
+      pat.setAttribute('id', NO_DATA_PATTERN_ID);
+      pat.setAttribute('patternUnits', 'userSpaceOnUse');
+      pat.setAttribute('width', '6');
+      pat.setAttribute('height', '6');
+      pat.setAttribute('patternTransform', 'rotate(45)');
+      const bg = document.createElementNS(NS, 'rect');
+      bg.setAttribute('width', '6');
+      bg.setAttribute('height', '6');
+      bg.setAttribute('fill', '#FBF9F4');
+      const line = document.createElementNS(NS, 'line');
+      line.setAttribute('x1', '0');
+      line.setAttribute('y1', '0');
+      line.setAttribute('x2', '0');
+      line.setAttribute('y2', '6');
+      line.setAttribute('stroke', dataColors.noDataHatch);
+      line.setAttribute('stroke-width', '1.5');
+      pat.appendChild(bg);
+      pat.appendChild(line);
+      defs.appendChild(pat);
+      svg.insertBefore(defs, svg.firstChild);
+    };
+    install();
+    return () => { stop = true; };
+  }, [map]);
+  return null;
+}
+
+// With the map on the full measure a fixed zoom left Punjab small and adrift
+// in the middle of the frame. Fitting the state's own bounds makes the
+// subject fill the plate at any container width.
+function FitToState({geo}) {
+  const map = useMap();
+  useEffect(() => {
+    if (!geo) return;
+    const layer = L.geoJSON(geo);
+    const bounds = layer.getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, {padding: [18, 18]});
+  }, [map, geo]);
+  return null;
+}
 
 // the map geometry names one district differently from every data feed
 const ALIAS = {'Shahid Bhagat Singh Nagar': 'Nawanshahr'};
@@ -76,8 +141,8 @@ async function loadCsv(url) {
 function Stat({label, value}) {
   return (
     <HStack justify="between" vAlign="baseline" gap={4}>
-      <Text type="supporting" color="secondary">{label}</Text>
-      <Text hasTabularNumbers>{value}</Text>
+      <Text type="label" color="secondary">{label}</Text>
+      <Text type="code" color="primary" hasTabularNumbers>{value}</Text>
     </HStack>
   );
 }
@@ -148,19 +213,26 @@ export default function MapSection({lang}) {
   };
   const legend = {year: t.lgYear, freq: t.lgFreq, impact: t.lgImp, now: t.lgNow}[layer];
 
-  const styleFn = (f) => ({
-    fillColor: colorFor(valueOf(f.properties.district), layer),
-    // dashed outline so an unobserved district reads as unknown at a glance,
-    // not merely as a slightly different shade of calm
-    dashArray: valueOf(f.properties.district) === null ? '4 3' : undefined,
-    fillOpacity: 0.88, color: '#39424e', weight: 1,
-  });
+  const styleFn = (f) => {
+    const unobserved = valueOf(f.properties.district) === null;
+    return {
+      fillColor: colorFor(valueOf(f.properties.district), layer),
+      // dashed outline so an unobserved district reads as unknown at a
+      // glance, not merely as a slightly different shade of calm. Paired
+      // with the hatch fill, it is unmistakable at any zoom.
+      dashArray: unobserved ? '4 3' : undefined,
+      fillOpacity: unobserved ? 1 : 0.9,
+      color: dataColors.mapOutline,
+      weight: unobserved ? 1.25 : 0.75,
+    };
+  };
   const onEach = (f, lyr) => {
     const name = f.properties.district;
+    const unobserved = valueOf(name) === null;
     lyr.bindTooltip(`${name} · ${fmt(valueOf(name))}`, {sticky: true, direction: 'top'});
     lyr.on({
-      mouseover: (e) => { e.target.setStyle({weight: 2, color: '#3ad0c0'}); e.target.bringToFront(); },
-      mouseout: (e) => { e.target.setStyle({weight: 1, color: '#39424e'}); },
+      mouseover: (e) => { e.target.setStyle({weight: 2.5, color: dataColors.mapHover}); e.target.bringToFront(); },
+      mouseout: (e) => { e.target.setStyle({weight: unobserved ? 1.25 : 0.75, color: dataColors.mapOutline}); },
       click: () => setSel(name),
     });
   };
@@ -182,63 +254,85 @@ export default function MapSection({lang}) {
   return (
     <Section variant="transparent" padding={0} dividers={['bottom']}>
       <HStack justify="center" width="100%">
-        <VStack width="100%" maxWidth={1080} paddingInline={4} paddingBlock={8} gap={5} hAlign="center" id="explore">
-          <HStack gap={3} vAlign="center">
-            <Text type="label" color="accent">{t.no}</Text>
-            <Heading level={2}>{t.title}</Heading>
-          </HStack>
-          <VStack maxWidth={700}>
+        <VStack width="100%" maxWidth={1120} paddingInline={4} paddingBlock={8} gap={6} hAlign="start" id="explore">
+          <VStack width="100%" gap={3}>
+            <Divider />
+            <HStack gap={4} vAlign="baseline" wrap="wrap" paddingBlock={1}>
+              <Text type="code" color="accent">{t.no}</Text>
+              <Heading level={2}>{t.title}</Heading>
+            </HStack>
+          </VStack>
+          <VStack maxWidth={660}>
             <Text type="large" color="secondary">{t.intro}</Text>
           </VStack>
-          <HStack gap={2} vAlign="center" wrap="wrap">
-            {LAYERS.map((L) => (
-              <Button key={L.k} variant={layer === L.k ? 'primary' : 'ghost'} onClick={() => setLayer(L.k)}>{L.label}</Button>
-            ))}
+          {/* One row of controls above the map, which is where a reader
+              looks for them and where they stop competing with the data. */}
+          <HStack gap={4} vAlign="center" wrap="wrap" width="100%">
+            <SegmentedControl label={t.title} size="sm" value={layer} onChange={setLayer}>
+              {LAYERS.map((L) => (
+                <SegmentedControlItem key={L.k} value={L.k} label={L.label} />
+              ))}
+            </SegmentedControl>
+            {layer === 'year' && (
+              <HStack gap={3} vAlign="center" wrap="wrap">
+                <Text type="code" color="primary" size="lg" hasTabularNumbers>{year}</Text>
+                <VStack width={260} maxWidth="100%">
+                  <Slider label="Year" isLabelHidden value={year} min={2015} max={2025} step={1} valueDisplay="none" onChange={(v) => setYear(Array.isArray(v) ? v[0] : v)} />
+                </VStack>
+                <Text type="supporting" color="secondary">2015 – 2025</Text>
+              </HStack>
+            )}
           </HStack>
-          {layer === 'year' && (
-            <HStack gap={4} vAlign="center" wrap="wrap">
-              <Text type="label" color="accent" hasTabularNumbers>{year}</Text>
-              <VStack width={320} maxWidth="100%">
-                <Slider label="Year" isLabelHidden value={year} min={2015} max={2025} step={1} valueDisplay="none" onChange={(v) => setYear(Array.isArray(v) ? v[0] : v)} />
-              </VStack>
-              <Text type="supporting" color="secondary">2015 – 2025</Text>
-            </HStack>
-          )}
-          <Grid columns={{minWidth: 320, max: 2}} gap={5} align="stretch" width="100%">
-            <div style={{height: 520, border: '1px solid var(--color-border-emphasized)', borderRadius: 'var(--radius-inner, 2px)', overflow: 'hidden', background: 'var(--color-background-surface)'}}>
+          {/* Punjab is a tall, narrow state, so the plate is portrait: given
+              the full measure the geometry fitted to height and left two
+              thirds of the frame empty. The read-out sits in the column
+              beside it, which is also where a reader's eye already is after
+              clicking a district. */}
+          <Grid columns={{minWidth: 360, max: 2}} gap={6} align="start" width="100%">
+            <div style={{height: 600, border: '1px solid var(--color-border-emphasized)', borderRadius: 'var(--radius-inner, 2px)', overflow: 'hidden', background: 'var(--color-background-surface)'}}>
+              {/* zoomSnap 0 lets fitBounds land on a fractional zoom.
+                  Leaflet's default integer snap was throwing away up to half
+                  the plate, which is why the state sat small in the middle of
+                  its own frame. */}
               {ready && (
-                <MapContainer center={[31.05, 75.4]} zoom={7} scrollWheelZoom={false} style={{height: '100%', width: '100%', background: 'transparent'}}>
-                  <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" subdomains="abcd" attribution='&copy; OpenStreetMap &copy; CARTO' />
+                <MapContainer center={[31.05, 75.4]} zoom={7} zoomSnap={0} zoomDelta={0.5} scrollWheelZoom={false} style={{height: '100%', width: '100%', background: 'transparent'}}>
+                  {/* A pale basemap so the choropleth carries the colour and
+                      the terrain stays reference, which is the way every
+                      newsroom draws a district map. */}
+                  <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" subdomains="abcd" attribution='&copy; OpenStreetMap &copy; CARTO' />
+                  <NoDataHatch />
+                  <FitToState geo={geo} />
                   <GeoJSON key={layer + year + Object.keys(byYear).length + Object.keys(now).length} data={geo} style={styleFn} onEachFeature={onEach} />
                 </MapContainer>
               )}
             </div>
-            <VStack gap={3}>
+            <VStack gap={3} width="100%">
               {sel ? (
-                <>
-                  <VStack gap={1}>
-                    <Heading level={3}>{sel}</Heading>
-                    <Text type="supporting" color="secondary">{headDesc}</Text>
-                    <Text size="2xl" color="accent" hasTabularNumbers>{fmt(valueOf(sel))}</Text>
-                  </VStack>
-                  <VStack gap={0}>
-                    <Divider />
-                    <VStack paddingBlock={2}><Stat label={`${year} ${t.yr}`} value={selYearHa != null ? `${Math.round(selYearHa).toLocaleString()} ha` : '—'} /></VStack>
-                    <Divider />
-                    <VStack paddingBlock={2}><Stat label={t.rec} value={fq ? `${fq.seasons_with_fraction_gt1pct} / 11` : '—'} /></VStack>
-                    {year === 2025 && (
-                      <>
-                        <Divider />
-                        <VStack paddingBlock={2}><Stat label={t.crop} value={s ? `${Math.round(+s.crop_flooded_ha).toLocaleString()} ha` : '—'} /></VStack>
-                        <Divider />
-                        <VStack paddingBlock={2}><Stat label={t.val} value={crore ? `₹ ${(+crore).toLocaleString()} crore` : '—'} /></VStack>
-                      </>
-                    )}
-                    <Divider />
-                  </VStack>
-                </>
+                <VStack width="100%" gap={0}>
+                  <Divider />
+                  <HStack justify="between" vAlign="baseline" gap={5} wrap="wrap" paddingBlock={4}>
+                    <VStack gap={1}>
+                      <Heading level={3}>{sel}</Heading>
+                      <Text type="label" color="secondary">{headDesc}</Text>
+                    </VStack>
+                    <Text type="figure" color="primary">{fmt(valueOf(sel))}</Text>
+                  </HStack>
+                  <Divider />
+                  <VStack paddingBlock={3}><Stat label={`${year} ${t.yr}`} value={selYearHa != null ? `${Math.round(selYearHa).toLocaleString()} ha` : '—'} /></VStack>
+                  <Divider />
+                  <VStack paddingBlock={3}><Stat label={t.rec} value={fq ? `${fq.seasons_with_fraction_gt1pct} / 11` : '—'} /></VStack>
+                  {year === 2025 && (
+                    <>
+                      <Divider />
+                      <VStack paddingBlock={3}><Stat label={t.crop} value={s ? `${Math.round(+s.crop_flooded_ha).toLocaleString()} ha` : '—'} /></VStack>
+                      <Divider />
+                      <VStack paddingBlock={3}><Stat label={t.val} value={crore ? `₹ ${(+crore).toLocaleString()} crore` : '—'} /></VStack>
+                    </>
+                  )}
+                  <Divider />
+                </VStack>
               ) : (
-                <VStack gap={2} justify="center" height="100%">
+                <VStack gap={2} width="100%">
                   <Text color="secondary">{t.hint}</Text>
                   <Text type="supporting" color="secondary">{legend}</Text>
                 </VStack>

@@ -7,6 +7,7 @@ import {Text} from '@astryxdesign/core/Text';
 import {Heading} from '@astryxdesign/core/Heading';
 import {Badge} from '@astryxdesign/core/Badge';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
+import {Banner} from '@astryxdesign/core/Banner';
 import {Link} from '@astryxdesign/core/Link';
 import {Divider} from '@astryxdesign/core/Divider';
 import {num, resolveForecastState} from './forecastSchema';
@@ -127,18 +128,21 @@ export default function ForecastSection({lang}) {
   return (
     <Section variant="transparent" padding={0} dividers={['bottom']}>
       <HStack justify="center" width="100%">
-        <VStack width="100%" maxWidth={1080} paddingInline={4} paddingBlock={9} gap={5} hAlign="center" id="forecast">
-          <HStack gap={3} vAlign="center" wrap="wrap">
-            <Text type="label" color="accent">{t.no}</Text>
-            <Heading level={2}>{t.title}</Heading>
-            <Badge variant="blue" label="AI" />
-          </HStack>
-          <Heading level={3} type="display-3">{t.lead}</Heading>
-          <VStack maxWidth={780} gap={3}>
+        <VStack width="100%" maxWidth={1120} paddingInline={4} paddingBlock={9} gap={6} hAlign="start" id="forecast">
+          <VStack width="100%" gap={3}>
+            <Divider />
+            <HStack gap={4} vAlign="baseline" wrap="wrap" paddingBlock={1}>
+              <Text type="code" color="accent">{t.no}</Text>
+              <Heading level={2}>{t.title}</Heading>
+              <Badge variant="blue" label="AI" />
+            </HStack>
+          </VStack>
+          <VStack maxWidth={900}>
+            <Heading level={3} type="display-3">{t.lead}</Heading>
+          </VStack>
+          <VStack maxWidth={680} gap={4}>
             <Text type="large" color="secondary">{t.intro}</Text>
             <Text type="large">{t.explain}</Text>
-          </VStack>
-          <VStack maxWidth={780}>
             <Text color="secondary">{t.boardNote}</Text>
           </VStack>
 
@@ -149,22 +153,27 @@ export default function ForecastSection({lang}) {
             </VStack>
           )}
 
+          {/* A missing forecast is the most important thing this page can
+              say, so it is promoted from a line of grey text to a warning
+              banner. Reading past it by accident should not be possible. */}
           {unavailable && (
-            <VStack maxWidth={780} gap={2}>
-              <StatusDot variant="warning" label="unavailable" />
-              <Text type="large">{t.unavailable}</Text>
-              {/* The feed says WHY in its own words, carrying the counts the
-                  decision was made on. The translated sentence above cannot
-                  hold them, and they are the whole difference between "the
-                  system is broken" and "the satellite has not covered enough
-                  of Punjab yet this cycle". Shown only when the producer
-                  itself declared the forecast unavailable, so a reason
-                  belonging to a feed that failed validation for some other
-                  cause is never presented as the explanation. */}
-              {nc && nc.forecast && nc.forecast.status === 'unavailable'
-                && nc.forecast.reason && (
-                <Text color="secondary">{nc.forecast.reason}</Text>
-              )}
+            <VStack width="100%" maxWidth={820}>
+              <Banner
+                status="warning"
+                title={t.unavailable}
+                /* The feed says WHY in its own words, carrying the counts the
+                   decision was made on. The translated sentence above cannot
+                   hold them, and they are the whole difference between "the
+                   system is broken" and "the satellite has not covered enough
+                   of Punjab yet this cycle". Shown only when the producer
+                   itself declared the forecast unavailable, so a reason
+                   belonging to a feed that failed validation for some other
+                   cause is never presented as the explanation. */
+                description={
+                  nc && nc.forecast && nc.forecast.status === 'unavailable'
+                    && nc.forecast.reason ? nc.forecast.reason : undefined
+                }
+              />
             </VStack>
           )}
 
@@ -176,11 +185,11 @@ export default function ForecastSection({lang}) {
                   <Text type="label" color="secondary">{t.liveHead}{nc ? ` · ${nc.window_start} → ${nc.window_end}` : ''}</Text>
                 </HStack>
                 <VStack width="100%" gap={0}>
-                  <HStack justify="between" vAlign="baseline" gap={3} paddingBlock={1}>
-                    <Text type="supporting" color="secondary">{t.districtCol}</Text>
+                  <HStack justify="between" vAlign="baseline" gap={3} paddingBlock={2}>
+                    <Text type="label" color="secondary">{t.districtCol}</Text>
                     <HStack gap={5} vAlign="baseline">
-                      <Text type="supporting" color="secondary">{t.tierCol}</Text>
-                      <Text type="supporting" color="secondary">{t.waterCol}</Text>
+                      <Text type="label" color="secondary">{t.tierCol}</Text>
+                      <Text type="label" color="secondary">{t.waterCol}</Text>
                     </HStack>
                   </HStack>
                   {rows.map((d) => {
@@ -200,11 +209,11 @@ export default function ForecastSection({lang}) {
                     return (
                       <React.Fragment key={d.district}>
                         <Divider />
-                        <HStack justify="between" vAlign="center" paddingBlock={2} gap={3}>
-                          <HStack gap={2} vAlign="baseline" wrap="wrap">
-                            <Text color="secondary" hasTabularNumbers type="supporting">{d.rank}</Text>
-                            <Text>{d.district}</Text>
-                            <Text type="supporting" color="secondary" hasTabularNumbers>{num(d.p_event).toFixed(3)}</Text>
+                        <HStack justify="between" vAlign="center" paddingBlock={3} gap={3}>
+                          <HStack gap={3} vAlign="baseline" wrap="wrap">
+                            <Text type="code" color="secondary" hasTabularNumbers>{d.rank}</Text>
+                            <Text weight="medium">{d.district}</Text>
+                            <Text type="code" color="secondary" hasTabularNumbers>{num(d.p_event).toFixed(3)}</Text>
                           </HStack>
                           <HStack gap={5} vAlign="center">
                             {tier === 'watch'
@@ -212,7 +221,7 @@ export default function ForecastSection({lang}) {
                               : tier === 'elevated'
                                 ? <Badge variant="orange" label={tierLabel.elevated} />
                                 : <Text type="supporting" color="secondary">{tierLabel.low}</Text>}
-                            <Text color="secondary" hasTabularNumbers>{water}</Text>
+                            <Text type="code" color="primary" hasTabularNumbers>{water}</Text>
                           </HStack>
                         </HStack>
                       </React.Fragment>
@@ -228,7 +237,7 @@ export default function ForecastSection({lang}) {
                   )}
                   <Text type="supporting" color="secondary">{t.legend}</Text>
                   {threshold && (
-                    <Text type="supporting" color="secondary" hasTabularNumbers>{t.thresholdIs}: {threshold}</Text>
+                    <Text type="code" color="secondary" hasTabularNumbers>{t.thresholdIs}: {threshold}</Text>
                   )}
                 </VStack>
               </VStack>

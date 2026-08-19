@@ -4,9 +4,9 @@ import {VStack} from '@astryxdesign/core/VStack';
 import {HStack} from '@astryxdesign/core/HStack';
 import {Text} from '@astryxdesign/core/Text';
 import {Heading} from '@astryxdesign/core/Heading';
-import {Badge} from '@astryxdesign/core/Badge';
 import {Button} from '@astryxdesign/core/Button';
 import {Card} from '@astryxdesign/core/Card';
+import {Divider} from '@astryxdesign/core/Divider';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 
 const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
@@ -100,11 +100,14 @@ export default function AlertSection({lang}) {
   return (
     <Section variant="transparent" padding={0} dividers={['bottom']}>
       <HStack justify="center" width="100%">
-        <VStack width="100%" maxWidth={1080} paddingInline={4} paddingBlock={8} gap={5} hAlign="center" id="alerts">
-          <HStack gap={3} vAlign="center" wrap="wrap">
-            <Heading level={2}>{t.title}</Heading>
-          </HStack>
-          <VStack maxWidth={680}>
+        <VStack width="100%" maxWidth={1120} paddingInline={4} paddingBlock={8} gap={6} hAlign="start" id="alerts">
+          <VStack width="100%" gap={3}>
+            <Divider />
+            <VStack paddingBlock={1}>
+              <Heading level={2}>{t.title}</Heading>
+            </VStack>
+          </VStack>
+          <VStack maxWidth={660}>
             <Text type="large" color="secondary">
               {t.intro}{districts.length > 0 ? ` ${t.pickHint}` : ''}
             </Text>
@@ -112,25 +115,30 @@ export default function AlertSection({lang}) {
 
           {districts.length > 0 ? (
             <>
-              <VStack gap={2}>
-                <Text type="supporting" color="secondary">{t.pick}</Text>
+              <VStack gap={3}>
+                <Text type="label" color="secondary">{t.pick}</Text>
                 <HStack gap={2} wrap="wrap">
                   {districts.map((d) => (
-                    <Button key={d.district} variant={sel === d.district ? 'primary' : 'ghost'} onClick={() => setSel(d.district)}>
+                    <Button key={d.district} variant={sel === d.district ? 'primary' : 'secondary'} onClick={() => setSel(d.district)}>
                       {d.district}
                     </Button>
                   ))}
                 </HStack>
               </VStack>
-              <Card padding={4}>
-                <VStack gap={3}>
-                  <HStack gap={2} vAlign="center">
-                    <StatusDot variant={warn ? 'error' : 'accent'} label={warn ? 'alert' : 'monitoring'} isPulsing={warn} />
-                    <Text type="label" color={warn ? 'primary' : 'secondary'}>{warn ? t.warning : t.monitoring} · {sel}</Text>
-                  </HStack>
-                  <Text type="large">{body}</Text>
-                </VStack>
-              </Card>
+              {/* The issued bulletin, set as a plate: the reader is looking
+                  at the artefact the pipeline actually emits, so it gets a
+                  frame and the sending face rather than page furniture. */}
+              <VStack width="100%" maxWidth={820}>
+                <Card padding={5}>
+                  <VStack gap={4}>
+                    <HStack gap={2} vAlign="center" wrap="wrap">
+                      <StatusDot variant={warn ? 'error' : 'accent'} label={warn ? 'alert' : 'monitoring'} isPulsing={warn} />
+                      <Text type="label" color={warn ? 'primary' : 'secondary'}>{warn ? t.warning : t.monitoring} · {sel}</Text>
+                    </HStack>
+                    <Text type="large">{body}</Text>
+                  </VStack>
+                </Card>
+              </VStack>
             </>
           ) : status === 'error' ? (
             <Card padding={4}><Text color="secondary">{t.err}</Text></Card>

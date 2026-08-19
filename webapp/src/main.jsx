@@ -8,7 +8,7 @@ import App from './App';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Theme theme={sailaabTheme} mode="dark">
+    <Theme theme={sailaabTheme} mode="light">
       <App />
     </Theme>
   </React.StrictMode>,

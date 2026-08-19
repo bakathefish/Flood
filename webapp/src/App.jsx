@@ -8,10 +8,11 @@ import {Text} from '@astryxdesign/core/Text';
 import {Heading} from '@astryxdesign/core/Heading';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Link} from '@astryxdesign/core/Link';
-import {Button} from '@astryxdesign/core/Button';
 import {Badge} from '@astryxdesign/core/Badge';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
-import {Card} from '@astryxdesign/core/Card';
+import {SegmentedControl} from '@astryxdesign/core/SegmentedControl';
+import {SegmentedControlItem} from '@astryxdesign/core/SegmentedControl';
+import {MediaTheme} from '@astryxdesign/core/theme';
 import AlertSection from './AlertSection';
 import ForecastSection from './ForecastSection';
 // heavy, below-the-fold sections (Leaflet + Recharts + PapaParse) are code-split
@@ -21,12 +22,15 @@ const ProofSection = React.lazy(() => import('./ProofSection'));
 
 const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
 
-// full-bleed page band with a centered reading column
-function Band({children, dividers, paddingBlock = 6, maxWidth = 1080, variant = 'transparent'}) {
+// A full-bleed band holding one measure-width column, set hard to the left.
+// The old band centred every child box, which is what made a page of
+// evidence read like a pitch deck: nothing had a common left edge to scan
+// down. Everything on this page now hangs off one margin.
+function Band({children, dividers, paddingBlock = 6, maxWidth = 1120, variant = 'transparent'}) {
   return (
     <Section variant={variant} padding={0} dividers={dividers}>
       <HStack justify="center" width="100%">
-        <VStack width="100%" maxWidth={maxWidth} paddingInline={4} paddingBlock={paddingBlock} gap={0} hAlign="center">
+        <VStack width="100%" maxWidth={maxWidth} paddingInline={4} paddingBlock={paddingBlock} gap={0} hAlign="start">
           {children}
         </VStack>
       </HStack>
@@ -34,11 +38,30 @@ function Band({children, dividers, paddingBlock = 6, maxWidth = 1080, variant = 
   );
 }
 
+// Every section opens the same way: a rule, a numeral set in the data face,
+// then the title. It is the page's repeating furniture, and it is what makes
+// a section read as an entry in a record rather than a slide.
+function SectionHead({no, title, badge, id}) {
+  return (
+    <VStack width="100%" gap={3} id={id}>
+      <Divider />
+      <HStack gap={4} vAlign="baseline" wrap="wrap" paddingBlock={1}>
+        {no && <Text type="code" color="accent">{no}</Text>}
+        <Heading level={2}>{title}</Heading>
+        {badge}
+      </HStack>
+    </VStack>
+  );
+}
+
+// A read-off from the instrument: caption above, figure below in the data
+// face. Numbers are the loudest thing in the block because the number is
+// the point.
 function StatBig({label, value}) {
   return (
     <VStack gap={1}>
-      <Text type="supporting" color="secondary">{label}</Text>
-      <Text size="2xl" color="accent" hasTabularNumbers>{value}</Text>
+      <Text type="label" color="secondary">{label}</Text>
+      <Text type="figure" color="primary">{value}</Text>
     </VStack>
   );
 }
@@ -203,38 +226,54 @@ function LiveSection({t}) {
   const totalKm2 = live ? numOrNull(live.total_flooded_km2) : null;
   const pct = covFrac === null ? '—' : Math.round(covFrac * 100) + '%';
   const km2 = totalKm2 === null ? '—' : totalKm2.toLocaleString() + ' km²';
+  // The single dark moment on a paper page. The radar frame is a greyscale
+  // photograph of the earth and it belongs on a dark mount, the way a plate
+  // sits in a printed report; mounting it on newsprint would fight it. The
+  // ground comes from MediaTheme rather than a hand-rolled dark block, so
+  // every control and rule inside it re-resolves to its dark token instead
+  // of being restyled by hand.
   return (
-    <Band dividers={['bottom']} paddingBlock={8}>
-      <VStack gap={5} id="live">
-        <HStack gap={3} vAlign="center">
-          <StatusDot variant="accent" label="live" isPulsing />
-          <Text type="label" color="secondary">{t.liveHead}</Text>
-        </HStack>
-        <HStack gap={3} vAlign="center">
-          <Text type="label" color="accent">02</Text>
-          <Heading level={2}>{t.liveTitle}</Heading>
-        </HStack>
-        <Grid columns={{minWidth: 320, max: 2}} gap={6} align="stretch">
-          <Card padding={1}>
-            <img
-              src={RAW + 'monitor/latest.jpg'}
-              alt={t.liveAlt}
-              loading="lazy"
-              style={{width: '100%', height: 'auto', display: 'block', borderRadius: 'var(--radius-inner, 2px)', filter: 'saturate(1.1) contrast(1.03)'}}
-            />
-          </Card>
-          <VStack gap={5} justify="center">
-            <StatBig label={t.liveLastL} value={live ? live.latest_pass : t.liveLoading} />
-            <Divider />
-            <StatBig label={t.liveCovL} value={pct} />
-            <Divider />
-            <StatBig label={t.liveFloodL} value={km2} />
-            <Divider />
-            <Text type="supporting" color="secondary">{t.liveCap}</Text>
+    <MediaTheme mode="dark">
+      <Section variant="section" padding={0} dividers={['top', 'bottom']}>
+        <HStack justify="center" width="100%">
+          <VStack width="100%" maxWidth={1120} paddingInline={4} paddingBlock={8} gap={5} hAlign="start" id="live">
+            <HStack gap={3} vAlign="center" wrap="wrap">
+              <StatusDot variant="accent" label="live" isPulsing />
+              <Text type="label" color="secondary">{t.liveHead}</Text>
+            </HStack>
+            <HStack gap={4} vAlign="baseline" wrap="wrap">
+              <Text type="code" color="accent">02</Text>
+              <Heading level={2}>{t.liveTitle}</Heading>
+            </HStack>
+            <Grid columns={{minWidth: 340, max: 2}} gap={6} align="stretch" width="100%">
+              <VStack gap={3} width="100%">
+                <img
+                  src={RAW + 'monitor/latest.jpg'}
+                  alt={t.liveAlt}
+                  loading="lazy"
+                  style={{
+                    width: '100%', height: 'auto', display: 'block',
+                    border: '1px solid var(--color-border-emphasized)',
+                    borderRadius: 'var(--radius-inner, 2px)',
+                    filter: 'saturate(1.05) contrast(1.03)',
+                  }}
+                />
+                <Text type="supporting" color="secondary">{t.liveCap}</Text>
+              </VStack>
+              <VStack gap={0} justify="start">
+                <Divider />
+                <VStack paddingBlock={4}><StatBig label={t.liveLastL} value={live ? live.latest_pass : t.liveLoading} /></VStack>
+                <Divider />
+                <VStack paddingBlock={4}><StatBig label={t.liveCovL} value={pct} /></VStack>
+                <Divider />
+                <VStack paddingBlock={4}><StatBig label={t.liveFloodL} value={km2} /></VStack>
+                <Divider />
+              </VStack>
+            </Grid>
           </VStack>
-        </Grid>
-      </VStack>
-    </Band>
+        </HStack>
+      </Section>
+    </MediaTheme>
   );
 }
 
@@ -249,33 +288,33 @@ export default function App() {
 
   return (
     <AppShell height="auto" contentPadding={0} variant="surface">
-      {/* masthead */}
+      {/* standing head: the masthead of a bulletin, not a product navbar */}
       <Band dividers={['bottom']} paddingBlock={3}>
-        <HStack justify="between" vAlign="center" width="100%">
-          <Text type="label" color="primary">SAILAAB</Text>
-          <HStack gap={1} vAlign="center">
+        <HStack justify="between" vAlign="center" width="100%" gap={4} wrap="wrap">
+          <Text type="code" color="primary" weight="semibold">SAILAAB</Text>
+          <SegmentedControl
+            label="Language"
+            size="sm"
+            value={lang}
+            onChange={setLang}
+          >
             {LANGS.map((l) => (
-              <Button
-                key={l.code}
-                variant={lang === l.code ? 'primary' : 'ghost'}
-                onClick={() => setLang(l.code)}
-                lang={l.code}
-                aria-pressed={lang === l.code}
-              >
-                {l.label}
-              </Button>
+              <SegmentedControlItem key={l.code} value={l.code} label={l.label} lang={l.code} />
             ))}
-          </HStack>
+          </SegmentedControl>
         </HStack>
       </Band>
 
-      {/* hero */}
-      <Band paddingBlock={9}>
-        <VStack gap={4} maxWidth={740}>
-          <Text type="label" color="secondary">{t.eyebrow}</Text>
+      {/* hero: kicker, headline, lede, and the two links that matter, all
+          hung on the same left margin the rest of the page uses */}
+      <Band paddingBlock={9} dividers={['bottom']}>
+        <VStack gap={5} maxWidth={860}>
+          <Text type="label" color="accent">{t.eyebrow}</Text>
           <Heading level={1} type="display-1">{t.h1}</Heading>
-          <Text type="large" color="secondary">{t.lede}</Text>
-          <HStack gap={5} vAlign="center" wrap="wrap">
+          <VStack maxWidth={660}>
+            <Text type="large" color="secondary">{t.lede}</Text>
+          </VStack>
+          <HStack gap={6} vAlign="center" wrap="wrap">
             <Link href="#forecast" isStandalone>{t.seeLive}</Link>
             <Link href="https://github.com/bakathefish/Flood" isStandalone>{t.source}</Link>
           </HStack>
@@ -288,36 +327,35 @@ export default function App() {
       <LiveSection t={t} />
       <React.Suspense fallback={null}><MapSection lang={lang} /></React.Suspense>
 
-      {/* how it is built */}
-      <Band paddingBlock={8} maxWidth={1080}>
-        <VStack gap={5} width="100%">
-          <HStack gap={3} vAlign="center">
-            <Text type="label" color="accent">04</Text>
-            <Heading level={2}>{t.sysTitle}</Heading>
-          </HStack>
-          <VStack gap={2} maxWidth={640}>
+      {/* how it is built: five modules as ruled rows, edge to edge, which is
+          how a schedule in a report reads and not how a card grid reads */}
+      <Band paddingBlock={8}>
+        <VStack gap={6} width="100%">
+          <SectionHead no="04" title={t.sysTitle} />
+          <VStack maxWidth={660}>
             <Text type="large" color="secondary">{t.sysIntro}</Text>
           </VStack>
-          <VStack gap={0}>
+          <VStack gap={0} width="100%">
             {MODULES.map((m, i) => (
               <React.Fragment key={i}>
                 <Divider />
-                <HStack gap={4} vAlign="start" paddingBlock={3} wrap="wrap">
-                  <Text type="supporting" hasTabularNumbers>{String(i + 1).padStart(2, '0')}</Text>
-                  <VStack gap={1} width={190} maxWidth="100%">
+                <HStack gap={5} vAlign="start" paddingBlock={4} wrap="wrap" width="100%">
+                  <Text type="code" color="secondary">{String(i + 1).padStart(2, '0')}</Text>
+                  <VStack gap={2} width={210} maxWidth="100%">
                     <HStack gap={2} vAlign="center" wrap="wrap">
-                      <Text type="label">{m[lang].name}</Text>
+                      <Heading level={3}>{m[lang].name}</Heading>
                       {m.tag && <Badge variant="blue" label={m.tag} />}
                     </HStack>
                   </VStack>
-                  <VStack width={440} maxWidth="100%">
+                  <VStack width={520} maxWidth="100%">
                     <Text color="secondary">{m[lang].desc}</Text>
                   </VStack>
                 </HStack>
               </React.Fragment>
             ))}
+            <Divider />
           </VStack>
-          <VStack gap={2} maxWidth={800}>
+          <VStack gap={2} maxWidth={820}>
             <Text type="label" color="accent">{t.techL}</Text>
             <Text color="secondary">{t.tech}</Text>
           </VStack>
@@ -325,31 +363,32 @@ export default function App() {
       </Band>
 
       {/* responsible AI: ethics, privacy, environment, uncertainty */}
-      <Band paddingBlock={7} dividers={['bottom']}>
-        <VStack gap={4} width="100%">
-          <Heading level={2}>{t.respTitle}</Heading>
-          <Grid columns={{minWidth: 260, max: 2}} gap={5}>
-            <VStack gap={1}><Text type="label" color="accent">{t.resp1L}</Text><Text color="secondary">{t.resp1}</Text></VStack>
-            <VStack gap={1}><Text type="label" color="accent">{t.resp2L}</Text><Text color="secondary">{t.resp2}</Text></VStack>
-            <VStack gap={1}><Text type="label" color="accent">{t.resp3L}</Text><Text color="secondary">{t.resp3}</Text></VStack>
-            <VStack gap={1}><Text type="label" color="accent">{t.resp4L}</Text><Text color="secondary">{t.resp4}</Text></VStack>
+      <Band paddingBlock={8}>
+        <VStack gap={6} width="100%">
+          <SectionHead title={t.respTitle} />
+          <Grid columns={{minWidth: 280, max: 2}} gap={6} width="100%">
+            <VStack gap={2}><Text type="label" color="accent">{t.resp1L}</Text><Text color="secondary">{t.resp1}</Text></VStack>
+            <VStack gap={2}><Text type="label" color="accent">{t.resp2L}</Text><Text color="secondary">{t.resp2}</Text></VStack>
+            <VStack gap={2}><Text type="label" color="accent">{t.resp3L}</Text><Text color="secondary">{t.resp3}</Text></VStack>
+            <VStack gap={2}><Text type="label" color="accent">{t.resp4L}</Text><Text color="secondary">{t.resp4}</Text></VStack>
           </Grid>
         </VStack>
       </Band>
 
-      {/* context: the gap */}
-      <Band paddingBlock={6} dividers={['top', 'bottom']}>
-        <HStack gap={5} vAlign="center" wrap="wrap">
+      {/* the gap, as a full-bleed figure. One glyph carries the whole
+          argument, so it is set at hero scale and given the room to land. */}
+      <Band paddingBlock={9} dividers={['top', 'bottom']} variant="muted">
+        <HStack gap={6} vAlign="center" wrap="wrap" width="100%">
           <Heading level={2} type="display-1" color="accent">0</Heading>
-          <VStack maxWidth={520}>
+          <VStack maxWidth={560}>
             <Text type="large" color="secondary">{t.gap}</Text>
           </VStack>
         </HStack>
       </Band>
 
       {/* context: who it is for + inclusion + SDGs */}
-      <Band paddingBlock={6} dividers={['bottom']}>
-        <Grid columns={{minWidth: 240, max: 3}} gap={5} width="100%">
+      <Band paddingBlock={8} dividers={['bottom']}>
+        <Grid columns={{minWidth: 250, max: 3}} gap={6} width="100%">
           <VStack gap={2}>
             <Text type="label" color="secondary">{t.who1L}</Text>
             <Text color="secondary">{t.who1}</Text>
@@ -368,11 +407,14 @@ export default function App() {
       {/* proof, at the very end */}
       <React.Suspense fallback={null}><ProofSection lang={lang} /></React.Suspense>
 
-      {/* footer */}
+      {/* colophon: the provenance line, set small in the data face the way a
+          source note sits under a chart */}
       <Section variant="transparent" padding={0} dividers={['top']}>
         <HStack justify="center" width="100%">
-          <VStack width="100%" maxWidth={1080} paddingInline={4} paddingBlock={5} gap={1}>
-            <Text type="supporting" color="secondary">{t.footer}</Text>
+          <VStack width="100%" maxWidth={1120} paddingInline={4} paddingBlock={6} gap={3}>
+            <VStack maxWidth={840}>
+              <Text type="supporting" color="secondary">{t.footer}</Text>
+            </VStack>
             <Link href="https://github.com/bakathefish/Flood" isStandalone>github.com/bakathefish/Flood</Link>
           </VStack>
         </HStack>
