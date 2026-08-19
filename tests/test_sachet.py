@@ -2193,3 +2193,45 @@ def test_appending_to_a_crlf_manifest_does_not_rewrite_its_line_endings(sach):
     assert raw.startswith(first), "an earlier row's line ending was rewritten"
     assert raw.count(b"\r\n") == 1, f"line endings were normalised: {raw!r}"
     assert [r["poll_id"] for r in fs.read_manifest(fs.POLLS)] == ["a", "b"]
+
+
+def test_a_restore_does_not_clobber_a_lock_taken_while_the_path_was_vacated(sach):
+    """The ownership check and the move are two operations.
+
+    A contender that breaks this lock and takes its own in that gap has its
+    lock moved aside by us. Putting it back unconditionally is the mirror of
+    the bug the move exists to fix: vacating the path makes it look free, a
+    third run can legitimately claim it, and the restore then destroys a live
+    claim that has done nothing wrong.
+    """
+    fs.acquire_lock(fs.LOCK, poll_id="holder-1111")
+    real_replace = os.replace
+    calls = []
+
+    def replace_losing_the_race(src, dst):
+        if str(src) == str(fs.LOCK) and not calls:
+            calls.append(1)
+            # the gap, part one: a contender breaks our lock and takes its own
+            fs.LOCK.write_text("contender-2222 t", encoding="utf-8")
+            real_replace(src, dst)
+            # the gap, part two: with the path free, a third run claims it
+            fs.LOCK.write_text("third-run-3333 t", encoding="utf-8")
+            return None
+        return real_replace(src, dst)
+
+    monkey = pytest.MonkeyPatch()
+    monkey.setattr(fs.os, "replace", replace_losing_the_race)
+    try:
+        assert fs.release_lock(fs.LOCK, poll_id="holder-1111") is False, (
+            "we no longer held it, so the release must report that"
+        )
+    finally:
+        monkey.undo()
+
+    assert calls, "the test did not reach the move it exists to exercise"
+    assert fs.LOCK.exists(), "the third run's lock was destroyed"
+    assert fs.lock_holder(fs.LOCK) == "third-run-3333", (
+        "the restore overwrote a lock taken while the path was vacated"
+    )
+    leftovers = list(fs.LOCK.parent.glob("*.releasing-*"))
+    assert not leftovers, f"staging copy left behind: {leftovers}"

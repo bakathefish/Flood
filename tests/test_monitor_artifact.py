@@ -162,19 +162,27 @@ def test_the_coverage_rule_runs_on_a_board_shaped_payload():
     on a quiet cycle is every run, so the rule would go unexercised for days at
     a time and its own imports would not even be reached. This runs it against
     a payload that always carries a board."""
+    from sailaab import nowcast as nc
+
     districts = [
         {"district": "a", "p_event": 0.4},
         {"district": "b", "p_event": 0.1},
         {"district": "c", "p_event": None},
     ]
+    n_scored = len([d for d in districts if d["p_event"] is not None])
+
+    # The sentence is DERIVED from the rows through the producer's own
+    # formatter, not copied. Hard-coding both sides made the test agree with
+    # itself: it would have kept passing after the producer's wording changed,
+    # and it could not have caught a producer that miscounted.
     stated, total, scored = _coverage_counts(
-        "2 of 3 districts were imaged inside this window and carry a score",
-        districts,
+        nc.coverage_sentence(n_scored, len(districts)), districts
     )
     assert (stated, total, scored) == (2, 3, 2)
 
+    # ...and it must be able to fail. An inflated count from the same formatter
+    # is caught, which is the regression this rule exists for.
     bad, total, scored = _coverage_counts(
-        "3 of 3 districts were imaged inside this window and carry a score",
-        districts,
+        nc.coverage_sentence(len(districts), len(districts)), districts
     )
     assert bad != scored, "the rule must be able to catch an inflated count"

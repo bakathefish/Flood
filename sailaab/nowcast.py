@@ -429,6 +429,57 @@ UNCOVERED_NULL_FIELDS = (
 )
 
 
+# The per-district fields ``extras`` legitimately owns.
+#
+# The merge below used to be an unrestricted ``dict.update``, which ran AFTER
+# the coverage decision and before a guard that only fires on uncovered rows.
+# So on a COVERED row extras could overwrite anything, including the
+# acquisition_state that coverage_is_earned() had just settled, and nothing
+# would notice. An allowlist is the structure that cannot rot: a field extras
+# has no business setting is not merely nulled afterwards, it never lands.
+EXTRAS_FIELDS = (
+    "rank",
+    "tier",
+    "transparent_score",
+    "latest_input",
+    "input_age_days",
+)
+
+
+def build_extras(ranked, last_seen: dict | None = None) -> dict:
+    """The per-district extras the feed publishes, built in one place.
+
+    The pipeline used to assemble this dict inline and the tests used to
+    hand-write a copy of it, so the two could describe different shapes and
+    the drift pin was pinning the test author's memory rather than the
+    producer. Both now call this.
+    """
+    seen = last_seen or {}
+    return {
+        r["district"]: {
+            "rank": r["rank"],
+            "tier": r["tier"],
+            "transparent_score": r["transparent_score"],
+            "latest_input": (seen.get(r["district"]) or {}).get("latest"),
+            "input_age_days": (seen.get(r["district"]) or {}).get("age_days"),
+        }
+        for r in ranked
+    }
+
+
+def coverage_sentence(n_scored: int, n_total: int) -> str:
+    """The forecast block's coverage line, describing the rows beside it.
+
+    Built here rather than inline so a test can derive the sentence from the
+    same counts the producer used, instead of hard-coding a copy of the words
+    that would keep passing after the producer's wording changed.
+    """
+    return (
+        f"{n_scored} of {n_total} districts were imaged inside this window and "
+        f"carry a score; the rest are published without one"
+    )
+
+
 def _evidence_inside_window(name, last_seen: dict, window_start) -> bool:
     """Whether the district's newest observation falls inside the window.
 
@@ -445,10 +496,20 @@ def _evidence_inside_window(name, last_seen: dict, window_start) -> bool:
     by exactly the temporal mosaic MIN_OBSERVED_FRACTION exists to forbid, with
     its stated evidence pointing outside the window it was certifying.
     """
+    if window_start is None:
+        # Refusing rather than passing. A caller that has a history to check
+        # against but cannot say which window it is checking is asking for the
+        # date test to be skipped, and skipping it is the defect this function
+        # exists to close: coverage would be granted with no window proof at
+        # all, which is exactly the state the previous version shipped in.
+        raise ValueError(
+            "window_start is required to test an observation against the "
+            "window its coverage claim describes"
+        )
     latest = (last_seen.get(name) or {}).get("latest")
     if latest is None:
         return False
-    return window_start is None or latest >= window_start
+    return latest >= window_start
 
 
 def coverage_is_earned(name, observed: dict, last_seen, window_start) -> bool:
@@ -624,7 +685,11 @@ def build_nowcast_json(
             }
         )
         if extras and name in extras:
-            rows[-1].update(extras[name])
+            # Allowlisted, not merged wholesale. See EXTRAS_FIELDS.
+            supplied = extras[name]
+            for field in EXTRAS_FIELDS:
+                if field in supplied:
+                    rows[-1][field] = supplied[field]
 
         # The one place the uncovered rule is applied, and it is applied last.
         #

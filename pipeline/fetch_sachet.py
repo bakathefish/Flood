@@ -543,12 +543,33 @@ def release_lock(path: Path | None = None, poll_id: str | None = None) -> bool:
     except OSError:
         holder = None
     if holder != mine:
-        # We moved a lock that had already changed hands. Put it back rather
-        # than destroy a claim we never held.
+        # We moved a lock that had already changed hands, so put it back — but
+        # only into a path nobody has taken in the meantime.
+        #
+        # An unconditional replace here was its own version of the bug this
+        # whole function is about. Vacating `path` makes it look free, so a
+        # third run can legitimately acquire it in that gap, and restoring over
+        # the top destroys a live claim that has done nothing wrong. The
+        # exclusive create is the same primitive acquire_lock uses, so whoever
+        # holds the path keeps it and we surrender our copy instead.
+        #
+        # The residual is that the original holder's lock was invisible for the
+        # width of that gap. That is recoverable by design: ownership is read
+        # from disk on every check, so the holder discovers it no longer holds
+        # rather than acting on a stale belief.
         try:
-            os.replace(staged, path)
+            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            pass                      # somebody else holds it now; leave them alone
         except OSError:
             pass
+        else:
+            try:
+                with os.fdopen(fd, "wb") as fh:
+                    fh.write(staged.read_bytes())
+            except OSError:
+                pass
+        staged.unlink(missing_ok=True)
         _HELD.pop(os.fspath(path), None)
         return False
     staged.unlink(missing_ok=True)

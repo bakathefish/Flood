@@ -416,10 +416,8 @@ def main() -> int:
             # the smaller set published "20 of 20 districts observed" over five
             # scored rows. The gate's own wording is kept in the run summary,
             # where it describes what it actually decided.
-            published_coverage = (
-                f"{len(seen)} of {len(districts)} districts were imaged inside "
-                f"this window and carry a score; the rest are published without "
-                f"one"
+            published_coverage = nowcast.coverage_sentence(
+                len(seen), len(districts)
             )
             model_score = model_score.loc[seen]
             trans = trans.loc[seen]
@@ -427,16 +425,7 @@ def main() -> int:
                 model_score, trans, alert_threshold=bundle["alert_threshold"]
             )
             p_event = {r["district"]: r["p_event"] for r in ranked}
-            extras = {
-                r["district"]: {
-                    "rank": r["rank"],
-                    "tier": r["tier"],
-                    "transparent_score": r["transparent_score"],
-                    "latest_input": last_seen.get(r["district"], {}).get("latest"),
-                    "input_age_days": last_seen.get(r["district"], {}).get("age_days"),
-                }
-                for r in ranked
-            }
+            extras = nowcast.build_extras(ranked, last_seen)
             forecast_block = {
                 "kind": "district flood onset",
                 "horizon_days": bundle["horizon_days"],

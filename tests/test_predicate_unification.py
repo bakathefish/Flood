@@ -249,19 +249,24 @@ def test_an_uncovered_row_keeps_no_observation_date_from_extras():
 
 
 
-def _producer_extras_keys() -> set:
-    """The per-district fields the real ranker emits, read off the producer.
+def _producer_extras(names) -> dict:
+    """Extras built by the producer's own code path, for the given districts.
 
-    pipeline/nowcast.py builds its `extras` from rank_and_tier's rows plus the
-    two freshness fields. Reading the keys from an actual call means this test
-    learns about a new one the moment it exists.
+    pipeline/nowcast.py calls exactly these two functions, so a field added to
+    either reaches this fixture without anybody remembering to add it. The
+    previous version listed the two freshness fields by hand, which is the
+    failure being tested for, one layer out.
     """
+    from sailaab import nowcast as nc
+
     ranked = forecast_live.rank_and_tier(
-        pd.Series([0.5], index=["x"]),
-        pd.Series([1.0], index=["x"]),
+        pd.Series([0.5 - 0.1 * i for i in range(len(names))], index=list(names)),
+        pd.Series([1.0] * len(names), index=list(names)),
         alert_threshold=0.9,
     )
-    return set(ranked[0])
+    return nc.build_extras(
+        ranked, {n: {"latest": "2026-08-13", "age_days": 1} for n in names}
+    )
 
 
 def test_the_uncovered_rule_covers_every_field_a_row_can_carry():
@@ -279,23 +284,13 @@ def test_the_uncovered_rule_covers_every_field_a_row_can_carry():
     # than hand-copied, so a field added to the producer's ranked rows reaches
     # this pin by itself; a hand-written dict only ever pins what its author
     # already remembered, which is the failure mode being tested for.
-    extras_fields = {
-        k for k in _producer_extras_keys() if k not in ("district", "p_event")
-    } | {"latest_input", "input_age_days"}
-    sample = {
-        "rank": 1, "tier": "elevated", "transparent_score": 1.5,
-        "latest_input": "2026-08-13", "input_age_days": 1,
-    }
-    missing = extras_fields - set(sample)
-    assert not missing, (
-        f"the producer emits extras fields this test has no value for: {missing}"
+    extras = _producer_extras(("Amritsar", "Barnala"))
+    assert set(nc.EXTRAS_FIELDS) == set(next(iter(extras.values()))), (
+        "EXTRAS_FIELDS and build_extras() disagree about the extras contract"
     )
     row = _window_boundary_payload(
         p_event={"Amritsar": 0.31, "Barnala": 0.12},
-        extras={
-            n: {k: sample[k] for k in extras_fields}
-            for n in ("Amritsar", "Barnala")
-        },
+        extras=extras,
     )["districts"][0]
     structural = {"district", "covered", "acquisition_state", "acquisition_fraction"}
     assert set(nc.UNCOVERED_NULL_FIELDS) == set(row) - structural, (
@@ -512,3 +507,59 @@ def test_covered_and_its_state_cannot_be_set_independently():
     assert _districts_are_valid(payload), (
         "the producer emitted a feed its own consumer refuses"
     )
+
+
+def test_extras_cannot_overwrite_a_field_they_do_not_own():
+    """The merge ran after the coverage decision and before a guard that only
+    fires on uncovered rows, so on a COVERED row extras could overwrite the
+    acquisition_state that coverage_is_earned() had just settled, and the
+    payload would go out contradicting itself with nothing to catch it."""
+    from sailaab import nowcast as nc
+
+    payload = nc.build_nowcast_json(
+        generated_utc="2026-08-19T00:00:00Z",
+        window={"core_season": True, "window_start": "2026-08-14",
+                "window_end": "2026-08-24", "activates": "2026-07-25"},
+        sources={},
+        districts=["west"],
+        observed={"west": {"covered": True, "observed_fraction": 0.01,
+                           "observed_km2": 2.0, "acquisition_state": "observed",
+                           "acquisition_fraction": 1.0}},
+        last_seen={"west": {"latest": "2026-08-18", "age_days": 1}},
+        p_event={"west": 0.3},
+        extras={"west": {
+            "rank": 1, "tier": "elevated", "transparent_score": 1.0,
+            "latest_input": "2026-08-18", "input_age_days": 1,
+            # fields extras has no business setting
+            "acquisition_state": "not_observed",
+            "acquisition_fraction": 0.0,
+            "covered": False,
+            "district": "somewhere else",
+        }},
+    )
+    row = payload["districts"][0]
+    assert row["district"] == "west"
+    assert row["covered"] is True
+    assert row["acquisition_state"] == "observed", (
+        "extras overwrote the state the coverage decision had settled"
+    )
+    assert row["acquisition_fraction"] == 1.0
+    assert row["rank"] == 1 and row["tier"] == "elevated", "owned fields still land"
+    assert _districts_are_valid(payload)
+
+
+def test_coverage_cannot_be_granted_without_saying_which_window():
+    """window_start used to be optional, and optional meant the date test was
+    skipped, which grants coverage with no window proof at all. A caller that
+    has a history to check against must say what it is checking against."""
+    from sailaab import nowcast as nc
+
+    observed = {"west": {"covered": True, "acquisition_state": "observed",
+                         "acquisition_fraction": 1.0}}
+    last_seen = {"west": {"latest": "2026-08-18", "age_days": 1}}
+    with pytest.raises(ValueError, match="window_start is required"):
+        nc.coverage_is_earned("west", observed, last_seen, None)
+
+    # ...and it still answers normally once told.
+    assert nc.coverage_is_earned("west", observed, last_seen, "2026-08-14") is True
+    assert nc.coverage_is_earned("west", observed, last_seen, "2026-08-19") is False
