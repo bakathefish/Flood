@@ -153,6 +153,18 @@ export default function ForecastSection({lang}) {
             <VStack maxWidth={780} gap={2}>
               <StatusDot variant="warning" label="unavailable" />
               <Text type="large">{t.unavailable}</Text>
+              {/* The feed says WHY in its own words, carrying the counts the
+                  decision was made on. The translated sentence above cannot
+                  hold them, and they are the whole difference between "the
+                  system is broken" and "the satellite has not covered enough
+                  of Punjab yet this cycle". Shown only when the producer
+                  itself declared the forecast unavailable, so a reason
+                  belonging to a feed that failed validation for some other
+                  cause is never presented as the explanation. */}
+              {nc && nc.forecast && nc.forecast.status === 'unavailable'
+                && nc.forecast.reason && (
+                <Text color="secondary">{nc.forecast.reason}</Text>
+              )}
             </VStack>
           )}
 
