@@ -11,6 +11,7 @@ features after they had been removed from the model.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -120,3 +121,60 @@ def test_forecast_block_is_honest_when_present(payload):
     blob = json.dumps(fc)
     for banned in ("96%", "four alerts", "0.549"):
         assert banned not in blob, f"{banned!r} back in the published feed"
+
+
+def test_the_coverage_line_counts_the_rows_beside_it(payload):
+    """The block's coverage sentence must describe the published rows.
+
+    It used to carry the publication gate's count, which is a different and
+    larger set: the gate counts districts holding a recent observation anywhere
+    in the rolling history, while a row is scored only if that observation also
+    falls inside this window and the footprint covered the district. The feed
+    could therefore state "20 of 20 districts observed" directly above five
+    scored rows, and both sentences were true of different questions.
+    """
+    fc = payload.get("forecast") or {}
+    coverage = fc.get("coverage")
+    if fc.get("status") == "unavailable" or not coverage:
+        pytest.skip("no forecast published this cycle")
+    m = re.match(r"(\d+) of (\d+)", coverage)
+    assert m, f"coverage line does not open with a count: {coverage!r}"
+    stated, total = int(m.group(1)), int(m.group(2))
+    scored = [d for d in payload["districts"] if d.get("p_event") is not None]
+    assert total == len(payload["districts"]), (
+        f"coverage line totals {total} districts, feed carries "
+        f"{len(payload['districts'])}"
+    )
+    assert stated == len(scored), (
+        f"coverage line claims {stated} scored, feed carries {len(scored)}"
+    )
+
+
+def _coverage_counts(coverage: str, districts: list) -> tuple[int, int, int]:
+    m = re.match(r"(\d+) of (\d+)", coverage)
+    assert m, f"coverage line does not open with a count: {coverage!r}"
+    scored = [d for d in districts if d.get("p_event") is not None]
+    return int(m.group(1)), int(m.group(2)), len(scored)
+
+
+def test_the_coverage_rule_runs_on_a_board_shaped_payload():
+    """The artifact test above skips whenever no forecast was published, which
+    on a quiet cycle is every run, so the rule would go unexercised for days at
+    a time and its own imports would not even be reached. This runs it against
+    a payload that always carries a board."""
+    districts = [
+        {"district": "a", "p_event": 0.4},
+        {"district": "b", "p_event": 0.1},
+        {"district": "c", "p_event": None},
+    ]
+    stated, total, scored = _coverage_counts(
+        "2 of 3 districts were imaged inside this window and carry a score",
+        districts,
+    )
+    assert (stated, total, scored) == (2, 3, 2)
+
+    bad, total, scored = _coverage_counts(
+        "3 of 3 districts were imaged inside this window and carry a score",
+        districts,
+    )
+    assert bad != scored, "the rule must be able to catch an inflated count"

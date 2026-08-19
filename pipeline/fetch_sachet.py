@@ -380,7 +380,8 @@ def heartbeat(path: Path | None = None, poll_id: str | None = None) -> None:
     contender's own death invisible, which inverts the one thing it is for.
     """
     path = LOCK if path is None else Path(path)
-    if not _holds(path, poll_id):
+    mine = poll_id or _HELD.get(os.fspath(path))
+    if mine is None or lock_holder(path) != mine:
         return
     try:
         os.utime(path, None)
@@ -389,7 +390,21 @@ def heartbeat(path: Path | None = None, poll_id: str | None = None) -> None:
         # to refresh, and it must not become the error a poll reports: this runs
         # inside every fetch retry, so an unguarded raise here would surface as a
         # capture failure whose message says nothing about the lock.
-        pass
+        return
+    # The check and the touch are still two operations, so read the owner back
+    # and find out which file we actually refreshed. A contender that broke this
+    # lock and re-took it inside that window now owns the mtime we just moved,
+    # and the honest response is to stop claiming the lock rather than to keep
+    # heartbeating someone else's.
+    #
+    # This narrows the race and makes losing it detectable; it does not remove
+    # it, because the touch cannot be made conditional on the owner without a
+    # file handle os.utime will accept on every platform this runs on. Losing it
+    # requires our lock to be older than LOCK_DEAD_AFTER already, which means a
+    # contender was entitled to break it and the refresh we handed them was to a
+    # lock whose holder is genuinely alive.
+    if lock_holder(path) != mine:
+        _HELD.pop(os.fspath(path), None)
 
 
 def break_stale_lock(path: Path, observed: os.stat_result, age: float) -> None:
@@ -503,7 +518,40 @@ def release_lock(path: Path | None = None, poll_id: str | None = None) -> bool:
         if lock_holder(path) != _HELD.get(os.fspath(path)):
             _HELD.pop(os.fspath(path), None)
         return False
-    path.unlink(missing_ok=True)
+    # Move it aside first, then look at what we moved.
+    #
+    # `unlink` after a separate ownership check deletes whatever is at the path
+    # NOW, which is not necessarily the file the check looked at: a contender
+    # that broke this lock and took its own in the gap had that lock deleted by
+    # us, and a third run then walked into the archive the second was writing,
+    # which is the exact failure the ownership check was added to prevent.
+    # `os.replace` is atomic on both platforms this runs on, so exactly one
+    # caller can win the move, and the winner reads the contents at leisure
+    # knowing nobody else holds them.
+    mine = poll_id or _HELD.get(os.fspath(path))
+    staged = path.with_name(f"{path.name}.releasing-{os.getpid()}")
+    try:
+        os.replace(path, staged)
+    except (FileNotFoundError, PermissionError):
+        # Gone, or another process is mid-move. Either way it is not ours to
+        # delete any more.
+        _HELD.pop(os.fspath(path), None)
+        return False
+    try:
+        fields = staged.read_text(encoding="utf-8").split()
+        holder = fields[0] if fields else None
+    except OSError:
+        holder = None
+    if holder != mine:
+        # We moved a lock that had already changed hands. Put it back rather
+        # than destroy a claim we never held.
+        try:
+            os.replace(staged, path)
+        except OSError:
+            pass
+        _HELD.pop(os.fspath(path), None)
+        return False
+    staged.unlink(missing_ok=True)
     _HELD.pop(os.fspath(path), None)
     return True
 

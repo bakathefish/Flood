@@ -39,9 +39,13 @@ def _by_name(payload):
 
 def test_uncovered_district_gets_no_score():
     observed = {
-        "Kapurthala": {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True},
+        "Kapurthala": {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True,
+                        "acquisition_state": "observed",
+                        "acquisition_fraction": 1.0},
         "Firozpur": {"observed_fraction": None, "observed_km2": None, "covered": False},
-        "Amritsar": {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True},
+        "Amritsar": {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True,
+                        "acquisition_state": "observed",
+                        "acquisition_fraction": 1.0},
     }
     # the model happily returned a number for the district nobody imaged
     p = {"Kapurthala": 0.72, "Firozpur": 0.55, "Amritsar": 0.02}
@@ -55,9 +59,13 @@ def test_uncovered_district_gets_no_score():
 def test_uncovered_district_gets_no_rank_or_tier():
     """Operational fields arrive via extras and must be stripped too."""
     observed = {
-        "Kapurthala": {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True},
+        "Kapurthala": {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True,
+                        "acquisition_state": "observed",
+                        "acquisition_fraction": 1.0},
         "Firozpur": {"observed_fraction": None, "observed_km2": None, "covered": False},
-        "Amritsar": {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True},
+        "Amritsar": {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True,
+                        "acquisition_state": "observed",
+                        "acquisition_fraction": 1.0},
     }
     p = {"Kapurthala": 0.72, "Firozpur": 0.55, "Amritsar": 0.02}
     extras = {
@@ -91,7 +99,8 @@ def test_district_absent_from_observed_is_not_scored():
 
 def test_every_district_covered_behaves_normally():
     observed = {
-        d: {"observed_fraction": 0.01, "observed_km2": 5.0, "covered": True}
+        d: {"observed_fraction": 0.01, "observed_km2": 5.0, "covered": True,
+            "acquisition_state": "observed", "acquisition_fraction": 1.0}
         for d in ("Kapurthala", "Firozpur", "Amritsar")
     }
     p = {"Kapurthala": 0.72, "Firozpur": 0.50, "Amritsar": 0.02}

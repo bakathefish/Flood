@@ -248,6 +248,22 @@ def test_an_uncovered_row_keeps_no_observation_date_from_extras():
             )
 
 
+
+def _producer_extras_keys() -> set:
+    """The per-district fields the real ranker emits, read off the producer.
+
+    pipeline/nowcast.py builds its `extras` from rank_and_tier's rows plus the
+    two freshness fields. Reading the keys from an actual call means this test
+    learns about a new one the moment it exists.
+    """
+    ranked = forecast_live.rank_and_tier(
+        pd.Series([0.5], index=["x"]),
+        pd.Series([1.0], index=["x"]),
+        alert_threshold=0.9,
+    )
+    return set(ranked[0])
+
+
 def test_the_uncovered_rule_covers_every_field_a_row_can_carry():
     """Stating the rule is only worth doing if the statement is complete.
 
@@ -259,15 +275,25 @@ def test_the_uncovered_rule_covers_every_field_a_row_can_carry():
 
     # Built through the EXTRAS path, because that path can put fields on a row
     # that the base dict never mentions, and those are exactly the ones the
-    # rule missed last time. A sixth extras field added without a line in the
-    # constant now fails here rather than on a live cycle. The real extras
-    # shape is used rather than an invented sentinel: pinning a field the
-    # producer does not emit would be testing fiction.
+    # rule missed last time. The shape is DERIVED from rank_and_tier rather
+    # than hand-copied, so a field added to the producer's ranked rows reaches
+    # this pin by itself; a hand-written dict only ever pins what its author
+    # already remembered, which is the failure mode being tested for.
+    extras_fields = {
+        k for k in _producer_extras_keys() if k not in ("district", "p_event")
+    } | {"latest_input", "input_age_days"}
+    sample = {
+        "rank": 1, "tier": "elevated", "transparent_score": 1.5,
+        "latest_input": "2026-08-13", "input_age_days": 1,
+    }
+    missing = extras_fields - set(sample)
+    assert not missing, (
+        f"the producer emits extras fields this test has no value for: {missing}"
+    )
     row = _window_boundary_payload(
         p_event={"Amritsar": 0.31, "Barnala": 0.12},
         extras={
-            n: {"rank": 1, "tier": "elevated", "transparent_score": 1.5,
-                "latest_input": "2026-08-13", "input_age_days": 1}
+            n: {k: sample[k] for k in extras_fields}
             for n in ("Amritsar", "Barnala")
         },
     )["districts"][0]
@@ -280,10 +306,13 @@ def test_the_uncovered_rule_covers_every_field_a_row_can_carry():
 def test_publishable_districts_is_the_intersection_not_either_side():
     from sailaab import nowcast as nc
 
+    covered = {"covered": True, "acquisition_state": "observed",
+               "acquisition_fraction": 1.0}
     observed = {
-        "fresh_and_imaged": {"covered": True},
-        "fresh_not_imaged": {"covered": False},
-        "imaged_not_fresh": {"covered": True},
+        "fresh_and_imaged": dict(covered),
+        "fresh_not_imaged": {"covered": False, "acquisition_state": "not_observed",
+                             "acquisition_fraction": 0.0},
+        "imaged_not_fresh": dict(covered),
     }
     eligible = {"fresh_and_imaged": {}, "fresh_not_imaged": {}}
     order = ["fresh_and_imaged", "fresh_not_imaged", "imaged_not_fresh"]
@@ -400,4 +429,86 @@ def test_a_tier_decided_on_the_raw_score_cannot_contradict_the_published_one():
     published = round(row["p_event"], 4)
     assert (row["tier"] == "watch") == (published >= threshold), (
         f"tier {row['tier']!r} contradicts published score {published}"
+    )
+
+
+# --- the window the claim is about, not merely some recent window ------------
+def test_a_previous_window_observation_cannot_certify_this_window():
+    """The mosaic guard checked membership and not the date.
+
+    In the first days of a window the rolling history still reaches back into
+    the window that just ended, so a district can satisfy the three-day
+    freshness rule on an observation taken BEFORE this window opened. If the
+    current window covered it only as a mosaic of partial passes, the row then
+    published a district-wide window fraction earned by exactly the temporal
+    mosaic MIN_OBSERVED_FRACTION forbids, with its stated evidence dated
+    outside the window it was certifying. Membership in `last_seen` was true
+    the whole time, so the guard let it through.
+    """
+    from sailaab import nowcast as nc
+
+    window = {"core_season": True, "window_start": "2026-08-14",
+              "window_end": "2026-08-24", "activates": "2026-07-25"}
+    observed = {
+        # the footprint union over the window's days reaches 95%, by mosaic
+        "west": {"covered": True, "observed_fraction": 0.0, "observed_km2": 0.0,
+                 "acquisition_state": "observed", "acquisition_fraction": 0.99},
+        "east": {"covered": True, "observed_fraction": 0.02, "observed_km2": 4.0,
+                 "acquisition_state": "observed", "acquisition_fraction": 1.0},
+    }
+    last_seen = {
+        # one day old and inside the freshness rule, but the PREVIOUS window
+        "west": {"latest": "2026-08-13", "age_days": 1},
+        "east": {"latest": "2026-08-15", "age_days": 1},
+    }
+    eligible = {"west": {}, "east": {}}
+
+    assert nc.publishable_districts(
+        ["west", "east"], eligible, observed,
+        last_seen=last_seen, window_start=window["window_start"],
+    ) == ["east"], "a pre-window observation cannot make a district scorable"
+
+    payload = nc.build_nowcast_json(
+        generated_utc="2026-08-15T00:00:00Z",
+        window=window, sources={}, districts=["west", "east"],
+        observed=observed, last_seen=last_seen,
+        p_event={"west": 0.4, "east": 0.2},
+        extras={"east": {"rank": 1, "tier": "elevated", "transparent_score": 1.0,
+                         "latest_input": "2026-08-15", "input_age_days": 0}},
+    )
+    rows = {r["district"]: r for r in payload["districts"]}
+    assert rows["west"]["p_event"] is None, "scored on a pre-window observation"
+    assert rows["west"]["covered"] is False
+    assert rows["west"]["observed_fraction_window"] is None
+    assert rows["east"]["p_event"] == 0.2, "the in-window district still scores"
+    assert _districts_are_valid(payload)
+
+
+def test_covered_and_its_state_cannot_be_set_independently():
+    """A caller that sets one and not the other must not publish a score.
+
+    `covered: True` with no acquisition_state emitted state "unknown" beside a
+    score, which the validator rejects outright, so a single such row took the
+    whole feed down. The producer does not repair the contradiction by
+    upgrading the state to match the flag, because that would invent an
+    observation; it withdraws the claim.
+    """
+    from sailaab import nowcast as nc
+
+    payload = nc.build_nowcast_json(
+        generated_utc="2026-08-19T00:00:00Z",
+        window={"core_season": True, "window_start": "2026-08-14",
+                "window_end": "2026-08-24", "activates": "2026-07-25"},
+        sources={},
+        districts=["ghost"],
+        # the shape a fixture reaches for: the flag alone
+        observed={"ghost": {"covered": True, "observed_fraction": 0.0,
+                            "observed_km2": 0.0}},
+        p_event={"ghost": 0.9},
+    )
+    row = payload["districts"][0]
+    assert row["covered"] is False, "a coverage flag with no acquisition behind it"
+    assert row["p_event"] is None
+    assert _districts_are_valid(payload), (
+        "the producer emitted a feed its own consumer refuses"
     )

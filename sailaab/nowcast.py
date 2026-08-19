@@ -429,7 +429,54 @@ UNCOVERED_NULL_FIELDS = (
 )
 
 
-def publishable_districts(order, eligible, observed: dict) -> list[str]:
+def _evidence_inside_window(name, last_seen: dict, window_start) -> bool:
+    """Whether the district's newest observation falls inside the window.
+
+    ``recent`` only carries a district-day whose footprint cleared the coverage
+    threshold on that date, so a date in ``last_seen`` means "properly imaged,
+    on that day". The question this answers is whether any such day lies inside
+    the window whose measurement the row is about to publish.
+
+    Membership alone was not enough, and the gap is not hypothetical. In the
+    first days of a window the rolling history still reaches back into the
+    window that just ended, so a district could hold a two-day-old observation
+    from the PREVIOUS window while the current window covered it only as a
+    mosaic of partial passes. The row then published a window fraction earned
+    by exactly the temporal mosaic MIN_OBSERVED_FRACTION exists to forbid, with
+    its stated evidence pointing outside the window it was certifying.
+    """
+    latest = (last_seen.get(name) or {}).get("latest")
+    if latest is None:
+        return False
+    return window_start is None or latest >= window_start
+
+
+def coverage_is_earned(name, observed: dict, last_seen, window_start) -> bool:
+    """Whether a district may present itself as covered, and carry a score.
+
+    Three conditions, and each one has been the sole survivor of a defect:
+    the flag is set, the state agrees with the flag, and there is an
+    observation inside the window to point at. ``last_seen=None`` means the
+    recent history was never fetched, which makes the third condition not
+    applicable rather than failed.
+    """
+    obs = observed.get(name) or {}
+    if obs.get("covered") is not True:
+        return False
+    # `covered` and `acquisition_state` are two spellings of one fact and the
+    # consumer checks them against each other. A caller that sets one and not
+    # the other is not making a claim this function can repair, so it fails
+    # closed rather than upgrading the state to match the flag.
+    if (obs.get("acquisition_state") or "unknown") != "observed":
+        return False
+    if last_seen is None:
+        return True
+    return _evidence_inside_window(name, last_seen, window_start)
+
+
+def publishable_districts(
+    order, eligible, observed: dict, last_seen=None, window_start=None
+) -> list[str]:
     """Districts that may carry a score, in ``order``.
 
     Two separate things have to be true, and they are checked over two
@@ -451,7 +498,8 @@ def publishable_districts(order, eligible, observed: dict) -> list[str]:
     return [
         name
         for name in order
-        if name in eligible and (observed.get(name) or {}).get("covered") is True
+        if name in eligible
+        and coverage_is_earned(name, observed, last_seen, window_start)
     ]
 
 
@@ -512,7 +560,11 @@ def build_nowcast_json(
         # history was fetched and this district is not in it, the claim is
         # withdrawn rather than published without evidence.
         acq_state = obs.get("acquisition_state") or "unknown"
-        if last_seen is not None and covered and name not in last_seen:
+        # The same predicate the ranking used, so a row cannot be built on one
+        # answer while its score was decided on another.
+        if covered and not coverage_is_earned(
+            name, observed, last_seen, window.get("window_start")
+        ):
             covered = False
             # The measurement goes with the claim. Leaving the fraction behind
             # would republish the mosaic reading under an uncovered row, which

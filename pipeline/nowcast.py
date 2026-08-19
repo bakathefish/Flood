@@ -389,7 +389,10 @@ def main() -> int:
             # built from the footprint and said not_observed twenty times over,
             # and the feed published a forecast block reporting "20 of 20
             # districts observed" above them.
-            seen = nowcast.publishable_districts(X.index, eligible, observed)
+            seen = nowcast.publishable_districts(
+                X.index, eligible, observed,
+                last_seen=last_seen, window_start=window["window_start"],
+            )
             gfm_meta["publishable_districts"] = len(seen)
             if not seen:
                 # No row can carry a score, so there is no forecast — and
@@ -404,6 +407,20 @@ def main() -> int:
                     f"({window['window_start']} onwards), so no district can be "
                     f"scored"
                 )
+            # The block's coverage line describes the rows beside it, not the
+            # gate that let the cycle proceed. Those are different sets and the
+            # difference is not cosmetic: the gate counts districts with a
+            # recent observation anywhere in the rolling history, while a row
+            # is scored only if that observation also falls inside this window
+            # and the footprint covered it. Reporting the gate's count above
+            # the smaller set published "20 of 20 districts observed" over five
+            # scored rows. The gate's own wording is kept in the run summary,
+            # where it describes what it actually decided.
+            published_coverage = (
+                f"{len(seen)} of {len(districts)} districts were imaged inside "
+                f"this window and carry a score; the rest are published without "
+                f"one"
+            )
             model_score = model_score.loc[seen]
             trans = trans.loc[seen]
             ranked = forecast_live.rank_and_tier(
@@ -436,7 +453,7 @@ def main() -> int:
                     "been fitted to a reliability curve, so read the tier and "
                     "the rank rather than the number"
                 ),
-                "coverage": coverage_reason,
+                "coverage": published_coverage,
                 "alert_threshold": bundle["alert_threshold"],
                 "alert_rate": bundle["alert_rate"],
                 "trained_years": bundle["trained_years"],

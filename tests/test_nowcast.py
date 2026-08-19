@@ -416,7 +416,9 @@ def test_build_nowcast_json_core_season_ranks_by_p_event():
     # Coverage is explicit now: an observation that does not say it was imaged
     # is treated as unimaged, so a caller cannot publish a score by omission.
     observed = {
-        d: {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True}
+        d: {"observed_fraction": 0.0, "observed_km2": 0.0, "covered": True,
+                        "acquisition_state": "observed",
+                        "acquisition_fraction": 1.0}
         for d in districts
     }
     p_event = {"Kapurthala": 0.72, "Firozpur": 0.50, "Amritsar": 0.02}

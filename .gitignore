@@ -41,6 +41,9 @@ webapp/*.jpg
 data/sachet/*.tmp
 data/sachet/*.lock
 data/sachet/.lock
+# the lock's staging name during an atomic release; a SIGKILL between the
+# move and the delete leaves one behind, and `*.lock` does not match it
+data/sachet/*.releasing-*
 # Output of a producer that was withdrawn. `fetch_hydro_drivers.py` was refuted
 # in review and never adopted, so committing its recorded output would publish a
 # measurement whose proposal no longer stands. The file itself is real and stays
