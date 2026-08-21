@@ -1,33 +1,36 @@
 {
- "generated_utc": "2026-08-19T07:44:32Z",
+ "generated_utc": "2026-08-21T01:10:42Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-08-18",
- "latest_pass_utc": "2026-08-18T01:07:58.545876Z",
- "new_scenes": 6,
+ "latest_pass": "2026-08-20",
+ "latest_pass_utc": "2026-08-20T00:51:47.445697Z",
+ "new_scenes": 4,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.018,
- "total_flooded_km2": 0.0,
+ "coverage_fraction": 0.35,
+ "total_flooded_km2": 0.7,
  "passes": [
   {
-   "date": "2026-08-17",
-   "scenes": 3,
-   "total_flooded_km2": 0.2,
+   "date": "2026-08-20",
+   "scenes": 4,
+   "total_flooded_km2": 0.7,
    "flagged": 0,
-   "coverage_fraction": 0.71
-  },
-  {
-   "date": "2026-08-18",
-   "scenes": 3,
-   "total_flooded_km2": 0.0,
-   "flagged": 0,
-   "coverage_fraction": 0.018
+   "coverage_fraction": 0.35
   }
  ],
  "districts": [
+  {
+   "district": "Rupnagar",
+   "flooded_km2": 0.5,
+   "flooded_fraction": 0.0003
+  },
+  {
+   "district": "Ludhiana",
+   "flooded_km2": 0.2,
+   "flooded_fraction": 0.0001
+  },
   {
    "district": "Amritsar",
    "flooded_km2": 0.0,
@@ -79,11 +82,6 @@
    "flooded_fraction": 0.0
   },
   {
-   "district": "Ludhiana",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
-  },
-  {
    "district": "Mansa",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
@@ -105,11 +103,6 @@
   },
   {
    "district": "Patiala",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
-  },
-  {
-   "district": "Rupnagar",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
