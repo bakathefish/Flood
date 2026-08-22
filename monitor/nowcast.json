@@ -5,7 +5,7 @@
   "reason": "only 6 of 20 districts have a recent observation, below the 50% floor",
   "note": "No forecast was produced this cycle. This is not an all-clear: absence of a forecast is absence of information, not evidence of calm."
  },
- "generated_utc": "2026-08-22T12:35:18Z",
+ "generated_utc": "2026-08-22T18:27:55Z",
  "window_start": "2026-08-14",
  "window_end": "2026-08-24",
  "core_season": true,
@@ -28,8 +28,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-17",
    "input_age_days": 5,
-   "observed_fraction_window": 0.001,
-   "observed_km2": 5.0
+   "observed_fraction_window": 0.0009,
+   "observed_km2": 4.9
   },
   {
    "district": "Tarn Taran",
@@ -42,8 +42,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-17",
    "input_age_days": 5,
-   "observed_fraction_window": 0.0015,
-   "observed_km2": 3.5
+   "observed_fraction_window": 0.0012,
+   "observed_km2": 3.0
   },
   {
    "district": "Nawanshahr",
@@ -56,8 +56,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-20",
    "input_age_days": 2,
-   "observed_fraction_window": 0.0021,
-   "observed_km2": 2.7
+   "observed_fraction_window": 0.0019,
+   "observed_km2": 2.5
   },
   {
    "district": "Amritsar",
@@ -71,7 +71,7 @@
    "latest_input": "2026-08-17",
    "input_age_days": 5,
    "observed_fraction_window": 0.0003,
-   "observed_km2": 0.9
+   "observed_km2": 0.7
   },
   {
    "district": "Bathinda",
