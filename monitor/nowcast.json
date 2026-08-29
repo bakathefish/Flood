@@ -2,10 +2,10 @@
  "forecast": {
   "kind": "district flood onset",
   "status": "unavailable",
-  "reason": "newest observation is stale: 4 days old (2026-08-25), limit 3",
+  "reason": "only 9 of 20 districts have a recent observation, below the 50% floor",
   "note": "No forecast was produced this cycle. This is not an all-clear: absence of a forecast is absence of information, not evidence of calm."
  },
- "generated_utc": "2026-08-29T12:18:42Z",
+ "generated_utc": "2026-08-29T20:25:57Z",
  "window_start": "2026-08-24",
  "window_end": "2026-09-03",
  "core_season": true,
@@ -26,10 +26,10 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
-   "observed_fraction_window": 0.0011,
-   "observed_km2": 5.7
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
+   "observed_fraction_window": 0.0013,
+   "observed_km2": 6.9
   },
   {
    "district": "Tarn Taran",
@@ -40,8 +40,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0017,
    "observed_km2": 4.1
   },
@@ -56,8 +56,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-25",
    "input_age_days": 4,
-   "observed_fraction_window": 0.0011,
-   "observed_km2": 3.9
+   "observed_fraction_window": 0.001,
+   "observed_km2": 3.5
   },
   {
    "district": "Kapurthala",
@@ -70,8 +70,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-25",
    "input_age_days": 4,
-   "observed_fraction_window": 0.001,
-   "observed_km2": 1.7
+   "observed_fraction_window": 0.0011,
+   "observed_km2": 1.9
   },
   {
    "district": "Amritsar",
@@ -82,8 +82,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0006,
    "observed_km2": 1.6
   },
@@ -99,7 +99,7 @@
    "latest_input": "2026-08-25",
    "input_age_days": 4,
    "observed_fraction_window": 0.0005,
-   "observed_km2": 1.2
+   "observed_km2": 1.4
   },
   {
    "district": "Ludhiana",
@@ -113,7 +113,21 @@
    "latest_input": "2026-08-25",
    "input_age_days": 4,
    "observed_fraction_window": 0.0003,
-   "observed_km2": 1.0
+   "observed_km2": 1.1
+  },
+  {
+   "district": "Bathinda",
+   "p_event": null,
+   "covered": true,
+   "acquisition_state": "observed",
+   "acquisition_fraction": 1.0,
+   "rank": null,
+   "tier": null,
+   "transparent_score": null,
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
+   "observed_fraction_window": 0.0002,
+   "observed_km2": 0.6
   },
   {
    "district": "Nawanshahr",
@@ -126,21 +140,7 @@
    "transparent_score": null,
    "latest_input": "2026-08-24",
    "input_age_days": 5,
-   "observed_fraction_window": 0.0004,
-   "observed_km2": 0.5
-  },
-  {
-   "district": "Bathinda",
-   "p_event": null,
-   "covered": true,
-   "acquisition_state": "observed",
-   "acquisition_fraction": 1.0,
-   "rank": null,
-   "tier": null,
-   "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
-   "observed_fraction_window": 0.0001,
+   "observed_fraction_window": 0.0003,
    "observed_km2": 0.4
   },
   {
@@ -158,7 +158,7 @@
    "observed_km2": 0.2
   },
   {
-   "district": "Moga",
+   "district": "Muktsar",
    "p_event": null,
    "covered": true,
    "acquisition_state": "observed",
@@ -166,9 +166,9 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
-   "observed_fraction_window": 0.0001,
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
+   "observed_fraction_window": 0.0,
    "observed_km2": 0.1
   },
   {
@@ -200,7 +200,7 @@
    "observed_km2": 0.1
   },
   {
-   "district": "Barnala",
+   "district": "Sangrur",
    "p_event": null,
    "covered": true,
    "acquisition_state": "observed",
@@ -210,6 +210,20 @@
    "transparent_score": null,
    "latest_input": "2026-08-25",
    "input_age_days": 4,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.1
+  },
+  {
+   "district": "Barnala",
+   "p_event": null,
+   "covered": true,
+   "acquisition_state": "observed",
+   "acquisition_fraction": 1.0,
+   "rank": null,
+   "tier": null,
+   "transparent_score": null,
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -222,8 +236,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -250,13 +264,13 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
   {
-   "district": "Muktsar",
+   "district": "Moga",
    "p_event": null,
    "covered": true,
    "acquisition_state": "observed",
@@ -264,8 +278,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
+   "latest_input": "2026-08-29",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -282,21 +296,7 @@
    "input_age_days": 5,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
-  },
-  {
-   "district": "Sangrur",
-   "p_event": null,
-   "covered": true,
-   "acquisition_state": "observed",
-   "acquisition_fraction": 1.0,
-   "rank": null,
-   "tier": null,
-   "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 4,
-   "observed_fraction_window": 0.0,
-   "observed_km2": 0.0
   }
  ],
- "notes": "Forecast unavailable for this cycle: newest observation is stale: 4 days old (2026-08-25), limit 3. No district-level risk is published, and this is NOT an all-clear. Absence of satellite imagery is absence of information."
+ "notes": "Forecast unavailable for this cycle: only 9 of 20 districts have a recent observation, below the 50% floor. No district-level risk is published, and this is NOT an all-clear. Absence of satellite imagery is absence of information."
 }
