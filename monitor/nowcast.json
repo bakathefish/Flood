@@ -5,7 +5,7 @@
   "reason": "only 9 of 20 districts have a recent observation, below the 50% floor",
   "note": "No forecast was produced this cycle. This is not an all-clear: absence of a forecast is absence of information, not evidence of calm."
  },
- "generated_utc": "2026-08-30T03:44:21Z",
+ "generated_utc": "2026-08-30T11:16:58Z",
  "window_start": "2026-08-24",
  "window_end": "2026-09-03",
  "core_season": true,
@@ -28,22 +28,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-29",
    "input_age_days": 1,
-   "observed_fraction_window": 0.0014,
-   "observed_km2": 7.2
-  },
-  {
-   "district": "Gurdaspur",
-   "p_event": null,
-   "covered": true,
-   "acquisition_state": "observed",
-   "acquisition_fraction": 1.0,
-   "rank": null,
-   "tier": null,
-   "transparent_score": null,
-   "latest_input": "2026-08-25",
-   "input_age_days": 5,
-   "observed_fraction_window": 0.0012,
-   "observed_km2": 4.5
+   "observed_fraction_window": 0.0013,
+   "observed_km2": 6.9
   },
   {
    "district": "Tarn Taran",
@@ -56,8 +42,22 @@
    "transparent_score": null,
    "latest_input": "2026-08-29",
    "input_age_days": 1,
-   "observed_fraction_window": 0.0018,
-   "observed_km2": 4.4
+   "observed_fraction_window": 0.0017,
+   "observed_km2": 4.1
+  },
+  {
+   "district": "Gurdaspur",
+   "p_event": null,
+   "covered": true,
+   "acquisition_state": "observed",
+   "acquisition_fraction": 1.0,
+   "rank": null,
+   "tier": null,
+   "transparent_score": null,
+   "latest_input": "2026-08-25",
+   "input_age_days": 5,
+   "observed_fraction_window": 0.001,
+   "observed_km2": 3.5
   },
   {
    "district": "Kapurthala",
@@ -70,8 +70,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-25",
    "input_age_days": 5,
-   "observed_fraction_window": 0.0013,
-   "observed_km2": 2.2
+   "observed_fraction_window": 0.0011,
+   "observed_km2": 1.9
   },
   {
    "district": "Amritsar",
@@ -84,8 +84,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-29",
    "input_age_days": 1,
-   "observed_fraction_window": 0.0007,
-   "observed_km2": 1.8
+   "observed_fraction_window": 0.0006,
+   "observed_km2": 1.6
   },
   {
    "district": "Jalandhar",
@@ -113,7 +113,7 @@
    "latest_input": "2026-08-25",
    "input_age_days": 5,
    "observed_fraction_window": 0.0003,
-   "observed_km2": 1.3
+   "observed_km2": 1.1
   },
   {
    "district": "Bathinda",
@@ -140,8 +140,8 @@
    "transparent_score": null,
    "latest_input": "2026-08-24",
    "input_age_days": 6,
-   "observed_fraction_window": 0.0004,
-   "observed_km2": 0.5
+   "observed_fraction_window": 0.0003,
+   "observed_km2": 0.4
   },
   {
    "district": "Hoshiarpur",
@@ -156,20 +156,6 @@
    "input_age_days": 5,
    "observed_fraction_window": 0.0001,
    "observed_km2": 0.2
-  },
-  {
-   "district": "Moga",
-   "p_event": null,
-   "covered": true,
-   "acquisition_state": "observed",
-   "acquisition_fraction": 1.0,
-   "rank": null,
-   "tier": null,
-   "transparent_score": null,
-   "latest_input": "2026-08-29",
-   "input_age_days": 1,
-   "observed_fraction_window": 0.0001,
-   "observed_km2": 0.1
   },
   {
    "district": "Muktsar",
@@ -271,6 +257,20 @@
   },
   {
    "district": "Mansa",
+   "p_event": null,
+   "covered": true,
+   "acquisition_state": "observed",
+   "acquisition_fraction": 1.0,
+   "rank": null,
+   "tier": null,
+   "transparent_score": null,
+   "latest_input": "2026-08-29",
+   "input_age_days": 1,
+   "observed_fraction_window": 0.0,
+   "observed_km2": 0.0
+  },
+  {
+   "district": "Moga",
    "p_event": null,
    "covered": true,
    "acquisition_state": "observed",
