@@ -1,70 +1,35 @@
 {
- "generated_utc": "2026-08-30T03:41:10Z",
+ "generated_utc": "2026-08-30T16:03:46Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-08-29",
- "latest_pass_utc": "2026-08-29T13:04:17.044377Z",
+ "latest_pass": "2026-08-30",
+ "latest_pass_utc": "2026-08-30T01:07:59.280625Z",
  "new_scenes": 3,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.71,
- "total_flooded_km2": 11.8,
+ "coverage_fraction": 0.018,
+ "total_flooded_km2": 0.0,
  "passes": [
   {
-   "date": "2026-08-29",
+   "date": "2026-08-30",
    "scenes": 3,
-   "total_flooded_km2": 11.8,
+   "total_flooded_km2": 0.0,
    "flagged": 0,
-   "coverage_fraction": 0.71
+   "coverage_fraction": 0.018
   }
  ],
  "districts": [
   {
-   "district": "Sangrur",
-   "flooded_km2": 5.0,
-   "flooded_fraction": 0.0014
-  },
-  {
-   "district": "Moga",
-   "flooded_km2": 2.6,
-   "flooded_fraction": 0.0011
+   "district": "Amritsar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
   },
   {
    "district": "Barnala",
-   "flooded_km2": 1.6,
-   "flooded_fraction": 0.0011
-  },
-  {
-   "district": "Jalandhar",
-   "flooded_km2": 0.9,
-   "flooded_fraction": 0.0003
-  },
-  {
-   "district": "Mansa",
-   "flooded_km2": 0.7,
-   "flooded_fraction": 0.0003
-  },
-  {
-   "district": "Amritsar",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Gurdaspur",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Kapurthala",
-   "flooded_km2": 0.2,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Ludhiana",
-   "flooded_km2": 0.2,
-   "flooded_fraction": 0.0001
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
   },
   {
    "district": "Bathinda",
@@ -87,7 +52,37 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Gurdaspur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Hoshiarpur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Jalandhar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Kapurthala",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Ludhiana",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Mansa",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Moga",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
@@ -113,6 +108,11 @@
   },
   {
    "district": "Sahibzada Ajit Singh Nagar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Sangrur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
