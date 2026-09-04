@@ -1,58 +1,33 @@
 {
- "generated_utc": "2026-09-01T20:34:43Z",
+ "generated_utc": "2026-09-04T10:37:26Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-09-01",
- "latest_pass_utc": "2026-09-01T00:51:48.078455Z",
- "new_scenes": 3,
+ "latest_pass": "2026-09-03",
+ "latest_pass_utc": "2026-09-03T13:11:58.617578Z",
+ "new_scenes": 1,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.35,
- "total_flooded_km2": 4.6,
+ "coverage_fraction": 0.0,
+ "total_flooded_km2": 0.0,
  "passes": [
   {
-   "date": "2026-09-01",
-   "scenes": 3,
-   "total_flooded_km2": 4.6,
+   "date": "2026-09-03",
+   "scenes": 1,
+   "total_flooded_km2": 0.0,
    "flagged": 0,
-   "coverage_fraction": 0.35
+   "coverage_fraction": 0.0
   }
  ],
  "districts": [
   {
-   "district": "Sangrur",
-   "flooded_km2": 1.3,
-   "flooded_fraction": 0.0004
-  },
-  {
-   "district": "Mansa",
-   "flooded_km2": 1.2,
-   "flooded_fraction": 0.0005
+   "district": "Amritsar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
   },
   {
    "district": "Barnala",
-   "flooded_km2": 1.0,
-   "flooded_fraction": 0.0007
-  },
-  {
-   "district": "Rupnagar",
-   "flooded_km2": 0.5,
-   "flooded_fraction": 0.0003
-  },
-  {
-   "district": "Ludhiana",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Nawanshahr",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0002
-  },
-  {
-   "district": "Amritsar",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
@@ -97,6 +72,16 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Ludhiana",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Mansa",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Moga",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
@@ -107,12 +92,27 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Nawanshahr",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Patiala",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
   {
+   "district": "Rupnagar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Sahibzada Ajit Singh Nagar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Sangrur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
