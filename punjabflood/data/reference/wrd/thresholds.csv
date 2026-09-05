@@ -1,0 +1,11 @@
+river,station,low_min,low_max,med_min,med_max,high_min,source_page
+Sutlej,Ropar Head Works,80000,140000,140000,200000,200000,11
+Sutlej,Railway Bridge Phillaur,100000,150000,150000,200000,200000,11
+Sutlej,Harike Head Works,50000,200000,200000,300000,300000,11
+Sutlej,Ferozepur Head Works,50000,150000,150000,225000,225000,11
+Beas,Naushera Mirthal,50000,150000,150000,225000,225000,11
+Beas,Dhilwan,80000,150000,200000,300000,300000,11
+Ravi,Madhopur Head Works,30000,60000,60000,100000,100000,11
+Ghaggar,Bhankarpur,21000,31500,31500,42000,42000,11
+Ghaggar,BML Crossing,10000,14999,15000,19999,20000,11
+Ghaggar,Crossing with Narwana Branch,21000,31500,31500,42000,42000,11

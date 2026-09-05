@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "punjabflood"
+version = "0.1.0"
+description = "Physically grounded, keyless flood-hazard forecasting for the Punjab rivers: reservoir headroom, open weather forecasts, published travel times."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "requests>=2.31",
+    "shapely>=2.0",
+    "pyproj>=3.6",
+    "pyshp>=2.3",
+    "pypdfium2>=4.30",
+    "typer>=0.12",
+    "scikit-learn>=1.4",
+    "scipy>=1.11",
+    "xarray>=2024.1",
+    "imdlib>=0.1.20",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+punjabflood = "punjabflood.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["punjabflood*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["network: hits a live external service (deselected by default with -m 'not network')"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

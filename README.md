@@ -21,6 +21,29 @@ In August and September 2025 Punjab had its worst flood since 1988: all 23 distr
 
 The public site (built in React with Meta's Astryx design system, trilingual in Punjabi, Hindi and English) is interactive: the live district-risk forecast, the live satellite monitor, an every-district map you can scrub through any monsoon from 2015 to now with decade-recurrence and rupee-impact layers, per-district panels, auto-generated trilingual alerts, and the held-out 2025 validation. Every figure loads from version-controlled data in this repo.
 
+## 2026 rebuild: the physically grounded hazard tier (`punjabflood/`)
+
+The forecaster above ranks districts on satellite flood labels, and its own audit trail
+(`docs/notes/forecaster.md`) records how much of that signal survives resampling. The 2026
+rebuild in [`punjabflood/`](punjabflood/) starts from the mechanism instead: Punjab's river
+floods are dam-release floods, so it forecasts the thing that causes them. It reads the
+BBMB bulletin (reservoir level, inflow, outflow), fits each dam's own level-storage relation
+on the CWC record, turns catchment rain forecasts (GFS, ECMWF IFS, ICON, the 51-member IFS
+ensemble) into inflow with a coefficient calibrated on measured storage changes, computes a
+headroom-exhaustion index per dam and horizon (how much of the forecast inflow a full
+reservoir cannot hold, so must spill), and routes the forced release to Ropar, Phillaur,
+Harike, Dhilwan and Ferozepur on the Water Resources Department's published travel times and
+thresholds. Every constant carries its source; the department's 38-year peak tables and
+travel times were digitised and checked page by page.
+
+It is verified three ways and the report is rendered from the outputs, never typed:
+[`punjabflood/docs/verification.md`](punjabflood/docs/verification.md). The 38-year annual
+peak class is where the skill is; the 2023 and 2025 event timing shows the model's known
+limit (the storage-change calibration undershoots extreme inflow); the 2026 season is the
+live test. A daily GitHub Action commits a dated prospective record to
+`punjabflood/outputs/forecast/`. Design and data sources: `punjabflood/docs/`. It is a hazard
+watch on physical quantities, not an official warning.
+
 ## Headline results
 
 - **2025 mapping.** 105,183 ha statewide SAR-flooded area (Tier-A change detection, 90 m, full coverage). The RF map adds about 52k ha in-district. The three-method envelope against Copernicus GFM is published: Tier-A 34k < RF 52k < GFM 86k in-district.

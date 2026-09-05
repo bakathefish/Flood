@@ -1,0 +1,48 @@
+name: punjabflood-hazard-forecast
+
+# One prospective hazard-watch cycle a day, committed with the runner's timestamp so the
+# record cannot be edited after the outcome is known. Runs after BBMB's 06:00 IST bulletin
+# is normally on the site. Public data only, no secrets: the BBMB bulletin, the CWC seed
+# record and fitted parameters committed under punjabflood/data/reference/, and keyless
+# Open-Meteo forecasts. The run must never rewrite an earlier day's record.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"   # 08:30 IST
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: hazard-forecast
+  cancel-in-progress: false
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: punjabflood
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - run: pip install -e ".[dev]"
+      - run: python -m pytest -q          # never publish from a red tree
+      # The bulletin fetch can fail from a foreign runner (bbmb.gov.in has an incomplete TLS
+      # chain and is not always reachable from outside India). A failed cycle is recorded in
+      # the job log and produces no file; it must not fail the commit step.
+      - name: forecast cycle
+        run: python -m punjabflood.cli forecast
+        continue-on-error: true
+        timeout-minutes: 35
+      - name: commit the dated record
+        run: |
+          git config user.name "bakathefish"
+          git config user.email "bakathefish@gmail.com"
+          git add outputs/forecast/
+          git diff --cached --quiet || git commit -m "hazard: prospective forecast record"
+          git pull --rebase --autostash origin master
+          git push

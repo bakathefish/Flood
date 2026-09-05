@@ -1,0 +1,14 @@
+# raw pulls and caches are rebuilt by the CLI; the reference tables, the verification
+# outputs the report is rendered from, and the dated prospective forecast records are committed
+data/raw/
+data/cache/
+private/
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.venv/
