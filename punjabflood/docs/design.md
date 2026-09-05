@@ -123,7 +123,7 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    comparison says too. A correction conditional on the forecast amount, or quantile
    mapping, needs more seasons of archive than exist.
 6. As-issued hindcast. For every issue date of the 2024 to 2026 seasons, the recorded or
-   model-carried Pong storage and the rain forecast that was actually issued that day
+   model-carried Pong and Bhakra storage and the rain forecast that was actually issued that day
    (archived lead 1 to 5 QPF, ECMWF and GFS, deterministic) go through the same water
    balance as the live product: what the product would have said, day by day, before the
    2025 event and through the two seasons without one. Scored as flagged issue dates (a
@@ -134,10 +134,18 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    minus the measurement), and the report prints the largest one between the first
    perfect-prognosis flag and the spill, because that gap is why the model's own flags can
    run ahead of its spill: a positive gap is the dam passing more than its turbines, the
-   inflow over-predicted, or both, and the public record cannot separate them. In 2025 both
-   models flagged from mid-August and every flag was a hit against the perfect-prognosis
-   run, with a few misses; the 2024 and 2026 seasons had no flags and no spill. The
-   prospective 2026 record continues this test forward with the live ensemble.
+   inflow over-predicted, or both, and the public record cannot separate them. For Pong in
+   2025 both models flagged from mid-August and every flag was a hit against the
+   perfect-prognosis run, with a few misses; the 2024 and 2026 seasons had no flags and no
+   spill at either dam. For Bhakra in 2025 the run under observed rain flagged in the last
+   days of August and never forced the spillway within the window: the measurement that
+   followed re-anchored the carried path downward, and the reservoir the record then shows
+   stayed below the ceiling, so the as-issued hits there were calls of a spill unless water
+   was released, and the record says that water was released, the inflow over-predicted, or
+   both. Where the model never spills, the re-anchor note runs from the first flag to the end
+   of the window instead of to the spill. The Dhilwan peak is dated in the WRD table and the
+   Ropar peak is not, so the observed-peak lead is Pong's alone. The prospective 2026 record
+   continues this test forward with the live ensemble.
 
 As-issued skill (forecast rather than observed rain) is measured on the 2024 to 2026
 seasons, the period for which Open-Meteo archives the lead 1 to 7 forecasts of GFS and

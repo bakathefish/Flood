@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from punjabflood import constants as C
+from punjabflood.verify import EVENT_WINDOW
 
 OUT = Path("outputs/verification")
 ERA5_IMD_CSV = Path("data/reference/rain/era5_vs_imd_event_windows.csv")
@@ -147,33 +148,52 @@ def _prospective_lines(forecast_dir: Path) -> list[str]:
     return lines
 
 
-def reanchor_note(pp: pd.DataFrame, year: int, first_flag: str, first_spill: str) -> str | None:
-    """Why the model's own flags can run ahead of its spill: between the first
-    perfect-prognosis flag and the spill, the largest downward re-anchor of the carried
-    storage path at a measurement (``reanchor_gap_bcm`` from ``verify.carry_storage``)."""
+def reanchor_note(
+    pp: pd.DataFrame,
+    dam: str,
+    year: int,
+    first_flag: str,
+    first_spill: str | None,
+    window_end: tuple[int, int] = EVENT_WINDOW[1],
+) -> str | None:
+    """Why the model's own flags can run ahead of its spill, or come without one: from the
+    first perfect-prognosis flag to the spill (with no spill, to the end of the event window),
+    the largest downward re-anchor of the carried storage path at a measurement
+    (``reanchor_gap_bcm`` from ``verify.carry_storage``)."""
     if "reanchor_gap_bcm" not in pp.columns or "dam" not in pp.columns:
         return None
+    end = pd.Timestamp(first_spill) if first_spill else pd.Timestamp(year, *window_end)
     d = pd.to_datetime(pp["date"])
     g = pp[
-        (pp["dam"] == "Pong")
-        & (d >= pd.Timestamp(first_flag))
-        & (d <= pd.Timestamp(first_spill))
-        & (d.dt.year == year)
+        (pp["dam"] == dam) & (d >= pd.Timestamp(first_flag)) & (d <= end) & (d.dt.year == year)
     ].dropna(subset=["reanchor_gap_bcm"])
     g = g[g["reanchor_gap_bcm"] > 0]
     if g.empty:
         return None
     i = g["reanchor_gap_bcm"].idxmax()
     when = pd.Timestamp(g.loc[i, "date"]).date().isoformat()
+    gap = f"{g.loc[i, 'reanchor_gap_bcm']:.2f} BCM"
+    cause = (
+        "the reservoir gained less than the water balance says, which is the dam passing more "
+        "than its turbines, the inflow over-predicted, or both; the public record cannot "
+        "separate them."
+    )
+    if first_spill:
+        return (
+            f"In {year} the {dam} run under observed rain flagged from {first_flag} while its "
+            f"spill came on {first_spill}. Between the two, the measured storage of {when} "
+            f"re-anchored the model's carried path downward by {gap}: {cause} The flags before "
+            "that date were therefore calls of a spill unless water was released, which is what "
+            "the index means, and the as-issued hits scored against them carry the same reading."
+        )
     return (
-        f"In {year} the run under observed rain flagged from {first_flag} while its spill came "
-        f"on {first_spill}. Between the two, the measured storage of {when} re-anchored the "
-        f"model's carried path downward by {g.loc[i, 'reanchor_gap_bcm']:.2f} BCM: the "
-        "reservoir gained less than the water balance says, which is the dam passing more than "
-        "its turbines, the inflow over-predicted, or both; the public record cannot separate "
-        "them. The flags before that date were therefore calls of a spill unless water was "
-        "released, which is what the index means, and the as-issued hits scored against them "
-        "carry the same reading."
+        f"In {year} the {dam} run under observed rain flagged from {first_flag} and did not force "
+        f"the spillway within the window (to {end.date().isoformat()}). After the first flag, the "
+        f"measured storage of {when} re-anchored the model's carried path downward by {gap}: "
+        f"{cause} The flags were therefore calls of a spill unless water was released, which is "
+        "what the index means; the as-issued hits scored against them carry the same reading, "
+        "and after the re-anchor the observed rain did not fill the reservoir before the window "
+        "closed."
     )
 
 
@@ -351,7 +371,7 @@ def render_verification(
     ai = results.get("as_issued_events") or []
     if ai:
         lines += [
-            "## As-issued hindcast: what the product would have said, Pong, 2024 to 2026",
+            "## As-issued hindcast: what the product would have said, Pong and Bhakra, 2024 to 2026",
             "",
             "For each issue date the recorded or model-carried storage and the rain forecast "
             "actually issued that day (archived lead 1 to 5 QPF, deterministic) go through the "
@@ -364,8 +384,8 @@ def render_verification(
             "it to the model's first spill under observed rain and to the dated Dhilwan peak. "
             "The window is 1 August to 15 September.",
             "",
-            "| year | model | issue days | flagged (hits, false) | missed | first flag of any kind | first hit (issue date, spill on day) | earliest possible flag (observed rain) | first spill under observed rain | lead (days) | observed Dhilwan peak | lead (days) | largest forecast peak release (cusecs) | perfect-prognosis peak release (cusecs) |",
-            "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+            "| year | dam | model | issue days | flagged (hits, false) | missed | first flag of any kind | first hit (issue date, spill on day) | earliest possible flag (observed rain) | first spill under observed rain | lead (days) | observed Dhilwan peak (Pong only) | lead (days) | largest forecast peak release (cusecs) | perfect-prognosis peak release (cusecs) |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
 
         def _d(x):
@@ -381,7 +401,7 @@ def render_verification(
                 else f"{r['first_hit_issue_date']}, day {r['first_hit_spill_day']}"
             )
             lines.append(
-                f"| {r['year']} | {r['model']} | {r['issue_days']} | "
+                f"| {r['year']} | {r.get('dam') or 'Pong'} | {r['model']} | {r['issue_days']} | "
                 f"{r['flagged_days']} ({r['hit_days']} hits, {r['false_flag_days']} false) | "
                 f"{r['missed_days']} | {_d(r.get('first_flag_issue_date'))} | {first_hit} | "
                 f"{_d(r.get('pp_first_flag_date'))} | {_d(r.get('pp_first_spill_date'))} | "
@@ -390,20 +410,23 @@ def render_verification(
                 f"{r['max_forecast_peak_release_cusecs']:,.0f} | {r['pp_peak_day1_release_cusecs']:,.0f} |"
             )
         lines.append("")
-        pp_ev = out_dir / "perfect_prog_event_pong.csv"
-        if not pp_ev.exists():
-            pp_ev = out_dir / "perfect_prog_hei_daily.csv"
-        if pp_ev.exists():
-            ppf = pd.read_csv(pp_ev, parse_dates=["date"])
-            seen = set()
-            for r in ai:
-                key = (r["year"], r.get("pp_first_flag_date"), r.get("pp_first_spill_date"))
-                if key in seen or key[1] is None or key[2] is None:
-                    continue
-                seen.add(key)
-                note = reanchor_note(ppf, int(r["year"]), key[1], key[2])
-                if note:
-                    lines += [note, ""]
+        seen = set()
+        for r in ai:
+            dam = r.get("dam") or "Pong"
+            key = (dam, r["year"], r.get("pp_first_flag_date"), r.get("pp_first_spill_date"))
+            if key in seen or key[2] is None:
+                continue
+            seen.add(key)
+            pp_ev = out_dir / f"perfect_prog_event_{dam.lower().replace(' ', '_')}.csv"
+            if not pp_ev.exists():
+                pp_ev = out_dir / "perfect_prog_hei_daily.csv"
+            if not pp_ev.exists():
+                continue
+            note = reanchor_note(
+                pd.read_csv(pp_ev, parse_dates=["date"]), dam, int(r["year"]), key[2], key[3]
+            )
+            if note:
+                lines += [note, ""]
 
     if era5_imd_path is not None and Path(era5_imd_path).exists():
         ri = rain_input_rows(pd.read_csv(era5_imd_path))

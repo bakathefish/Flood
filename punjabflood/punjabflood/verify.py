@@ -354,6 +354,7 @@ def as_issued_event_summary(
         rows.append(
             {
                 "year": year,
+                "dam": str(g["dam"].iloc[0]) if "dam" in g and len(g) else None,
                 "model": model,
                 "issue_days": int(len(g)),
                 "flagged_days": int(len(flags)),

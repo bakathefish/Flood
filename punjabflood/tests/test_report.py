@@ -38,6 +38,7 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
         "as_issued_events": [
             {
                 "year": 2025,
+                "dam": "Pong",
                 "model": "ecmwf_ifs025",
                 "issue_days": 46,
                 "flagged_days": 9,
@@ -57,6 +58,7 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             },
             {
                 "year": 2024,
+                "dam": "Pong",
                 "model": "ecmwf_ifs025",
                 "issue_days": 46,
                 "flagged_days": 0,
@@ -72,6 +74,26 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
                 "observed_peak_date": None,
                 "lead_days_to_observed_peak": None,
                 "max_forecast_peak_release_cusecs": 0.0,
+                "pp_peak_day1_release_cusecs": 0.0,
+            },
+            {
+                "year": 2025,
+                "dam": "Bhakra",
+                "model": "ecmwf_ifs025",
+                "issue_days": 46,
+                "flagged_days": 3,
+                "hit_days": 3,
+                "false_flag_days": 0,
+                "missed_days": 1,
+                "first_flag_issue_date": "2025-08-30",
+                "first_hit_issue_date": "2025-08-30",
+                "first_hit_spill_day": 4,
+                "pp_first_flag_date": "2025-08-29",
+                "pp_first_spill_date": None,
+                "lead_days_to_pp_spill": None,
+                "observed_peak_date": None,
+                "lead_days_to_observed_peak": None,
+                "max_forecast_peak_release_cusecs": 35473.0,
                 "pp_peak_day1_release_cusecs": 0.0,
             },
         ],
@@ -128,6 +150,19 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             "reanchor_gap_bcm": [float("nan"), float("nan"), 0.4, float("nan"), 0.6],
         }
     ).to_csv(tmp_path / "perfect_prog_hei_daily.csv", index=False)
+    # Bhakra flagged under observed rain and never spilled; the largest gap inside the window
+    # is the one the note must pick, not the larger one after the window closes
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2025-08-29", "2025-09-02", "2025-09-06", "2025-09-20"]),
+            "dam": "Bhakra",
+            "hei": [0.0, -0.05, -0.05, -0.1],
+            "storage_basis": ["model", "press", "press", "press"],
+            "rain_day1_mm": [16.0, 15.0, 3.0, 1.0],
+            "inflow_day1_cusecs": [80_000.0, 100_000.0, 48_000.0, 30_000.0],
+            "reanchor_gap_bcm": [float("nan"), 0.61, 0.13, 0.9],
+        }
+    ).to_csv(tmp_path / "perfect_prog_event_bhakra.csv", index=False)
     md = report.render_verification(
         tmp_path, tmp_path / "params.json", era5_imd_path=None, forecast_dir=None
     )
@@ -137,8 +172,8 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     assert "| 2023 | 1 | 0 | 0 | 0 | 2 |" in md and "| 2025 | 1 | 0 | 1 | 0 | 0 |" in md
     # the re-anchor note sits between the first perfect-prognosis flag and the spill
     assert (
-        "In 2025 the run under observed rain flagged from 2025-08-22 while its spill came on "
-        "2025-08-26. Between the two, the measured storage of 2025-08-24 re-anchored the "
+        "In 2025 the Pong run under observed rain flagged from 2025-08-22 while its spill came "
+        "on 2025-08-26. Between the two, the measured storage of 2025-08-24 re-anchored the "
         "model's carried path downward by 0.60 BCM" in md
     )
     assert "In 2024" not in md
@@ -153,13 +188,25 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     assert "| Pong | 20 | 34,000 | 30,000 | -12% | +0.80 | 5,000 | -1% | +0.70 | 6,000 |" in md
     assert "## As-issued hindcast" in md
     assert (
-        "| 2025 | ecmwf_ifs025 | 46 | 9 (7 hits, 2 false) | 1 | 2025-08-20 | 2025-08-24, day 2 | "
-        "2025-08-22 | 2025-08-26 | +2 | 2025-08-31 | +7 | 120,000 | 150,000 |" in md
+        "| 2025 | Pong | ecmwf_ifs025 | 46 | 9 (7 hits, 2 false) | 1 | 2025-08-20 | "
+        "2025-08-24, day 2 | 2025-08-22 | 2025-08-26 | +2 | 2025-08-31 | +7 | 120,000 | 150,000 |"
+        in md
     )
     assert (
-        "| 2024 | ecmwf_ifs025 | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | "
-        "none | n/a | 0 | 0 |" in md
+        "| 2024 | Pong | ecmwf_ifs025 | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | "
+        "n/a | none | n/a | 0 | 0 |" in md
     )
+    assert (
+        "| 2025 | Bhakra | ecmwf_ifs025 | 46 | 3 (3 hits, 0 false) | 1 | 2025-08-30 | "
+        "2025-08-30, day 4 | 2025-08-29 | none | n/a | none | n/a | 35,473 | 0 |" in md
+    )
+    # no spill under observed rain: the note runs from the first flag to the end of the window
+    assert (
+        "In 2025 the Bhakra run under observed rain flagged from 2025-08-29 and did not force the "
+        "spillway within the window (to 2025-09-15). After the first flag, the measured storage "
+        "of 2025-09-02 re-anchored the model's carried path downward by 0.61 BCM" in md
+    )
+    assert "0.90 BCM" not in md
 
 
 def test_rain_input_rows_and_section(tmp_path):

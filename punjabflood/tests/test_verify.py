@@ -213,6 +213,7 @@ def test_as_issued_hei_and_event_summary():
     by = {r["model"]: r for r in rows}
     ex, gf = by["ecmwf_ifs025"], by["gfs_seamless"]
     assert ex["flagged_days"] > 0 and ex["first_flag_issue_date"] is not None
+    assert ex["dam"] == gf["dam"] == "Pong"
     assert ex["pp_first_spill_date"] == gf["pp_first_spill_date"]
     # the exact archive is the perfect-prognosis run: every flag a hit, nothing false or missed
     assert ex["hit_days"] == ex["flagged_days"] and ex["false_flag_days"] == 0

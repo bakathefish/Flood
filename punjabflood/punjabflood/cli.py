@@ -289,33 +289,54 @@ def run_verify(horizon_days: int = 5):
             ).to_dict(orient="records")
             if QPF_CSV.exists():
                 # what the product would have said: the archived as-issued QPF through the
-                # same water balance, one row per issue date and model
+                # same water balance, one row per issue date, dam and model. The Dhilwan peak
+                # is dated in the WRD table (Pong's river); the Ropar peak is not.
                 qpf_leads_ev = pd.read_csv(QPF_CSV)
-                ai = pd.concat(
-                    [
-                        verify.as_issued_hei(
-                            state_measured,
-                            rain_daily,
-                            qpf_leads_ev,
-                            "Pong",
-                            "Pong",
-                            params["Pong"],
-                            m,
-                            horizon_days,
-                        )
-                        for m in verify.AS_ISSUED_MODELS
-                    ],
-                    ignore_index=True,
-                )
-                ai.to_csv(out / "as_issued_event_pong.csv", index=False)
                 obs_dates = peaks_d.set_index("year")["date"].to_dict() if "date" in peaks_d else {}
                 results["as_issued_events"] = []
-                years = sorted(pd.to_datetime(ai["date"]).dt.year.unique()) if len(ai) else []
-                for y in years:
-                    od = obs_dates.get(int(y))
-                    od = None if od is None or od != od else pd.Timestamp(od).date().isoformat()
-                    results["as_issued_events"] += verify.as_issued_event_summary(
-                        ai, pp_event, int(y), od
+                ai_all = []
+                for dam in ("Pong", "Bhakra"):
+                    if dam not in params:
+                        continue
+                    pp_dam = (
+                        pp_event
+                        if dam == "Pong"
+                        else verify.perfect_prog_hei(
+                            state_measured, rain_daily, dam, dam, params[dam], horizon_days, "model"
+                        )
+                    )
+                    if dam != "Pong":
+                        pp_dam.to_csv(
+                            out / f"perfect_prog_event_{dam.lower().replace(' ', '_')}.csv",
+                            index=False,
+                        )
+                    ai = pd.concat(
+                        [
+                            verify.as_issued_hei(
+                                state_measured,
+                                rain_daily,
+                                qpf_leads_ev,
+                                dam,
+                                dam,
+                                params[dam],
+                                m,
+                                horizon_days,
+                            )
+                            for m in verify.AS_ISSUED_MODELS
+                        ],
+                        ignore_index=True,
+                    )
+                    ai_all.append(ai)
+                    years = sorted(pd.to_datetime(ai["date"]).dt.year.unique()) if len(ai) else []
+                    for y in years:
+                        od = obs_dates.get(int(y)) if dam == "Pong" else None
+                        od = None if od is None or od != od else pd.Timestamp(od).date().isoformat()
+                        results["as_issued_events"] += verify.as_issued_event_summary(
+                            ai, pp_dam, int(y), od
+                        )
+                if ai_all:
+                    pd.concat(ai_all, ignore_index=True).to_csv(
+                        out / "as_issued_events.csv", index=False
                     )
 
     for dam in ("Bhakra", "Pong"):

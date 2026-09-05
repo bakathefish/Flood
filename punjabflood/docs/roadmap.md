@@ -37,9 +37,13 @@ numbers that motivate them are in `verification.md`, never repeated here.
   rule that would let one in is written down in `design.md`.
 - **As-issued hindcast of the 2025 event.** The archived lead 1 to 5 forecasts of ECMWF and
   GFS, issue date by issue date, through the product's water balance with the recorded or
-  carried Pong storage: the first flagged issue date, how many days were flagged, and the
+  carried Pong and Bhakra storage: the first flagged issue date, how many days were flagged, and the
   lead to the model's own first spill under observed rain and to the dated Dhilwan peak, for
-  2024 (no event), 2025 (the event) and 2026 to date. The numbers are in `verification.md`.
+  2024 (no event), 2025 (the event) and 2026 to date. At Bhakra the model flagged in the last
+  days of August 2025 and never spilled within the window; the early-September measurement
+  re-anchored its carried path downward, the same reading as Pong's mid-August gap (the dam
+  releasing more than its turbines, the inflow over-predicted, or both). The numbers are in
+  `verification.md`.
 - **Prospective record summary** at the end of the verification report, one row per issue
   date, growing daily from the Action.
 
