@@ -225,11 +225,30 @@ record.
   reservoir is carried by the model's own water balance (`carry_storage`). The report adds
   the model's one-day inflow on the wettest day against BBMB's recorded maximum, because
   that gap is what limits the test.
-- Task 12, step 3: the first prospective record is `outputs/forecast/2026-09-05.{json,md}`
-  (gitignored outputs; the owner decides what to publish).
+- Task 12, step 3: the first prospective record is `outputs/forecast/2026-09-05.{json,md}`.
+  Outputs are committed (the owner's decision the same evening); the daily GitHub Action
+  adds one record per day and a record is never rewritten.
 - Task 13: `report` was added as a command; `pull-rain` became `build-rain` (IMD) and
   `pull-rain-recent` (ERA5, current season).
-- No commits were made by the agent; the owner commits.
+- Commits: the owner authorised the agent to commit into the Sailaab repository on top of
+  the existing history (no rewrite), which is where this sub-project now lives.
+
+## Second round (2026-09-05, late evening), beyond the plan
+
+- Inflow: the runoff coefficient became wetness-dependent (`c + c_wet * API / 100 mm`,
+  capped at 0.95, joint NNLS with the lag weights) after the storage record showed the
+  response rising with antecedent rain for Pong and Ranjit Sagar. Calibration uses measured
+  storage rows only; the implausible-jump filter was raised to 1.0 BCM so event days stay in.
+- Routing: diversions per river (Nangal canals, Mukerian Hydel Channel) and the spill-day
+  river release as spill plus turbine passage less diversion; the event test reports both
+  that and spill only.
+- Verification: persistence baseline in the live test; ERA5 against IMD over the event
+  windows; a leave-one-season-out test of a multiplicative QPF bias correction, which the
+  product does not adopt because the correction fails the rule in `design.md`.
+- Product: P(spillway forced) printed with and without the inflow model's own error
+  (`hei.ensemble_summary_with_error`; the residual lag-1 autocorrelation joined the
+  parameter file for it).
+- `docs/roadmap.md` lists what comes next and the data each step needs.
 
 ## Self-review
 

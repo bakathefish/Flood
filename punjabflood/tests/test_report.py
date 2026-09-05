@@ -132,7 +132,61 @@ def test_rain_input_rows_and_section(tmp_path):
             "brier_skill_score",
         ]
     ).to_csv(tmp_path / "peak_tests.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                "catchment": "Pong",
+                "model": "ecmwf_ifs025",
+                "lead_days": 2,
+                "n_days": 300,
+                "n_seasons": 3,
+                "factor_min": 1.1,
+                "factor_max": 1.3,
+                "factor_all_seasons": 1.2,
+                "heavy_days_obs": 17,
+                "raw_bias_pct": -15.0,
+                "raw_mae_mm": 5.0,
+                "raw_hit_rate": 0.25,
+                "raw_false_alarm_ratio": float("nan"),
+                "corrected_bias_pct": 2.0,
+                "corrected_mae_mm": 5.4,
+                "corrected_hit_rate": 0.4,
+                "corrected_false_alarm_ratio": 0.6,
+            },
+            # lead 7 is outside the product's horizons and is not rendered
+            {
+                "catchment": "Pong",
+                "model": "ecmwf_ifs025",
+                "lead_days": 7,
+                "n_days": 300,
+                "n_seasons": 3,
+                "factor_min": 1.0,
+                "factor_max": 1.0,
+                "factor_all_seasons": 1.0,
+                "heavy_days_obs": 17,
+                "raw_bias_pct": 0.0,
+                "raw_mae_mm": 6.0,
+                "raw_hit_rate": 0.1,
+                "raw_false_alarm_ratio": 0.9,
+                "corrected_bias_pct": 0.0,
+                "corrected_mae_mm": 6.0,
+                "corrected_hit_rate": 0.1,
+                "corrected_false_alarm_ratio": 0.9,
+            },
+        ]
+    ).to_csv(tmp_path / "qpf_bias_test.csv", index=False)
     md = report.render_verification(tmp_path, None, era5_imd_path=p)
     assert "## Rain input check" in md
     assert "| Pong | 2023 | 2023-08-12 to 2023-08-14 | 3 | 150 | 60 | 0.40 | 100 | 30 |" in md
     assert "| Pong | 2025 | 2025-08-25 to 2025-08-26 | 2 | 100 | 90 | 0.90 | 55 | 50 |" in md
+    assert "### Multiplicative bias correction" in md
+    assert (
+        "| Pong | ecmwf_ifs025 | 2 | 300 | 1.10 to 1.30 | -15% / +2% | 5.0 / 5.4 | 0.25 / 0.40 | n/a / 0.60 |"
+        in md
+    )
+    assert "| Pong | ecmwf_ifs025 | 7 |" not in md
+    # the counts that decide whether the product applies the correction are computed
+    assert (
+        "MAE lower after correction in 0 of 1 rows, heavy-day hit rate higher in 1, "
+        "false-alarm ratio higher in 0." in md
+    )

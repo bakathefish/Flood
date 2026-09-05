@@ -66,6 +66,9 @@ class InflowParams:
     rho_raw: float = float("nan")  # the unclipped autocovariance ratio; nan when defaulted
     c_wet: float = 0.0  # extra runoff coefficient per API_REF_MM of antecedent rain
     api_days: int = API_DAYS
+    # lag-1 autocorrelation of the calibration residuals: how the model's error persists from
+    # one day to the next, used to propagate that error over a forecast horizon
+    resid_acf1: float = float("nan")
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -189,6 +192,7 @@ def calibrate(
         rho_raw=recession_ratio(res),
         c_wet=c_wet,
         api_days=API_DAYS,
+        resid_acf1=residual_acf1(res),
     )
     if "sm_0_7" in r.columns and r["sm_0_7"].notna().sum() > 60:
         params.gamma = _fit_gamma(df, r, rv, params, lags)
@@ -219,6 +223,24 @@ def recession_ratio(res: pd.Series) -> float:
     if var <= 0 or c1 <= 0.05 * var or c2 <= 0:
         return float("nan")
     return c2 / c1
+
+
+def residual_acf1(res: pd.Series) -> float:
+    """Lag-1 autocorrelation of the residuals over consecutive days: the day-to-day
+    persistence of the model's own error, which decides how that error accumulates over a
+    forecast horizon (independent errors partly cancel in the volume, persistent ones do
+    not). Nan when the series is too short."""
+    res = res.dropna()
+    if len(res) < 40:
+        return float("nan")
+    day = res.index.to_series().diff().dt.days
+    r0 = res - res.mean()
+    r1 = r0.shift(1)
+    ok = r1.notna() & (day == 1)
+    var = float((r0**2).mean())
+    if ok.sum() < 30 or var <= 0:
+        return float("nan")
+    return float((r0[ok] * r1[ok]).mean() / var)
 
 
 def estimate_recession(res: pd.Series, default: float = DEFAULT_RHO) -> float:

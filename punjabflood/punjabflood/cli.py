@@ -328,9 +328,13 @@ def run_verify(horizon_days: int = 5):
         results["live_2026"][dam] = live
 
     if QPF_CSV.exists():
-        qs = verify.qpf_skill(pd.read_csv(QPF_CSV), rain_daily)
+        qpf_leads = pd.read_csv(QPF_CSV)
+        qs = verify.qpf_skill(qpf_leads, rain_daily)
         qs.to_csv(out / "qpf_skill.csv", index=False)
         results["qpf_skill_rows"] = int(len(qs))
+        qb = verify.qpf_bias_test(qpf_leads, rain_daily)
+        qb.to_csv(out / "qpf_bias_test.csv", index=False)
+        results["qpf_bias_rows"] = int(len(qb))
 
     verify.write_json(results, out / "results.json")
     typer.echo(

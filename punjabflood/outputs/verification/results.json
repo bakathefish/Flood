@@ -5843,5 +5843,6 @@
       "magnitude_ratio": 0.5919526625048155
     }
   ],
-  "qpf_skill_rows": 80
+  "qpf_skill_rows": 80,
+  "qpf_bias_rows": 80
 }

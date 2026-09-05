@@ -201,12 +201,33 @@ def test_params_round_trip():
         rmse_bcm=0.01,
         rho_raw=0.93,
         c_wet=0.2,
+        resid_acf1=0.3,
     )
     assert inflow.InflowParams.from_dict(p.to_dict()) == p
-    # a parameter file written before rho_raw and the wet coefficient existed still loads
+    # a parameter file written before rho_raw, the wet coefficient and the residual
+    # persistence existed still loads
     d = p.to_dict()
     del d["rho_raw"]
     del d["c_wet"]
     del d["api_days"]
+    del d["resid_acf1"]
     old = inflow.InflowParams.from_dict(d)
     assert np.isnan(old.rho_raw) and old.c_wet == 0.0 and old.api_days == inflow.API_DAYS
+    assert np.isnan(old.resid_acf1)
+
+
+def test_residual_acf1_recovers_ar1_persistence():
+    rng = np.random.default_rng(7)
+    n = 3000
+    e = np.empty(n)
+    e[0] = rng.normal()
+    for t in range(1, n):
+        e[t] = 0.7 * e[t - 1] + np.sqrt(1 - 0.7**2) * rng.normal()
+    res = pd.Series(e, index=pd.date_range("2000-01-01", periods=n))
+    assert inflow.residual_acf1(res) == pytest.approx(0.7, abs=0.05)
+    white = pd.Series(rng.normal(size=n), index=pd.date_range("2000-01-01", periods=n))
+    assert abs(inflow.residual_acf1(white)) < 0.05
+    assert np.isnan(inflow.residual_acf1(res.iloc[:20]))
+    # only consecutive days count: a series sampled every other day has no lag-1 pairs
+    sparse = pd.Series(e[:200], index=pd.date_range("2000-01-01", periods=200, freq="2D"))
+    assert np.isnan(inflow.residual_acf1(sparse))

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
 from punjabflood import constants as C
@@ -56,6 +57,51 @@ def test_ensemble_summary():
     # 0.2 BCM of headroom, 0.3 in and 0.1116 out per day: full on day 2
     assert s["median_day_of_exhaustion"] == 2
     assert s["hei_q90"] > s["hei_q10"]
+
+
+def test_error_paths_are_stationary_and_persistent():
+    rng = np.random.default_rng(1)
+    e = hei.error_paths(5, 20_000, sd_bcm=0.03, acf1=0.6, rng=rng)
+    assert e.shape == (20_000, 5)
+    # every day has the stationary standard deviation, and neighbours correlate at acf1
+    assert e.std(axis=0) == pytest.approx(np.full(5, 0.03), rel=0.03)
+    r = np.corrcoef(e[:, 2], e[:, 3])[0, 1]
+    assert r == pytest.approx(0.6, abs=0.03)
+    # nan persistence means independent days
+    e0 = hei.error_paths(3, 20_000, 0.03, float("nan"), np.random.default_rng(2))
+    assert abs(np.corrcoef(e0[:, 0], e0[:, 1])[0, 1]) < 0.03
+
+
+def test_ensemble_summary_with_error_brackets_the_plain_summary():
+    cap = C.PONG.live_capacity_bcm.value
+    a = C.cusec_days_to_bcm(45_600)
+    # member 1 fills the 0.2 BCM of headroom on day 2; member 2 never gets near it
+    members = [[0.3, 0.3], [0.05, 0.05]]
+    plain = hei.ensemble_summary(
+        [hei.headroom_exhaustion("Pong", cap - 0.2, m, 45_600) for m in members]
+    )
+    zero = hei.ensemble_summary_with_error("Pong", cap - 0.2, members, 45_600, 0.0, 0.5)
+    assert zero["p_exhaustion_model_error"] == plain["p_exhaustion"] == 0.5
+    assert zero["peak_release_q90_model_error_cusecs"] == pytest.approx(
+        C.bcm_to_cusec_days(0.3 - a + 0.3 - a - 0.2)
+    )
+    # with the model's own error the probability moves off the QPF-only value and stays in
+    # (0, 1); the same seed gives the same product
+    wide = hei.ensemble_summary_with_error("Pong", cap - 0.2, members, 45_600, 0.1, 0.5)
+    assert 0.0 < wide["p_exhaustion_model_error"] < 1.0
+    assert wide["p_exhaustion_model_error"] != plain["p_exhaustion"]
+    again = hei.ensemble_summary_with_error("Pong", cap - 0.2, members, 45_600, 0.1, 0.5)
+    assert again == wide
+    assert wide["n_error_draws"] == 200 and wide["error_sd_bcm_per_day"] == 0.1
+    assert wide["error_acf1"] == 0.5
+    # a member that exhausts under every draw and one that never does bracket the answer
+    sure = hei.ensemble_summary_with_error("Pong", cap, [[1.0, 1.0]], 45_600, 0.01, 0.0)
+    assert sure["p_exhaustion_model_error"] == 1.0
+    never = hei.ensemble_summary_with_error("Pong", 1.0, [[0.01, 0.01]], 45_600, 0.01, 0.0)
+    assert never["p_exhaustion_model_error"] == 0.0
+    # no calibration error on file: nothing is claimed
+    assert hei.ensemble_summary_with_error("Pong", cap, members, 45_600, float("nan"), 0.5) == {}
+    assert hei.ensemble_summary_with_error("Pong", cap, [], 45_600, 0.1, 0.5) == {}
 
 
 def test_absorption_lookup():

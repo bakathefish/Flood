@@ -117,6 +117,46 @@ def test_qpf_skill_metrics():
     assert s.loc[3, "heavy_days_obs"] == 10 and s.loc[1, "pearson_r"] == pytest.approx(1.0)
 
 
+def test_qpf_bias_test_leave_one_season_out():
+    # two seasons; the forecast reads half the observed rain in both, so the held-out factor
+    # is 2.0 each time and the corrected forecast is exact
+    frames, obs_frames = [], []
+    for year in (2024, 2025):
+        days = pd.date_range(f"{year}-06-01", periods=80)
+        o = np.r_[np.full(70, 4.0), np.full(10, 40.0)]
+        obs_frames.append(pd.DataFrame({"date": days, "catchment": "Pong", "rain_mm": o}))
+        frames.append(
+            pd.DataFrame(
+                {
+                    "target_date": days,
+                    "lead_days": 2,
+                    "model": "ecmwf_ifs025",
+                    "rain_mm": o * 0.5,
+                    "catchment": "Pong",
+                }
+            )
+        )
+    qb = verify.qpf_bias_test(pd.concat(frames), pd.concat(obs_frames))
+    assert len(qb) == 1
+    r = qb.iloc[0]
+    assert r["n_days"] == 160 and r["n_seasons"] == 2
+    assert r["factor_min"] == 2.0 and r["factor_max"] == 2.0 and r["factor_all_seasons"] == 2.0
+    assert r["raw_bias_pct"] == pytest.approx(-50.0) and r["corrected_bias_pct"] == pytest.approx(
+        0.0
+    )
+    assert r["raw_hit_rate"] == 0.0 and r["corrected_hit_rate"] == 1.0
+    assert r["raw_mae_mm"] > 0 and r["corrected_mae_mm"] == pytest.approx(0.0)
+    assert r["heavy_days_obs"] == 20
+    # one season only: nothing to hold out, no row
+    single = verify.qpf_bias_test(frames[0], obs_frames[0])
+    assert single.empty
+    # the factor is clipped, so a forecast reading a tenth of the rain is corrected by 2 at most
+    tenth = [f.assign(rain_mm=f["rain_mm"] * 0.2) for f in frames]
+    clipped = verify.qpf_bias_test(pd.concat(tenth), pd.concat(obs_frames)).iloc[0]
+    assert clipped["factor_max"] == verify.QPF_FACTOR_CLIP[1]
+    assert clipped["corrected_bias_pct"] == pytest.approx(-80.0)
+
+
 def test_perfect_prog_hei_runs_and_flags_exhaustion(tmp_path):
     days = pd.date_range("2023-08-01", "2023-08-31", freq="D")
     st = pd.DataFrame(

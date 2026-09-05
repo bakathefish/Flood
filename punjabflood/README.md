@@ -19,7 +19,9 @@ turns that mechanism into a daily hazard watch:
    lag weights, fitted on day-to-day changes of measured storage during filling season.
 4. **Headroom-exhaustion index.** Forecast inflow volume minus headroom minus what the
    turbines can pass, per dam and horizon (1 to 5 days). Positive means the spillway must
-   open: a full reservoir passes its inflow.
+   open: a full reservoir passes its inflow. The probability that it opens is printed twice,
+   from the 51-member rain ensemble alone and with the inflow model's own error sampled on
+   top.
 5. **Routing.** The forced release travels with the Water Resources Department's Annexure Z
    times to Ropar, Phillaur, Harike, Dhilwan and Ferozepur and is classed Low, Medium or
    High against the department's own thresholds.

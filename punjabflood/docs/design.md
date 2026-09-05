@@ -56,6 +56,18 @@ outlet design), Ranjit Sagar about 20,000 cusecs (an estimate from 600 MW at 121
 no published figure). This is a bound on the operator, not a prediction of the operator:
 BBMB can release earlier and lower, and did in 2025; the verification scores both.
 
+**Two probabilities.** The product prints P(spillway forced) twice. The first is the share
+of the 51 ECMWF ensemble members whose rain would fill the reservoir: the weather
+uncertainty alone, with the inflow model taken as exact. The second samples the inflow
+model's own error on top of every member: additive Gaussian error on each day's inflow
+volume with the calibration RMSE as its standard deviation and the calibration residuals'
+lag-1 autocorrelation as its day-to-day persistence (`hei.ensemble_summary_with_error`,
+200 seeded paths per member, perturbed inflows floored at zero). The RMSE is measured on
+the ordinary filling days the model was fitted on, so this is the model's ordinary-day
+error; at flood scale the error is larger (the event section of the verification report
+says by how much), and the second probability is therefore still an inner estimate of the
+uncertainty, not an outer one.
+
 **Release to control point.** Pure translation with the WRD's Annexure Z travel times, no
 attenuation, no tributaries; Harike sums the Sutlej and Beas arrivals; Ferozepur is Harike
 plus twelve hours; Dhilwan is placed on the Tanda to Harike reach by distance. Each river
@@ -99,6 +111,17 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
 4. Rain input check. ERA5 catchment rain against the IMD grid over the 2023 and 2025 event
    windows, because the forecast models share ERA5's physics and resolution; a reanalysis
    that misses the mountain rain of an event says the forecasts will too.
+5. QPF bias correction, out of sample. One multiplicative factor per catchment, model and
+   lead (observed over forecast season rain), fitted on every season but one and applied to
+   the held-out one, scored against the raw forecast on the held-out days. The rule for the
+   product: a correction is applied only if it lowers the held-out MAE and raises the
+   held-out heavy-day hit rate for the dam catchments. On the 2024 to 2026 archive it does
+   neither: the mean bias goes by construction, the MAE rises on nearly every row, the
+   heavy-day hit rate moves in a handful of rows and in both directions, and the false-alarm
+   ratio rises in half of them, so the product applies no correction. The models' shortfall is
+   on the heavy days themselves, not a uniform scale error, which is what the ERA5
+   comparison says too. A correction conditional on the forecast amount, or quantile
+   mapping, needs more seasons of archive than exist.
 
 As-issued skill (forecast rather than observed rain) is measured on the 2024 to 2026
 seasons, the period for which Open-Meteo archives the lead 1 to 7 forecasts of GFS and

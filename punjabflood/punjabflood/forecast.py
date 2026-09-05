@@ -212,31 +212,28 @@ def build_product(
             }
         members = _members(qpf_ens, cat)
         if members:
+            h_max = max(horizons)
+            # the daily prediction is causal, so one run per member over the longest horizon
+            # serves every shorter one by slicing
+            member_daily = [
+                inflow.predict_daily_bcm(p, fc[:h_max], base, rain_mm_recent=recent)
+                for fc in members.values()
+            ]
+            res_max: list[hei.HEIResult] = []
             for H in horizons:
-                res = [
-                    hei.headroom_exhaustion(
-                        dam,
-                        st["storage_bcm"],
-                        inflow.predict_daily_bcm(p, fc[:H], base, rain_mm_recent=recent),
-                        absorb,
+                daily_h = [d[:H] for d in member_daily if len(d) >= H]
+                res = [hei.headroom_exhaustion(dam, st["storage_bcm"], d, absorb) for d in daily_h]
+                summary = hei.ensemble_summary(res)
+                # the inflow model's own error, sampled on top of the QPF spread
+                summary.update(
+                    hei.ensemble_summary_with_error(
+                        dam, st["storage_bcm"], daily_h, absorb, p.rmse_bcm, p.resid_acf1
                     )
-                    for fc in members.values()
-                    if len(fc) >= H
-                ]
-                entry["ensemble"][str(H)] = hei.ensemble_summary(res)
-            H = max(horizons)
-            rel = np.array(
-                [
-                    hei.headroom_exhaustion(
-                        dam,
-                        st["storage_bcm"],
-                        inflow.predict_daily_bcm(p, fc[:H], base, rain_mm_recent=recent),
-                        absorb,
-                    ).release_by_day_cusecs
-                    for fc in members.values()
-                    if len(fc) >= H
-                ]
-            )
+                )
+                entry["ensemble"][str(H)] = summary
+                if H == h_max:
+                    res_max = res
+            rel = np.array([r.release_by_day_cusecs for r in res_max])
             median_rel = np.median(rel, axis=0)
             entry["forced_release_median_cusecs_by_day"] = [float(x) for x in median_rel]
             # what actually reaches the river: today's outflow continues, plus forced spill
@@ -306,12 +303,15 @@ def render_markdown(product: dict) -> str:
         if e["ensemble"]:
             lines.append("")
             lines.append(
-                "| horizon (days) | P(spillway forced) | HEI median | peak forced release, median (cusecs) |"
+                "| horizon (days) | P(spillway forced), QPF spread | P(spillway forced), QPF spread "
+                "and model error | HEI median | peak forced release, median (cusecs) |"
             )
-            lines.append("|---|---|---|---|")
+            lines.append("|---|---|---|---|---|")
             for H, s in e["ensemble"].items():
+                pe = s.get("p_exhaustion_model_error")
                 lines.append(
-                    f"| {H} | {s['p_exhaustion']:.2f} | {s['hei_q50']:+.3f} | {s['peak_release_q50_cusecs']:,.0f} |"
+                    f"| {H} | {s['p_exhaustion']:.2f} | {'n/a' if pe is None else f'{pe:.2f}'} | "
+                    f"{s['hei_q50']:+.3f} | {s['peak_release_q50_cusecs']:,.0f} |"
                 )
         lines.append("")
     if product["reaches"]:

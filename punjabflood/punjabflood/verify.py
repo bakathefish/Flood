@@ -324,12 +324,8 @@ def live_test(predicted_cusecs: pd.Series, observed_cusecs: pd.Series) -> dict:
     }
 
 
-def qpf_skill(
-    qpf_leads: pd.DataFrame, rain_daily: pd.DataFrame, heavy_mm: float = 30.0
-) -> pd.DataFrame:
-    """As-issued catchment QPF against the observed catchment rain, per catchment, model and
-    lead: bias, Pearson r, MAE, and hit rate and false-alarm ratio for heavy days
-    (observed or forecast at or above ``heavy_mm``). Only the days both series have."""
+def _qpf_merge(qpf_leads: pd.DataFrame, rain_daily: pd.DataFrame) -> pd.DataFrame:
+    """As-issued forecasts joined to the observed catchment rain on the days both have."""
     obs = rain_daily.copy()
     obs["date"] = pd.to_datetime(obs["date"])
     obs = obs.rename(columns={"date": "target_date", "rain_mm": "obs_mm"})[
@@ -337,38 +333,108 @@ def qpf_skill(
     ]
     q = qpf_leads.copy()
     q["target_date"] = pd.to_datetime(q["target_date"])
-    df = q.merge(obs, on=["target_date", "catchment"], how="inner").dropna(
+    return q.merge(obs, on=["target_date", "catchment"], how="inner").dropna(
         subset=["rain_mm", "obs_mm"]
     )
+
+
+def _qpf_scores(f: np.ndarray, o: np.ndarray, heavy_mm: float) -> dict:
+    """Bias, Pearson r, MAE, and hit rate and false-alarm ratio for heavy days (observed or
+    forecast at or above ``heavy_mm``)."""
+    hits = int(((f >= heavy_mm) & (o >= heavy_mm)).sum())
+    misses = int(((f < heavy_mm) & (o >= heavy_mm)).sum())
+    false_alarms = int(((f >= heavy_mm) & (o < heavy_mm)).sum())
+    return {
+        "obs_mean_mm": float(o.mean()),
+        "fc_mean_mm": float(f.mean()),
+        "bias_pct": float((f.mean() - o.mean()) / o.mean() * 100) if o.mean() > 0 else float("nan"),
+        "pearson_r": float(np.corrcoef(f, o)[0, 1])
+        if f.std() > 0 and o.std() > 0
+        else float("nan"),
+        "mae_mm": float(np.abs(f - o).mean()),
+        "heavy_days_obs": hits + misses,
+        "hit_rate": hits / (hits + misses) if hits + misses else float("nan"),
+        "false_alarm_ratio": false_alarms / (hits + false_alarms)
+        if hits + false_alarms
+        else float("nan"),
+    }
+
+
+def qpf_skill(
+    qpf_leads: pd.DataFrame, rain_daily: pd.DataFrame, heavy_mm: float = 30.0
+) -> pd.DataFrame:
+    """As-issued catchment QPF against the observed catchment rain, per catchment, model and
+    lead: bias, Pearson r, MAE, and hit rate and false-alarm ratio for heavy days
+    (observed or forecast at or above ``heavy_mm``). Only the days both series have."""
+    df = _qpf_merge(qpf_leads, rain_daily)
     rows = []
     for (cat, model, lead), g in df.groupby(["catchment", "model", "lead_days"]):
         n = len(g)
         if n < 20:
             continue
-        f, o = g["rain_mm"].to_numpy(), g["obs_mm"].to_numpy()
-        hits = int(((f >= heavy_mm) & (o >= heavy_mm)).sum())
-        misses = int(((f < heavy_mm) & (o >= heavy_mm)).sum())
-        false_alarms = int(((f >= heavy_mm) & (o < heavy_mm)).sum())
+        scores = _qpf_scores(g["rain_mm"].to_numpy(), g["obs_mm"].to_numpy(), heavy_mm)
+        rows.append(
+            {"catchment": cat, "model": model, "lead_days": int(lead), "n_days": n, **scores}
+        )
+    return pd.DataFrame(rows)
+
+
+QPF_FACTOR_CLIP = (0.5, 2.0)
+QPF_SCORE_COLS = ("bias_pct", "mae_mm", "hit_rate", "false_alarm_ratio")
+
+
+def qpf_bias_test(
+    qpf_leads: pd.DataFrame,
+    rain_daily: pd.DataFrame,
+    heavy_mm: float = 30.0,
+    factor_clip: tuple[float, float] = QPF_FACTOR_CLIP,
+    min_train_days: int = 60,
+) -> pd.DataFrame:
+    """Does a multiplicative bias correction of the as-issued QPF help out of sample?
+
+    For each catchment, model and lead, one factor (observed season rain over forecast season
+    rain, clipped to ``factor_clip``) is fitted on every season but one and applied to the
+    held-out season; the held-out corrected forecasts of all seasons are then scored against
+    the raw ones with ``_qpf_scores``. Pearson r does not move under a scale factor within a
+    season, so the row keeps bias, MAE, hit rate and false-alarm ratio, raw and corrected,
+    plus the range of the held-out factors and the factor fitted on every season (the one a
+    product would apply)."""
+    df = _qpf_merge(qpf_leads, rain_daily)
+    df["season"] = df["target_date"].dt.year
+    rows = []
+    for (cat, model, lead), g in df.groupby(["catchment", "model", "lead_days"]):
+        seasons = sorted(g["season"].unique())
+        f_all, o_all = g["rain_mm"].to_numpy(), g["obs_mm"].to_numpy()
+        season = g["season"].to_numpy()
+        if len(seasons) < 2 or len(g) < 20 or f_all.sum() <= 0:
+            continue
+        corrected = np.full(len(g), np.nan)
+        factors = {}
+        for y in seasons:
+            train = season != y
+            if train.sum() < min_train_days or f_all[train].sum() <= 0:
+                continue
+            fac = float(np.clip(o_all[train].sum() / f_all[train].sum(), *factor_clip))
+            factors[int(y)] = fac
+            corrected[~train] = f_all[~train] * fac
+        ok = ~np.isnan(corrected)
+        if ok.sum() < 20:
+            continue
+        raw = _qpf_scores(f_all[ok], o_all[ok], heavy_mm)
+        cor = _qpf_scores(corrected[ok], o_all[ok], heavy_mm)
         rows.append(
             {
                 "catchment": cat,
                 "model": model,
                 "lead_days": int(lead),
-                "n_days": n,
-                "obs_mean_mm": float(o.mean()),
-                "fc_mean_mm": float(f.mean()),
-                "bias_pct": float((f.mean() - o.mean()) / o.mean() * 100)
-                if o.mean() > 0
-                else float("nan"),
-                "pearson_r": float(np.corrcoef(f, o)[0, 1])
-                if f.std() > 0 and o.std() > 0
-                else float("nan"),
-                "mae_mm": float(np.abs(f - o).mean()),
-                "heavy_days_obs": hits + misses,
-                "hit_rate": hits / (hits + misses) if hits + misses else float("nan"),
-                "false_alarm_ratio": false_alarms / (hits + false_alarms)
-                if hits + false_alarms
-                else float("nan"),
+                "n_days": int(ok.sum()),
+                "n_seasons": len(factors),
+                "factor_min": min(factors.values()),
+                "factor_max": max(factors.values()),
+                "factor_all_seasons": float(np.clip(o_all.sum() / f_all.sum(), *factor_clip)),
+                "heavy_days_obs": raw["heavy_days_obs"],
+                **{f"raw_{k}": raw[k] for k in QPF_SCORE_COLS},
+                **{f"corrected_{k}": cor[k] for k in QPF_SCORE_COLS},
             }
         )
     return pd.DataFrame(rows)

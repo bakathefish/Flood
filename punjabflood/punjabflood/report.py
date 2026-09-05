@@ -34,6 +34,11 @@ def _fmt(x, nd=2):
     return str(x)
 
 
+def _rate(x) -> str:
+    """A rate in [0, 1] to two decimals, n/a when undefined."""
+    return "n/a" if x is None or x != x else f"{x:.2f}"
+
+
 def rain_input_rows(era5_imd: pd.DataFrame) -> pd.DataFrame:
     """Per catchment and event window: IMD and ERA5 totals, their ratio, and ERA5 on the
     IMD-wettest day. ``era5_imd`` has columns event, date, catchment, era5_mm, imd_mm."""
@@ -271,6 +276,48 @@ def render_verification(
                 f"{_fmt(r['false_alarm_ratio']).replace('+', '')} |"
             )
         lines.append("")
+
+    qb_path = out_dir / "qpf_bias_test.csv"
+    if qb_path.exists():
+        qb = pd.read_csv(qb_path)
+        qb = qb[qb["lead_days"].between(1, 5)]
+        lines += [
+            "### Multiplicative bias correction, tested out of sample",
+            "",
+            "One factor per catchment, model and lead (observed season rain over forecast season "
+            "rain, clipped to 0.5 to 2), fitted on every season but one and applied to the "
+            "held-out season; the held-out days of all seasons are scored together. Pearson r "
+            "does not move under a scale factor, so the columns that can move are shown raw and "
+            "corrected. Leads 1 to 5 are the product's horizons.",
+            "",
+            "| catchment | model | lead (days) | days | held-out factors | bias raw / corrected | MAE (mm) raw / corrected | hit rate raw / corrected | false-alarm ratio raw / corrected |",
+            "|---|---|---|---|---|---|---|---|---|",
+        ]
+        for _, r in qb.sort_values(["catchment", "model", "lead_days"]).iterrows():
+            lines.append(
+                f"| {r['catchment']} | {r['model']} | {int(r['lead_days'])} | {int(r['n_days'])} | "
+                f"{r['factor_min']:.2f} to {r['factor_max']:.2f} | "
+                f"{r['raw_bias_pct']:+.0f}% / {r['corrected_bias_pct']:+.0f}% | "
+                f"{r['raw_mae_mm']:.1f} / {r['corrected_mae_mm']:.1f} | "
+                f"{_rate(r['raw_hit_rate'])} / {_rate(r['corrected_hit_rate'])} | "
+                f"{_rate(r['raw_false_alarm_ratio'])} / {_rate(r['corrected_false_alarm_ratio'])} |"
+            )
+        lines.append("")
+        dams = qb[qb["catchment"].isin(list(C.DAMS))]
+        if len(dams):
+            better_mae = int((dams["corrected_mae_mm"] < dams["raw_mae_mm"]).sum())
+            better_hit = int((dams["corrected_hit_rate"] > dams["raw_hit_rate"]).sum())
+            worse_far = int(
+                (dams["corrected_false_alarm_ratio"] > dams["raw_false_alarm_ratio"]).sum()
+            )
+            lines += [
+                f"Held-out days, dam catchments, leads 1 to 5: MAE lower after correction in "
+                f"{better_mae} of {len(dams)} rows, heavy-day hit rate higher in {better_hit}, "
+                f"false-alarm ratio higher in {worse_far}. The product applies a correction only "
+                "when MAE and hit rate both improve on the held-out seasons for a dam catchment; "
+                "the rule is in `design.md`.",
+                "",
+            ]
 
     lines += [
         "## Live 2026: one-day inflow prediction against the BBMB bulletins",

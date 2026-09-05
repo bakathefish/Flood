@@ -22,6 +22,19 @@ numbers that motivate them are in `verification.md`, never repeated here.
   naive forecast it has to beat.
 - **Record repair** (stale CWC rows, level slips) and **model-carried storage** between the
   sparse event-week measurements, both described in `design.md`.
+- **Model error inside the spill probability.** P(spillway forced) is now printed twice: from
+  the 51-member QPF spread with the inflow model taken as exact, and with the model's own
+  error sampled on top (additive on each day's inflow volume, the calibration RMSE as its
+  spread and the residual lag-1 autocorrelation as its persistence, 200 seeded paths per
+  member). The calibration RMSE is an ordinary-day error, so the second probability is still
+  an inner estimate; it is labelled as such.
+- **Scale bias correction of the QPF, tested and not adopted.** One factor per catchment,
+  model and lead, fitted leave-one-season-out on the 2024 to 2026 archive. On the held-out
+  seasons it removes the mean bias and little else: the MAE rises on nearly every
+  dam-catchment row, the heavy-day hit rate moves in a handful of rows and in both
+  directions, the false-alarm ratio worsens in half of them (`verification.md`). The under-forecast is concentrated on the heavy days, so scaling
+  every day up mostly inflates the ordinary ones. The product applies no correction, and the
+  rule that would let one in is written down in `design.md`.
 
 ## Next, in order
 
@@ -48,27 +61,29 @@ numbers that motivate them are in `verification.md`, never repeated here.
 3. **Rain input for the extremes.** ERA5 saw well under half of the IMD catchment rain over
    Pong in the August 2023 event (`data/reference/rain/era5_vs_imd_event_windows.csv`,
    rendered in `verification.md`). The forecast models share ERA5's physics and resolution,
-   so their heavy-day totals over these mountain catchments are likely low by a similar
-   factor, and the as-issued skill table shows heavy-day hit rates of one in four or worse.
-   Two fixes, in order: a per-catchment, per-model bias correction fitted on the as-issued
-   archive (2024 onward; small sample, so shrink towards one), then quantile mapping once
-   three or more seasons of archive exist. Effort: small; the archive puller exists.
-4. **Uncertainty that includes the model.** P(spill) today reflects only the 51-member QPF
-   spread. The inflow model's own error (calibration RMSE, the live-test residuals) should be
-   sampled into the ensemble so the probabilities are honest. Effort: small.
-5. **Local inflow between the dams and Harike.** The WRD peaks at Harike and Dhilwan include
+   so their heavy-day totals over these mountain catchments are low, and the as-issued skill
+   table shows heavy-day hit rates of one in four or worse. A uniform scale factor does not
+   fix this (tested above). What would: a correction conditional on the forecast amount, or
+   quantile mapping, both of which need more than the three seasons of archive that exist;
+   or a higher-resolution model (ICON-D2 does not cover India; the IMD's own NWP is not
+   keyless). Effort: wait for archive, then small.
+4. **Local inflow between the dams and Harike.** The WRD peaks at Harike and Dhilwan include
    tributaries (Swan and Sirsa on the Sutlej; Chakki and the Kandi torrents on the Beas) and
    plains rain. The HydroBASINS intermediate sub-basins are in the archive; the same runoff
    model with its own coefficient would add a local term at each control point. Effort:
    medium; improves magnitude ratios, not timing.
-6. **Attenuation.** Pure translation is the department's own assumption and is right for
+5. **Attenuation.** Pure translation is the department's own assumption and is right for
    timing; a linear reservoir per reach (one parameter each, fitted on nothing we have yet)
    would soften peaks. Only worth doing once daily gauge readings at the control points are
    available; the WRD publishes them during floods in its situation reports.
-7. **Soil moisture as the wetness carrier.** The API is a proxy. ERA5-Land soil moisture is
+6. **Soil moisture as the wetness carrier.** The API is a proxy. ERA5-Land soil moisture is
    one archive pull away (the code path exists, `gamma`), and would let the coefficient
    respond to snowmelt-wetted soils the rain index cannot see. Effort: one long, quota-bound
    pull.
+7. **Flood-scale error for the second probability.** The model-error term uses the
+   ordinary-day RMSE. Once a daily inflow record for an event exists (item 1), the error at
+   flood scale can be measured and the probability made an outer estimate instead of an
+   inner one. Effort: small once item 1 lands.
 8. **Flood cushion above FRL.** Pong went to 1398 ft in 2023 and 1394.7 ft in 2025, above the
    1390 ft FRL; that storage absorbed part of the peak. The rating clamps at the highest
    level in the record, so the model treats FRL as the ceiling, which makes the forced

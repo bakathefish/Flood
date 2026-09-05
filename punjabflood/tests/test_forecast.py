@@ -83,7 +83,14 @@ def _inputs(storage_frac=0.99, qpf_mm=80.0):
     )
     params = {
         "Pong": inflow.InflowParams(
-            "Pong", 12560.0, c=0.6, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0
+            "Pong",
+            12560.0,
+            c=0.6,
+            w=(0.5, 0.3, 0.2, 0.0),
+            rho=0.9,
+            intercept_bcm_per_day=0.0,
+            rmse_bcm=0.03,
+            resid_acf1=0.3,
         )
     }
     return states, det, ens, params
@@ -102,6 +109,11 @@ def test_build_product_full_reservoir_forces_release_and_routes_it():
     )
     pong = prod["dams"]["Pong"]
     assert pong["ensemble"]["5"]["p_exhaustion"] == 1.0
+    # the model's own error is sampled on top of the QPF spread; with 1% of headroom and
+    # 80 mm days it changes nothing here, but the fields are on the record
+    assert pong["ensemble"]["5"]["p_exhaustion_model_error"] == 1.0
+    assert pong["ensemble"]["5"]["n_error_draws"] == 200
+    assert pong["ensemble"]["5"]["error_sd_bcm_per_day"] == 0.03
     assert pong["deterministic"]["ecmwf_ifs025"]["horizons"]["1"]["day_of_exhaustion"] == 1
     assert max(pong["forced_release_median_cusecs_by_day"]) > 100_000
     stations = {r["station"]: r for r in prod["reaches"]}
@@ -114,6 +126,7 @@ def test_build_product_full_reservoir_forces_release_and_routes_it():
     json.dumps(prod, default=str)  # serialisable
     md = forecast.render_markdown(prod)
     assert "Not an official warning" in md and "Dhilwan" in md
+    assert "QPF spread and model error" in md and "| 5 | 1.00 | 1.00 |" in md
 
 
 def test_build_product_empty_reservoir_no_release():
@@ -121,6 +134,7 @@ def test_build_product_empty_reservoir_no_release():
     prod = forecast.build_product("2026-09-04", states, det, ens, {}, params)
     pong = prod["dams"]["Pong"]
     assert pong["ensemble"]["5"]["p_exhaustion"] == 0.0
+    assert pong["ensemble"]["5"]["p_exhaustion_model_error"] == 0.0
     # only today's outflow continues downstream, less the Mukerian Hydel Channel's 11,500
     # cusecs at the Shah Nehar barrage: 8,500 cusecs is below every WRD low band
     dh = [r for r in prod["reaches"] if r["station"] == "Dhilwan"][0]

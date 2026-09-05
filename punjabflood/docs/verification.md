@@ -226,6 +226,65 @@ Heavy day: 30 mm or more over the catchment in a day. Lead 0 is the archive's st
 | Ranjit Sagar | gfs_seamless | 6 | 339 | 7.9 | -56% | 0.33 | 6.1 | 16 | 0.00 | 1.00 |
 | Ranjit Sagar | gfs_seamless | 7 | 339 | 7.9 | -57% | 0.27 | 6.2 | 16 | 0.00 | n/a |
 
+### Multiplicative bias correction, tested out of sample
+
+One factor per catchment, model and lead (observed season rain over forecast season rain, clipped to 0.5 to 2), fitted on every season but one and applied to the held-out season; the held-out days of all seasons are scored together. Pearson r does not move under a scale factor, so the columns that can move are shown raw and corrected. Leads 1 to 5 are the product's horizons.
+
+| catchment | model | lead (days) | days | held-out factors | bias raw / corrected | MAE (mm) raw / corrected | hit rate raw / corrected | false-alarm ratio raw / corrected |
+|---|---|---|---|---|---|---|---|---|
+| Bhakra | ecmwf_ifs025 | 1 | 339 | 1.08 to 1.25 | -16% / -1% | 2.1 / 2.3 | n/a / n/a | n/a / n/a |
+| Bhakra | ecmwf_ifs025 | 2 | 339 | 1.07 to 1.20 | -12% / -1% | 2.2 / 2.3 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_ifs025 | 3 | 339 | 1.04 to 1.22 | -11% / -1% | 2.4 / 2.6 | n/a / n/a | n/a / 1.00 |
+| Bhakra | ecmwf_ifs025 | 4 | 339 | 1.02 to 1.19 | -10% / -1% | 2.6 / 2.8 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_ifs025 | 5 | 339 | 0.99 to 1.18 | -8% / -2% | 2.6 / 2.8 | n/a / n/a | n/a / n/a |
+| Bhakra | gfs_seamless | 1 | 339 | 1.02 to 1.10 | -6% / -1% | 2.5 / 2.6 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | gfs_seamless | 2 | 339 | 0.93 to 1.11 | -4% / -1% | 2.8 / 2.9 | n/a / n/a | n/a / n/a |
+| Bhakra | gfs_seamless | 3 | 339 | 0.85 to 1.04 | +3% / -1% | 3.1 / 3.1 | n/a / n/a | n/a / n/a |
+| Bhakra | gfs_seamless | 4 | 339 | 0.77 to 0.94 | +13% / -1% | 3.0 / 2.9 | n/a / n/a | 1.00 / n/a |
+| Bhakra | gfs_seamless | 5 | 339 | 1.35 to 2.00 | -41% / -1% | 3.1 / 3.8 | n/a / n/a | n/a / 1.00 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 1 | 339 | 0.96 to 1.04 | +1% / -1% | 5.2 / 5.1 | 0.42 / 0.33 | 0.17 / 0.20 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 2 | 339 | 0.84 to 0.98 | +9% / +1% | 5.6 / 5.5 | 0.33 / 0.33 | 0.33 / 0.33 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 3 | 339 | 0.83 to 0.91 | +16% / -1% | 6.0 / 5.6 | 0.33 / 0.33 | 0.56 / 0.50 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 4 | 339 | 0.77 to 0.86 | +23% / -1% | 6.4 / 5.8 | 0.17 / 0.08 | 0.82 / 0.86 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 5 | 339 | 0.78 to 0.86 | +22% / -1% | 6.7 / 6.0 | 0.17 / 0.00 | 0.82 / 1.00 |
+| Ghaggar Bhankarpur | gfs_seamless | 1 | 339 | 1.00 to 1.15 | -9% / +2% | 5.3 / 5.6 | 0.17 / 0.17 | 0.71 / 0.78 |
+| Ghaggar Bhankarpur | gfs_seamless | 2 | 339 | 0.81 to 1.01 | +8% / -1% | 6.3 / 6.0 | 0.17 / 0.17 | 0.75 / 0.71 |
+| Ghaggar Bhankarpur | gfs_seamless | 3 | 339 | 0.64 to 0.84 | +33% / -1% | 7.8 / 6.6 | 0.17 / 0.17 | 0.87 / 0.83 |
+| Ghaggar Bhankarpur | gfs_seamless | 4 | 339 | 0.63 to 0.85 | +33% / -0% | 8.0 / 6.8 | 0.08 / 0.08 | 0.95 / 0.86 |
+| Ghaggar Bhankarpur | gfs_seamless | 5 | 339 | 1.15 to 1.86 | -31% / +2% | 5.7 / 7.0 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 1 | 339 | 0.91 to 1.00 | +4% / +0% | 4.8 / 4.7 | 0.36 / 0.36 | 0.33 / 0.33 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 2 | 339 | 0.80 to 0.98 | +11% / +3% | 5.1 / 4.9 | 0.36 / 0.27 | 0.43 / 0.50 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 3 | 339 | 0.79 to 0.86 | +20% / +1% | 5.6 / 5.1 | 0.27 / 0.27 | 0.67 / 0.67 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 4 | 339 | 0.76 to 0.85 | +23% / +1% | 5.8 / 5.3 | 0.18 / 0.18 | 0.85 / 0.67 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 5 | 339 | 0.76 to 0.82 | +25% / +0% | 6.1 / 5.5 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Ghaggar Khanauri | gfs_seamless | 1 | 339 | 0.98 to 1.27 | -10% / +5% | 4.9 / 5.4 | 0.18 / 0.18 | 0.67 / 0.83 |
+| Ghaggar Khanauri | gfs_seamless | 2 | 339 | 0.88 to 1.01 | +5% / -1% | 5.5 / 5.4 | 0.18 / 0.18 | 0.75 / 0.67 |
+| Ghaggar Khanauri | gfs_seamless | 3 | 339 | 0.70 to 0.86 | +28% / -0% | 7.0 / 6.1 | 0.18 / 0.18 | 0.86 / 0.82 |
+| Ghaggar Khanauri | gfs_seamless | 4 | 339 | 0.67 to 0.82 | +34% / -0% | 7.5 / 6.3 | 0.09 / 0.09 | 0.94 / 0.86 |
+| Ghaggar Khanauri | gfs_seamless | 5 | 339 | 1.22 to 1.86 | -33% / +1% | 5.1 / 6.3 | 0.09 / 0.09 | 0.67 / 0.89 |
+| Pong | ecmwf_ifs025 | 1 | 339 | 1.15 to 1.37 | -22% / -2% | 4.9 / 5.3 | 0.24 / 0.24 | 0.56 / 0.64 |
+| Pong | ecmwf_ifs025 | 2 | 339 | 1.01 to 1.22 | -11% / -2% | 5.3 / 5.6 | 0.29 / 0.29 | 0.58 / 0.62 |
+| Pong | ecmwf_ifs025 | 3 | 339 | 0.99 to 1.25 | -11% / -2% | 5.8 / 6.2 | 0.12 / 0.12 | 0.78 / 0.78 |
+| Pong | ecmwf_ifs025 | 4 | 339 | 0.99 to 1.22 | -11% / -2% | 5.5 / 5.8 | 0.18 / 0.18 | 0.57 / 0.75 |
+| Pong | ecmwf_ifs025 | 5 | 339 | 0.93 to 1.21 | -9% / -2% | 5.8 / 6.3 | 0.18 / 0.18 | 0.70 / 0.77 |
+| Pong | gfs_seamless | 1 | 339 | 1.11 to 1.29 | -18% / -2% | 5.7 / 6.1 | 0.12 / 0.12 | 0.75 / 0.78 |
+| Pong | gfs_seamless | 2 | 339 | 1.01 to 1.35 | -19% / -2% | 5.9 / 6.5 | 0.06 / 0.06 | 0.80 / 0.86 |
+| Pong | gfs_seamless | 3 | 339 | 0.87 to 1.25 | -8% / -0% | 6.3 / 6.9 | 0.12 / 0.06 | 0.75 / 0.86 |
+| Pong | gfs_seamless | 4 | 339 | 0.76 to 1.08 | +4% / -1% | 6.8 / 7.0 | 0.06 / 0.06 | 0.92 / 0.92 |
+| Pong | gfs_seamless | 5 | 339 | 1.38 to 2.00 | -46% / -6% | 6.8 / 8.1 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Ranjit Sagar | ecmwf_ifs025 | 1 | 339 | 1.29 to 1.37 | -26% / -1% | 4.6 / 4.7 | 0.25 / 0.31 | 0.20 / 0.44 |
+| Ranjit Sagar | ecmwf_ifs025 | 2 | 339 | 1.11 to 1.20 | -14% / -1% | 5.1 / 5.4 | 0.19 / 0.31 | 0.62 / 0.67 |
+| Ranjit Sagar | ecmwf_ifs025 | 3 | 339 | 1.16 to 1.23 | -17% / -1% | 5.2 / 5.4 | 0.25 / 0.25 | 0.50 / 0.56 |
+| Ranjit Sagar | ecmwf_ifs025 | 4 | 339 | 1.11 to 1.24 | -16% / -1% | 4.9 / 5.2 | 0.12 / 0.25 | 0.60 / 0.64 |
+| Ranjit Sagar | ecmwf_ifs025 | 5 | 339 | 1.05 to 1.19 | -13% / -1% | 5.3 / 5.6 | 0.12 / 0.12 | 0.75 / 0.78 |
+| Ranjit Sagar | gfs_seamless | 1 | 339 | 1.07 to 1.20 | -13% / -1% | 5.1 / 5.3 | 0.19 / 0.19 | 0.50 / 0.50 |
+| Ranjit Sagar | gfs_seamless | 2 | 339 | 1.02 to 1.32 | -17% / -1% | 5.5 / 5.9 | 0.06 / 0.12 | 0.67 / 0.67 |
+| Ranjit Sagar | gfs_seamless | 3 | 339 | 0.91 to 1.34 | -12% / +1% | 5.7 / 6.4 | 0.06 / 0.06 | 0.67 / 0.83 |
+| Ranjit Sagar | gfs_seamless | 4 | 339 | 0.81 to 1.15 | +2% / +1% | 6.5 / 6.6 | 0.12 / 0.06 | 0.80 / 0.88 |
+| Ranjit Sagar | gfs_seamless | 5 | 339 | 1.36 to 2.00 | -43% / -1% | 5.8 / 7.1 | 0.06 / 0.12 | 0.67 / 0.88 |
+
+Held-out days, dam catchments, leads 1 to 5: MAE lower after correction in 1 of 30 rows, heavy-day hit rate higher in 5, false-alarm ratio higher in 16. The product applies a correction only when MAE and hit rate both improve on the held-out seasons for a dam catchment; the rule is in `design.md`.
+
 ## Live 2026: one-day inflow prediction against the BBMB bulletins
 
 Persistence (tomorrow's inflow equals today's) is the baseline any one-day prediction has to beat; the model's base component is that persistence with the rain response added, so the difference between the two rows is what the rain brings.
