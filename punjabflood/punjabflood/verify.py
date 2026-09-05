@@ -635,6 +635,76 @@ def live_test(predicted_cusecs: pd.Series, observed_cusecs: pd.Series) -> dict:
     }
 
 
+LIVE_HORIZONS = (1, 2, 3, 4, 5)
+
+
+def live_horizon_test(
+    bulletins: pd.DataFrame,
+    rain: pd.Series,
+    params: inflow.InflowParams,
+    qpf_leads: pd.DataFrame | None = None,
+    catchment: str | None = None,
+    horizons=LIVE_HORIZONS,
+    models=AS_ISSUED_MODELS,
+) -> pd.DataFrame:
+    """The live season's inflow prediction by horizon, against persistence.
+
+    ``bulletins``: one row per day (index date) with ``inflow_cusecs``, the season's BBMB
+    figures. From every bulletin day d the base flow is the observed inflow less the quick
+    response the recent rain explains, and the inflow of day d + h is predicted with the
+    observed catchment rain of the days in between (``rain``, the perfect-prognosis leg)
+    and, where ``qpf_leads`` is given, with the rain forecast issued on d (lead 1 to h of
+    each model). Persistence says the inflow of d + h equals that of d. Each prediction is
+    scored on the days a bulletin exists for d + h (``live_test``). One row per horizon and
+    rain source, with the source ``persistence`` beside them."""
+    rs = rain.sort_index()
+    n_hist = inflow.history_days(params)
+    fc: dict = {}
+    if qpf_leads is not None and catchment is not None:
+        q = qpf_leads[qpf_leads["catchment"] == catchment]
+        fc = {
+            (str(m), pd.Timestamp(t), int(k)): float(v)
+            for m, t, k, v in zip(
+                q["model"], q["target_date"], q["lead_days"], q["rain_mm"], strict=True
+            )
+        }
+    obs = bulletins["inflow_cusecs"].astype(float)
+    rows = []
+    for h in horizons:
+        preds: dict[str, dict] = {"observed rain": {}, "persistence": {}}
+        for m in models:
+            preds[m] = {}
+        for d in bulletins.index:
+            target = d + pd.Timedelta(days=h)
+            if target not in obs.index:
+                continue
+            hist = rs.reindex(pd.date_range(d - pd.Timedelta(days=n_hist - 1), d))
+            if hist.isna().any():
+                continue
+            base = inflow.base_from_observed(params, float(obs.loc[d]), hist.to_numpy())
+            preds["persistence"][target] = float(obs.loc[d])
+            fut = rs.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=h))
+            if not fut.isna().any():
+                vol = inflow.predict_daily_bcm(
+                    params, fut.to_numpy(), base, rain_mm_recent=hist.to_numpy()
+                )
+                preds["observed rain"][target] = C.bcm_to_cusec_days(float(vol[-1]))
+            for m in models:
+                f = [fc.get((m, d + pd.Timedelta(days=k), k)) for k in range(1, h + 1)]
+                if any(v is None or v != v for v in f):
+                    continue
+                vol = inflow.predict_daily_bcm(
+                    params, np.asarray(f, dtype=float), base, rain_mm_recent=hist.to_numpy()
+                )
+                preds[m][target] = C.bcm_to_cusec_days(float(vol[-1]))
+        for source, p in preds.items():
+            if not p:
+                continue
+            score = live_test(pd.Series(p), obs)
+            rows.append({"dam": params.dam, "horizon_days": int(h), "rain": source, **score})
+    return pd.DataFrame(rows)
+
+
 def _qpf_merge(qpf_leads: pd.DataFrame, rain_daily: pd.DataFrame) -> pd.DataFrame:
     """As-issued forecasts joined to the observed catchment rain on the days both have."""
     obs = rain_daily.copy()

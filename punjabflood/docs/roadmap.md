@@ -19,7 +19,9 @@ numbers that motivate them are in `verification.md`, never repeated here.
   for Bhakra, the Mukerian Hydel Channel for Pong, both sourced). The product and the event
   test now route that, with the spill-only figure kept as the inner bound.
 - **Persistence baseline** in the live test, so the rain response is judged against the
-  naive forecast it has to beat.
+  naive forecast it has to beat, and the live test carried out to five days ahead with
+  observed rain, with each model's as-issued rain and by persistence, so the report says from
+  which day the rain response beats persistence at each dam.
 - **Record repair** (stale CWC rows, level slips) and **model-carried storage** between the
   sparse event-week measurements, both described in `design.md`.
 - **Model error inside the spill probability.** P(spillway forced) is now printed twice: from

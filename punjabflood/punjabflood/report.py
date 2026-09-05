@@ -633,6 +633,34 @@ def render_verification(
         lines.append("Not run.")
     lines.append("")
 
+    lh = results.get("live_horizons") or []
+    if lh:
+        lines += [
+            "### By horizon, with observed and with forecast rain",
+            "",
+            "From each bulletin day, the inflow one to five days ahead: predicted with the "
+            "observed catchment rain of the days in between (what the hydrology alone can do), "
+            "with the rain forecast issued that day (what the product does, per model), and by "
+            "persistence (the inflow stays at the day's value). Scored on the days a bulletin "
+            "exists for the target day.",
+            "",
+            "| dam | horizon (days) | rain | days | bias | Pearson r | MAE (cusecs) |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for r in lh:
+            bp = r.get("bias_pct")
+            if bp is None or bp != bp:
+                lines.append(
+                    f"| {r['dam']} | {int(r['horizon_days'])} | {r['rain']} | {int(r['n'])} | "
+                    f"{r.get('note') or 'too few days'} | | |"
+                )
+            else:
+                lines.append(
+                    f"| {r['dam']} | {int(r['horizon_days'])} | {r['rain']} | {int(r['n'])} | "
+                    f"{bp:+.0f}% | {_fmt(r.get('pearson_r'))} | {r['mae_cusecs']:,.0f} |"
+                )
+        lines.append("")
+
     if forecast_dir is not None and Path(forecast_dir).exists():
         lines += _prospective_lines(Path(forecast_dir))
     return "\n".join(lines)

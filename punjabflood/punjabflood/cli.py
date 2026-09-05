@@ -432,6 +432,8 @@ def run_verify(horizon_days: int = 5):
                         out / "as_issued_events.csv", index=False
                     )
 
+    qpf_live = pd.read_csv(QPF_CSV) if QPF_CSV.exists() else None
+    results["live_horizons"] = []
     for dam in ("Bhakra", "Pong"):
         if dam not in params:
             continue
@@ -470,6 +472,12 @@ def run_verify(horizon_days: int = 5):
             if k in base_line:
                 live[f"persistence_{k}"] = base_line[k]
         results["live_2026"][dam] = live
+        # the same season one to five days ahead, with observed rain, with the rain forecast
+        # issued that day, and by persistence
+        lh = verify.live_horizon_test(b, rs, params[dam], qpf_live, dam)
+        results["live_horizons"] += lh.to_dict(orient="records")
+    if results["live_horizons"]:
+        pd.DataFrame(results["live_horizons"]).to_csv(out / "live_horizons.csv", index=False)
 
     if QPF_CSV.exists():
         qpf_leads = pd.read_csv(QPF_CSV)

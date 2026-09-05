@@ -98,6 +98,37 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             },
         ],
     }
+    results["live_horizons"] = [
+        {
+            "dam": "Pong",
+            "horizon_days": 3,
+            "rain": "observed rain",
+            "n": 18,
+            "bias_pct": -4.0,
+            "pearson_r": 0.71,
+            "mae_cusecs": 6500.0,
+            "mean_obs_cusecs": 34000.0,
+            "mean_pred_cusecs": 32640.0,
+        },
+        {
+            "dam": "Pong",
+            "horizon_days": 3,
+            "rain": "persistence",
+            "n": 18,
+            "bias_pct": 1.0,
+            "pearson_r": 0.40,
+            "mae_cusecs": 9000.0,
+            "mean_obs_cusecs": 34000.0,
+            "mean_pred_cusecs": 34340.0,
+        },
+        {
+            "dam": "Bhakra",
+            "horizon_days": 5,
+            "rain": "gfs_seamless",
+            "n": 2,
+            "note": "too few days",
+        },
+    ]
     results["inflow_variants"] = {
         "loso": [
             {
@@ -312,6 +343,11 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
         "of the stated peak." in md
     )
     assert report._ratio_range(pd.Series([0.97, 1.13])) == "0.97 to 1.13"
+    # the live season by horizon, persistence beside the model; too few days prints the note
+    assert "### By horizon" in md
+    assert "| Pong | 3 | observed rain | 18 | -4% | +0.71 | 6,500 |" in md
+    assert "| Pong | 3 | persistence | 18 | +1% | +0.40 | 9,000 |" in md
+    assert "| Bhakra | 5 | gfs_seamless | 2 | too few days | | |" in md
     # the response variant: one row per dam and variant, the flood-scale summaries, the verdict
     assert "### A sharper response to heavy rain" in md
     assert (

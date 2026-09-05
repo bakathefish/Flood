@@ -269,6 +269,9 @@ record.
   threshold-excess response, `inflow.loso_score` scores any variant leave-one-season-out,
   and `verify` fits and scores the variant beside the response in use each run
   (`verify.variant_verdict` applies the adoption rule; refused on this record).
+- Live test by horizon: `verify.live_horizon_test` scores one to five days ahead with
+  observed rain, with each model's as-issued rain and by persistence
+  (`outputs/verification/live_horizons.csv`).
 - `docs/roadmap.md` lists what comes next and the data each step needs.
 
 ## Self-review

@@ -117,8 +117,13 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    those ratios are lower bounds.
 3. Live season. The one-day inflow prediction against every 2026 BBMB bulletin: bias,
    correlation, mean absolute error, beside the same numbers for persistence (tomorrow
-   equals today), which any one-day prediction has to beat. 2026 is a deficit season, so
-   this leg supplies false-alarm and calibration evidence only.
+   equals today), which any one-day prediction has to beat; then the same one to five days
+   ahead, with the observed rain of the days in between (the hydrology alone), with the
+   rain forecast issued that day per model (what the product does), and by persistence,
+   scored on the days a bulletin exists for the target day. Persistence is hard to beat a
+   day ahead in a deficit season and easy to beat further out; the table says from which
+   day the rain response earns its place at each dam. 2026 is a deficit season, so this leg
+   supplies false-alarm and calibration evidence only.
 4. Rain input check. ERA5 catchment rain against the IMD grid over the 2023 and 2025 event
    windows, because the forecast models share ERA5's physics and resolution; a reanalysis
    that misses the mountain rain of an event says the forecasts will too.

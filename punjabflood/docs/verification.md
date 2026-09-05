@@ -360,6 +360,53 @@ Persistence (tomorrow's inflow equals today's) is the baseline any one-day predi
 | Bhakra | 26 | 42,141 | 41,447 | -2% | +0.46 | 4,567 | -0% | +0.56 | 4,463 |
 | Pong | 26 | 37,862 | 36,970 | -2% | +0.38 | 11,594 | -0% | +0.33 | 12,557 |
 
+### By horizon, with observed and with forecast rain
+
+From each bulletin day, the inflow one to five days ahead: predicted with the observed catchment rain of the days in between (what the hydrology alone can do), with the rain forecast issued that day (what the product does, per model), and by persistence (the inflow stays at the day's value). Scored on the days a bulletin exists for the target day.
+
+| dam | horizon (days) | rain | days | bias | Pearson r | MAE (cusecs) |
+|---|---|---|---|---|---|---|
+| Bhakra | 1 | observed rain | 26 | -2% | +0.46 | 4,567 |
+| Bhakra | 1 | persistence | 27 | -0% | +0.56 | 4,427 |
+| Bhakra | 1 | ecmwf_ifs025 | 27 | -1% | +0.48 | 4,472 |
+| Bhakra | 1 | gfs_seamless | 27 | -0% | +0.48 | 5,280 |
+| Bhakra | 2 | observed rain | 25 | -4% | +0.23 | 6,410 |
+| Bhakra | 2 | persistence | 26 | -1% | +0.33 | 6,037 |
+| Bhakra | 2 | ecmwf_ifs025 | 26 | -0% | +0.26 | 6,503 |
+| Bhakra | 2 | gfs_seamless | 26 | -1% | +0.26 | 7,096 |
+| Bhakra | 3 | observed rain | 24 | -5% | +0.22 | 6,804 |
+| Bhakra | 3 | persistence | 25 | -2% | +0.23 | 6,598 |
+| Bhakra | 3 | ecmwf_ifs025 | 25 | -1% | +0.36 | 6,277 |
+| Bhakra | 3 | gfs_seamless | 25 | -1% | +0.28 | 7,231 |
+| Bhakra | 4 | observed rain | 23 | -7% | +0.25 | 6,420 |
+| Bhakra | 4 | persistence | 24 | -1% | +0.16 | 7,283 |
+| Bhakra | 4 | ecmwf_ifs025 | 24 | -1% | +0.35 | 5,764 |
+| Bhakra | 4 | gfs_seamless | 24 | +1% | +0.36 | 6,455 |
+| Bhakra | 5 | observed rain | 22 | -7% | +0.13 | 6,957 |
+| Bhakra | 5 | persistence | 23 | +0% | -0.01 | 7,534 |
+| Bhakra | 5 | ecmwf_ifs025 | 23 | +0% | +0.32 | 6,693 |
+| Bhakra | 5 | gfs_seamless | 23 | +3% | +0.37 | 7,063 |
+| Pong | 1 | observed rain | 26 | -2% | +0.38 | 11,594 |
+| Pong | 1 | persistence | 27 | +3% | +0.28 | 13,180 |
+| Pong | 1 | ecmwf_ifs025 | 27 | +0% | +0.32 | 12,124 |
+| Pong | 1 | gfs_seamless | 27 | -0% | +0.30 | 12,728 |
+| Pong | 2 | observed rain | 25 | -4% | -0.02 | 15,009 |
+| Pong | 2 | persistence | 26 | +1% | -0.30 | 18,010 |
+| Pong | 2 | ecmwf_ifs025 | 26 | +1% | -0.08 | 15,960 |
+| Pong | 2 | gfs_seamless | 26 | -2% | -0.09 | 16,774 |
+| Pong | 3 | observed rain | 24 | -7% | +0.41 | 11,320 |
+| Pong | 3 | persistence | 25 | -1% | +0.03 | 16,107 |
+| Pong | 3 | ecmwf_ifs025 | 25 | +6% | +0.41 | 13,489 |
+| Pong | 3 | gfs_seamless | 25 | +1% | +0.30 | 14,547 |
+| Pong | 4 | observed rain | 23 | -9% | +0.62 | 9,312 |
+| Pong | 4 | persistence | 24 | -1% | +0.42 | 12,990 |
+| Pong | 4 | ecmwf_ifs025 | 24 | +4% | +0.63 | 8,313 |
+| Pong | 4 | gfs_seamless | 24 | +6% | +0.59 | 10,978 |
+| Pong | 5 | observed rain | 22 | -9% | +0.08 | 14,474 |
+| Pong | 5 | persistence | 23 | +3% | +0.05 | 15,786 |
+| Pong | 5 | ecmwf_ifs025 | 23 | +8% | +0.13 | 14,190 |
+| Pong | 5 | gfs_seamless | 23 | +14% | +0.32 | 14,062 |
+
 ## Prospective record, 2026 season
 
 Issued daily from the committed inputs and the live BBMB bulletin; a record is never rewritten (`outputs/forecast/`). P(spillway forced) is at the five-day horizon.

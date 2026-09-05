@@ -352,6 +352,36 @@ def test_model_carry_bridges_sparse_measurements_and_reanchors():
     assert pd.Timestamp("2023-09-20") not in s2.index and pd.Timestamp("2023-09-05") in s2.index
 
 
+def test_live_horizon_test_scores_each_horizon_against_persistence():
+    _, rain, p = _event_inputs()
+    rs = rain.set_index("date")["rain_mm"]
+    days = pd.date_range("2025-08-05", "2025-08-31", freq="D")
+    # an inflow record that follows the model's own rain response, so the observed-rain
+    # prediction beats persistence once the spell arrives
+    inflow_series = []
+    for d in days:
+        hist = rs.reindex(pd.date_range(d - pd.Timedelta(days=5), d)).to_numpy()
+        inflow_series.append(40_000.0 + C.bcm_to_cusec_days(inflow.quick_response_bcm(p, hist)))
+    b = pd.DataFrame({"inflow_cusecs": inflow_series}, index=days)
+    archive = _qpf_archive(rain, "ecmwf_ifs025", 0, 1.0)  # a perfect archive
+    out = verify.live_horizon_test(
+        b, rs, p, archive, "Pong", horizons=(1, 3), models=("ecmwf_ifs025",)
+    )
+    assert set(out["rain"]) == {"observed rain", "persistence", "ecmwf_ifs025"}
+    assert set(out["horizon_days"]) == {1, 3}
+    h1 = out[out["horizon_days"] == 1].set_index("rain")
+    # the horizon-1 observed-rain leg is the plain live test on the same pairs
+    assert h1.loc["observed rain", "n"] == len(days) - 1
+    assert h1.loc["observed rain", "mae_cusecs"] < h1.loc["persistence", "mae_cusecs"]
+    # a perfect archive reproduces the observed-rain leg
+    assert h1.loc["ecmwf_ifs025", "mae_cusecs"] == pytest.approx(
+        h1.loc["observed rain", "mae_cusecs"]
+    )
+    h3 = out[out["horizon_days"] == 3].set_index("rain")
+    assert h3.loc["persistence", "n"] == len(days) - 3
+    assert h3.loc["observed rain", "mae_cusecs"] < h3.loc["persistence", "mae_cusecs"]
+
+
 def test_flood_scale_summary_and_variant_verdict():
     cols = verify.FLOOD_SCALE_COLS
     base_fs = pd.DataFrame(
