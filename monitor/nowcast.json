@@ -5,7 +5,7 @@
   "reason": "newest observation is stale: 4 days old (2026-09-01), limit 3",
   "note": "No forecast was produced this cycle. This is not an all-clear: absence of a forecast is absence of information, not evidence of calm."
  },
- "generated_utc": "2026-09-05T09:58:48Z",
+ "generated_utc": "2026-09-05T14:36:38Z",
  "window_start": "2026-09-03",
  "window_end": "2026-09-13",
  "core_season": true,
