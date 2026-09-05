@@ -6010,6 +6010,132 @@
       "source": "Rajya Sabha reply via PTI, 2 Dec 2025"
     }
   ],
+  "inflow_variants": {
+    "loso": [
+      {
+        "dam": "Bhakra",
+        "variant": "baseline",
+        "n_seasons": 11,
+        "n_days": 1009,
+        "rmse_bcm": 0.043904593889189734,
+        "n_heavy_days": 2,
+        "heavy_rmse_bcm": 0.10127785238588252,
+        "heavy_bias_bcm": -0.09075794649565229,
+        "in_sample_rmse_bcm": 0.04337534845997248,
+        "c": 0.17033704612728234,
+        "c_wet": 0.24991984946245677,
+        "w": "0.54 0.27 0.10 0.09",
+        "c_excess": 0.0,
+        "w_excess": ""
+      },
+      {
+        "dam": "Bhakra",
+        "variant": "excess above 30 mm",
+        "n_seasons": 11,
+        "n_days": 1009,
+        "rmse_bcm": 0.06675904322963067,
+        "n_heavy_days": 2,
+        "heavy_rmse_bcm": 0.09229371165171793,
+        "heavy_bias_bcm": -0.07727081736046566,
+        "in_sample_rmse_bcm": 0.04331919456117842,
+        "c": 0.1935371995053191,
+        "c_wet": 0.20732740755545315,
+        "w": "0.55 0.21 0.12 0.12",
+        "c_excess": 0.3033218593002517,
+        "w_excess": "0.00 1.00 0.00 0.00"
+      },
+      {
+        "dam": "Pong",
+        "variant": "baseline",
+        "n_seasons": 8,
+        "n_days": 733,
+        "rmse_bcm": 0.030167320958222166,
+        "n_heavy_days": 28,
+        "heavy_rmse_bcm": 0.07821890494236387,
+        "heavy_bias_bcm": -0.015798955145759474,
+        "in_sample_rmse_bcm": 0.029594760927673373,
+        "c": 0.20252556951077164,
+        "c_wet": 0.32815516998502064,
+        "w": "0.35 0.48 0.09 0.08",
+        "c_excess": 0.0,
+        "w_excess": ""
+      },
+      {
+        "dam": "Pong",
+        "variant": "excess above 30 mm",
+        "n_seasons": 8,
+        "n_days": 733,
+        "rmse_bcm": 0.030443498324002956,
+        "n_heavy_days": 28,
+        "heavy_rmse_bcm": 0.07731122574079383,
+        "heavy_bias_bcm": -0.012880333384611828,
+        "in_sample_rmse_bcm": 0.029585376911511613,
+        "c": 0.20007826131876072,
+        "c_wet": 0.3322928346153121,
+        "w": "0.40 0.39 0.11 0.10",
+        "c_excess": 0.523263961684464,
+        "w_excess": "0.20 0.65 0.09 0.06"
+      },
+      {
+        "dam": "Ranjit Sagar",
+        "variant": "baseline",
+        "n_seasons": 11,
+        "n_days": 1184,
+        "rmse_bcm": 0.022865580884362528,
+        "n_heavy_days": 29,
+        "heavy_rmse_bcm": 0.044218959773392984,
+        "heavy_bias_bcm": -0.011311050216115308,
+        "in_sample_rmse_bcm": 0.022427979081118554,
+        "c": 0.1313774408026632,
+        "c_wet": 0.26331892708888766,
+        "w": "0.62 0.24 0.08 0.05",
+        "c_excess": 0.0,
+        "w_excess": ""
+      },
+      {
+        "dam": "Ranjit Sagar",
+        "variant": "excess above 30 mm",
+        "n_seasons": 11,
+        "n_days": 1184,
+        "rmse_bcm": 0.022946415221679107,
+        "n_heavy_days": 29,
+        "heavy_rmse_bcm": 0.04686214996479379,
+        "heavy_bias_bcm": -0.007403421808335571,
+        "in_sample_rmse_bcm": 0.022326492412643725,
+        "c": 0.15599727929848317,
+        "c_wet": 0.16597692458717728,
+        "w": "0.47 0.27 0.15 0.11",
+        "c_excess": 0.4686172859406195,
+        "w_excess": "0.46 0.48 0.00 0.07"
+      }
+    ],
+    "flood_scale": {
+      "baseline": {
+        "n_period_means": 6,
+        "period_mean_worst_deviation": 0.22287181576552884,
+        "season_peak_ratio_min": 0.5698738822817063,
+        "season_peak_ratio_max": 0.5823307631193606
+      },
+      "excess above 30 mm": {
+        "n_period_means": 6,
+        "period_mean_worst_deviation": 0.2635423560682024,
+        "season_peak_ratio_min": 0.5491850574655527,
+        "season_peak_ratio_max": 0.5776685245303764
+      }
+    },
+    "verdict": {
+      "variant": "excess above 30 mm",
+      "dams": [
+        "Bhakra",
+        "Pong",
+        "Ranjit Sagar"
+      ],
+      "loso_error_not_higher": false,
+      "season_peaks_higher": false,
+      "period_means_hold": false,
+      "adopt": false
+    }
+  },
   "as_issued_events": [
     {
       "year": 2024,

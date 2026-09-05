@@ -484,6 +484,49 @@ def flood_scale_inflow_check(
     return pd.DataFrame(rows, columns=FLOOD_SCALE_COLS)
 
 
+def flood_scale_summary(fs: pd.DataFrame, min_period_days: int = 10) -> dict:
+    """What the adoption rule for a response variant reads off a flood-scale table: how many
+    period means the run covers on at least ``min_period_days`` days, the worst deviation of
+    those ratios from one, and the smallest and largest season-peak ratio."""
+    pm = fs[(fs["kind"] == "period mean") & (fs["n_days"] >= min_period_days)].dropna(
+        subset=["ratio"]
+    )
+    pk = fs[fs["kind"] == "season peak"].dropna(subset=["ratio"])
+    return {
+        "n_period_means": int(len(pm)),
+        "period_mean_worst_deviation": float((pm["ratio"] - 1.0).abs().max())
+        if len(pm)
+        else float("nan"),
+        "season_peak_ratio_min": float(pk["ratio"].min()) if len(pk) else float("nan"),
+        "season_peak_ratio_max": float(pk["ratio"].max()) if len(pk) else float("nan"),
+    }
+
+
+def variant_verdict(base: dict, variant: dict, loso: pd.DataFrame, variant_name: str) -> dict:
+    """The adoption rule for an inflow-response variant, each condition on its own: the
+    leave-one-season-out error may not rise at any dam, the season-peak ratios of the
+    flood-scale check must rise, and the period means may not move further from the reported
+    means than the baseline's worst one does. ``base`` and ``variant`` are
+    ``flood_scale_summary`` results; ``loso`` has one row per dam and variant with
+    ``rmse_bcm`` (``variant == 'baseline'`` for the response in use)."""
+    b = loso[loso["variant"] == "baseline"].set_index("dam")["rmse_bcm"]
+    v = loso[loso["variant"] == variant_name].set_index("dam")["rmse_bcm"]
+    dams = sorted(set(b.index) & set(v.index))
+    rmse_ok = bool(dams) and all(float(v[d]) <= float(b[d]) * (1 + 1e-9) for d in dams)
+    peaks_ok = bool(variant["season_peak_ratio_min"] > base["season_peak_ratio_min"])
+    periods_ok = bool(
+        variant["period_mean_worst_deviation"] <= base["period_mean_worst_deviation"] + 1e-9
+    )
+    return {
+        "variant": variant_name,
+        "dams": dams,
+        "loso_error_not_higher": rmse_ok,
+        "season_peaks_higher": peaks_ok,
+        "period_means_hold": periods_ok,
+        "adopt": bool(rmse_ok and peaks_ok and periods_ok),
+    }
+
+
 def annual_max(df: pd.DataFrame, col: str, name: str) -> pd.DataFrame:
     d = pd.to_datetime(df["date"])
     out = df.groupby(d.dt.year)[col].max().rename(name).to_frame()

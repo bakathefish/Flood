@@ -18,22 +18,31 @@ def _synthetic(
     seed=0,
     years=(2001, 2002, 2003, 2004, 2005),
     c_wet=0.0,
+    c_excess=0.0,
+    w_excess=(0.7, 0.3, 0.0, 0.0),
+    threshold_mm=inflow.EXCESS_THRESHOLD_MM,
+    rain_scale=12.0,
 ):
     """Storage and rain series generated from the model itself. ``c_wet`` is the extra
-    runoff coefficient per 100 mm of rain over the previous ``inflow.API_DAYS`` days."""
+    runoff coefficient per 100 mm of rain over the previous ``inflow.API_DAYS`` days. With
+    ``c_excess`` the rain above ``threshold_mm`` responds through ``c_excess`` and
+    ``w_excess`` and only the rest through ``c`` and ``w``."""
     rng = np.random.default_rng(seed)
     rows_state, rows_rain = [], []
     for y in years:
         days = pd.date_range(f"{y}-05-25", f"{y}-09-30", freq="D")
-        rain = rng.gamma(0.6, 12.0, size=len(days))  # mm/day, skewed like monsoon rain
+        rain = rng.gamma(0.6, rain_scale, size=len(days))  # mm/day, skewed like monsoon rain
         rain[rng.random(len(days)) < 0.45] = 0.0
-        rv = inflow.rain_volume_bcm(rain, area_km2)
+        base_mm, ex_mm = inflow.split_excess(rain, threshold_mm if c_excess > 0 else None)
+        rv = inflow.rain_volume_bcm(base_mm, area_km2)
+        ev = inflow.rain_volume_bcm(ex_mm, area_km2)
         storage = 2.0
         base = 0.05  # BCM/day
         for i, d in enumerate(days):
             api = float(rain[max(i - inflow.API_DAYS, 0) : i].sum())
             ci = min(c + c_wet * api / 100.0, inflow.C_MAX)
             quick = sum(ci * w[k] * rv[i - k] for k in range(4) if i - k >= 0)
+            quick += sum(c_excess * w_excess[k] * ev[i - k] for k in range(4) if i - k >= 0)
             base = base * rho + 0.05 * (1 - rho)  # relaxes towards a mean base
             infl = base + quick
             storage = storage + infl - outflow_bcm
@@ -65,6 +74,61 @@ def test_calibration_recovers_wetness_dependence():
     assert inflow.coefficient(p, api_mm=0.0) == pytest.approx(p.c)
     assert inflow.coefficient(p, api_mm=100.0) == pytest.approx(min(p.c + p.c_wet, inflow.C_MAX))
     assert inflow.coefficient(p, api_mm=1e6) == inflow.C_MAX
+
+
+def test_calibration_recovers_the_excess_response():
+    state, rain = _synthetic(c=0.4, c_excess=0.8, seed=11, years=range(2001, 2013), rain_scale=20.0)
+    p = inflow.calibrate(state, rain, "Pong", 12560.0, excess_threshold_mm=30.0)
+    assert p.has_excess and p.excess_threshold_mm == 30.0
+    assert abs(p.c - 0.4) < 0.08, p
+    assert abs(p.c_excess - 0.8) < 0.2, p
+    assert abs(p.w_excess[0] - 0.7) < 0.15 and abs(sum(p.w_excess) - 1.0) < 1e-9, p
+    # the plain response cannot follow the heavy days as well
+    p0 = inflow.calibrate(state, rain, "Pong", 12560.0)
+    assert not p0.has_excess and p0.w_excess == ()
+    assert p0.rmse_bcm > p.rmse_bcm
+    # the fitted relation reproduces its own calibration residuals
+    df = inflow.design_matrix(state, rain, "Pong", 12560.0, excess_threshold_mm=30.0)
+    resid = df["ds"].to_numpy() - inflow.predict_storage_change(p, df)
+    assert float(np.sqrt(np.mean(resid**2))) == pytest.approx(p.rmse_bcm)
+
+
+def test_excess_fit_on_linear_data_matches_the_plain_coefficient():
+    # no excess mechanism was generated, so the rain above the threshold responds with the
+    # same coefficient as the rest, and the held-out error is the same either way
+    state, rain = _synthetic(seed=0, years=range(2001, 2011), rain_scale=20.0)
+    p = inflow.calibrate(state, rain, "Pong", 12560.0, excess_threshold_mm=30.0)
+    assert abs(p.c - 0.55) < 0.1 and abs(p.c_excess - 0.55) < 0.2, p
+    a = inflow.loso_score(state, rain, "Pong", 12560.0)
+    b = inflow.loso_score(state, rain, "Pong", 12560.0, excess_threshold_mm=30.0)
+    assert a["n_seasons"] == 10 and a["n_days"] == len(
+        inflow.design_matrix(state, rain, "Pong", 12560.0)
+    )
+    assert a["n_heavy_days"] > 20 and a["n_heavy_days"] == b["n_heavy_days"]
+    assert abs(a["rmse_bcm"] - b["rmse_bcm"]) / a["rmse_bcm"] < 0.1
+    assert a["heavy_rmse_bcm"] > 0 and abs(a["heavy_bias_bcm"]) < a["heavy_rmse_bcm"]
+
+
+def test_quick_response_with_excess_splits_the_day():
+    common = dict(c=0.4, w=(1.0, 0.0, 0.0, 0.0), rho=0.9, intercept_bcm_per_day=0.0)
+    plain = inflow.InflowParams("Pong", 12560.0, **common)
+    ex = inflow.InflowParams(
+        "Pong",
+        12560.0,
+        **common,
+        c_excess=0.8,
+        w_excess=(1.0, 0.0, 0.0, 0.0),
+        excess_threshold_mm=30.0,
+    )
+    hist = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 50.0])
+    vol = lambda mm: inflow.rain_volume_bcm(mm, 12560.0)  # noqa: E731
+    assert inflow.quick_response_bcm(plain, hist) == pytest.approx(0.4 * vol(50.0))
+    assert inflow.quick_response_bcm(ex, hist) == pytest.approx(0.4 * vol(30.0) + 0.8 * vol(20.0))
+    # below the threshold the two agree
+    light = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 20.0])
+    assert inflow.quick_response_bcm(ex, light) == pytest.approx(
+        inflow.quick_response_bcm(plain, light)
+    )
 
 
 def test_quick_response_uses_antecedent_rain():
@@ -202,18 +266,29 @@ def test_params_round_trip():
         rho_raw=0.93,
         c_wet=0.2,
         resid_acf1=0.3,
+        c_excess=0.7,
+        w_excess=(0.8, 0.2, 0.0, 0.0),
+        excess_threshold_mm=30.0,
     )
     assert inflow.InflowParams.from_dict(p.to_dict()) == p
-    # a parameter file written before rho_raw, the wet coefficient and the residual
-    # persistence existed still loads
+    assert p.to_dict()["w_excess"] == [0.8, 0.2, 0.0, 0.0]
+    # a parameter file written before rho_raw, the wet coefficient, the residual
+    # persistence and the excess response existed still loads
     d = p.to_dict()
-    del d["rho_raw"]
-    del d["c_wet"]
-    del d["api_days"]
-    del d["resid_acf1"]
+    for k in (
+        "rho_raw",
+        "c_wet",
+        "api_days",
+        "resid_acf1",
+        "c_excess",
+        "w_excess",
+        "excess_threshold_mm",
+    ):
+        del d[k]
     old = inflow.InflowParams.from_dict(d)
     assert np.isnan(old.rho_raw) and old.c_wet == 0.0 and old.api_days == inflow.API_DAYS
     assert np.isnan(old.resid_acf1)
+    assert old.w_excess == () and not old.has_excess
 
 
 def test_residual_acf1_recovers_ar1_persistence():

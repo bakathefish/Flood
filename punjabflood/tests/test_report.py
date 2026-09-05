@@ -98,6 +98,64 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             },
         ],
     }
+    results["inflow_variants"] = {
+        "loso": [
+            {
+                "dam": "Pong",
+                "variant": "baseline",
+                "n_seasons": 8,
+                "n_days": 700,
+                "rmse_bcm": 0.0296,
+                "n_heavy_days": 28,
+                "heavy_rmse_bcm": 0.09,
+                "heavy_bias_bcm": 0.0123,
+                "in_sample_rmse_bcm": 0.029,
+                "c": 0.203,
+                "c_wet": 0.328,
+                "w": "0.35 0.48 0.09 0.08",
+                "c_excess": 0.0,
+                "w_excess": "",
+            },
+            {
+                "dam": "Pong",
+                "variant": "excess above 30 mm",
+                "n_seasons": 8,
+                "n_days": 700,
+                "rmse_bcm": 0.0301,
+                "n_heavy_days": 28,
+                "heavy_rmse_bcm": float("nan"),
+                "heavy_bias_bcm": -0.005,
+                "in_sample_rmse_bcm": 0.0285,
+                "c": 0.19,
+                "c_wet": 0.3,
+                "w": "0.40 0.45 0.10 0.05",
+                "c_excess": 0.412,
+                "w_excess": "0.60 0.40 0.00 0.00",
+            },
+        ],
+        "flood_scale": {
+            "baseline": {
+                "n_period_means": 5,
+                "period_mean_worst_deviation": 0.22,
+                "season_peak_ratio_min": 0.57,
+                "season_peak_ratio_max": 0.58,
+            },
+            "excess above 30 mm": {
+                "n_period_means": 5,
+                "period_mean_worst_deviation": 0.25,
+                "season_peak_ratio_min": 0.61,
+                "season_peak_ratio_max": 0.66,
+            },
+        },
+        "verdict": {
+            "variant": "excess above 30 mm",
+            "dams": ["Bhakra", "Pong"],
+            "loso_error_not_higher": False,
+            "season_peaks_higher": True,
+            "period_means_hold": False,
+            "adopt": False,
+        },
+    }
     (tmp_path / "results.json").write_text(json.dumps(results), encoding="utf-8")
     pd.DataFrame(
         [
@@ -254,6 +312,22 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
         "of the stated peak." in md
     )
     assert report._ratio_range(pd.Series([0.97, 1.13])) == "0.97 to 1.13"
+    # the response variant: one row per dam and variant, the flood-scale summaries, the verdict
+    assert "### A sharper response to heavy rain" in md
+    assert (
+        "| Pong | baseline | 8 | 700 | 0.0296 | 28 | 0.0900 | +0.0123 | 0.203 | 0.328 | "
+        "0.35 0.48 0.09 0.08 | 0.000 | none |" in md
+    )
+    assert (
+        "| Pong | excess above 30 mm | 8 | 700 | 0.0301 | 28 | n/a | -0.0050 | 0.190 | 0.300 | "
+        "0.40 0.45 0.10 0.05 | 0.412 | 0.60 0.40 0.00 0.00 |" in md
+    )
+    assert "| baseline | 5 | 0.22 | 0.57 | 0.58 |" in md
+    assert (
+        "Verdict on 'excess above 30 mm', not adopted. Conditions: the held-out error does not "
+        "rise at any dam (fails); the season peaks rise (passes); the period means hold (fails)."
+        in md
+    )
     assert "| Pong_max5d_bcm | 38 | 5 | +0.61 | 0.93 | +0.31 |" in md
     assert (
         "| 2023 | spill + passage | 2023-08-16 | 150,000 | 2023-08-17 | 237,500 | -1 | 0.63 |" in md

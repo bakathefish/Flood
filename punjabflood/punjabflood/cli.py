@@ -43,6 +43,8 @@ DAM_NAMES = ("Bhakra", "Pong", "Ranjit Sagar")
 PAC_PERIODS_CSV = REF / "bbmb" / "pac_period_means_2025.csv"
 INFLOW_POINTS_CSV = REF / "bbmb" / "inflow_points_2025.csv"
 SEASON_PEAKS_CSV = REF / "bbmb" / "season_peak_inflows_2025.csv"
+# the inflow-response variant the verification fits and scores beside the response in use
+EXCESS_VARIANT = f"excess above {inflow.EXCESS_THRESHOLD_MM:.0f} mm"
 
 
 def _log():
@@ -341,9 +343,57 @@ def run_verify(horizon_days: int = 5):
                         index=False,
                     )
             # flood scale: the model's one-day inflow against the figures the record holds
-            fs = verify.flood_scale_inflow_check(pp_by_dam, *_flood_scale_truth(state_measured))
+            truth = _flood_scale_truth(state_measured)
+            fs = verify.flood_scale_inflow_check(pp_by_dam, *truth)
             fs.to_csv(out / "flood_scale_inflow.csv", index=False)
             results["flood_scale_inflow"] = fs.to_dict(orient="records")
+            # a sharper response to heavy rain, fitted and scored out of sample beside the
+            # response in use; verify.variant_verdict says whether it may replace it
+            variant_rows, pp_variant = [], {}
+            summaries = {"baseline": verify.flood_scale_summary(fs)}
+            for dam in DAM_NAMES:
+                if dam not in params:
+                    continue
+                r = rain_daily[rain_daily["catchment"] == dam]
+                area = _covered_area(rain_daily, dam, cats[dam].area_km2)
+                for name, thr in (("baseline", None), (EXCESS_VARIANT, inflow.EXCESS_THRESHOLD_MM)):
+                    try:
+                        p_v = inflow.calibrate(
+                            state_measured, r, dam, area, excess_threshold_mm=thr
+                        )
+                    except ValueError as exc:
+                        typer.echo(f"{dam} {name}: {exc}")
+                        continue
+                    variant_rows.append(
+                        {
+                            "dam": dam,
+                            "variant": name,
+                            **inflow.loso_score(state_measured, r, dam, area, thr),
+                            "in_sample_rmse_bcm": p_v.rmse_bcm,
+                            "c": p_v.c,
+                            "c_wet": p_v.c_wet,
+                            "w": " ".join(f"{x:.2f}" for x in p_v.w),
+                            "c_excess": p_v.c_excess,
+                            "w_excess": " ".join(f"{x:.2f}" for x in p_v.w_excess),
+                        }
+                    )
+                    if thr is not None:
+                        pp_variant[dam] = verify.perfect_prog_hei(
+                            state_measured, rain_daily, dam, dam, p_v, horizon_days, "model"
+                        )
+            if variant_rows:
+                loso_df = pd.DataFrame(variant_rows)
+                loso_df.to_csv(out / "inflow_variants.csv", index=False)
+                summaries[EXCESS_VARIANT] = verify.flood_scale_summary(
+                    verify.flood_scale_inflow_check(pp_variant, *truth)
+                )
+                results["inflow_variants"] = {
+                    "loso": loso_df.to_dict(orient="records"),
+                    "flood_scale": summaries,
+                    "verdict": verify.variant_verdict(
+                        summaries["baseline"], summaries[EXCESS_VARIANT], loso_df, EXCESS_VARIANT
+                    ),
+                }
             if QPF_CSV.exists():
                 # what the product would have said: the archived as-issued QPF through the
                 # same water balance, one row per issue date, dam and model. The Dhilwan peak

@@ -37,6 +37,13 @@ def _fmt(x, nd=2):
     return str(x)
 
 
+def _num(x, spec: str) -> str:
+    """A number in the given format spec, or ``n/a`` when missing."""
+    if x is None or (isinstance(x, float) and x != x):
+        return "n/a"
+    return format(float(x), spec)
+
+
 def _rate(x) -> str:
     """A rate in [0, 1] to two decimals, n/a when undefined."""
     return "n/a" if x is None or x != x else f"{x:.2f}"
@@ -393,6 +400,57 @@ def render_verification(
                 f"is {_ratio_range(pk['ratio'])} of the stated peak. The flood's volume is close to "
                 "right and its peak day is not: the model spreads the volume over more days than "
                 "the river does, which is consistent with lag weights fitted on ordinary days.",
+            ]
+        lines.append("")
+
+    iv = results.get("inflow_variants")
+    if iv and iv.get("loso"):
+        lines += [
+            "### A sharper response to heavy rain, tested out of sample",
+            "",
+            "Rain above the heavy-day threshold in a catchment day gets its own coefficient and "
+            "lag weights (the threshold-excess variant), fitted jointly with the ordinary "
+            "response on the same storage record. The rule before it can replace the response "
+            "the product uses: the leave-one-season-out error (each season scored by a fit on "
+            "the others) may not rise at any dam, the season-peak ratios of the flood-scale "
+            "table must rise, and the period means may not move further from the reported "
+            "means than the baseline's worst one does. Heavy-day bias is observed minus "
+            "predicted storage change, positive when heavy days are under-predicted.",
+            "",
+            "| dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        ]
+        for r in iv["loso"]:
+            lines.append(
+                f"| {r['dam']} | {r['variant']} | {int(r['n_seasons'])} | {int(r['n_days'])} | "
+                f"{_num(r.get('rmse_bcm'), '.4f')} | {int(r['n_heavy_days'])} | "
+                f"{_num(r.get('heavy_rmse_bcm'), '.4f')} | {_num(r.get('heavy_bias_bcm'), '+.4f')} | "
+                f"{r['c']:.3f} | {r['c_wet']:.3f} | {r['w']} | {r['c_excess']:.3f} | {r['w_excess'] or 'none'} |"
+            )
+        lines += [
+            "",
+            "| variant | period means covered | worst deviation of a period mean from 1 | season-peak ratio, smallest | season-peak ratio, largest |",
+            "|---|---|---|---|---|",
+        ]
+        for name, s in (iv.get("flood_scale") or {}).items():
+            lines.append(
+                f"| {name} | {int(s['n_period_means'])} | "
+                f"{_num(s.get('period_mean_worst_deviation'), '.2f')} | "
+                f"{_num(s.get('season_peak_ratio_min'), '.2f')} | "
+                f"{_num(s.get('season_peak_ratio_max'), '.2f')} |"
+            )
+        vd = iv.get("verdict")
+        if vd:
+            conds = [
+                ("the held-out error does not rise at any dam", vd["loso_error_not_higher"]),
+                ("the season peaks rise", vd["season_peaks_higher"]),
+                ("the period means hold", vd["period_means_hold"]),
+            ]
+            said = "; ".join(f"{c} ({'passes' if ok else 'fails'})" for c, ok in conds)
+            lines += [
+                "",
+                f"Verdict on '{vd['variant']}', {'adopted' if vd['adopt'] else 'not adopted'}. "
+                f"Conditions: {said}.",
             ]
         lines.append("")
 

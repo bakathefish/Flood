@@ -265,6 +265,10 @@ record.
   (`scripts/wayback_bulletins.py`). The perfect-prognosis and as-issued runs cover Ranjit
   Sagar as well, and `carry_storage` runs on for its carry limit past a season's last
   measurement instead of stopping there.
+- Inflow response variant: `inflow.calibrate(..., excess_threshold_mm)` fits a
+  threshold-excess response, `inflow.loso_score` scores any variant leave-one-season-out,
+  and `verify` fits and scores the variant beside the response in use each run
+  (`verify.variant_verdict` applies the adoption rule; refused on this record).
 - `docs/roadmap.md` lists what comes next and the data each step needs.
 
 ## Self-review

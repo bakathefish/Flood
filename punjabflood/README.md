@@ -47,9 +47,10 @@ watch on physical quantities, published with its verification.
   package publishes the catchment rain forecast and its climatological percentile only.
 - No claim to capture the extremes fully yet. Against the flood-scale figures the record
   holds, the model's volumes over the 2025 flood periods come close to what BBMB reported,
-  but its largest days fall well short of the stated peaks (see the verification report); a
-  day-wise inflow record for the 2023 and 2025 events and the daily CWC record from 1991 are
-  the data that fix this. `docs/roadmap.md` lists what comes next and what each step needs.
+  but its largest days fall well short of the stated peaks (see the verification report). A
+  sharper response to heavy rain was tested out of sample and refused; a day-wise inflow
+  record for the 2023 and 2025 events and the daily CWC record from 1991 are the data that
+  fix this. `docs/roadmap.md` lists what comes next and what each step needs.
 
 ## Run
 

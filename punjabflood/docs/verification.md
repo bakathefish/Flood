@@ -143,6 +143,26 @@ The runoff coefficient is fitted on ordinary filling days (the storage-change re
 
 Where the run covers at least 10 of a period's days, the model's mean is 0.78 to 1.13 of the reported mean; its largest day of the season is 0.57 to 0.58 of the stated peak. The flood's volume is close to right and its peak day is not: the model spreads the volume over more days than the river does, which is consistent with lag weights fitted on ordinary days.
 
+### A sharper response to heavy rain, tested out of sample
+
+Rain above the heavy-day threshold in a catchment day gets its own coefficient and lag weights (the threshold-excess variant), fitted jointly with the ordinary response on the same storage record. The rule before it can replace the response the product uses: the leave-one-season-out error (each season scored by a fit on the others) may not rise at any dam, the season-peak ratios of the flood-scale table must rise, and the period means may not move further from the reported means than the baseline's worst one does. Heavy-day bias is observed minus predicted storage change, positive when heavy days are under-predicted.
+
+| dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Bhakra | baseline | 11 | 1009 | 0.0439 | 2 | 0.1013 | -0.0908 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none |
+| Bhakra | excess above 30 mm | 11 | 1009 | 0.0668 | 2 | 0.0923 | -0.0773 | 0.194 | 0.207 | 0.55 0.21 0.12 0.12 | 0.303 | 0.00 1.00 0.00 0.00 |
+| Pong | baseline | 8 | 733 | 0.0302 | 28 | 0.0782 | -0.0158 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none |
+| Pong | excess above 30 mm | 8 | 733 | 0.0304 | 28 | 0.0773 | -0.0129 | 0.200 | 0.332 | 0.40 0.39 0.11 0.10 | 0.523 | 0.20 0.65 0.09 0.06 |
+| Ranjit Sagar | baseline | 11 | 1184 | 0.0229 | 29 | 0.0442 | -0.0113 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none |
+| Ranjit Sagar | excess above 30 mm | 11 | 1184 | 0.0229 | 29 | 0.0469 | -0.0074 | 0.156 | 0.166 | 0.47 0.27 0.15 0.11 | 0.469 | 0.46 0.48 0.00 0.07 |
+
+| variant | period means covered | worst deviation of a period mean from 1 | season-peak ratio, smallest | season-peak ratio, largest |
+|---|---|---|---|---|
+| baseline | 6 | 0.22 | 0.57 | 0.58 |
+| excess above 30 mm | 6 | 0.26 | 0.55 | 0.58 |
+
+Verdict on 'excess above 30 mm', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (fails); the period means hold (fails).
+
 ## As-issued hindcast: what the product would have said, each dam, 2024 to 2026
 
 For each issue date the recorded or model-carried storage and the rain forecast actually issued that day (archived lead 1 to 5 QPF, deterministic) go through the same water balance as the live product. A flagged day is an issue date whose forecast forces the spillway within five days. BBMB's gate log is not public, so the model's own run under observed rain (perfect prognosis) is the reference: a flag is a hit when that run also forces the spillway within five days of the same issue date, a false flag otherwise, and a perfect-prognosis flag without an as-issued flag is a miss. The first hit is the warning; the lead is counted from it to the model's first spill under observed rain and to the dated Dhilwan peak. The window is 1 August to 15 September.

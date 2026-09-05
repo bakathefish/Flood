@@ -55,6 +55,18 @@ numbers that motivate them are in `verification.md`, never repeated here.
   `verification.md`.
 - **Prospective record summary** at the end of the verification report, one row per issue
   date, growing daily from the Action.
+- **Threshold-excess response, tested and not adopted.** Rain above the heavy-day threshold
+  was given its own coefficient and lag weights, fitted jointly on the same storage record and
+  scored leave-one-season-out beside the response in use, with the adoption rule written
+  before the fit (`verification.md`). In every fit the excess runs off with a far larger
+  coefficient than the ordinary rain, which is the physics one expects, but out of sample it
+  buys nothing: the held-out error rises at Bhakra, whose record holds two heavy days, and
+  does not fall at Pong or Ranjit Sagar; the season peaks of the flood-scale check do not
+  rise, because the fit hands the excess mostly to the day after; and the heavy-day
+  residuals say the storage change on those days is already over-predicted, which is the dam
+  releasing while it rains. The
+  storage-change target cannot carry a sharper heavy-day response; a day-wise inflow record
+  could (item 1).
 
 ## Next, in order
 
@@ -75,18 +87,15 @@ numbers that motivate them are in `verification.md`, never repeated here.
    disappears. Effort: data hunt plus one calibration mode.
 2. **Peak-day concentration.** The flood-scale check says the model's volumes over the 2025
    flood periods are close to the means BBMB reported while its largest days fall well short
-   of the stated season peaks: the four-day lag weights, fitted on the storage record's
-   ordinary days, spread a flood's volume over more days than the river does. A response
-   that steepens with the rain (shorter lags above a threshold, or weights that depend on
-   the day's total), fitted on the same record and checked against the peak figures now in
-   hand, would concentrate it and lift the forced-release peak the product prints; this matters
-   for the class, because in both 2023 and 2025 the routed Dhilwan peak fell below the Medium
-   band the observed peak sat in (`verification.md`, event timing). The stated
-   peaks are readings at a moment and the model's day is a daily volume, so part of the gap is
-   that, not the model; the adoption rule is the one used for the QPF correction: the change
-   goes in only if the leave-one-season-out calibration error does not rise and the peak-day
-   ratios rise without the period means leaving their present agreement. Effort: small; the
-   day-wise record (item 1) is what would verify it properly.
+   of the stated season peaks, and in both 2023 and 2025 the routed Dhilwan peak fell below
+   the Medium band the observed peak sat in (`verification.md`, event timing). The stated
+   peaks are readings at a moment and the model's day is a daily volume, so part of the gap
+   is that, not the model. The one sharper response the storage record could support, a
+   threshold-excess term, was tested under a rule written in advance and refused (above): on
+   heavy days the storage change carries the dam's releases, so it cannot teach the model
+   what the river did. What would settle it is the day-wise inflow record of item 1, on
+   which a heavy-day response could be fitted directly, and a sub-daily reading of the peaks
+   to say how much of the gap is the daily mean. Effort: blocked on item 1.
 3. **The operator.** The forced release is a bound on BBMB, not a prediction of BBMB. The
    board runs a filling schedule (rule curve). Two points of the Bhakra schedule are now in
    hand from the chart on page 44 of the CBIP decision-support presentation (2019 season,

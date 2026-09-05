@@ -352,6 +352,98 @@ def test_model_carry_bridges_sparse_measurements_and_reanchors():
     assert pd.Timestamp("2023-09-20") not in s2.index and pd.Timestamp("2023-09-05") in s2.index
 
 
+def test_flood_scale_summary_and_variant_verdict():
+    cols = verify.FLOOD_SCALE_COLS
+    base_fs = pd.DataFrame(
+        [
+            [
+                "Pong",
+                "period mean",
+                "2025-08-01",
+                "2025-08-24",
+                77000.0,
+                83000.0,
+                83000 / 77000,
+                19,
+                "s",
+            ],
+            [
+                "Pong",
+                "period mean",
+                "2025-08-25",
+                "2025-09-04",
+                121600.0,
+                137000.0,
+                137000 / 121600,
+                11,
+                "s",
+            ],
+            [
+                "Ranjit Sagar",
+                "period mean",
+                "2025-08-25",
+                "2025-09-04",
+                71960.0,
+                80000.0,
+                80000 / 71960,
+                4,
+                "s",
+            ],
+            [
+                "Pong",
+                "season peak",
+                "2025-06-01",
+                "2025-09-30",
+                349522.0,
+                203000.0,
+                203000 / 349522,
+                112,
+                "s",
+            ],
+            [
+                "Bhakra",
+                "season peak",
+                "2025-06-01",
+                "2025-09-30",
+                190603.0,
+                108000.0,
+                108000 / 190603,
+                121,
+                "s",
+            ],
+        ],
+        columns=cols,
+    )
+    b = verify.flood_scale_summary(base_fs)
+    # the 4-day period is not covered well enough to count
+    assert b["n_period_means"] == 2
+    assert b["period_mean_worst_deviation"] == pytest.approx(137000 / 121600 - 1)
+    assert b["season_peak_ratio_min"] == pytest.approx(108000 / 190603)
+    better = base_fs.copy()
+    better.loc[better["kind"] == "season peak", "ratio"] += 0.1
+    v = verify.flood_scale_summary(better)
+    loso = pd.DataFrame(
+        {
+            "dam": ["Pong", "Bhakra", "Pong", "Bhakra"],
+            "variant": ["baseline", "baseline", "excess", "excess"],
+            "rmse_bcm": [0.030, 0.043, 0.029, 0.043],
+        }
+    )
+    verdict = verify.variant_verdict(b, v, loso, "excess")
+    assert verdict["adopt"] and verdict["dams"] == ["Bhakra", "Pong"]
+    # a higher held-out error at one dam is enough to refuse
+    loso.loc[3, "rmse_bcm"] = 0.0431
+    verdict = verify.variant_verdict(b, v, loso, "excess")
+    assert not verdict["loso_error_not_higher"] and not verdict["adopt"]
+    assert verdict["season_peaks_higher"] and verdict["period_means_hold"]
+    # period means drifting further from the reported means also refuse
+    worse = better.copy()
+    worse.loc[worse["kind"] == "period mean", "ratio"] += 0.2
+    loso.loc[3, "rmse_bcm"] = 0.043
+    verdict = verify.variant_verdict(b, verify.flood_scale_summary(worse), loso, "excess")
+    assert not verdict["period_means_hold"] and not verdict["adopt"]
+
+
 def test_carry_storage_runs_on_after_the_last_measurement_for_the_carry_limit():
     _, rain, p = _event_inputs()
     two = pd.Series(

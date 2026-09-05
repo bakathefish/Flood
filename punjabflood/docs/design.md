@@ -30,7 +30,10 @@ the catchment already is: `c + c_wet * API / 100 mm`, API the previous five days
 rain, capped at 0.95. The record itself asked for this (the share of a rain volume that
 showed up as storage change rose steadily with antecedent rain for Pong and Ranjit Sagar),
 and it is fitted jointly with the lag weights by non-negative least squares, leaving out
-days the cap would bind. The base component today is the observed BBMB inflow minus the
+days the cap would bind. A threshold-excess response (rain above the heavy-day threshold
+with its own coefficient and lag weights) was fitted on the same record and scored
+leave-one-season-out beside this one; it did not lower the held-out error and is not used
+(`verification.md`; the rule is in `roadmap.md`). The base component today is the observed BBMB inflow minus the
 quick response the recent rain explains, decaying at a fitted daily recession. The recession is estimated from the residuals as the lag-2 to lag-1
 autocovariance ratio, which is unbiased under white measurement noise; where the residual
 drifts through the season instead of recessing the ratio exceeds one and the estimate sits
@@ -168,10 +171,11 @@ The full list, ordered by expected effect, is `roadmap.md`.
   `docs/verification.md`) puts the model's volumes over the 2025 flood periods close to the
   means BBMB reported and its largest days well below the stated season peaks: the lag
   weights, fitted on ordinary filling days, spread a flood over more days than the river
-  does, and on days the dam releases heavily the storage change understates the inflow.
-  The daily CWC record from 1991 (pull in progress) adds the large filling days of 1988 to
-  2014, and any day-wise inflow series for 2023 or 2025 would let the response be fitted on
-  inflow itself.
+  does, and on days the dam releases heavily the storage change understates the inflow. A
+  sharper heavy-day response fitted on the storage record was tested and refused for that
+  reason: the record's heavy days carry the dam's releases. The daily CWC record from 1991
+  (pull in progress) adds the large filling days of 1988 to 2014, and any day-wise inflow
+  series for 2023 or 2025 would let the response be fitted on inflow itself.
 - The storage record is sparse exactly in the event weeks; the model carry is a bridge, not
   a measurement. BBMB keeps no bulletin archive, so 2026 is the first season with daily
   measured state in this project.
