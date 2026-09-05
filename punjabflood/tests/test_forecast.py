@@ -141,6 +141,14 @@ def test_write_outputs(tmp_path):
     jp, mp = forecast.write_outputs(prod, tmp_path)
     assert jp.exists() and mp.exists()
     assert json.loads(jp.read_text(encoding="utf-8"))["issue_date"] == "2026-09-04"
+    # a second run on the same issue date never rewrites the first record
+    first = jp.read_text(encoding="utf-8")
+    prod2 = dict(prod, generated_utc="2026-09-04T09:15:00+00:00", disclaimer="changed")
+    jp2, mp2 = forecast.write_outputs(prod2, tmp_path)
+    assert jp2 != jp and jp2.name == "2026-09-04_rerun_20260904T091500.json"
+    assert jp.read_text(encoding="utf-8") == first
+    jp3, _ = forecast.write_outputs(prod2, tmp_path)
+    assert jp3.name == "2026-09-04_rerun_20260904T091500_2.json"
 
 
 def test_climatology_round_trip_and_missing_file(tmp_path):

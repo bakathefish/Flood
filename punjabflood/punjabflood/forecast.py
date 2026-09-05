@@ -343,9 +343,20 @@ def render_markdown(product: dict) -> str:
 
 
 def write_outputs(product: dict, out_dir: Path = Path("outputs/forecast")) -> tuple[Path, Path]:
+    """Write the dated record. A prospective record is never rewritten: if a record for the
+    issue date already exists, the new run is saved beside it with its generation time in
+    the name (``<date>_rerun_<UTC stamp>``), and the first record of the day stands."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    jp = out_dir / f"{product['issue_date']}.json"
-    mp = out_dir / f"{product['issue_date']}.md"
+    stem = str(product["issue_date"])
+    if (out_dir / f"{stem}.json").exists():
+        stamp = str(product.get("generated_utc", "")).replace(":", "").replace("-", "")[:15]
+        stem = f"{stem}_rerun_{stamp or 'later'}"
+        n = 1
+        while (out_dir / f"{stem}.json").exists():
+            n += 1
+            stem = f"{product['issue_date']}_rerun_{stamp or 'later'}_{n}"
+    jp = out_dir / f"{stem}.json"
+    mp = out_dir / f"{stem}.md"
     jp.write_text(json.dumps(product, indent=2, default=str), encoding="utf-8")
     mp.write_text(render_markdown(product), encoding="utf-8")
     return jp, mp
