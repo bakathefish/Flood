@@ -85,8 +85,10 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             "inflow_day1_cusecs": [50_000.0, 183_500.0, 40_000.0, 120_000.0],
         }
     ).to_csv(tmp_path / "perfect_prog_hei_daily.csv", index=False)
-    md = report.render_verification(tmp_path, tmp_path / "params.json", era5_imd_path=None)
-    assert "Rain input check" not in md
+    md = report.render_verification(
+        tmp_path, tmp_path / "params.json", era5_imd_path=None, forecast_dir=None
+    )
+    assert "Rain input check" not in md and "Prospective record" not in md
     assert "| Pong | 13,637 | 0.410 | 0.000 |" in md
     assert "| 0.900 (1.070) |" in md
     assert "| 2023 | 1 | 0 | 0 | 0 | 2 |" in md and "| 2025 | 0 | 0 | 1 | 0 | 0 |" in md
@@ -175,7 +177,7 @@ def test_rain_input_rows_and_section(tmp_path):
             },
         ]
     ).to_csv(tmp_path / "qpf_bias_test.csv", index=False)
-    md = report.render_verification(tmp_path, None, era5_imd_path=p)
+    md = report.render_verification(tmp_path, None, era5_imd_path=p, forecast_dir=None)
     assert "## Rain input check" in md
     assert "| Pong | 2023 | 2023-08-12 to 2023-08-14 | 3 | 150 | 60 | 0.40 | 100 | 30 |" in md
     assert "| Pong | 2025 | 2025-08-25 to 2025-08-26 | 2 | 100 | 90 | 0.90 | 55 | 50 |" in md
@@ -190,3 +192,86 @@ def test_rain_input_rows_and_section(tmp_path):
         "MAE lower after correction in 0 of 1 rows, heavy-day hit rate higher in 1, "
         "false-alarm ratio higher in 0." in md
     )
+
+
+def _product(issue_date, p_pong, p_pong_err, dhilwan_class, as_on="04-09-2026"):
+    return {
+        "issue_date": issue_date,
+        "bulletin": {"as_on_date": as_on},
+        "dams": {
+            "Bhakra": {
+                "storage_fraction": 0.654,
+                "ensemble": {
+                    "1": {"p_exhaustion": 0.0},
+                    "5": {"p_exhaustion": 0.0, "p_exhaustion_model_error": 0.0},
+                },
+            },
+            "Pong": {
+                "storage_fraction": 0.748,
+                "ensemble": {
+                    "1": {"p_exhaustion": 0.0},
+                    "5": {"p_exhaustion": p_pong, "p_exhaustion_model_error": p_pong_err},
+                },
+            },
+        },
+        "reaches": [
+            {"station": "Dhilwan", "peak_class": dhilwan_class},
+            {"station": "Harike Head Works", "peak_class": "low" if dhilwan_class else None},
+        ],
+    }
+
+
+def test_prospective_record_section(tmp_path):
+    fdir = tmp_path / "forecast"
+    fdir.mkdir()
+    (fdir / "2026-09-05.json").write_text(
+        json.dumps(_product("2026-09-05", 0.0, 0.0, None)), encoding="utf-8"
+    )
+    (fdir / "2026-09-06.json").write_text(
+        json.dumps(_product("2026-09-06", 0.41, 0.47, "medium", as_on="06-09-2026")),
+        encoding="utf-8",
+    )
+    # a rerun saved beside the day's record is not the record
+    (fdir / "2026-09-06_rerun_20260906T091500.json").write_text(
+        json.dumps(_product("2026-09-06", 0.9, 0.9, "high")), encoding="utf-8"
+    )
+    # a record written before the model-error field existed
+    old = _product("2026-09-07", 0.0, None, None)
+    del old["dams"]["Pong"]["ensemble"]["5"]["p_exhaustion_model_error"]
+    (fdir / "2026-09-07.json").write_text(json.dumps(old), encoding="utf-8")
+    rows = report.prospective_rows(fdir)
+    assert list(rows["issue_date"]) == ["2026-09-05", "2026-09-06", "2026-09-07"]
+    assert rows.loc[1, "Pong_p_spill"] == 0.41 and rows.loc[1, "worst_class"] == "medium"
+    assert rows.loc[1, "worst_station"] == "Dhilwan"
+    assert (
+        rows.loc[2, "Pong_p_spill_model_error"] is None
+        or rows.loc[2, "Pong_p_spill_model_error"] != rows.loc[2, "Pong_p_spill_model_error"]
+    )
+    (tmp_path / "results.json").write_text(json.dumps({"peak_tests": []}), encoding="utf-8")
+    pd.DataFrame(
+        columns=[
+            "table",
+            "predictor",
+            "n_years",
+            "n_high",
+            "spearman_rho",
+            "auroc_high",
+            "brier_skill_score",
+        ]
+    ).to_csv(tmp_path / "peak_tests.csv", index=False)
+    md = report.render_verification(tmp_path, None, era5_imd_path=None, forecast_dir=fdir)
+    assert "## Prospective record" in md
+    assert "3 issue dates from 2026-09-05 to 2026-09-07." in md
+    assert "Pong: P(spillway forced) above zero on 1 of 3 days." in md
+    assert "Bhakra: P(spillway forced) above zero on 0 of 3 days." in md
+    assert "Days with any control point at or above the WRD low band: 1." in md
+    assert (
+        "| 2026-09-06 | 06-09-2026 | 65% | 0.00 / 0.00 | 75% | 0.41 / 0.47 | medium (Dhilwan) |"
+        in md
+    )
+    assert "| 2026-09-05 |" not in md and "| 2026-09-07 |" not in md
+    # an empty directory renders the section with its placeholder
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    md2 = report.render_verification(tmp_path, None, era5_imd_path=None, forecast_dir=empty)
+    assert "No record yet." in md2

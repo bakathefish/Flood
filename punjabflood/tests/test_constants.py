@@ -77,3 +77,18 @@ def test_every_dam_constant_carries_a_source():
     assert C.PONG.turbine_capacity_cusecs.value == 6 * 7600
     assert C.PONG.spillway_capacity_cusecs.value == 437_000
     assert C.RANJIT_SAGAR.spillway_capacity_cusecs.value == pytest.approx(C.m3s_to_cusecs(24_637.0))
+
+
+def test_extra_constants_carry_sources_and_the_rule_curve_is_ordered():
+    for dam in C.DAMS.values():
+        for name, s in dam.extra.items():
+            if isinstance(s, C.Sourced):
+                assert s.source and s.value > 0, (dam.name, name)
+    # the 2019 Bhakra filling schedule: below FRL, rising through the season, page cited
+    jul = C.BHAKRA.extra["rule_curve_max_level_ft_31_jul"]
+    aug = C.BHAKRA.extra["rule_curve_max_level_ft_15_aug"]
+    assert jul.value < aug.value < C.BHAKRA.frl_ft.value
+    assert "page 44" in jul.source and "2019" in jul.note and "2019" in aug.note
+    # nothing of the kind is claimed for Pong or Ranjit Sagar
+    assert not any(k.startswith("rule_curve") for k in C.PONG.extra)
+    assert not any(k.startswith("rule_curve") for k in C.RANJIT_SAGAR.extra)

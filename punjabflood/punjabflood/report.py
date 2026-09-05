@@ -12,6 +12,8 @@ from punjabflood import constants as C
 
 OUT = Path("outputs/verification")
 ERA5_IMD_CSV = Path("data/reference/rain/era5_vs_imd_event_windows.csv")
+FORECAST_DIR = Path("outputs/forecast")
+CLASS_ORDER = {"low": 1, "medium": 2, "high": 3}
 KEY_PREDICTORS = (
     "Pong_max3d_bcm",
     "Pong_max5d_bcm",
@@ -63,10 +65,93 @@ def rain_input_rows(era5_imd: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def prospective_rows(forecast_dir: Path) -> pd.DataFrame:
+    """One row per issue date of the prospective record: the first record of each day
+    (``<date>.json``; reruns saved beside it are not the record), with each dam's storage
+    fraction and P(spillway forced) at the longest horizon, with and without the model
+    error, and the worst WRD class at any control point."""
+    rows = []
+    for p in sorted(Path(forecast_dir).glob("????-??-??.json")):
+        prod = json.loads(p.read_text(encoding="utf-8"))
+        row: dict = {
+            "issue_date": prod["issue_date"],
+            "bulletin_as_on": (prod.get("bulletin") or {}).get("as_on_date"),
+        }
+        for dam, e in (prod.get("dams") or {}).items():
+            ens = e.get("ensemble") or {}
+            top = ens[str(max(int(k) for k in ens))] if ens else {}
+            row[f"{dam}_storage_fraction"] = e.get("storage_fraction")
+            row[f"{dam}_p_spill"] = top.get("p_exhaustion")
+            row[f"{dam}_p_spill_model_error"] = top.get("p_exhaustion_model_error")
+        worst_class, worst_station = None, None
+        for r in prod.get("reaches") or []:
+            c = r.get("peak_class")
+            if c and CLASS_ORDER.get(c, 0) > CLASS_ORDER.get(worst_class or "", 0):
+                worst_class, worst_station = c, r.get("station")
+        row["worst_class"] = worst_class
+        row["worst_station"] = worst_station
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def _prospective_lines(forecast_dir: Path) -> list[str]:
+    pr = prospective_rows(forecast_dir)
+    lines = [
+        "## Prospective record, 2026 season",
+        "",
+        "Issued daily from the committed inputs and the live BBMB bulletin; a record is never "
+        "rewritten (`outputs/forecast/`). P(spillway forced) is at the five-day horizon.",
+        "",
+    ]
+    if pr.empty:
+        return lines + ["No record yet.", ""]
+    dams = sorted({c[: -len("_p_spill")] for c in pr.columns if c.endswith("_p_spill")})
+    n = len(pr)
+    plural = "s" if n != 1 else ""
+    parts = [f"{n} issue date{plural} from {pr['issue_date'].min()} to {pr['issue_date'].max()}."]
+    for dam in dams:
+        k = int((pr[f"{dam}_p_spill"].fillna(0) > 0).sum())
+        parts.append(f"{dam}: P(spillway forced) above zero on {k} of {n} days.")
+    classed = pr["worst_class"].notna()
+    parts.append(f"Days with any control point at or above the WRD low band: {int(classed.sum())}.")
+    lines += [" ".join(parts), ""]
+    flagged = pr[classed | (pr[[f"{d}_p_spill" for d in dams]].fillna(0) > 0).any(axis=1)]
+    if flagged.empty:
+        lines += [
+            "No day so far has put a forced spill or a classed arrival on the record.",
+            "",
+        ]
+        return lines
+    head = "| issue date | bulletin as on |"
+    sep = "|---|---|"
+    for dam in dams:
+        head += f" {dam} storage | {dam} P(spill), QPF spread / with model error |"
+        sep += "|---|---|"
+    lines += [head + " worst class (station) |", sep + "---|"]
+    for _, r in flagged.iterrows():
+        cells = [str(r["issue_date"]), str(r["bulletin_as_on"])]
+        for dam in dams:
+            sf = r.get(f"{dam}_storage_fraction")
+            p1 = r.get(f"{dam}_p_spill")
+            p2 = r.get(f"{dam}_p_spill_model_error")
+            cells.append("n/a" if sf is None or sf != sf else f"{sf * 100:.0f}%")
+            cells.append(
+                ("n/a" if p1 is None or p1 != p1 else f"{p1:.2f}")
+                + " / "
+                + ("n/a" if p2 is None or p2 != p2 else f"{p2:.2f}")
+            )
+        wc = r["worst_class"]
+        cells.append("none" if wc is None or wc != wc else f"{wc} ({r['worst_station']})")
+        lines.append("| " + " | ".join(cells) + " |")
+    lines.append("")
+    return lines
+
+
 def render_verification(
     out_dir: Path = OUT,
     params_path: Path | None = None,
     era5_imd_path: Path | None = ERA5_IMD_CSV,
+    forecast_dir: Path | None = FORECAST_DIR,
 ) -> str:
     results = json.loads((out_dir / "results.json").read_text(encoding="utf-8"))
     peaks = pd.read_csv(out_dir / "peak_tests.csv")
@@ -351,4 +436,7 @@ def render_verification(
     else:
         lines.append("Not run.")
     lines.append("")
+
+    if forecast_dir is not None and Path(forecast_dir).exists():
+        lines += _prospective_lines(Path(forecast_dir))
     return "\n".join(lines)

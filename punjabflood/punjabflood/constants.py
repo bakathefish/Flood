@@ -220,6 +220,23 @@ BHAKRA = Dam(
             "diverted into the Sutlej above Bhakra",
         ),
         "sundernagar_sutlej_tunnel_cusecs": Sourced(14_250.0, SRC_BBMB_GLANCE),
+        # The filling schedule BBMB operates to (rule curve). Two points, 2019 vintage, read
+        # off the chart on page 44 of the RTDSS presentation: the labels are in the PDF text
+        # layer, the values are where the labelled lines sit on the level gridlines. A press
+        # figure of 1,662 ft for 19 August 2025 shows the schedule has been revised since;
+        # no operator scenario is built on these until the current schedule is sourced.
+        "rule_curve_max_level_ft_31_jul": Sourced(
+            1650.0,
+            SRC_BBMB_CBIP_DSS + ", page 44",
+            "'MAXIMUM PERMISSIBLE RESERVOIR LEVEL UPTO 31 JULY AS PER RULE CURVE'; 2019 season "
+            "chart; line on the 1,650 ft gridline",
+        ),
+        "rule_curve_max_level_ft_15_aug": Sourced(
+            1670.0,
+            SRC_BBMB_CBIP_DSS + ", page 44",
+            "'MAXIMUM PERMISSIBLE RESERVOIR LEVEL UPTO 15AUGUST AS PER RULE CURVE'; 2019 season "
+            "chart; line on the 1,670 ft gridline",
+        ),
     },
 )
 

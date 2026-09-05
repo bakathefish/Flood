@@ -293,3 +293,11 @@ Persistence (tomorrow's inflow equals today's) is the baseline any one-day predi
 |---|---|---|---|---|---|---|---|---|---|
 | Bhakra | 25 | 42,221 | 41,525 | -2% | +0.46 | 4,724 | -1% | +0.56 | 4,587 |
 | Pong | 25 | 38,005 | 36,967 | -3% | +0.38 | 11,946 | -2% | +0.35 | 12,508 |
+
+## Prospective record, 2026 season
+
+Issued daily from the committed inputs and the live BBMB bulletin; a record is never rewritten (`outputs/forecast/`). P(spillway forced) is at the five-day horizon.
+
+1 issue date from 2026-09-05 to 2026-09-05. Bhakra: P(spillway forced) above zero on 0 of 1 days. Pong: P(spillway forced) above zero on 0 of 1 days. Days with any control point at or above the WRD low band: 0.
+
+No day so far has put a forced spill or a classed arrival on the record.

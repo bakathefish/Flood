@@ -49,15 +49,18 @@ numbers that motivate them are in `verification.md`, never repeated here.
    for an event, the coefficient can be fitted on inflow rather than on storage change, and
    the release-during-event bias disappears. Effort: data hunt plus one calibration mode.
 2. **The operator.** The forced release is a bound on BBMB, not a prediction of BBMB. The
-   board runs a filling schedule (rule curve): press coverage of 19 August 2025 quotes a
-   guideline level of 1,662 ft for that date at Bhakra, three feet below the actual level,
-   and the gates opened that day. The decision-support presentation in the BBMB documents
-   shows rule-curve levels for 31 July and 15 August but the chart values did not survive
-   text extraction. With the schedule as dated (date, level) points, a second scenario
-   follows: release forced by the rule curve, which fires days before the FRL bound and
-   would have caught the 2025 pre-emptive releases. Effort: locate the schedule (BBMB
-   Technical Committee minutes, the DSS presentation as image, or a right-to-information
-   reply), then a small module.
+   board runs a filling schedule (rule curve). Two points of the Bhakra schedule are now in
+   hand from the chart on page 44 of the CBIP decision-support presentation (2019 season,
+   read off the image, the lines sit on the gridlines): a maximum permissible level of
+   1,650 ft up to 31 July and 1,670 ft up to 15 August, against a full reservoir level of
+   1,680 ft; they are recorded in `constants.py` with the vintage. Press coverage of
+   19 August 2025 quotes a guideline of 1,662 ft for that date, below the 2019 line, so the
+   schedule has been revised since and the current one, with the date the reservoir may
+   reach FRL, is what a rule-curve scenario needs; nothing is in hand for Pong. With the
+   current schedule as dated (date, level) points, a second scenario follows: release forced
+   by the rule curve, which fires days before the FRL bound and would speak to the 2025
+   pre-emptive releases. Effort: locate the current schedule (BBMB Technical Committee
+   minutes or a right-to-information reply), then a small module.
 3. **Rain input for the extremes.** ERA5 saw well under half of the IMD catchment rain over
    Pong in the August 2023 event (`data/reference/rain/era5_vs_imd_event_windows.csv`,
    rendered in `verification.md`). The forecast models share ERA5's physics and resolution,
