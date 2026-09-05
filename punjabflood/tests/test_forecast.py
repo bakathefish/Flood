@@ -119,6 +119,12 @@ def test_build_product_full_reservoir_forces_release_and_routes_it():
     stations = {r["station"]: r for r in prod["reaches"]}
     assert "Dhilwan" in stations and "Harike Head Works" in stations
     assert stations["Dhilwan"]["peak_class"] in {"medium", "high"}
+    # on a spill day the river gets the spill plus the turbine passage the water balance
+    # assumed, less the Mukerian Hydel Channel; Dhilwan is pure translation, so its peak is
+    # that of the release
+    assert stations["Dhilwan"]["peak_cusecs"] == pytest.approx(
+        max(pong["forced_release_median_cusecs_by_day"]) + 45_600 - 11_500
+    )
     assert stations["Harike Head Works"]["peak_date"] >= "2026-09-07"  # 72 h after the release
     assert prod["ghaggar"]["Ghaggar Khanauri"]["qpf_3day_mm"]["best_match"] == 90.0
     assert prod["ghaggar"]["Ghaggar Khanauri"]["qpf_3day_percentile"]["best_match"] == 45.0

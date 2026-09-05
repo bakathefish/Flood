@@ -147,6 +147,19 @@ def _members(qpf_ens: pd.DataFrame, catchment: str) -> dict[int, np.ndarray]:
     }
 
 
+def _river_series(
+    dam: str, spill_cusecs, outflow_today_cusecs: float, absorb_cusecs: float, dates
+) -> pd.Series:
+    """What reaches the river on each forecast day. On a day the spillway is forced, the
+    spill plus the turbine passage the water balance assumed (a full reservoir passes its
+    inflow, so the turbines run), the same rule the event test routes; on any other day
+    today's outflow continued, the operator's choice persisting. The diversion capacity is
+    taken off in ``routing.river_release``."""
+    spill = np.asarray(spill_cusecs, dtype=float)
+    total = np.where(spill > 0, absorb_cusecs + spill, outflow_today_cusecs)
+    return pd.Series(routing.river_release(dam, total), index=dates)
+
+
 def build_product(
     issue_date: str,
     states: dict[str, dict],
@@ -236,16 +249,15 @@ def build_product(
             rel = np.array([r.release_by_day_cusecs for r in res_max])
             median_rel = np.median(rel, axis=0)
             entry["forced_release_median_cusecs_by_day"] = [float(x) for x in median_rel]
-            # what actually reaches the river: today's outflow continues, plus forced spill
             outflow = float(st.get("outflow_cusecs") or 0.0)
-            total = outflow + median_rel
-            release_series[dam] = pd.Series(routing.river_release(dam, total), index=dates)
+            release_series[dam] = _river_series(dam, median_rel, outflow, absorb, dates)
         elif det_daily:
             model = "ecmwf_ifs025" if "ecmwf_ifs025" in det_daily else next(iter(det_daily))
             res = hei.headroom_exhaustion(dam, st["storage_bcm"], det_daily[model], absorb)
             outflow = float(st.get("outflow_cusecs") or 0.0)
-            total = outflow + np.array(res.release_by_day_cusecs)
-            release_series[dam] = pd.Series(routing.river_release(dam, total), index=dates)
+            release_series[dam] = _river_series(
+                dam, np.array(res.release_by_day_cusecs), outflow, absorb, dates
+            )
         product["dams"][dam] = entry
 
     if release_series:
