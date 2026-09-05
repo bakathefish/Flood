@@ -26,9 +26,11 @@ turns that mechanism into a daily hazard watch:
    times to Ropar, Phillaur, Harike, Dhilwan and Ferozepur and is classed Low, Medium or
    High against the department's own thresholds.
 6. **Verification.** 38 years of annual peaks with the department's High/Medium/Low class,
-   the dated 2023 and 2025 Dhilwan peaks, the as-issued rain forecasts of 2024 to 2026, and
-   the live 2026 bulletins. Results, with their caveats, are in `docs/verification.md`,
-   rendered from `outputs/verification/` and never typed by hand.
+   the dated 2023 and 2025 Dhilwan peaks, the as-issued rain forecasts of 2024 to 2026 (as
+   rain skill, and as a day-by-day hindcast of what the product would have said before the
+   2025 event), the live 2026 bulletins, and the season's prospective record. Results, with
+   their caveats, are in `docs/verification.md`, rendered from `outputs/verification/` and
+   never typed by hand.
 
 Not an official warning. The Punjab WRD, CWC, BBMB and IMD issue those. This is a hazard
 watch on physical quantities, published with its verification.

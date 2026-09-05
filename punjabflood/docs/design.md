@@ -122,6 +122,22 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    on the heavy days themselves, not a uniform scale error, which is what the ERA5
    comparison says too. A correction conditional on the forecast amount, or quantile
    mapping, needs more seasons of archive than exist.
+6. As-issued hindcast. For every issue date of the 2024 to 2026 seasons, the recorded or
+   model-carried Pong storage and the rain forecast that was actually issued that day
+   (archived lead 1 to 5 QPF, ECMWF and GFS, deterministic) go through the same water
+   balance as the live product: what the product would have said, day by day, before the
+   2025 event and through the two seasons without one. Scored as flagged issue dates (a
+   forecast that forces the spillway within five days), the first of them, and the lead from
+   it to the model's own first spill under observed rain and to the dated Dhilwan peak.
+   BBMB's gate log is not public, so the perfect-prognosis run stands in for the spill date.
+   The model carry records its re-anchor gaps (the carried storage on a measurement day
+   minus the measurement), and the report prints the largest one between the first
+   perfect-prognosis flag and the spill, because that gap is why the model's own flags can
+   run ahead of its spill: a positive gap is the dam passing more than its turbines, the
+   inflow over-predicted, or both, and the public record cannot separate them. In 2025 both
+   models flagged from mid-August and every flag was a hit against the perfect-prognosis
+   run, with a few misses; the 2024 and 2026 seasons had no flags and no spill. The
+   prospective 2026 record continues this test forward with the live ensemble.
 
 As-issued skill (forecast rather than observed rain) is measured on the 2024 to 2026
 seasons, the period for which Open-Meteo archives the lead 1 to 7 forecasts of GFS and

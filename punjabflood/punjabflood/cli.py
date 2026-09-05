@@ -287,6 +287,36 @@ def run_verify(horizon_days: int = 5):
             results["event_timing_spill_only"] = verify.event_timing_test(
                 spill_only, peaks_d
             ).to_dict(orient="records")
+            if QPF_CSV.exists():
+                # what the product would have said: the archived as-issued QPF through the
+                # same water balance, one row per issue date and model
+                qpf_leads_ev = pd.read_csv(QPF_CSV)
+                ai = pd.concat(
+                    [
+                        verify.as_issued_hei(
+                            state_measured,
+                            rain_daily,
+                            qpf_leads_ev,
+                            "Pong",
+                            "Pong",
+                            params["Pong"],
+                            m,
+                            horizon_days,
+                        )
+                        for m in verify.AS_ISSUED_MODELS
+                    ],
+                    ignore_index=True,
+                )
+                ai.to_csv(out / "as_issued_event_pong.csv", index=False)
+                obs_dates = peaks_d.set_index("year")["date"].to_dict() if "date" in peaks_d else {}
+                results["as_issued_events"] = []
+                years = sorted(pd.to_datetime(ai["date"]).dt.year.unique()) if len(ai) else []
+                for y in years:
+                    od = obs_dates.get(int(y))
+                    od = None if od is None or od != od else pd.Timestamp(od).date().isoformat()
+                    results["as_issued_events"] += verify.as_issued_event_summary(
+                        ai, pp_event, int(y), od
+                    )
 
     for dam in ("Bhakra", "Pong"):
         if dam not in params:

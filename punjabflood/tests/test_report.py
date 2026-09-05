@@ -35,6 +35,46 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
                 "persistence_mae_cusecs": 6000.0,
             }
         },
+        "as_issued_events": [
+            {
+                "year": 2025,
+                "model": "ecmwf_ifs025",
+                "issue_days": 46,
+                "flagged_days": 9,
+                "hit_days": 7,
+                "false_flag_days": 2,
+                "missed_days": 1,
+                "first_flag_issue_date": "2025-08-20",
+                "first_hit_issue_date": "2025-08-24",
+                "first_hit_spill_day": 2,
+                "pp_first_flag_date": "2025-08-22",
+                "pp_first_spill_date": "2025-08-26",
+                "lead_days_to_pp_spill": 2,
+                "observed_peak_date": "2025-08-31",
+                "lead_days_to_observed_peak": 7,
+                "max_forecast_peak_release_cusecs": 120000.0,
+                "pp_peak_day1_release_cusecs": 150000.0,
+            },
+            {
+                "year": 2024,
+                "model": "ecmwf_ifs025",
+                "issue_days": 46,
+                "flagged_days": 0,
+                "hit_days": 0,
+                "false_flag_days": 0,
+                "missed_days": 0,
+                "first_flag_issue_date": None,
+                "first_hit_issue_date": None,
+                "first_hit_spill_day": None,
+                "pp_first_flag_date": None,
+                "pp_first_spill_date": None,
+                "lead_days_to_pp_spill": None,
+                "observed_peak_date": None,
+                "lead_days_to_observed_peak": None,
+                "max_forecast_peak_release_cusecs": 0.0,
+                "pp_peak_day1_release_cusecs": 0.0,
+            },
+        ],
     }
     (tmp_path / "results.json").write_text(json.dumps(results), encoding="utf-8")
     pd.DataFrame(
@@ -77,12 +117,15 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     (tmp_path / "params.json").write_text(json.dumps(params), encoding="utf-8")
     pd.DataFrame(
         {
-            "date": pd.to_datetime(["2023-08-01", "2023-08-02", "2023-08-03", "2025-08-01"]),
+            "date": pd.to_datetime(
+                ["2023-08-01", "2023-08-02", "2023-08-03", "2025-08-01", "2025-08-24"]
+            ),
             "dam": "Pong",
             "hei": 0.0,
-            "storage_basis": ["cwc", "interp", "interp", "press"],
-            "rain_day1_mm": [10.0, 99.0, 5.0, 60.0],
-            "inflow_day1_cusecs": [50_000.0, 183_500.0, 40_000.0, 120_000.0],
+            "storage_basis": ["cwc", "interp", "interp", "press", "cwc"],
+            "rain_day1_mm": [10.0, 99.0, 5.0, 60.0, 1.0],
+            "inflow_day1_cusecs": [50_000.0, 183_500.0, 40_000.0, 120_000.0, 30_000.0],
+            "reanchor_gap_bcm": [float("nan"), float("nan"), 0.4, float("nan"), 0.6],
         }
     ).to_csv(tmp_path / "perfect_prog_hei_daily.csv", index=False)
     md = report.render_verification(
@@ -91,7 +134,14 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     assert "Rain input check" not in md and "Prospective record" not in md
     assert "| Pong | 13,637 | 0.410 | 0.000 |" in md
     assert "| 0.900 (1.070) |" in md
-    assert "| 2023 | 1 | 0 | 0 | 0 | 2 |" in md and "| 2025 | 0 | 0 | 1 | 0 | 0 |" in md
+    assert "| 2023 | 1 | 0 | 0 | 0 | 2 |" in md and "| 2025 | 1 | 0 | 1 | 0 | 0 |" in md
+    # the re-anchor note sits between the first perfect-prognosis flag and the spill
+    assert (
+        "In 2025 the run under observed rain flagged from 2025-08-22 while its spill came on "
+        "2025-08-26. Between the two, the measured storage of 2025-08-24 re-anchored the "
+        "model's carried path downward by 0.60 BCM" in md
+    )
+    assert "In 2024" not in md
     # the wettest day is the day after the issue date; the ratio is against the sourced record
     assert "| 2023 | 2023-08-03 | 99 | 183,500 | 0.25 |" in md
     assert "734,000 cusecs" in md
@@ -101,6 +151,15 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     )
     assert "| 2025 | spill + passage | no predicted release |" in md
     assert "| Pong | 20 | 34,000 | 30,000 | -12% | +0.80 | 5,000 | -1% | +0.70 | 6,000 |" in md
+    assert "## As-issued hindcast" in md
+    assert (
+        "| 2025 | ecmwf_ifs025 | 46 | 9 (7 hits, 2 false) | 1 | 2025-08-20 | 2025-08-24, day 2 | "
+        "2025-08-22 | 2025-08-26 | +2 | 2025-08-31 | +7 | 120,000 | 150,000 |" in md
+    )
+    assert (
+        "| 2024 | ecmwf_ifs025 | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | "
+        "none | n/a | 0 | 0 |" in md
+    )
 
 
 def test_rain_input_rows_and_section(tmp_path):

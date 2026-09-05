@@ -157,6 +157,88 @@ def test_qpf_bias_test_leave_one_season_out():
     assert clipped["corrected_bias_pct"] == pytest.approx(-80.0)
 
 
+def _event_inputs():
+    days = pd.date_range("2025-08-01", "2025-08-31", freq="D")
+    cap = C.PONG.live_capacity_bcm.value
+    st = pd.DataFrame(
+        {"date": days, "dam": "Pong", "storage_bcm": np.linspace(cap - 0.6, cap - 0.05, len(days))}
+    )
+    st["basis"] = "cwc"
+    rain = pd.DataFrame({"date": pd.date_range("2025-07-20", "2025-09-20"), "catchment": "Pong"})
+    rain["rain_mm"] = 2.0
+    rain.loc[rain.date.between("2025-08-24", "2025-08-26"), "rain_mm"] = 120.0
+    p = inflow.InflowParams(
+        "Pong", 12560.0, c=0.6, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0
+    )
+    return st, rain, p
+
+
+def _qpf_archive(rain: pd.DataFrame, model: str, shift_days: int, scale: float) -> pd.DataFrame:
+    """A synthetic archive: the lead-k forecast for a target day is the observed rain of the
+    target day shifted by ``shift_days`` (a forecast that places the event late) and scaled."""
+    obs = rain.set_index("date")["rain_mm"]
+    frames = []
+    for k in range(1, 8):
+        shifted = obs.shift(shift_days).fillna(2.0) * scale
+        frames.append(
+            pd.DataFrame(
+                {
+                    "target_date": shifted.index,
+                    "lead_days": k,
+                    "model": model,
+                    "rain_mm": shifted.to_numpy(),
+                    "catchment": "Pong",
+                }
+            )
+        )
+    return pd.concat(frames, ignore_index=True)
+
+
+def test_as_issued_hei_and_event_summary():
+    st, rain, p = _event_inputs()
+    pp = verify.perfect_prog_hei(st, rain, "Pong", "Pong", p, horizon_days=5)
+    # a perfect archive reproduces the perfect-prognosis run day for day
+    exact = _qpf_archive(rain, "ecmwf_ifs025", 0, 1.0)
+    ai = verify.as_issued_hei(st, rain, exact, "Pong", "Pong", p, "ecmwf_ifs025", carry="given")
+    assert {"model", "qpf_horizon_mm", "obs_horizon_mm", "storage_bcm"} <= set(ai.columns)
+    m = ai.merge(pp, on="date", suffixes=("_ai", "_pp"))
+    assert len(m) == len(pp) > 0
+    assert m["hei_ai"].to_numpy() == pytest.approx(m["hei_pp"].to_numpy())
+    assert (m["qpf_horizon_mm"] == m["obs_horizon_mm"]).all()
+    # an archive that puts the event two days late and reads half the rain flags later
+    late = _qpf_archive(rain, "gfs_seamless", 2, 0.5)
+    ai2 = verify.as_issued_hei(st, rain, late, "Pong", "Pong", p, "gfs_seamless", carry="given")
+    both = pd.concat([ai, ai2], ignore_index=True)
+    rows = verify.as_issued_event_summary(both, pp, 2025, observed_peak_date="2025-08-31")
+    by = {r["model"]: r for r in rows}
+    ex, gf = by["ecmwf_ifs025"], by["gfs_seamless"]
+    assert ex["flagged_days"] > 0 and ex["first_flag_issue_date"] is not None
+    assert ex["pp_first_spill_date"] == gf["pp_first_spill_date"]
+    # the exact archive is the perfect-prognosis run: every flag a hit, nothing false or missed
+    assert ex["hit_days"] == ex["flagged_days"] and ex["false_flag_days"] == 0
+    assert ex["missed_days"] == 0
+    first_pp_flag = pp[pp["day_of_exhaustion"].notna()]["date"].min().date().isoformat()
+    assert ex["first_flag_issue_date"] == ex["first_hit_issue_date"] == first_pp_flag
+    assert ex["pp_first_flag_date"] == first_pp_flag
+    # the late, dry archive flags later or not at all, and every flag is a hit or false
+    assert gf["first_flag_issue_date"] is None or gf["first_flag_issue_date"] >= first_pp_flag
+    assert gf["flagged_days"] <= ex["flagged_days"]
+    assert gf["hit_days"] + gf["false_flag_days"] == gf["flagged_days"]
+    assert gf["missed_days"] >= ex["flagged_days"] - gf["hit_days"]
+    assert ex["observed_peak_date"] == "2025-08-31"
+    assert (
+        ex["lead_days_to_observed_peak"]
+        == (pd.Timestamp("2025-08-31") - pd.Timestamp(ex["first_hit_issue_date"])).days
+    )
+    assert ex["lead_days_to_pp_spill"] >= 1  # the warning comes before the spill it foresees
+    assert ex["first_hit_spill_day"] == ex["lead_days_to_pp_spill"]
+    assert ex["max_forecast_peak_release_cusecs"] > 0 and ex["pp_peak_day1_release_cusecs"] > 0
+    # a season with nothing in the archive gives no rows; a season outside the window gives
+    # zero issue days
+    assert verify.as_issued_event_summary(both.iloc[0:0], pp, 2025) == []
+    assert verify.as_issued_event_summary(both, pp, 2019)[0]["issue_days"] == 0
+
+
 def test_perfect_prog_hei_runs_and_flags_exhaustion(tmp_path):
     days = pd.date_range("2023-08-01", "2023-08-31", freq="D")
     st = pd.DataFrame(
@@ -216,10 +298,34 @@ def test_model_carry_bridges_sparse_measurements_and_reanchors():
     assert (pp.loc["2023-08-11":"2023-08-16", "storage_basis"] == "model").all()
     assert pp.loc["2023-08-17", "storage_basis"] == "cwc"
     # dry days lose the passage less the intercept; the spell fills the reservoir
-    s = verify.carry_storage(
+    s, _, gaps = verify.carry_storage(
         st.set_index("date")["storage_bcm"], {}, rain.set_index("date")["rain_mm"], "Pong", p
-    )[0]
+    )
     assert s.loc["2023-08-11"] < 4.65 and s.loc["2023-08-16"] > 5.5
+    # the re-anchor gap is the model's carried value for the measurement day minus the
+    # measurement; the first measurement has nothing carried into it
+    assert pd.Timestamp(st["date"].min()) not in gaps and pd.Timestamp("2023-08-17") in gaps
+    carried_17 = min(
+        s.loc["2023-08-16"]
+        + inflow.predict_daily_bcm(
+            p,
+            [rain.set_index("date")["rain_mm"].loc["2023-08-17"]],
+            C.bcm_to_cusec_days(C.cusec_days_to_bcm(C.PONG.turbine_capacity_cusecs.value)),
+            rain_mm_recent=rain.set_index("date")["rain_mm"]
+            .loc["2023-08-12":"2023-08-16"]
+            .to_numpy(),
+        )[0]
+        - C.cusec_days_to_bcm(C.PONG.turbine_capacity_cusecs.value),
+        C.PONG.live_capacity_bcm.value,
+    )
+    assert gaps[pd.Timestamp("2023-08-17")] == pytest.approx(
+        carried_17 - st.set_index("date")["storage_bcm"].loc["2023-08-17"]
+    )
+    assert "reanchor_gap_bcm" in pp.columns
+    assert pp.loc["2023-08-17", "reanchor_gap_bcm"] == pytest.approx(
+        gaps[pd.Timestamp("2023-08-17")]
+    )
+    assert np.isnan(pp.loc["2023-08-12", "reanchor_gap_bcm"])
     assert s.loc["2023-08-17"] == 6.11  # the measurement re-anchors
     # the spell forces a first-day release before the next measurement, and the carried path
     # is never above live capacity

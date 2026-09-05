@@ -103,14 +103,19 @@ def carry_storage(
     dam: str,
     params: inflow.InflowParams,
     max_carry_days: int = MAX_CARRY_DAYS,
-) -> tuple[pd.Series, dict]:
+) -> tuple[pd.Series, dict, dict]:
     """Daily storage between measurements from the model's own water balance.
 
     Each day without a measurement takes ``S = min(cap, S_prev + I - A)``: the one-day inflow
     the calibrated model gives for the observed rain, less the non-spill passage ``A``, which
     is exactly the storage-change relation the model was fitted on. Every measurement
     re-anchors the path; gaps longer than ``max_carry_days`` are left empty. Carried days
-    get ``basis='model'``."""
+    get ``basis='model'``.
+
+    Returns the series, the basis per day, and the re-anchor gaps: on each measurement day
+    the path reaches, the model's carried value for that day minus the measurement. A
+    positive gap means the reservoir gained less than the model's balance says, which is the
+    dam passing more than its turbines, the inflow over-predicted, or both."""
     cap = C.DAMS[dam].live_capacity_bcm.value
     absorb = hei.absorption_cusecs(dam)
     a_bcm = C.cusec_days_to_bcm(absorb)
@@ -120,10 +125,28 @@ def carry_storage(
     full = pd.date_range(measured.index.min(), measured.index.max(), freq="D")
     out = pd.Series(np.nan, index=full)
     out_basis = {}
+    gaps: dict = {}
+    n_hist = inflow.history_days(params)
+
+    def step(prev_value: float, d: pd.Timestamp) -> float:
+        hist = rain.reindex(pd.date_range(d - pd.Timedelta(days=n_hist - 1), d))
+        if hist.isna().any():
+            return float("nan")
+        inflow_bcm = float(
+            inflow.predict_daily_bcm(
+                params, [hist.iloc[-1]], base_cusecs, rain_mm_recent=hist.iloc[:-1].to_numpy()
+            )[0]
+        )
+        return float(min(max(prev_value + inflow_bcm - a_bcm, 0.0), cap))
+
     prev = np.nan
     since = 0
     for d in full:
         if d in measured.index:
+            if not np.isnan(prev) and since < max_carry_days:
+                carried = step(prev, d)
+                if carried == carried:
+                    gaps[d] = carried - float(measured.loc[d])
             prev = float(measured.loc[d])
             since = 0
             out.loc[d] = prev
@@ -133,21 +156,12 @@ def carry_storage(
         if np.isnan(prev) or since > max_carry_days:
             prev = np.nan
             continue
-        hist = rain.reindex(
-            pd.date_range(d - pd.Timedelta(days=inflow.history_days(params) - 1), d)
-        )
-        if hist.isna().any():
-            prev = np.nan
+        prev = step(prev, d)
+        if np.isnan(prev):
             continue
-        inflow_bcm = float(
-            inflow.predict_daily_bcm(
-                params, [hist.iloc[-1]], base_cusecs, rain_mm_recent=hist.iloc[:-1].to_numpy()
-            )[0]
-        )
-        prev = float(min(max(prev + inflow_bcm - a_bcm, 0.0), cap))
         out.loc[d] = prev
         out_basis[d] = "model"
-    return out.dropna(), out_basis
+    return out.dropna(), out_basis, gaps
 
 
 def perfect_prog_hei(
@@ -166,17 +180,7 @@ def perfect_prog_hei(
     ``carry='given'`` uses the storage rows as supplied (the caller may have interpolated
     gaps, basis ``interp``). ``carry='model'`` drops interpolated rows and bridges the gaps
     between measurements with ``carry_storage`` (basis ``model``)."""
-    s = state[(state["dam"] == dam) & state["storage_bcm"].notna()].copy()
-    s["date"] = pd.to_datetime(s["date"])
-    if carry == "model" and "basis" in s:
-        s = s[s["basis"] != "interp"]
-    basis = s.set_index("date")["basis"].to_dict() if "basis" in s else {}
-    s = s.set_index("date")["storage_bcm"].sort_index()
-    r = rain_daily[rain_daily["catchment"] == catchment].copy()
-    r["date"] = pd.to_datetime(r["date"])
-    rain = r.set_index("date")["rain_mm"].sort_index()
-    if carry == "model" and len(s):
-        s, basis = carry_storage(s, basis, rain, dam, params)
+    s, basis, rain, gaps = _event_series(state, rain_daily, dam, catchment, params, carry)
     absorb = hei.absorption_cusecs(dam)
     rows = []
     for d, storage in s.items():
@@ -188,32 +192,191 @@ def perfect_prog_hei(
         )
         if fut.isna().any() or past.isna().any():
             continue
-        # base flow: the model's own intercept-free base is unknown historically; use the
-        # rain-only quick response plus the calibration intercept as the base component
-        base_bcm = max(params.intercept_bcm_per_day + C.cusec_days_to_bcm(absorb), 0.0)
-        daily = inflow.predict_daily_bcm(
-            params, fut.to_numpy(), C.bcm_to_cusec_days(base_bcm), rain_mm_recent=past.to_numpy()
+        row = _hei_row(dam, d, storage, fut.to_numpy(), past.to_numpy(), params, absorb)
+        row["storage_basis"] = basis.get(d, "")
+        row["reanchor_gap_bcm"] = gaps.get(d, float("nan"))
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def _event_series(
+    state: pd.DataFrame,
+    rain_daily: pd.DataFrame,
+    dam: str,
+    catchment: str,
+    params: inflow.InflowParams,
+    carry: str,
+) -> tuple[pd.Series, dict, pd.Series, dict]:
+    """The storage series (measured, or measured and model-carried), its basis per day, the
+    observed catchment rain series, and the re-anchor gaps of ``carry_storage`` (empty
+    without the model carry)."""
+    s = state[(state["dam"] == dam) & state["storage_bcm"].notna()].copy()
+    s["date"] = pd.to_datetime(s["date"])
+    if carry == "model" and "basis" in s:
+        s = s[s["basis"] != "interp"]
+    basis = s.set_index("date")["basis"].to_dict() if "basis" in s else {}
+    s = s.set_index("date")["storage_bcm"].sort_index()
+    r = rain_daily[rain_daily["catchment"] == catchment].copy()
+    r["date"] = pd.to_datetime(r["date"])
+    rain = r.set_index("date")["rain_mm"].sort_index()
+    gaps: dict = {}
+    if carry == "model" and len(s):
+        s, basis, gaps = carry_storage(s, basis, rain, dam, params)
+    return s, basis, rain, gaps
+
+
+def _hei_row(dam, d, storage, fut, past, params: inflow.InflowParams, absorb: float) -> dict:
+    """One day's index from a storage, a rain path over the horizon (``fut``, mm per day) and
+    the recent observed rain (``past``). The base flow the product takes from the bulletin is
+    unknown historically, so the calibration intercept plus the non-spill passage stands in
+    for it (the storage-change relation the model was fitted on)."""
+    base_bcm = max(params.intercept_bcm_per_day + C.cusec_days_to_bcm(absorb), 0.0)
+    daily = inflow.predict_daily_bcm(
+        params, np.asarray(fut, dtype=float), C.bcm_to_cusec_days(base_bcm), rain_mm_recent=past
+    )
+    res = hei.headroom_exhaustion(dam, float(storage), daily, absorb)
+    return {
+        "date": d,
+        "dam": dam,
+        "storage_bcm": float(storage),
+        "hei": res.hei,
+        "forced_release_bcm": res.forced_release_bcm,
+        "peak_release_cusecs": max(res.release_by_day_cusecs) if res.release_by_day_cusecs else 0.0,
+        "release_day1_cusecs": res.release_by_day_cusecs[0] if res.release_by_day_cusecs else 0.0,
+        "inflow_day1_cusecs": C.bcm_to_cusec_days(float(daily[0])),
+        "rain_day1_mm": float(fut[0]),
+        "day_of_exhaustion": res.day_of_exhaustion,
+    }
+
+
+AS_ISSUED_MODELS = ("ecmwf_ifs025", "gfs_seamless")
+
+
+def as_issued_hei(
+    state: pd.DataFrame,
+    rain_daily: pd.DataFrame,
+    qpf_leads: pd.DataFrame,
+    dam: str,
+    catchment: str,
+    params: inflow.InflowParams,
+    model: str,
+    horizon_days: int = 5,
+    carry: str = "model",
+) -> pd.DataFrame:
+    """The index each day from the rain forecast that was actually issued that day (the
+    archived lead 1 to ``horizon_days`` QPF of ``model``) and the recorded or model-carried
+    storage: what the product would have said, day by day, with the base flow stand-in of
+    ``_hei_row``. Rows carry the forecast and the observed rain over the horizon."""
+    s, basis, rain, _ = _event_series(state, rain_daily, dam, catchment, params, carry)
+    q = qpf_leads[(qpf_leads["catchment"] == catchment) & (qpf_leads["model"] == model)]
+    fc = {
+        (pd.Timestamp(t), int(k)): float(v)
+        for t, k, v in zip(q["target_date"], q["lead_days"], q["rain_mm"], strict=True)
+    }
+    absorb = hei.absorption_cusecs(dam)
+    rows = []
+    for d, storage in s.items():
+        if d.month not in SEASON_MONTHS:
+            continue
+        fut = [fc.get((d + pd.Timedelta(days=k), k)) for k in range(1, horizon_days + 1)]
+        past = rain.reindex(
+            pd.date_range(d - pd.Timedelta(days=inflow.history_days(params) - 1), d)
         )
-        res = hei.headroom_exhaustion(dam, float(storage), daily, absorb)
-        rows.append(
+        if any(v is None or v != v for v in fut) or past.isna().any():
+            continue
+        obs_fut = rain.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=horizon_days))
+        row = _hei_row(dam, d, storage, fut, past.to_numpy(), params, absorb)
+        row.update(
             {
-                "date": d,
-                "dam": dam,
-                "hei": res.hei,
-                "forced_release_bcm": res.forced_release_bcm,
-                "peak_release_cusecs": max(res.release_by_day_cusecs)
-                if res.release_by_day_cusecs
-                else 0.0,
-                "release_day1_cusecs": res.release_by_day_cusecs[0]
-                if res.release_by_day_cusecs
-                else 0.0,
-                "inflow_day1_cusecs": C.bcm_to_cusec_days(float(daily[0])),
-                "rain_day1_mm": float(fut.iloc[0]),
-                "day_of_exhaustion": res.day_of_exhaustion,
+                "model": model,
                 "storage_basis": basis.get(d, ""),
+                "qpf_horizon_mm": float(np.sum(fut)),
+                "obs_horizon_mm": float(obs_fut.sum())
+                if not obs_fut.isna().any()
+                else float("nan"),
             }
         )
+        rows.append(row)
     return pd.DataFrame(rows)
+
+
+EVENT_WINDOW = ((8, 1), (9, 15))  # the late-monsoon weeks in which the release floods happen
+
+
+def as_issued_event_summary(
+    ai: pd.DataFrame,
+    pp: pd.DataFrame,
+    year: int,
+    observed_peak_date: str | None = None,
+    window=EVENT_WINDOW,
+) -> list[dict]:
+    """Per model, over the event window of ``year``, the as-issued flags scored against the
+    model's own perfect-prognosis run (the spillway forced within the horizon under observed
+    rain), since BBMB's gate log is not public.
+
+    A flagged issue date is a hit when the perfect-prognosis run of the same date also forces
+    the spillway within the horizon, a false flag otherwise; a perfect-prognosis flag with no
+    as-issued flag is a miss. The first hit is the warning: the row carries its date and the
+    day it put the spill on, and the lead from it to the model's first spill under observed
+    rain and to the observed control-point peak where one is dated. The earliest flag of any
+    kind and the earliest perfect-prognosis flag are kept beside it."""
+    start = pd.Timestamp(year, *window[0])
+    end = pd.Timestamp(year, *window[1])
+    pd_dates = pd.to_datetime(pp["date"])
+    p = pp[(pd_dates >= start) & (pd_dates <= end)]
+    spill = p[p["release_day1_cusecs"] > 0]
+    pp_first = pd.to_datetime(spill["date"]).min() + pd.Timedelta(days=1) if len(spill) else None
+    pp_peak = float(p["release_day1_cusecs"].max()) if len(p) else float("nan")
+    pp_flags = set(pd.to_datetime(p[p["day_of_exhaustion"].notna()]["date"]))
+    obs_peak = pd.Timestamp(observed_peak_date) if observed_peak_date else None
+
+    def _iso(t):
+        return None if t is None else pd.Timestamp(t).date().isoformat()
+
+    def _lead(frm, to):
+        return None if frm is None or to is None else int((pd.Timestamp(to) - frm).days)
+
+    rows = []
+    for model, g in ai.groupby("model"):
+        dates = pd.to_datetime(g["date"])
+        g = g[(dates >= start) & (dates <= end)].sort_values("date")
+        g_dates = set(pd.to_datetime(g["date"]))
+        flagged = g[g["day_of_exhaustion"].notna()]
+        flags = set(pd.to_datetime(flagged["date"]))
+        hits = sorted(flags & pp_flags)
+        first_any = min(flags) if flags else None
+        first_hit = hits[0] if hits else None
+        first_hit_row = (
+            flagged[pd.to_datetime(flagged["date"]) == first_hit].iloc[0]
+            if first_hit is not None
+            else None
+        )
+        rows.append(
+            {
+                "year": year,
+                "model": model,
+                "issue_days": int(len(g)),
+                "flagged_days": int(len(flags)),
+                "hit_days": int(len(hits)),
+                "false_flag_days": int(len(flags - pp_flags)),
+                "missed_days": int(len((pp_flags & g_dates) - flags)),
+                "first_flag_issue_date": _iso(first_any),
+                "first_hit_issue_date": _iso(first_hit),
+                "first_hit_spill_day": None
+                if first_hit_row is None
+                else int(first_hit_row["day_of_exhaustion"]),
+                "pp_first_flag_date": _iso(min(pp_flags)) if pp_flags else None,
+                "pp_first_spill_date": _iso(pp_first),
+                "lead_days_to_pp_spill": _lead(first_hit, pp_first),
+                "observed_peak_date": _iso(obs_peak),
+                "lead_days_to_observed_peak": _lead(first_hit, obs_peak),
+                "max_forecast_peak_release_cusecs": float(g["peak_release_cusecs"].max())
+                if len(g)
+                else float("nan"),
+                "pp_peak_day1_release_cusecs": pp_peak,
+            }
+        )
+    return rows
 
 
 def annual_max(df: pd.DataFrame, col: str, name: str) -> pd.DataFrame:

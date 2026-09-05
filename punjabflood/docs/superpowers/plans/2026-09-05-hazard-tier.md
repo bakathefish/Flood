@@ -247,7 +247,14 @@ record.
   product does not adopt because the correction fails the rule in `design.md`.
 - Product: P(spillway forced) printed with and without the inflow model's own error
   (`hei.ensemble_summary_with_error`; the residual lag-1 autocorrelation joined the
-  parameter file for it).
+  parameter file for it). On a forced-spill day the product routes spill plus turbine
+  passage less the diversion, the same rule as the event test.
+- Verification, continued: an as-issued hindcast (`verify.as_issued_hei`, the archived lead
+  1 to 5 QPF of ECMWF and GFS through the product's water balance for every issue date of
+  2024 to 2026, scored as hits, false flags and misses against the perfect-prognosis run)
+  and a prospective-record summary rendered from `outputs/forecast/`.
+- Constants: two points of the 2019 Bhakra rule curve from the CBIP presentation chart,
+  with the vintage caveat; no operator scenario yet.
 - `docs/roadmap.md` lists what comes next and the data each step needs.
 
 ## Self-review

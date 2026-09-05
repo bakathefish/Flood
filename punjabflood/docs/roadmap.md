@@ -35,6 +35,13 @@ numbers that motivate them are in `verification.md`, never repeated here.
   directions, the false-alarm ratio worsens in half of them (`verification.md`). The under-forecast is concentrated on the heavy days, so scaling
   every day up mostly inflates the ordinary ones. The product applies no correction, and the
   rule that would let one in is written down in `design.md`.
+- **As-issued hindcast of the 2025 event.** The archived lead 1 to 5 forecasts of ECMWF and
+  GFS, issue date by issue date, through the product's water balance with the recorded or
+  carried Pong storage: the first flagged issue date, how many days were flagged, and the
+  lead to the model's own first spill under observed rain and to the dated Dhilwan peak, for
+  2024 (no event), 2025 (the event) and 2026 to date. The numbers are in `verification.md`.
+- **Prospective record summary** at the end of the verification report, one row per issue
+  date, growing daily from the Action.
 
 ## Next, in order
 

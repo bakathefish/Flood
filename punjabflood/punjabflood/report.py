@@ -147,6 +147,36 @@ def _prospective_lines(forecast_dir: Path) -> list[str]:
     return lines
 
 
+def reanchor_note(pp: pd.DataFrame, year: int, first_flag: str, first_spill: str) -> str | None:
+    """Why the model's own flags can run ahead of its spill: between the first
+    perfect-prognosis flag and the spill, the largest downward re-anchor of the carried
+    storage path at a measurement (``reanchor_gap_bcm`` from ``verify.carry_storage``)."""
+    if "reanchor_gap_bcm" not in pp.columns or "dam" not in pp.columns:
+        return None
+    d = pd.to_datetime(pp["date"])
+    g = pp[
+        (pp["dam"] == "Pong")
+        & (d >= pd.Timestamp(first_flag))
+        & (d <= pd.Timestamp(first_spill))
+        & (d.dt.year == year)
+    ].dropna(subset=["reanchor_gap_bcm"])
+    g = g[g["reanchor_gap_bcm"] > 0]
+    if g.empty:
+        return None
+    i = g["reanchor_gap_bcm"].idxmax()
+    when = pd.Timestamp(g.loc[i, "date"]).date().isoformat()
+    return (
+        f"In {year} the run under observed rain flagged from {first_flag} while its spill came "
+        f"on {first_spill}. Between the two, the measured storage of {when} re-anchored the "
+        f"model's carried path downward by {g.loc[i, 'reanchor_gap_bcm']:.2f} BCM: the "
+        "reservoir gained less than the water balance says, which is the dam passing more than "
+        "its turbines, the inflow over-predicted, or both; the public record cannot separate "
+        "them. The flags before that date were therefore calls of a spill unless water was "
+        "released, which is what the index means, and the as-issued hits scored against them "
+        "carry the same reading."
+    )
+
+
 def render_verification(
     out_dir: Path = OUT,
     params_path: Path | None = None,
@@ -317,6 +347,63 @@ def render_verification(
                     f"{q / rec.value:.2f} |"
                 )
             lines.append("")
+
+    ai = results.get("as_issued_events") or []
+    if ai:
+        lines += [
+            "## As-issued hindcast: what the product would have said, Pong, 2024 to 2026",
+            "",
+            "For each issue date the recorded or model-carried storage and the rain forecast "
+            "actually issued that day (archived lead 1 to 5 QPF, deterministic) go through the "
+            "same water balance as the live product. A flagged day is an issue date whose "
+            "forecast forces the spillway within five days. BBMB's gate log is not public, so "
+            "the model's own run under observed rain (perfect prognosis) is the reference: a "
+            "flag is a hit when that run also forces the spillway within five days of the same "
+            "issue date, a false flag otherwise, and a perfect-prognosis flag without an "
+            "as-issued flag is a miss. The first hit is the warning; the lead is counted from "
+            "it to the model's first spill under observed rain and to the dated Dhilwan peak. "
+            "The window is 1 August to 15 September.",
+            "",
+            "| year | model | issue days | flagged (hits, false) | missed | first flag of any kind | first hit (issue date, spill on day) | earliest possible flag (observed rain) | first spill under observed rain | lead (days) | observed Dhilwan peak | lead (days) | largest forecast peak release (cusecs) | perfect-prognosis peak release (cusecs) |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        ]
+
+        def _d(x):
+            return "none" if x is None or x != x else str(x)
+
+        def _n(x):
+            return "n/a" if x is None or x != x else f"{int(x):+d}"
+
+        for r in ai:
+            first_hit = (
+                "none"
+                if r.get("first_hit_issue_date") is None
+                else f"{r['first_hit_issue_date']}, day {r['first_hit_spill_day']}"
+            )
+            lines.append(
+                f"| {r['year']} | {r['model']} | {r['issue_days']} | "
+                f"{r['flagged_days']} ({r['hit_days']} hits, {r['false_flag_days']} false) | "
+                f"{r['missed_days']} | {_d(r.get('first_flag_issue_date'))} | {first_hit} | "
+                f"{_d(r.get('pp_first_flag_date'))} | {_d(r.get('pp_first_spill_date'))} | "
+                f"{_n(r.get('lead_days_to_pp_spill'))} | {_d(r.get('observed_peak_date'))} | "
+                f"{_n(r.get('lead_days_to_observed_peak'))} | "
+                f"{r['max_forecast_peak_release_cusecs']:,.0f} | {r['pp_peak_day1_release_cusecs']:,.0f} |"
+            )
+        lines.append("")
+        pp_ev = out_dir / "perfect_prog_event_pong.csv"
+        if not pp_ev.exists():
+            pp_ev = out_dir / "perfect_prog_hei_daily.csv"
+        if pp_ev.exists():
+            ppf = pd.read_csv(pp_ev, parse_dates=["date"])
+            seen = set()
+            for r in ai:
+                key = (r["year"], r.get("pp_first_flag_date"), r.get("pp_first_spill_date"))
+                if key in seen or key[1] is None or key[2] is None:
+                    continue
+                seen.add(key)
+                note = reanchor_note(ppf, int(r["year"]), key[1], key[2])
+                if note:
+                    lines += [note, ""]
 
     if era5_imd_path is not None and Path(era5_imd_path).exists():
         ri = rain_input_rows(pd.read_csv(era5_imd_path))
