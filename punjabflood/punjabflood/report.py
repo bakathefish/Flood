@@ -148,6 +148,11 @@ def _prospective_lines(forecast_dir: Path) -> list[str]:
     return lines
 
 
+def _ratio_range(s: pd.Series) -> str:
+    lo, hi = float(s.min()), float(s.max())
+    return f"{lo:.2f}" if abs(hi - lo) < 0.005 else f"{lo:.2f} to {hi:.2f}"
+
+
 def reanchor_note(
     pp: pd.DataFrame,
     dam: str,
@@ -341,37 +346,57 @@ def render_verification(
                     f"{int(n.get('press', 0))} | {int(n.get('model', 0))} | {int(n.get('interp', 0))} |"
                 )
             lines.append("")
-        if "inflow_day1_cusecs" in pp.columns and len(pp):
-            rec = C.PONG.max_observed_inflow_cusecs
+    fs_path = out_dir / "flood_scale_inflow.csv"
+    if fs_path.exists():
+        fs = pd.read_csv(fs_path)
+        lines += [
+            "### Flood-scale inflow: the model against the figures the record holds",
+            "",
+            "The runoff coefficient is fitted on ordinary filling days (the storage-change "
+            "relation), so what the model does at flood scale has to be checked against whatever "
+            "flood-scale inflow the public record holds: BBMB's daily sheets where the Internet "
+            "Archive kept them, dated press figures credited to the dam offices, the period means "
+            "of BBMB inflow that the Public Action Committee compiled for August to early "
+            "September 2025, the season's largest inflows as stated to the Rajya Sabha, and the "
+            "record inflow in the Pong emergency action plan. Each is set against the model's "
+            "one-day inflow under observed rain (the perfect-prognosis run with its base-flow "
+            "stand-in) on the same day or days: a period mean against the model's mean over the "
+            "same days, a season peak against the model's largest day of the same June to "
+            "September. The full citations are in `data-sources.md` and the reference tables.",
+            "",
+            "| dam | figure | model days | reported (cusecs) | model (cusecs) | model / reported | source |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for _, r in fs.iterrows():
+            if r["kind"] == "period mean":
+                what = f"mean, {r['start']} to {r['end']}"
+            elif r["kind"] == "season peak":
+                what = f"largest day of {str(r['start'])[:4]}"
+            else:
+                what = f"{r['kind']}, {r['start']}"
+            model = "n/a" if r["model_cusecs"] != r["model_cusecs"] else f"{r['model_cusecs']:,.0f}"
+            ratio = "n/a" if r["ratio"] != r["ratio"] else f"{r['ratio']:.2f}"
+            lines.append(
+                f"| {r['dam']} | {what} | {int(r['n_days'])} | {r['truth_cusecs']:,.0f} | {model} | "
+                f"{ratio} | {r['source']} |"
+            )
+        pm = fs[(fs["kind"] == "period mean") & (fs["n_days"] >= 10)].dropna(subset=["ratio"])
+        pk = fs[fs["kind"] == "season peak"].dropna(subset=["ratio"])
+        if len(pm) and len(pk):
             lines += [
-                "Model one-day inflow on the wettest catchment day of each event August, against "
-                "the largest inflow BBMB has recorded at Pong "
-                f"({rec.value:,.0f} cusecs, {rec.note}; {rec.source}). The gap is the "
-                "storage-change calibration's known weakness: on days when the dam releases "
-                "heavily the storage change understates the inflow, and the largest daily "
-                "changes are excluded as implausible, so the runoff coefficient is fitted on "
-                "ordinary days and undershoots the extremes.",
                 "",
-                "| year | wettest day | catchment rain (mm) | model one-day inflow (cusecs) | ratio to the BBMB record |",
-                "|---|---|---|---|---|",
+                "Where the run covers at least 10 of a period's days, the model's mean is "
+                f"{_ratio_range(pm['ratio'])} of the reported mean; its largest day of the season "
+                f"is {_ratio_range(pk['ratio'])} of the stated peak. The flood's volume is close to "
+                "right and its peak day is not: the model spreads the volume over more days than "
+                "the river does, which is consistent with lag weights fitted on ordinary days.",
             ]
-            for r in et:
-                g = pp[pp["date"].dt.year == int(r["year"])].dropna(subset=["rain_day1_mm"])
-                if g.empty:
-                    continue
-                i = g["rain_day1_mm"].idxmax()
-                day = (g.loc[i, "date"] + pd.Timedelta(days=1)).date().isoformat()
-                q = float(g.loc[i, "inflow_day1_cusecs"])
-                lines.append(
-                    f"| {r['year']} | {day} | {g.loc[i, 'rain_day1_mm']:.0f} | {q:,.0f} | "
-                    f"{q / rec.value:.2f} |"
-                )
-            lines.append("")
+        lines.append("")
 
     ai = results.get("as_issued_events") or []
     if ai:
         lines += [
-            "## As-issued hindcast: what the product would have said, Pong and Bhakra, 2024 to 2026",
+            "## As-issued hindcast: what the product would have said, each dam, 2024 to 2026",
             "",
             "For each issue date the recorded or model-carried storage and the rain forecast "
             "actually issued that day (archived lead 1 to 5 QPF, deterministic) go through the "

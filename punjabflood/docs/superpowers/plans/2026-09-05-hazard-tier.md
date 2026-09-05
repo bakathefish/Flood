@@ -257,6 +257,14 @@ record.
   `outputs/forecast/`.
 - Constants: two points of the 2019 Bhakra rule curve from the CBIP presentation chart,
   with the vintage caveat; no operator scenario yet.
+- Flood-scale inflow truth: the record was searched for daily event inflow and holds none
+  day by day; what it holds (Public Action Committee period means, Rajya Sabha season peaks,
+  dated press figures, two BBMB sheets from the Internet Archive) is in
+  `data/reference/bbmb/` and set against the model in `verify.flood_scale_inflow_check`;
+  the archived sheets also enter the storage record through `reservoirs.load_bulletins`
+  (`scripts/wayback_bulletins.py`). The perfect-prognosis and as-issued runs cover Ranjit
+  Sagar as well, and `carry_storage` runs on for its carry limit past a season's last
+  measurement instead of stopping there.
 - `docs/roadmap.md` lists what comes next and the data each step needs.
 
 ## Self-review

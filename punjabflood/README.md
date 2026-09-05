@@ -26,11 +26,13 @@ turns that mechanism into a daily hazard watch:
    times to Ropar, Phillaur, Harike, Dhilwan and Ferozepur and is classed Low, Medium or
    High against the department's own thresholds.
 6. **Verification.** 38 years of annual peaks with the department's High/Medium/Low class,
-   the dated 2023 and 2025 Dhilwan peaks, the as-issued rain forecasts of 2024 to 2026 (as
-   rain skill, and as a day-by-day hindcast of what the product would have said before the
-   2025 event), the live 2026 bulletins, and the season's prospective record. Results, with
-   their caveats, are in `docs/verification.md`, rendered from `outputs/verification/` and
-   never typed by hand.
+   the dated 2023 and 2025 Dhilwan peaks, every flood-scale inflow figure the public record
+   holds for 2023 and 2025 (BBMB's archived sheets, the Public Action Committee's period
+   means, the season peaks stated to the Rajya Sabha, dated press figures), the as-issued
+   rain forecasts of 2024 to 2026 (as rain skill, and as a day-by-day hindcast of what the
+   product would have said before the 2025 event, at each dam), the live 2026 bulletins,
+   and the season's prospective record. Results, with their caveats, are in
+   `docs/verification.md`, rendered from `outputs/verification/` and never typed by hand.
 
 Not an official warning. The Punjab WRD, CWC, BBMB and IMD issue those. This is a hazard
 watch on physical quantities, published with its verification.
@@ -43,10 +45,11 @@ watch on physical quantities, published with its verification.
   pooled hazard model) is a separate sub-project with its own pre-registration.
 - No Ghaggar discharge model. There is no public gauge history for the Ghaggar; the
   package publishes the catchment rain forecast and its climatological percentile only.
-- No claim to capture the extremes fully yet. The storage-change calibration still
-  undershoots the inflow of the 2023 and 2025 events (see the verification report); a daily
-  inflow record for those events and the daily CWC record from 1991 are the data that fix
-  this. `docs/roadmap.md` lists what comes next and what each step needs.
+- No claim to capture the extremes fully yet. Against the flood-scale figures the record
+  holds, the model's volumes over the 2025 flood periods come close to what BBMB reported,
+  but its largest days fall well short of the stated peaks (see the verification report); a
+  day-wise inflow record for the 2023 and 2025 events and the daily CWC record from 1991 are
+  the data that fix this. `docs/roadmap.md` lists what comes next and what each step needs.
 
 ## Run
 

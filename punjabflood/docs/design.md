@@ -95,15 +95,21 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    in 38 the AUROC has wide sampling error and the Brier skill is the more demanding number.
 2. Event timing. The one-day-ahead forced release of each day's perfect-prognosis run,
    placed on the day it happens and routed, against the dated Dhilwan peaks of 17 August
-   2023 and 31 August 2025: signed lag in days and magnitude ratio. Only the spill is
-   routed, so the magnitude is a lower bound. The public storage record is weekly in
-   August 2023 and a few press points in August 2025; between measurements the reservoir
-   is carried by the model's own water balance under the observed rain and re-anchored at
-   every measurement. The same section reports the model's one-day inflow on the wettest
-   day against the largest inflow BBMB has recorded at Pong, because that gap, not the
-   routing, is what limits the event test: on days when the dam releases heavily the
-   storage change understates the inflow, and the largest daily changes are excluded from
-   the fit as implausible, so the coefficient is an ordinary-day coefficient.
+   2023 and 31 August 2025: signed lag in days and magnitude ratio. The spill plus the
+   turbine passage less the diversion is routed, with spill alone as the inner bound, so
+   the magnitude is a lower bound either way. The public storage record is weekly in
+   August 2023 and a few press points in August 2025, plus the two BBMB daily sheets of
+   September 2025 that the Internet Archive kept; between measurements the reservoir is
+   carried by the model's own water balance under the observed rain, re-anchored at every
+   measurement, and run on for three weeks past the last one where a season's record stops
+   early (Ranjit Sagar's does in 2025). The same section sets the model's one-day inflow under observed rain
+   against every flood-scale inflow figure the public record holds (the archived BBMB
+   sheets, dated press figures credited to the dam offices, the Public Action Committee's
+   period means of BBMB inflow for August to early September 2025 at all three dams, the
+   season peaks stated to the Rajya Sabha, the record inflow in the Pong emergency action
+   plan), because that gap, not the routing, is what limits the event test: the
+   coefficient is fitted on ordinary filling days, and on days when the dam releases
+   heavily the storage change understates the inflow.
 3. Live season. The one-day inflow prediction against every 2026 BBMB bulletin: bias,
    correlation, mean absolute error, beside the same numbers for persistence (tomorrow
    equals today), which any one-day prediction has to beat. 2026 is a deficit season, so
@@ -123,7 +129,7 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    comparison says too. A correction conditional on the forecast amount, or quantile
    mapping, needs more seasons of archive than exist.
 6. As-issued hindcast. For every issue date of the 2024 to 2026 seasons, the recorded or
-   model-carried Pong and Bhakra storage and the rain forecast that was actually issued that day
+   model-carried storage of each dam and the rain forecast that was actually issued that day
    (archived lead 1 to 5 QPF, ECMWF and GFS, deterministic) go through the same water
    balance as the live product: what the product would have said, day by day, before the
    2025 event and through the two seasons without one. Scored as flagged issue dates (a
@@ -156,11 +162,14 @@ of 30 mm or more.
 
 The full list, ordered by expected effect, is `roadmap.md`.
 
-- Extreme-event inflow is still underestimated by the storage-change calibration even with
-  the wetness term (see the event section of `docs/verification.md`): on days the dam
-  releases heavily the storage change understates the inflow. The daily CWC record from
-  1991 (pull in progress) adds the large filling days of 1988 to 2014, and any daily inflow
-  series for 2023 or 2025 would let the coefficient be fitted on inflow itself.
+- Peak-day inflow is still underestimated. The flood-scale check (event section of
+  `docs/verification.md`) puts the model's volumes over the 2025 flood periods close to the
+  means BBMB reported and its largest days well below the stated season peaks: the lag
+  weights, fitted on ordinary filling days, spread a flood over more days than the river
+  does, and on days the dam releases heavily the storage change understates the inflow.
+  The daily CWC record from 1991 (pull in progress) adds the large filling days of 1988 to
+  2014, and any day-wise inflow series for 2023 or 2025 would let the response be fitted on
+  inflow itself.
 - The storage record is sparse exactly in the event weeks; the model carry is a bridge, not
   a measurement. BBMB keeps no bulletin archive, so 2026 is the first season with daily
   measured state in this project.

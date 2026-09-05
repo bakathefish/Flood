@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -119,6 +121,37 @@ def test_bulletins_load_with_both_dams_and_latest_per_day():
     assert b["inflow_cusecs"].gt(0).all()
     latest = b.sort_values("as_on").groupby(["dam", "date"]).tail(1)
     assert len(latest) < len(b)  # two bulletins a day collapse to one
+
+
+def test_parse_sheet_text_handles_both_date_forms():
+    old = (
+        "Latest BBMB Reservoir Data \nas on 15.09.2025 at 6.00 PM \nReservoir Level \n(Feet) \n"
+        "Inflows \n(Cusecs) \nOutflows \n(Cusecs) \nBhakra 1676.01 54667 50000 \n"
+        "Pong 1393.23 76498 53901 \n"
+    )
+    r = reservoirs.parse_sheet_text(old)
+    assert r["as_on_date"] == "15-09-2025" and r["as_on_time"] == "18:00"
+    assert r["bhakra_level_ft"] == 1676.01 and r["pong_inflow_cusecs"] == 76498
+    assert r["as_on_key"] == "15-09-2025 18:00"
+    new = (
+        "Latest BBMB Reservoir Data\nas on 24-06-2026 06:00 Hrs.\nBhakra  1562.82  18715  32650\n"
+        "Pong  1320.89  3527  11002"
+    )
+    r2 = reservoirs.parse_sheet_text(new)
+    assert r2["as_on_time"] == "06:00" and r2["pong_outflow_cusecs"] == 11002
+    with pytest.raises(ValueError):
+        reservoirs.parse_sheet_text("no data here")
+
+
+def test_bulletins_include_the_archived_sheets():
+    b = reservoirs.load_bulletins()
+    sep15 = b[(b["dam"] == "Pong") & (b["as_on"] == pd.Timestamp("2025-09-15 18:00"))]
+    assert len(sep15) == 1 and sep15["inflow_cusecs"].iloc[0] == 76498
+    assert (sep15["basis"] == "bbmb").all()
+    only_live = reservoirs.load_bulletins(extra=())
+    assert (only_live["date"] >= pd.Timestamp("2026-08-09")).all()
+    none = reservoirs.load_bulletins(path=Path("does_not_exist.jsonl"), extra=())
+    assert len(none) == 0 and list(none.columns) == reservoirs.BULLETIN_COLUMNS
 
 
 def test_daily_state_prefers_measured_storage_and_fills_from_rating(legacy_cwc):

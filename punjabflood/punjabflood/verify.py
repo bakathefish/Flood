@@ -109,8 +109,10 @@ def carry_storage(
     Each day without a measurement takes ``S = min(cap, S_prev + I - A)``: the one-day inflow
     the calibrated model gives for the observed rain, less the non-spill passage ``A``, which
     is exactly the storage-change relation the model was fitted on. Every measurement
-    re-anchors the path; gaps longer than ``max_carry_days`` are left empty. Carried days
-    get ``basis='model'``.
+    re-anchors the path; gaps longer than ``max_carry_days`` are left empty, and after the
+    last measurement the path runs on for ``max_carry_days`` more (a season whose record
+    stops early, as Ranjit Sagar's does in 2025) and then ends. Carried days get
+    ``basis='model'``.
 
     Returns the series, the basis per day, and the re-anchor gaps: on each measurement day
     the path reaches, the model's carried value for that day minus the measurement. A
@@ -122,7 +124,11 @@ def carry_storage(
     base_bcm = max(params.intercept_bcm_per_day + a_bcm, 0.0)
     base_cusecs = C.bcm_to_cusec_days(base_bcm)
     measured = measured.sort_index()
-    full = pd.date_range(measured.index.min(), measured.index.max(), freq="D")
+    full = pd.date_range(
+        measured.index.min(),
+        measured.index.max() + pd.Timedelta(days=max_carry_days),
+        freq="D",
+    )
     out = pd.Series(np.nan, index=full)
     out_basis = {}
     gaps: dict = {}
@@ -378,6 +384,104 @@ def as_issued_event_summary(
             }
         )
     return rows
+
+
+FLOOD_SCALE_COLS = [
+    "dam",
+    "kind",
+    "start",
+    "end",
+    "truth_cusecs",
+    "model_cusecs",
+    "ratio",
+    "n_days",
+    "source",
+]
+
+
+def flood_scale_inflow_check(
+    pp_by_dam: dict[str, pd.DataFrame],
+    periods: pd.DataFrame | None = None,
+    points: pd.DataFrame | None = None,
+    season_peaks: pd.DataFrame | None = None,
+    record_days: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """The model's one-day inflow under observed rain against the flood-scale inflow figures
+    the public record holds. ``pp_by_dam`` maps a dam to its perfect-prognosis run
+    (``perfect_prog_hei``), whose ``inflow_day1_cusecs`` on issue date d is the inflow of the
+    day after. ``periods``: dam, period_start, period_end, mean_inflow_cusecs, source (set
+    against the model's mean over the same days); ``points`` and ``record_days``: date, dam,
+    inflow_cusecs, source (one day each; the second is labelled ``record day``);
+    ``season_peaks``: dam, year, peak_inflow_cusecs, source (against the model's largest day
+    of the same June to September). One row per figure: the model value, the ratio of model
+    to figure, and how many model days entered (0 with the model value missing when the run
+    does not cover the days)."""
+    daily: dict[str, pd.Series] = {}
+    for dam, pp in pp_by_dam.items():
+        g = pp.dropna(subset=["inflow_day1_cusecs"])
+        s = pd.Series(
+            g["inflow_day1_cusecs"].to_numpy(dtype=float),
+            index=pd.to_datetime(g["date"]) + pd.Timedelta(days=1),
+        ).sort_index()
+        daily[dam] = s[~s.index.duplicated(keep="last")]
+    empty = pd.Series(dtype=float)
+    rows = []
+
+    def add(dam, kind, start, end, truth, sel: pd.Series, agg, source):
+        model = float(agg(sel)) if len(sel) else float("nan")
+        rows.append(
+            {
+                "dam": dam,
+                "kind": kind,
+                "start": pd.Timestamp(start).date().isoformat(),
+                "end": pd.Timestamp(end).date().isoformat(),
+                "truth_cusecs": float(truth),
+                "model_cusecs": model,
+                "ratio": model / float(truth)
+                if model == model and float(truth) > 0
+                else float("nan"),
+                "n_days": int(len(sel)),
+                "source": source,
+            }
+        )
+
+    if periods is not None:
+        for r in periods.itertuples(index=False):
+            s = daily.get(r.dam, empty)
+            a, b = pd.Timestamp(r.period_start), pd.Timestamp(r.period_end)
+            add(
+                r.dam,
+                "period mean",
+                a,
+                b,
+                r.mean_inflow_cusecs,
+                s[(s.index >= a) & (s.index <= b)],
+                np.mean,
+                r.source,
+            )
+    for frame, kind in ((points, "day"), (record_days, "record day")):
+        if frame is None:
+            continue
+        for r in frame.itertuples(index=False):
+            s = daily.get(r.dam, empty)
+            d = pd.Timestamp(r.date)
+            add(r.dam, kind, d, d, r.inflow_cusecs, s[s.index == d], np.mean, r.source)
+    if season_peaks is not None:
+        for r in season_peaks.itertuples(index=False):
+            s = daily.get(r.dam, empty)
+            y = int(r.year)
+            sel = s[(s.index.year == y) & s.index.month.isin(SEASON_MONTHS)]
+            add(
+                r.dam,
+                "season peak",
+                f"{y}-06-01",
+                f"{y}-09-30",
+                r.peak_inflow_cusecs,
+                sel,
+                np.max,
+                r.source,
+            )
+    return pd.DataFrame(rows, columns=FLOOD_SCALE_COLS)
 
 
 def annual_max(df: pd.DataFrame, col: str, name: str) -> pd.DataFrame:

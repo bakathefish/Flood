@@ -352,6 +352,21 @@ def test_model_carry_bridges_sparse_measurements_and_reanchors():
     assert pd.Timestamp("2023-09-20") not in s2.index and pd.Timestamp("2023-09-05") in s2.index
 
 
+def test_carry_storage_runs_on_after_the_last_measurement_for_the_carry_limit():
+    _, rain, p = _event_inputs()
+    two = pd.Series(
+        [4.0, 4.5], index=pd.to_datetime(["2025-08-01", "2025-08-10"]), name="storage_bcm"
+    )
+    s, basis, gaps = verify.carry_storage(two, {}, rain.set_index("date")["rain_mm"], "Pong", p)
+    # the path continues for MAX_CARRY_DAYS after the last measurement and then ends
+    last = pd.Timestamp("2025-08-10") + pd.Timedelta(days=verify.MAX_CARRY_DAYS)
+    assert s.index.max() == last and basis[last] == "model"
+    assert (last + pd.Timedelta(days=1)) not in s.index
+    assert s.loc["2025-08-10"] == 4.5 and pd.Timestamp("2025-08-10") in gaps
+    # nothing after the last measurement is a re-anchor
+    assert max(gaps) == pd.Timestamp("2025-08-10")
+
+
 def test_routed_next_day_release_places_release_on_the_following_day():
     pp = pd.DataFrame(
         {
@@ -387,3 +402,52 @@ def test_routed_next_day_release_places_release_on_the_following_day():
     assert ropp == pytest.approx(
         50_000.0 + C.BHAKRA.turbine_capacity_cusecs.value - routing.BHAKRA_CANAL_DRAW_CUSECS
     )
+
+
+def test_flood_scale_inflow_check_compares_like_days():
+    days = pd.date_range("2025-08-20", "2025-09-10")
+    # the run's inflow_day1 on issue date d is the inflow of d + 1
+    pp = pd.DataFrame(
+        {
+            "date": days,
+            "dam": "Pong",
+            "inflow_day1_cusecs": 50_000.0 + 1000.0 * np.arange(len(days)),
+        }
+    )
+    periods = pd.DataFrame(
+        [
+            {
+                "dam": "Pong",
+                "period_start": "2025-08-25",
+                "period_end": "2025-09-04",
+                "mean_inflow_cusecs": 121_600.0,
+                "source": "PAC",
+            }
+        ]
+    )
+    points = pd.DataFrame(
+        [{"date": "2025-08-26", "dam": "Pong", "inflow_cusecs": 233_000.0, "source": "PTI"}]
+    )
+    peaks = pd.DataFrame(
+        [{"dam": "Pong", "year": 2025, "peak_inflow_cusecs": 349_522.0, "source": "RS"}]
+    )
+    rec = pd.DataFrame(
+        [{"date": "2023-08-14", "dam": "Pong", "inflow_cusecs": 734_000.0, "source": "EAP"}]
+    )
+    fs = verify.flood_scale_inflow_check({"Pong": pp}, periods, points, peaks, rec)
+    assert list(fs.columns) == verify.FLOOD_SCALE_COLS
+    pm = fs[fs["kind"] == "period mean"].iloc[0]
+    # inflow days 25 Aug to 4 Sep come from issue dates 24 Aug to 3 Sep: offsets 4 to 14
+    expect = float(np.mean([50_000.0 + 1000.0 * k for k in range(4, 15)]))
+    assert pm["model_cusecs"] == pytest.approx(expect) and pm["n_days"] == 11
+    assert pm["ratio"] == pytest.approx(expect / 121_600.0)
+    assert pm["start"] == "2025-08-25" and pm["end"] == "2025-09-04"
+    day = fs[fs["kind"] == "day"].iloc[0]
+    assert day["model_cusecs"] == pytest.approx(50_000.0 + 1000.0 * 5) and day["n_days"] == 1
+    pk = fs[fs["kind"] == "season peak"].iloc[0]
+    assert pk["model_cusecs"] == pytest.approx(50_000.0 + 1000.0 * (len(days) - 1))
+    assert pk["start"] == "2025-06-01" and pk["n_days"] == len(days)
+    rd = fs[fs["kind"] == "record day"].iloc[0]
+    # no 2023 run was supplied: the figure is kept, the model value is missing
+    assert rd["truth_cusecs"] == 734_000.0 and rd["n_days"] == 0
+    assert rd["model_cusecs"] != rd["model_cusecs"] and rd["ratio"] != rd["ratio"]

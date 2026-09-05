@@ -38,6 +38,11 @@ PARAMS_JSON = REF / "inflow_params.json"
 GHAGGAR_CLIM_JSON = REF / "ghaggar_season_3day_totals.json"  # committed; lets a runner without
 # the raw rain archive place the Ghaggar forecast in the record's percentiles
 DAM_NAMES = ("Bhakra", "Pong", "Ranjit Sagar")
+# the flood-scale inflow figures the public record holds (sources inside each file and in
+# docs/data-sources.md); the model is checked against them in `verify`
+PAC_PERIODS_CSV = REF / "bbmb" / "pac_period_means_2025.csv"
+INFLOW_POINTS_CSV = REF / "bbmb" / "inflow_points_2025.csv"
+SEASON_PEAKS_CSV = REF / "bbmb" / "season_peak_inflows_2025.csv"
 
 
 def _log():
@@ -184,6 +189,43 @@ def _covered_area(rain_daily: pd.DataFrame, name: str, fallback: float) -> float
     return fallback
 
 
+def _flood_scale_truth(
+    state: pd.DataFrame, event_year: int = 2025
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """The flood-scale inflow figures the record holds, for ``verify.flood_scale_inflow_check``:
+    the Public Action Committee period means, the dated press figures, BBMB's own sheets of the
+    event year that the Internet Archive kept (from the state, basis ``bbmb``), the season
+    peaks stated to the Rajya Sabha, and the record inflow in the Pong emergency action plan.
+    Each carries its short source label; the full citations are in the reference tables."""
+    periods = pd.read_csv(PAC_PERIODS_CSV)
+    periods["source"] = periods["source_short"]
+    points = pd.read_csv(INFLOW_POINTS_CSV)
+    points["source"] = points["source_short"]
+    sheets = state[
+        (state["basis"] == "bbmb")
+        & (pd.to_datetime(state["date"]).dt.year == event_year)
+        & state["inflow_cusecs"].notna()
+    ][["date", "dam", "inflow_cusecs"]].copy()
+    sheets["source"] = "BBMB daily sheet, Internet Archive"
+    points = pd.concat(
+        [points[["date", "dam", "inflow_cusecs", "source"]], sheets], ignore_index=True
+    )
+    peaks = pd.read_csv(SEASON_PEAKS_CSV)
+    peaks["source"] = peaks["source_short"]
+    rec = C.PONG.max_observed_inflow_cusecs  # "on 14 August 2023" in its note
+    record_days = pd.DataFrame(
+        [
+            {
+                "date": "2023-08-14",
+                "dam": "Pong",
+                "inflow_cusecs": rec.value,
+                "source": "BBMB Pong EAP, largest inflow recorded",
+            }
+        ]
+    )
+    return periods, points, peaks, record_days
+
+
 @app.command("calibrate")
 def calibrate():
     """Fit the inflow model per dam on storage changes and catchment rain."""
@@ -287,6 +329,21 @@ def run_verify(horizon_days: int = 5):
             results["event_timing_spill_only"] = verify.event_timing_test(
                 spill_only, peaks_d
             ).to_dict(orient="records")
+            # the same run under observed rain for the other dams, saved beside Pong's
+            pp_by_dam = {"Pong": pp_event}
+            for dam in ("Bhakra", "Ranjit Sagar"):
+                if dam in params:
+                    pp_by_dam[dam] = verify.perfect_prog_hei(
+                        state_measured, rain_daily, dam, dam, params[dam], horizon_days, "model"
+                    )
+                    pp_by_dam[dam].to_csv(
+                        out / f"perfect_prog_event_{dam.lower().replace(' ', '_')}.csv",
+                        index=False,
+                    )
+            # flood scale: the model's one-day inflow against the figures the record holds
+            fs = verify.flood_scale_inflow_check(pp_by_dam, *_flood_scale_truth(state_measured))
+            fs.to_csv(out / "flood_scale_inflow.csv", index=False)
+            results["flood_scale_inflow"] = fs.to_dict(orient="records")
             if QPF_CSV.exists():
                 # what the product would have said: the archived as-issued QPF through the
                 # same water balance, one row per issue date, dam and model. The Dhilwan peak
@@ -295,21 +352,7 @@ def run_verify(horizon_days: int = 5):
                 obs_dates = peaks_d.set_index("year")["date"].to_dict() if "date" in peaks_d else {}
                 results["as_issued_events"] = []
                 ai_all = []
-                for dam in ("Pong", "Bhakra"):
-                    if dam not in params:
-                        continue
-                    pp_dam = (
-                        pp_event
-                        if dam == "Pong"
-                        else verify.perfect_prog_hei(
-                            state_measured, rain_daily, dam, dam, params[dam], horizon_days, "model"
-                        )
-                    )
-                    if dam != "Pong":
-                        pp_dam.to_csv(
-                            out / f"perfect_prog_event_{dam.lower().replace(' ', '_')}.csv",
-                            index=False,
-                        )
+                for dam, pp_dam in pp_by_dam.items():
                     ai = pd.concat(
                         [
                             verify.as_issued_hei(

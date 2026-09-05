@@ -7,7 +7,9 @@ Sources
   on 2025-07-11.
 * BBMB bulletins (``data/reference/bbmb/bulletins_2026.jsonl``): level in feet, inflow and
   outflow in cusecs, twice daily (as on 06:00 and 18:00 IST), Bhakra and Pong only. Storage
-  is not printed, so it is read off the CWC-fitted rating.
+  is not printed, so it is read off the CWC-fitted rating. The sheets the Internet Archive
+  holds from before the hourly capture (two of September 2025, four of 2026) are in
+  ``bulletins_wayback.jsonl`` in the same schema (``scripts/wayback_bulletins.py``).
 * Press supplement for August to September 2025 (levels in feet, storage where a percent
   full was reported) fills the CWC gap for that flood.
 """
@@ -15,6 +17,7 @@ Sources
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -29,6 +32,23 @@ CWC_PULL = Path("data/raw/cwc/cwc_daily.csv")
 CWC_LEGACY = REF / "cwc" / "reservoirs_monsoon_2015_2025_legacy.csv"
 SUPPLEMENT_2025 = REF / "cwc" / "reservoirs_2025_flood_supplement.csv"
 BULLETINS = REF / "bbmb" / "bulletins_2026.jsonl"
+BULLETINS_WAYBACK = REF / "bbmb" / "bulletins_wayback.jsonl"
+BULLETIN_COLUMNS = [
+    "as_on",
+    "date",
+    "dam",
+    "level_ft",
+    "level_m",
+    "inflow_cusecs",
+    "outflow_cusecs",
+    "basis",
+]
+# the sheet's own date line: "as on 15.09.2025 at 6.00 PM" (2025) or "as on 24-06-2026 06:00 Hrs."
+SHEET_AS_ON = re.compile(
+    r"as on\s+(\d{2})[.-](\d{2})[.-](\d{4})\s+(?:at\s+)?(\d{1,2})[.:](\d{2})\s*(AM|PM|Hrs\.?)?",
+    re.IGNORECASE,
+)
+SHEET_ROW = re.compile(r"^(Bhakra|Pong)\s+([\d.]+)\s+(\d+)\s+(\d+)\s*$", re.MULTILINE)
 
 STATE_COLUMNS = [
     "date",
@@ -102,35 +122,72 @@ def load_supplement(path: Path = SUPPLEMENT_2025) -> pd.DataFrame:
     return out.sort_values(["dam", "date"]).reset_index(drop=True)
 
 
-def load_bulletins(path: Path = BULLETINS) -> pd.DataFrame:
+def parse_sheet_text(text: str) -> dict:
+    """The parsed fields of one BBMB ``res_data.pdf`` sheet from its extracted text:
+    ``as_on_date`` (dd-mm-yyyy), ``as_on_time`` (HH:MM, 24-hour), and per dam the level in
+    feet, inflow and outflow in cusecs and the printed row, plus ``as_on_key``. The sheets
+    of 2025 print "as on 15.09.2025 at 6.00 PM"; those of 2026 "as on 24-06-2026 06:00 Hrs."."""
+    m = SHEET_AS_ON.search(text)
+    if not m:
+        raise ValueError("no 'as on' line in the sheet")
+    dd, mm, yyyy, hh, mi, suffix = m.groups()
+    hour = int(hh)
+    if suffix and suffix.upper() == "PM" and hour < 12:
+        hour += 12
+    if suffix and suffix.upper() == "AM" and hour == 12:
+        hour = 0
+    rec: dict = {"as_on_date": f"{dd}-{mm}-{yyyy}", "as_on_time": f"{hour:02d}:{mi}"}
+    for dam, level, inflow, outflow in SHEET_ROW.findall(text):
+        key = dam.lower()
+        rec[f"{key}_level_ft"] = float(level)
+        rec[f"{key}_inflow_cusecs"] = int(inflow)
+        rec[f"{key}_outflow_cusecs"] = int(outflow)
+        rec[f"{key}_row"] = f"{dam}  {level}  {inflow}  {outflow}"
+    if "bhakra_level_ft" not in rec or "pong_level_ft" not in rec:
+        raise ValueError("sheet rows for both dams not found")
+    rec["as_on_key"] = f"{rec['as_on_date']} {rec['as_on_time']}"
+    return rec
+
+
+def load_bulletins(
+    path: Path = BULLETINS, extra: tuple[Path, ...] = (BULLETINS_WAYBACK,)
+) -> pd.DataFrame:
     """One row per bulletin per dam: ``as_on`` (naive IST timestamp), ``date``, ``dam``,
-    ``level_m``, ``inflow_cusecs``, ``outflow_cusecs``, ``basis='bbmb'``."""
+    ``level_m``, ``inflow_cusecs``, ``outflow_cusecs``, ``basis='bbmb'``, from ``path`` and
+    from every file in ``extra`` that exists (the archived sheets). A sheet present in two
+    files counts once."""
     rows = []
-    for line in Path(path).read_text(encoding="utf-8").splitlines():
-        if not line.strip():
+    for p in (path, *extra):
+        p = Path(p)
+        if not p.exists():
             continue
-        r = json.loads(line)
-        d = r.get("as_on_date")
-        if not d:
-            continue
-        dd, mm, yy = d.split("-")
-        t = (r.get("as_on_time") or "00:00").replace(".", ":")
-        as_on = pd.Timestamp(f"{yy}-{mm}-{dd} {t}")
-        for key, dam in (("bhakra", "Bhakra"), ("pong", "Pong")):
-            if r.get(f"{key}_level_ft") is None:
+        for line in p.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
                 continue
-            rows.append(
-                {
-                    "as_on": as_on,
-                    "date": as_on.normalize(),
-                    "dam": dam,
-                    "level_ft": float(r[f"{key}_level_ft"]),
-                    "level_m": float(r[f"{key}_level_ft"]) * C.FOOT_M,
-                    "inflow_cusecs": r.get(f"{key}_inflow_cusecs"),
-                    "outflow_cusecs": r.get(f"{key}_outflow_cusecs"),
-                    "basis": "bbmb",
-                }
-            )
+            r = json.loads(line)
+            d = r.get("as_on_date")
+            if not d:
+                continue
+            dd, mm, yy = d.split("-")
+            t = (r.get("as_on_time") or "00:00").replace(".", ":")
+            as_on = pd.Timestamp(f"{yy}-{mm}-{dd} {t}")
+            for key, dam in (("bhakra", "Bhakra"), ("pong", "Pong")):
+                if r.get(f"{key}_level_ft") is None:
+                    continue
+                rows.append(
+                    {
+                        "as_on": as_on,
+                        "date": as_on.normalize(),
+                        "dam": dam,
+                        "level_ft": float(r[f"{key}_level_ft"]),
+                        "level_m": float(r[f"{key}_level_ft"]) * C.FOOT_M,
+                        "inflow_cusecs": r.get(f"{key}_inflow_cusecs"),
+                        "outflow_cusecs": r.get(f"{key}_outflow_cusecs"),
+                        "basis": "bbmb",
+                    }
+                )
+    if not rows:
+        return pd.DataFrame(columns=BULLETIN_COLUMNS)
     df = pd.DataFrame(rows)
     return df.sort_values(["dam", "as_on"]).drop_duplicates(["dam", "as_on"]).reset_index(drop=True)
 

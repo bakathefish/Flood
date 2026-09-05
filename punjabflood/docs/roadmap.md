@@ -35,9 +35,18 @@ numbers that motivate them are in `verification.md`, never repeated here.
   directions, the false-alarm ratio worsens in half of them (`verification.md`). The under-forecast is concentrated on the heavy days, so scaling
   every day up mostly inflates the ordinary ones. The product applies no correction, and the
   rule that would let one in is written down in `design.md`.
+- **Flood-scale inflow truth, what the record holds.** A hunt for daily inflow at the event
+  scale found no day-wise series: BBMB keeps no archive, and the Internet Archive holds two
+  of its daily sheets from September 2025 and none from August 2023 or August 2025. What
+  the record does hold is now in the reference tables and set against the model in
+  `verification.md`: the Public Action Committee's period means of BBMB inflow and outflow
+  for 1 to 24 August and 25 August to 4 September 2025 at all three dams (as reported by
+  The Wire), the season's largest inflows at Pong and Bhakra as stated to the Rajya Sabha,
+  two dated press figures credited to the dam offices, and the two archived sheets, which
+  also join the storage record as measured state.
 - **As-issued hindcast of the 2025 event.** The archived lead 1 to 5 forecasts of ECMWF and
   GFS, issue date by issue date, through the product's water balance with the recorded or
-  carried Pong and Bhakra storage: the first flagged issue date, how many days were flagged, and the
+  carried storage of each of the three dams: the first flagged issue date, how many days were flagged, and the
   lead to the model's own first spill under observed rain and to the dated Dhilwan peak, for
   2024 (no event), 2025 (the event) and 2026 to date. At Bhakra the model flagged in the last
   days of August 2025 and never spilled within the window; the early-September measurement
@@ -54,12 +63,25 @@ numbers that motivate them are in `verification.md`, never repeated here.
    the season-long capture that started in August 2026 is the first daily inflow record this
    project has. For 2023 and 2025 the public record holds scattered figures (a record inflow
    on 14 August 2023 in the Pong EAP; period averages for Ranjit Sagar in press coverage of
-   the state's release data; season totals stated by BBMB). The Punjab Agriculture
-   Commission released a month of daily discharge data for the three dams in September 2025;
-   the primary table has not been located as a document yet. With any daily inflow series
-   for an event, the coefficient can be fitted on inflow rather than on storage change, and
-   the release-during-event bias disappears. Effort: data hunt plus one calibration mode.
-2. **The operator.** The forced release is a bound on BBMB, not a prediction of BBMB. The
+   the state's release data; season totals stated by BBMB). The Public Action Committee, a
+   Ludhiana group, released a month of BBMB discharge data for the three dams on
+   8 September 2025; the press carried its period means (1 to 24 August and 25 August to
+   4 September, inflow and outflow, all three dams), which are kept in
+   `data/reference/bbmb/pac_period_means_2025.csv` and checked against the model in
+   `verification.md`; the day-wise table itself was not published. The Internet Archive holds
+   two of BBMB's daily sheets from September 2025 (15 and 24 September) and none from
+   August 2023 or August 2025. With any daily inflow series for an event, the coefficient can
+   be fitted on inflow rather than on storage change, and the release-during-event bias
+   disappears. Effort: data hunt plus one calibration mode.
+2. **Peak-day concentration.** The flood-scale check says the model's volumes over the 2025
+   flood periods are close to the means BBMB reported while its largest days fall well short
+   of the stated season peaks: the four-day lag weights, fitted on the storage record's
+   ordinary days, spread a flood's volume over more days than the river does. A response
+   that steepens with the rain (shorter lags above a threshold, or weights that depend on
+   the day's total), fitted on the same record and checked against the peak figures now in
+   hand, would concentrate it and lift the forced-release peak the product prints. Effort:
+   small; the day-wise record (item 1) is what would verify it properly.
+3. **The operator.** The forced release is a bound on BBMB, not a prediction of BBMB. The
    board runs a filling schedule (rule curve). Two points of the Bhakra schedule are now in
    hand from the chart on page 44 of the CBIP decision-support presentation (2019 season,
    read off the image, the lines sit on the gridlines): a maximum permissible level of
@@ -72,7 +94,7 @@ numbers that motivate them are in `verification.md`, never repeated here.
    by the rule curve, which fires days before the FRL bound and would speak to the 2025
    pre-emptive releases. Effort: locate the current schedule (BBMB Technical Committee
    minutes or a right-to-information reply), then a small module.
-3. **Rain input for the extremes.** ERA5 saw well under half of the IMD catchment rain over
+4. **Rain input for the extremes.** ERA5 saw well under half of the IMD catchment rain over
    Pong in the August 2023 event (`data/reference/rain/era5_vs_imd_event_windows.csv`,
    rendered in `verification.md`). The forecast models share ERA5's physics and resolution,
    so their heavy-day totals over these mountain catchments are low, and the as-issued skill
@@ -81,32 +103,33 @@ numbers that motivate them are in `verification.md`, never repeated here.
    quantile mapping, both of which need more than the three seasons of archive that exist;
    or a higher-resolution model (ICON-D2 does not cover India; the IMD's own NWP is not
    keyless). Effort: wait for archive, then small.
-4. **Local inflow between the dams and Harike.** The WRD peaks at Harike and Dhilwan include
+5. **Local inflow between the dams and Harike.** The WRD peaks at Harike and Dhilwan include
    tributaries (Swan and Sirsa on the Sutlej; Chakki and the Kandi torrents on the Beas) and
    plains rain. The HydroBASINS intermediate sub-basins are in the archive; the same runoff
    model with its own coefficient would add a local term at each control point. Effort:
    medium; improves magnitude ratios, not timing.
-5. **Attenuation.** Pure translation is the department's own assumption and is right for
+6. **Attenuation.** Pure translation is the department's own assumption and is right for
    timing; a linear reservoir per reach (one parameter each, fitted on nothing we have yet)
    would soften peaks. Only worth doing once daily gauge readings at the control points are
    available; the WRD publishes them during floods in its situation reports.
-6. **Soil moisture as the wetness carrier.** The API is a proxy. ERA5-Land soil moisture is
+7. **Soil moisture as the wetness carrier.** The API is a proxy. ERA5-Land soil moisture is
    one archive pull away (the code path exists, `gamma`), and would let the coefficient
    respond to snowmelt-wetted soils the rain index cannot see. Effort: one long, quota-bound
    pull.
-7. **Flood-scale error for the second probability.** The model-error term uses the
+8. **Flood-scale error for the second probability.** The model-error term uses the
    ordinary-day RMSE. Once a daily inflow record for an event exists (item 1), the error at
    flood scale can be measured and the probability made an outer estimate instead of an
-   inner one. Effort: small once item 1 lands.
-8. **Flood cushion above FRL.** Pong went to 1398 ft in 2023 and 1394.7 ft in 2025, above the
+   inner one; the flood-scale check in `verification.md` already brackets it from the period
+   means and season peaks the record holds. Effort: small once item 1 lands.
+9. **Flood cushion above FRL.** Pong went to 1398 ft in 2023 and 1394.7 ft in 2025, above the
    1390 ft FRL; that storage absorbed part of the peak. The rating clamps at the highest
    level in the record, so the model treats FRL as the ceiling, which makes the forced
    release an early, upper bound. A published elevation-capacity table above FRL (the EAP has
    the gross figure at design FRL) would resolve it. Effort: small once the table is found.
-9. **A second observed-rain record.** CHIRPS through the keyless ClimateSERV polygon API
+10. **A second observed-rain record.** CHIRPS through the keyless ClimateSERV polygon API
    would give an independent 1981-onward series to cross-check the IMD grid in the mountains.
    Effort: medium; another dependency and quota.
-10. **Ghaggar gauge model.** Nothing public gives Ghaggar discharge history; the state's
+11. **Ghaggar gauge model.** Nothing public gives Ghaggar discharge history; the state's
     situation reports during floods do. A request to the department for the Khanauri and
     Chandpur gauge records would unlock the rain-fed pathway as a real model instead of a
     percentile.

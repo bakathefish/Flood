@@ -21,7 +21,7 @@ For each WRD peak table, the predictors ranked by area under the ROC curve for t
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Pong_days_above_95pct | 11 | 2 | +0.62 | 1.00 | +0.72 |
+| Pong_days_above_95pct | 11 | 2 | +0.62 | 1.00 | +0.54 |
 | Ranjit Sagar_frac_aug01 | 10 | 1 | +0.71 | 1.00 | -0.04 |
 | Pong_hei_pp_max | 11 | 2 | +0.75 | 1.00 | +0.45 |
 | Pong_release_pp_max | 11 | 2 | +0.62 | 1.00 | +0.84 |
@@ -49,7 +49,7 @@ Other pre-named predictors:
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Pong_days_above_95pct | 11 | 2 | +0.68 | 1.00 | +0.72 |
+| Pong_days_above_95pct | 11 | 2 | +0.68 | 1.00 | +0.54 |
 | Ranjit Sagar_frac_aug01 | 10 | 1 | +0.73 | 1.00 | -0.04 |
 | Pong_hei_pp_max | 11 | 2 | +0.88 | 1.00 | +0.45 |
 | Pong_release_pp_max | 11 | 2 | +0.68 | 1.00 | +0.84 |
@@ -77,7 +77,7 @@ Other pre-named predictors:
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Pong_days_above_95pct | 11 | 2 | +0.57 | 1.00 | +0.72 |
+| Pong_days_above_95pct | 11 | 2 | +0.57 | 1.00 | +0.54 |
 | Ranjit Sagar_frac_aug01 | 10 | 1 | +0.56 | 1.00 | -0.04 |
 | Pong_hei_pp_max | 11 | 2 | +0.69 | 1.00 | +0.45 |
 | Pong_release_pp_max | 11 | 2 | +0.57 | 1.00 | +0.84 |
@@ -119,14 +119,31 @@ Storage basis of the Pong path in August of each event year (days):
 | 2023 | 4 | 1 | 0 | 26 | 0 |
 | 2025 | 0 | 0 | 4 | 22 | 0 |
 
-Model one-day inflow on the wettest catchment day of each event August, against the largest inflow BBMB has recorded at Pong (734,000 cusecs, 20784.56 m3/s on 14 August 2023; BBMB, Emergency Action Plan / Disaster Management Plan, Pong Dam (amended), bbmb.gov.in GeneralDocument/492_1_Pong_Dam_EAP_Amended.pdf, Annexure II salient features, pp. 56-60 (fetched 2026-09-05, sha256 186f374a4a8339f2...)). The gap is the storage-change calibration's known weakness: on days when the dam releases heavily the storage change understates the inflow, and the largest daily changes are excluded as implausible, so the runoff coefficient is fitted on ordinary days and undershoots the extremes.
+### Flood-scale inflow: the model against the figures the record holds
 
-| year | wettest day | catchment rain (mm) | model one-day inflow (cusecs) | ratio to the BBMB record |
-|---|---|---|---|---|
-| 2023 | 2023-08-14 | 99 | 233,281 | 0.32 |
-| 2025 | 2025-08-26 | 64 | 175,210 | 0.24 |
+The runoff coefficient is fitted on ordinary filling days (the storage-change relation), so what the model does at flood scale has to be checked against whatever flood-scale inflow the public record holds: BBMB's daily sheets where the Internet Archive kept them, dated press figures credited to the dam offices, the period means of BBMB inflow that the Public Action Committee compiled for August to early September 2025, the season's largest inflows as stated to the Rajya Sabha, and the record inflow in the Pong emergency action plan. Each is set against the model's one-day inflow under observed rain (the perfect-prognosis run with its base-flow stand-in) on the same day or days: a period mean against the model's mean over the same days, a season peak against the model's largest day of the same June to September. The full citations are in `data-sources.md` and the reference tables.
 
-## As-issued hindcast: what the product would have said, Pong and Bhakra, 2024 to 2026
+| dam | figure | model days | reported (cusecs) | model (cusecs) | model / reported | source |
+|---|---|---|---|---|---|---|
+| Bhakra | mean, 2025-08-01 to 2025-08-24 | 24 | 57,430 | 55,913 | 0.97 | PAC data via The Wire, 8 Sep 2025 |
+| Bhakra | mean, 2025-08-25 to 2025-09-04 | 11 | 73,400 | 81,542 | 1.11 | PAC data via The Wire, 8 Sep 2025 |
+| Pong | mean, 2025-08-01 to 2025-08-24 | 19 | 77,000 | 83,012 | 1.08 | PAC data via The Wire, 8 Sep 2025 |
+| Pong | mean, 2025-08-25 to 2025-09-04 | 11 | 121,600 | 137,283 | 1.13 | PAC data via The Wire, 8 Sep 2025 |
+| Ranjit Sagar | mean, 2025-08-01 to 2025-08-24 | 20 | 38,700 | 30,075 | 0.78 | PAC data via The Wire, 8 Sep 2025 |
+| Ranjit Sagar | mean, 2025-08-25 to 2025-09-04 | 11 | 71,960 | 69,098 | 0.96 | PAC data via The Wire, 8 Sep 2025 |
+| Pong | day, 2025-08-26 | 1 | 233,000 | 175,210 | 0.75 | PTI via The Week, 26 Aug 2025 (about) |
+| Bhakra | day, 2025-09-05 | 1 | 76,318 | 67,120 | 0.88 | SDO Nangal via Babushahi, 5 Sep 2025 |
+| Bhakra | day, 2025-09-15 | 1 | 54,667 | 44,853 | 0.82 | BBMB daily sheet, Internet Archive |
+| Bhakra | day, 2025-09-24 | 1 | 35,666 | 35,817 | 1.00 | BBMB daily sheet, Internet Archive |
+| Pong | day, 2025-09-15 | 1 | 76,498 | 83,124 | 1.09 | BBMB daily sheet, Internet Archive |
+| Pong | day, 2025-09-24 | 1 | 17,291 | 40,090 | 2.32 | BBMB daily sheet, Internet Archive |
+| Pong | record day, 2023-08-14 | 1 | 734,000 | 233,281 | 0.32 | BBMB Pong EAP, largest inflow recorded |
+| Pong | largest day of 2025 | 112 | 349,522 | 203,537 | 0.58 | Rajya Sabha reply via PTI, 2 Dec 2025 |
+| Bhakra | largest day of 2025 | 121 | 190,603 | 108,620 | 0.57 | Rajya Sabha reply via PTI, 2 Dec 2025 |
+
+Where the run covers at least 10 of a period's days, the model's mean is 0.78 to 1.13 of the reported mean; its largest day of the season is 0.57 to 0.58 of the stated peak. The flood's volume is close to right and its peak day is not: the model spreads the volume over more days than the river does, which is consistent with lag weights fitted on ordinary days.
+
+## As-issued hindcast: what the product would have said, each dam, 2024 to 2026
 
 For each issue date the recorded or model-carried storage and the rain forecast actually issued that day (archived lead 1 to 5 QPF, deterministic) go through the same water balance as the live product. A flagged day is an issue date whose forecast forces the spillway within five days. BBMB's gate log is not public, so the model's own run under observed rain (perfect prognosis) is the reference: a flag is a hit when that run also forces the spillway within five days of the same issue date, a false flag otherwise, and a perfect-prognosis flag without an as-issued flag is a miss. The first hit is the warning; the lead is counted from it to the model's first spill under observed rain and to the dated Dhilwan peak. The window is 1 August to 15 September.
 
@@ -136,18 +153,24 @@ For each issue date the recorded or model-carried storage and the rain forecast 
 | 2024 | Pong | gfs_seamless | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | 2024-08-12 | n/a | 0 | 0 |
 | 2025 | Pong | ecmwf_ifs025 | 41 | 25 (25 hits, 0 false) | 4 | 2025-08-15 | 2025-08-15, day 5 | 2025-08-14 | 2025-08-27 | +12 | 2025-08-31 | +16 | 173,377 | 139,401 |
 | 2025 | Pong | gfs_seamless | 41 | 23 (23 hits, 0 false) | 6 | 2025-08-17 | 2025-08-17, day 4 | 2025-08-14 | 2025-08-27 | +10 | 2025-08-31 | +14 | 120,955 | 139,401 |
-| 2026 | Pong | ecmwf_ifs025 | 22 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
-| 2026 | Pong | gfs_seamless | 22 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
+| 2026 | Pong | ecmwf_ifs025 | 30 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
+| 2026 | Pong | gfs_seamless | 30 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
 | 2024 | Bhakra | ecmwf_ifs025 | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
 | 2024 | Bhakra | gfs_seamless | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
 | 2025 | Bhakra | ecmwf_ifs025 | 46 | 3 (3 hits, 0 false) | 1 | 2025-08-30 | 2025-08-30, day 4 | 2025-08-29 | none | n/a | none | n/a | 35,473 | 0 |
 | 2025 | Bhakra | gfs_seamless | 46 | 1 (1 hits, 0 false) | 3 | 2025-09-01 | 2025-09-01, day 2 | 2025-08-29 | none | n/a | none | n/a | 48,966 | 0 |
-| 2026 | Bhakra | ecmwf_ifs025 | 22 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
-| 2026 | Bhakra | gfs_seamless | 22 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
+| 2026 | Bhakra | ecmwf_ifs025 | 30 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
+| 2026 | Bhakra | gfs_seamless | 30 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
+| 2024 | Ranjit Sagar | ecmwf_ifs025 | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
+| 2024 | Ranjit Sagar | gfs_seamless | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
+| 2025 | Ranjit Sagar | ecmwf_ifs025 | 42 | 13 (12 hits, 1 false) | 3 | 2025-08-26 | 2025-08-26, day 4 | 2025-08-23 | 2025-08-28 | +2 | none | n/a | 67,036 | 71,845 |
+| 2025 | Ranjit Sagar | gfs_seamless | 42 | 13 (12 hits, 1 false) | 3 | 2025-08-26 | 2025-08-26, day 4 | 2025-08-23 | 2025-08-28 | +2 | none | n/a | 48,721 | 71,845 |
 
 In 2025 the Pong run under observed rain flagged from 2025-08-14 while its spill came on 2025-08-27. Between the two, the measured storage of 2025-08-18 re-anchored the model's carried path downward by 0.82 BCM: the reservoir gained less than the water balance says, which is the dam passing more than its turbines, the inflow over-predicted, or both; the public record cannot separate them. The flags before that date were therefore calls of a spill unless water was released, which is what the index means, and the as-issued hits scored against them carry the same reading.
 
 In 2025 the Bhakra run under observed rain flagged from 2025-08-29 and did not force the spillway within the window (to 2025-09-15). After the first flag, the measured storage of 2025-09-02 re-anchored the model's carried path downward by 0.61 BCM: the reservoir gained less than the water balance says, which is the dam passing more than its turbines, the inflow over-predicted, or both; the public record cannot separate them. The flags were therefore calls of a spill unless water was released, which is what the index means; the as-issued hits scored against them carry the same reading, and after the re-anchor the observed rain did not fill the reservoir before the window closed.
+
+In 2025 the Ranjit Sagar run under observed rain flagged from 2025-08-23 while its spill came on 2025-08-28. Between the two, the measured storage of 2025-08-27 re-anchored the model's carried path downward by 0.06 BCM: the reservoir gained less than the water balance says, which is the dam passing more than its turbines, the inflow over-predicted, or both; the public record cannot separate them. The flags before that date were therefore calls of a spill unless water was released, which is what the index means, and the as-issued hits scored against them carry the same reading.
 
 ## Rain input check: ERA5 against the IMD grid over the event windows
 
@@ -314,8 +337,8 @@ Persistence (tomorrow's inflow equals today's) is the baseline any one-day predi
 
 | dam | days | mean observed (cusecs) | mean predicted (cusecs) | bias | Pearson r | MAE (cusecs) | persistence bias | persistence r | persistence MAE |
 |---|---|---|---|---|---|---|---|---|---|
-| Bhakra | 25 | 42,221 | 41,525 | -2% | +0.46 | 4,724 | -1% | +0.56 | 4,587 |
-| Pong | 25 | 38,005 | 36,967 | -3% | +0.38 | 11,946 | -2% | +0.35 | 12,508 |
+| Bhakra | 26 | 42,141 | 41,447 | -2% | +0.46 | 4,567 | -0% | +0.56 | 4,463 |
+| Pong | 26 | 37,862 | 36,970 | -2% | +0.38 | 11,594 | -0% | +0.33 | 12,557 |
 
 ## Prospective record, 2026 season
 

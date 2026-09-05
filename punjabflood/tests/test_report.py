@@ -163,6 +163,65 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             "reanchor_gap_bcm": [float("nan"), 0.61, 0.13, 0.9],
         }
     ).to_csv(tmp_path / "perfect_prog_event_bhakra.csv", index=False)
+    pd.DataFrame(
+        [
+            [
+                "Pong",
+                "period mean",
+                "2025-08-25",
+                "2025-09-04",
+                121600.0,
+                100000.0,
+                0.8224,
+                11,
+                "PAC data via The Wire",
+            ],
+            [
+                "Bhakra",
+                "day",
+                "2025-09-05",
+                "2025-09-05",
+                76318.0,
+                70000.0,
+                0.9172,
+                1,
+                "SDO Nangal via Babushahi",
+            ],
+            [
+                "Pong",
+                "season peak",
+                "2025-06-01",
+                "2025-09-30",
+                349522.0,
+                175210.0,
+                0.5013,
+                120,
+                "Rajya Sabha reply",
+            ],
+            [
+                "Pong",
+                "record day",
+                "2023-08-14",
+                "2023-08-14",
+                734000.0,
+                float("nan"),
+                float("nan"),
+                0,
+                "Pong EAP",
+            ],
+        ],
+        columns=[
+            "dam",
+            "kind",
+            "start",
+            "end",
+            "truth_cusecs",
+            "model_cusecs",
+            "ratio",
+            "n_days",
+            "source",
+        ],
+    ).to_csv(tmp_path / "flood_scale_inflow.csv", index=False)
     md = report.render_verification(
         tmp_path, tmp_path / "params.json", era5_imd_path=None, forecast_dir=None
     )
@@ -177,9 +236,24 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
         "model's carried path downward by 0.60 BCM" in md
     )
     assert "In 2024" not in md
-    # the wettest day is the day after the issue date; the ratio is against the sourced record
-    assert "| 2023 | 2023-08-03 | 99 | 183,500 | 0.25 |" in md
-    assert "734,000 cusecs" in md
+    # flood-scale inflow rows: one line per reported figure, the model value beside it
+    assert "### Flood-scale inflow" in md
+    assert (
+        "| Pong | mean, 2025-08-25 to 2025-09-04 | 11 | 121,600 | 100,000 | 0.82 | PAC data via The Wire |"
+        in md
+    )
+    assert (
+        "| Bhakra | day, 2025-09-05 | 1 | 76,318 | 70,000 | 0.92 | SDO Nangal via Babushahi |" in md
+    )
+    assert (
+        "| Pong | largest day of 2025 | 120 | 349,522 | 175,210 | 0.50 | Rajya Sabha reply |" in md
+    )
+    assert "| Pong | record day, 2023-08-14 | 0 | 734,000 | n/a | n/a | Pong EAP |" in md
+    assert (
+        "the model's mean is 0.82 of the reported mean; its largest day of the season is 0.50 "
+        "of the stated peak." in md
+    )
+    assert report._ratio_range(pd.Series([0.97, 1.13])) == "0.97 to 1.13"
     assert "| Pong_max5d_bcm | 38 | 5 | +0.61 | 0.93 | +0.31 |" in md
     assert (
         "| 2023 | spill + passage | 2023-08-16 | 150,000 | 2023-08-17 | 237,500 | -1 | 0.63 |" in md
