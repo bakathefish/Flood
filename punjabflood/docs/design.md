@@ -109,7 +109,9 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    season peaks stated to the Rajya Sabha, the record inflow in the Pong emergency action
    plan), because that gap, not the routing, is what limits the event test: the
    coefficient is fitted on ordinary filling days, and on days when the dam releases
-   heavily the storage change understates the inflow.
+   heavily the storage change understates the inflow. The period means compare like with
+   like; the stated peaks are readings at a moment against the model's daily volume, so
+   those ratios are lower bounds.
 3. Live season. The one-day inflow prediction against every 2026 BBMB bulletin: bias,
    correlation, mean absolute error, beside the same numbers for persistence (tomorrow
    equals today), which any one-day prediction has to beat. 2026 is a deficit season, so

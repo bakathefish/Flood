@@ -79,8 +79,14 @@ numbers that motivate them are in `verification.md`, never repeated here.
    ordinary days, spread a flood's volume over more days than the river does. A response
    that steepens with the rain (shorter lags above a threshold, or weights that depend on
    the day's total), fitted on the same record and checked against the peak figures now in
-   hand, would concentrate it and lift the forced-release peak the product prints. Effort:
-   small; the day-wise record (item 1) is what would verify it properly.
+   hand, would concentrate it and lift the forced-release peak the product prints; this matters
+   for the class, because in both 2023 and 2025 the routed Dhilwan peak fell below the Medium
+   band the observed peak sat in (`verification.md`, event timing). The stated
+   peaks are readings at a moment and the model's day is a daily volume, so part of the gap is
+   that, not the model; the adoption rule is the one used for the QPF correction: the change
+   goes in only if the leave-one-season-out calibration error does not rise and the peak-day
+   ratios rise without the period means leaving their present agreement. Effort: small; the
+   day-wise record (item 1) is what would verify it properly.
 3. **The operator.** The forced release is a bound on BBMB, not a prediction of BBMB. The
    board runs a filling schedule (rule curve). Two points of the Bhakra schedule are now in
    hand from the chart on page 44 of the CBIP decision-support presentation (2019 season,

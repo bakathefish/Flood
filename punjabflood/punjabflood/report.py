@@ -362,7 +362,10 @@ def render_verification(
             "one-day inflow under observed rain (the perfect-prognosis run with its base-flow "
             "stand-in) on the same day or days: a period mean against the model's mean over the "
             "same days, a season peak against the model's largest day of the same June to "
-            "September. The full citations are in `data-sources.md` and the reference tables.",
+            "September. A period mean is a daily quantity like the model's; the season peaks, "
+            "the evening press figure and the sheets' figures are readings at a time of day, so "
+            "against a daily volume those ratios are lower bounds on the model's share of the "
+            "day's mean. The full citations are in `data-sources.md` and the reference tables.",
             "",
             "| dam | figure | model days | reported (cusecs) | model (cusecs) | model / reported | source |",
             "|---|---|---|---|---|---|---|",
