@@ -54,14 +54,29 @@ def test_harike_sums_sutlej_and_beas_and_classifies():
     assert dh.loc["2025-08-30", "class"] == "medium"
 
 
-def test_river_release_removes_bhakra_canal_draw_only():
+def test_river_release_removes_each_dams_diversion():
     q = np.array([20_000.0, 60_000.0])
     out = routing.river_release("Bhakra", q)
     assert out[0] == 0.0 and out[1] == pytest.approx(60_000 - 22_650)
-    assert np.array_equal(routing.river_release("Pong", q), q)
+    # the Beas loses up to the Mukerian Hydel Channel's capacity at the Shah Nehar barrage
+    assert np.array_equal(routing.river_release("Pong", q), q - 11_500)
+    # no sourced diversion for the Ravi below Ranjit Sagar: nothing is taken off
+    assert np.array_equal(routing.river_release("Ranjit Sagar", q), q)
     assert routing.BHAKRA_CANAL_DRAW_CUSECS == pytest.approx(
         C.BHAKRA.extra["nangal_hydel_channel_cusecs"].value
         + C.BHAKRA.extra["anandpur_sahib_hydel_channel_cusecs"].value
+    )
+    assert routing.DIVERSION_CUSECS["Pong"] == C.PONG.extra["mukerian_hydel_channel_cusecs"].value
+
+
+def test_river_release_when_spilling_adds_passage_only_on_spill_days():
+    spill = np.array([0.0, 100_000.0])
+    pong = routing.river_release_when_spilling("Pong", spill)
+    assert pong[0] == 0.0
+    assert pong[1] == pytest.approx(100_000 + C.PONG.turbine_capacity_cusecs.value - 11_500)
+    bhakra = routing.river_release_when_spilling("Bhakra", spill)
+    assert bhakra[1] == pytest.approx(
+        100_000 + C.BHAKRA.turbine_capacity_cusecs.value - routing.BHAKRA_CANAL_DRAW_CUSECS
     )
 
 

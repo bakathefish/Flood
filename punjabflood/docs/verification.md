@@ -6,11 +6,12 @@ Rendered from `outputs/verification/` (results.json, peak_tests.csv). Regenerate
 
 Fitted by non-negative least squares on day-to-day changes of measured storage (CWC table, or the CWC level through the dam's own rating) against lagged catchment rain volumes; spilling days and implausible jumps excluded. The recession is the lag-2 to lag-1 autocovariance ratio of the residuals, clipped to [0.50, 0.99]; a raw ratio above the clip means the residual drifts through the season (base flow and outflow both move slowly) rather than recessing, so the base is carried as nearly constant over the horizon.
 
-| dam | area used (km2) | runoff coefficient c | lag weights w0..w3 | recession (raw ratio) | gamma | R2 | RMSE (BCM/day) | days |
-|---|---|---|---|---|---|---|---|---|
-| Bhakra | 25,762 | 0.278 | 0.27, 0.36, 0.18, 0.19 | 0.990 (1.875) | 0.00 | 0.224 | 0.0430 | 1009 |
-| Pong | 13,637 | 0.493 | 0.23, 0.47, 0.17, 0.14 | 0.902 (0.902) | 0.00 | 0.700 | 0.0316 | 731 |
-| Ranjit Sagar | 6,953 | 0.341 | 0.34, 0.45, 0.11, 0.10 | 0.990 (2.168) | 0.00 | 0.361 | 0.0231 | 1184 |
+| dam | area used (km2) | runoff coefficient c (dry) | c_wet per 100 mm antecedent | lag weights w0..w3 | recession (raw ratio) | gamma | R2 | RMSE (BCM/day) | days |
+|---|---|---|---|---|---|---|---|---|---|
+| Bhakra | 25,762 | 0.170 | 0.250 | 0.54, 0.27, 0.10, 0.09 | 0.990 (1.856) | 0.00 | 0.212 | 0.0434 | 1009 |
+| Pong | 13,637 | 0.203 | 0.328 | 0.35, 0.48, 0.09, 0.08 | 0.990 (1.051) | 0.00 | 0.777 | 0.0296 | 733 |
+| Ranjit Sagar | 6,953 | 0.131 | 0.263 | 0.62, 0.24, 0.08, 0.05 | 0.990 (2.219) | 0.00 | 0.398 | 0.0224 | 1184 |
+The coefficient in force on a day is c plus c_wet times the previous five days' catchment rain over 100 mm, capped at 0.95.
 
 ## Annual peak class, 38 years (1988 to 2025)
 
@@ -22,8 +23,8 @@ For each WRD peak table, the predictors ranked by area under the ROC curve for t
 |---|---|---|---|---|---|
 | Pong_days_above_95pct | 11 | 2 | +0.62 | 1.00 | +0.72 |
 | Ranjit Sagar_frac_aug01 | 10 | 1 | +0.71 | 1.00 | -0.04 |
-| Pong_hei_pp_max | 11 | 2 | +0.75 | 1.00 | +0.35 |
-| Pong_release_pp_max | 11 | 2 | +0.66 | 1.00 | +0.66 |
+| Pong_hei_pp_max | 11 | 2 | +0.75 | 1.00 | +0.45 |
+| Pong_release_pp_max | 11 | 2 | +0.62 | 1.00 | +0.84 |
 | Pong_frac_aug01 | 10 | 1 | +0.48 | 1.00 | -0.04 |
 | Ranjit Sagar_max10d_bcm | 38 | 5 | +0.36 | 0.99 | +0.62 |
 | Ranjit Sagar_max5d_bcm | 38 | 5 | +0.33 | 0.98 | +0.49 |
@@ -50,8 +51,8 @@ Other pre-named predictors:
 |---|---|---|---|---|---|
 | Pong_days_above_95pct | 11 | 2 | +0.68 | 1.00 | +0.72 |
 | Ranjit Sagar_frac_aug01 | 10 | 1 | +0.73 | 1.00 | -0.04 |
-| Pong_hei_pp_max | 11 | 2 | +0.88 | 1.00 | +0.35 |
-| Pong_release_pp_max | 11 | 2 | +0.67 | 1.00 | +0.66 |
+| Pong_hei_pp_max | 11 | 2 | +0.88 | 1.00 | +0.45 |
+| Pong_release_pp_max | 11 | 2 | +0.68 | 1.00 | +0.84 |
 | Pong_frac_aug01 | 10 | 1 | +0.49 | 1.00 | -0.04 |
 | Ranjit Sagar_max10d_bcm | 38 | 5 | +0.62 | 0.99 | +0.62 |
 | Ranjit Sagar_max5d_bcm | 38 | 5 | +0.56 | 0.98 | +0.49 |
@@ -78,8 +79,8 @@ Other pre-named predictors:
 |---|---|---|---|---|---|
 | Pong_days_above_95pct | 11 | 2 | +0.57 | 1.00 | +0.72 |
 | Ranjit Sagar_frac_aug01 | 10 | 1 | +0.56 | 1.00 | -0.04 |
-| Pong_hei_pp_max | 11 | 2 | +0.69 | 1.00 | +0.35 |
-| Pong_release_pp_max | 11 | 2 | +0.66 | 1.00 | +0.66 |
+| Pong_hei_pp_max | 11 | 2 | +0.69 | 1.00 | +0.45 |
+| Pong_release_pp_max | 11 | 2 | +0.57 | 1.00 | +0.84 |
 | Pong_frac_aug01 | 10 | 1 | +0.56 | 1.00 | -0.04 |
 | Ranjit Sagar_max10d_bcm | 38 | 5 | +0.52 | 0.99 | +0.62 |
 | Ranjit Sagar_max5d_bcm | 38 | 5 | +0.49 | 0.98 | +0.49 |
@@ -102,12 +103,14 @@ Other pre-named predictors:
 
 ## Event timing: routed perfect-prognosis release versus the dated Dhilwan peaks
 
-The forced release of a full Pong reservoir under the observed rain (one-day-ahead spill of each day's run, placed on the day it happens) is routed to Dhilwan with the Annexure Z travel times and compared with the department's dated peak. Only the spill is routed; turbine passage that also reaches the river is left out, so the predicted magnitude is a lower bound. The storage that drives the index comes from the public record, which is weekly in August 2023 and a handful of press points in August 2025; between measurements the reservoir is carried by the model's own water balance under the observed rain (one-day inflow less the non-spill passage), and every measurement re-anchors it.
+The forced release of a full Pong reservoir under the observed rain (one-day-ahead spill of each day's run, placed on the day it happens) is routed to Dhilwan with the Annexure Z travel times and compared with the department's dated peak. The river release on a spill day is the spill plus the turbine passage less the Mukerian Hydel Channel's capacity (a full reservoir passes its inflow, so the turbines run); this is the lower bound on what the dam sends down the Beas, and the spill-only row below it is the lower bound of that. Tributaries between Pong and Dhilwan are not modelled. The storage that drives the index comes from the public record, which is weekly in August 2023 and a handful of press points in August 2025; between measurements the reservoir is carried by the model's own water balance under the observed rain (one-day inflow less the non-spill passage), and every measurement re-anchors it.
 
-| year | predicted peak date | predicted peak (cusecs) | observed peak date | observed peak (cusecs) | lag (days) | magnitude ratio |
-|---|---|---|---|---|---|---|
-| 2023 | 2023-08-25 | 53,458 | 2023-08-17 | 237,500 | +8 | 0.23 |
-| 2025 | 2025-08-28 | 93,204 | 2025-08-31 | 235,494 | -3 | 0.40 |
+| year | release routed | predicted peak date | predicted peak (cusecs) | observed peak date | observed peak (cusecs) | lag (days) | magnitude ratio |
+|---|---|---|---|---|---|---|---|
+| 2023 | spill + passage | 2023-08-17 | 181,686 | 2023-08-17 | 237,500 | +0 | 0.76 |
+| 2025 | spill + passage | 2025-08-28 | 173,501 | 2025-08-31 | 235,494 | -3 | 0.74 |
+| 2023 | spill only | 2023-08-17 | 147,586 | 2023-08-17 | 237,500 | +0 | 0.62 |
+| 2025 | spill only | 2025-08-28 | 139,401 | 2025-08-31 | 235,494 | -3 | 0.59 |
 
 Storage basis of the Pong path in August of each event year (days):
 
@@ -120,8 +123,21 @@ Model one-day inflow on the wettest catchment day of each event August, against 
 
 | year | wettest day | catchment rain (mm) | model one-day inflow (cusecs) | ratio to the BBMB record |
 |---|---|---|---|---|
-| 2023 | 2023-08-14 | 99 | 167,845 | 0.23 |
-| 2025 | 2025-08-26 | 64 | 150,958 | 0.21 |
+| 2023 | 2023-08-14 | 99 | 233,281 | 0.32 |
+| 2025 | 2025-08-26 | 64 | 175,210 | 0.24 |
+
+## Rain input check: ERA5 against the IMD grid over the event windows
+
+ERA5 (0.25 degree reanalysis, through Open-Meteo) is the rain record the product uses for the current season, and the forecast models it ingests share its resolution and physics over these mountain catchments. The IMD gridded analysis is the observed record the model is calibrated on. A reanalysis that misses the rain of an event says the forecasts will too; the ratio column is the size of that miss over each event window.
+
+| catchment | event | window | days | IMD total (mm) | ERA5 total (mm) | ERA5 / IMD | IMD wettest day (mm) | ERA5 that day (mm) |
+|---|---|---|---|---|---|---|---|---|
+| Bhakra | 2023 | 2023-08-06 to 2023-08-20 | 15 | 106 | 39 | 0.37 | 28 | 8 |
+| Bhakra | 2025 | 2025-08-18 to 2025-09-06 | 20 | 197 | 167 | 0.85 | 28 | 32 |
+| Pong | 2023 | 2023-08-06 to 2023-08-20 | 15 | 286 | 109 | 0.38 | 99 | 33 |
+| Pong | 2025 | 2025-08-18 to 2025-09-06 | 20 | 425 | 359 | 0.85 | 64 | 31 |
+| Ranjit Sagar | 2023 | 2023-08-06 to 2023-08-20 | 15 | 137 | 81 | 0.59 | 50 | 26 |
+| Ranjit Sagar | 2025 | 2025-08-18 to 2025-09-06 | 20 | 473 | 446 | 0.94 | 85 | 76 |
 
 ## As-issued catchment QPF against observed catchment rain (2024 to 2026 seasons)
 
@@ -212,7 +228,9 @@ Heavy day: 30 mm or more over the catchment in a day. Lead 0 is the archive's st
 
 ## Live 2026: one-day inflow prediction against the BBMB bulletins
 
-| dam | days | mean observed (cusecs) | mean predicted (cusecs) | bias | Pearson r | MAE (cusecs) |
-|---|---|---|---|---|---|---|
-| Bhakra | 25 | 42,221 | 41,536 | -2% | +0.57 | 4,142 |
-| Pong | 25 | 38,005 | 35,209 | -7% | +0.49 | 11,177 |
+Persistence (tomorrow's inflow equals today's) is the baseline any one-day prediction has to beat; the model's base component is that persistence with the rain response added, so the difference between the two rows is what the rain brings.
+
+| dam | days | mean observed (cusecs) | mean predicted (cusecs) | bias | Pearson r | MAE (cusecs) | persistence bias | persistence r | persistence MAE |
+|---|---|---|---|---|---|---|---|---|---|
+| Bhakra | 25 | 42,221 | 41,525 | -2% | +0.46 | 4,724 | -1% | +0.56 | 4,587 |
+| Pong | 25 | 38,005 | 36,967 | -3% | +0.38 | 11,946 | -2% | +0.35 | 12,508 |

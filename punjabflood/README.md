@@ -15,8 +15,8 @@ turns that mechanism into a daily hazard watch:
    ERA5 through Open-Meteo for the current season, deterministic and 51-member ensemble
    quantitative precipitation forecasts (GFS, ECMWF IFS, ICON), all area-weighted over the
    real HydroBASINS catchments, all through keyless APIs.
-3. **Inflow.** A calibrated runoff coefficient with lag weights, fitted on day-to-day changes
-   of measured storage during filling season.
+3. **Inflow.** A runoff coefficient that rises with how wet the catchment already is, with
+   lag weights, fitted on day-to-day changes of measured storage during filling season.
 4. **Headroom-exhaustion index.** Forecast inflow volume minus headroom minus what the
    turbines can pass, per dam and horizon (1 to 5 days). Positive means the spillway must
    open: a full reservoir passes its inflow.
@@ -39,10 +39,10 @@ watch on physical quantities, published with its verification.
   pooled hazard model) is a separate sub-project with its own pre-registration.
 - No Ghaggar discharge model. There is no public gauge history for the Ghaggar; the
   package publishes the catchment rain forecast and its climatological percentile only.
-- No claim to capture the extremes yet. The storage-change calibration undershoots the
-  inflow of the 2023 and 2025 events (see the verification report); the daily CWC record
-  from 1991 and the BBMB release chronologies are the data that fix this, and the pull is
-  in progress.
+- No claim to capture the extremes fully yet. The storage-change calibration still
+  undershoots the inflow of the 2023 and 2025 events (see the verification report); a daily
+  inflow record for those events and the daily CWC record from 1991 are the data that fix
+  this. `docs/roadmap.md` lists what comes next and what each step needs.
 
 ## Run
 

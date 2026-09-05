@@ -133,7 +133,9 @@ def carry_storage(
         if np.isnan(prev) or since > max_carry_days:
             prev = np.nan
             continue
-        hist = rain.reindex(pd.date_range(d - pd.Timedelta(days=len(params.w) - 1), d))
+        hist = rain.reindex(
+            pd.date_range(d - pd.Timedelta(days=inflow.history_days(params) - 1), d)
+        )
         if hist.isna().any():
             prev = np.nan
             continue
@@ -181,7 +183,9 @@ def perfect_prog_hei(
         if d.month not in SEASON_MONTHS:
             continue
         fut = rain.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=horizon_days))
-        past = rain.reindex(pd.date_range(d - pd.Timedelta(days=3), d))
+        past = rain.reindex(
+            pd.date_range(d - pd.Timedelta(days=inflow.history_days(params) - 1), d)
+        )
         if fut.isna().any() or past.isna().any():
             continue
         # base flow: the model's own intercept-free base is unknown historically; use the
@@ -378,20 +382,22 @@ def routed_forced_release(pp: pd.DataFrame, dam: str) -> pd.DataFrame:
     return routing.arrivals({dam: s})
 
 
-def routed_next_day_release(pp: pd.DataFrame, dam: str) -> pd.DataFrame:
+def routed_next_day_release(pp: pd.DataFrame, dam: str, passage: bool = True) -> pd.DataFrame:
     """Route the perfect-prog forced release placed on the day it happens: the release on
     day d+1 is the first-day forced spill of the run issued on day d (today's storage,
     tomorrow's observed rain).
 
-    Only the forced spill is routed. Turbine passage also reaches the river in part
-    (Bhakra: passage minus the Nangal canal draw; Pong: passage minus the Shah Nehar
-    diversion, whose capacity is not in the sourced constants), so the routed series is a
-    lower bound on the river release of a full reservoir, for both dams."""
+    With ``passage`` the routed river release on a spill day is the spill plus the turbine
+    passage less the diversion capacity (``routing.river_release_when_spilling``), the lower
+    bound on what a full reservoir sends down the river; without it only the spill is routed,
+    a lower bound of a lower bound."""
     g = pp[pp["dam"] == dam].copy()
     g["date"] = pd.to_datetime(g["date"]) + pd.Timedelta(days=1)
     s = g.set_index("date")["release_day1_cusecs"].sort_index()
     full = pd.date_range(s.index.min(), s.index.max(), freq="D")
     s = s.reindex(full).fillna(0.0)
+    if passage:
+        s = pd.Series(routing.river_release_when_spilling(dam, s.to_numpy()), index=s.index)
     return routing.arrivals({dam: s})
 
 

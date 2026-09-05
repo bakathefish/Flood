@@ -121,9 +121,10 @@ def test_build_product_empty_reservoir_no_release():
     prod = forecast.build_product("2026-09-04", states, det, ens, {}, params)
     pong = prod["dams"]["Pong"]
     assert pong["ensemble"]["5"]["p_exhaustion"] == 0.0
-    # only today's outflow continues downstream: 20,000 cusecs is below every WRD low band
+    # only today's outflow continues downstream, less the Mukerian Hydel Channel's 11,500
+    # cusecs at the Shah Nehar barrage: 8,500 cusecs is below every WRD low band
     dh = [r for r in prod["reaches"] if r["station"] == "Dhilwan"][0]
-    assert dh["peak_cusecs"] == 20_000 and dh["peak_class"] is None
+    assert dh["peak_cusecs"] == 20_000 - 11_500 and dh["peak_class"] is None
 
 
 def test_dam_state_from_bulletin_uses_rating():

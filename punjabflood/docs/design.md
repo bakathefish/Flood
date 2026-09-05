@@ -25,9 +25,13 @@ inflow minus a slowly varying outflow, so regressing it on lagged rain volumes (
 least squares, days at or above 97 percent of capacity excluded) recovers the runoff
 coefficient and the lag weights. Only measured storage enters the fit (the CWC table, or
 the CWC level through the dam's own rating); storage read off the rating from a bulletin
-level has flat-step artefacts in its daily differences. The base component today is the
-observed BBMB inflow minus the quick response the recent rain explains, decaying at a
-fitted daily recession. The recession is estimated from the residuals as the lag-2 to lag-1
+level has flat-step artefacts in its daily differences. The coefficient depends on how wet
+the catchment already is: `c + c_wet * API / 100 mm`, API the previous five days' catchment
+rain, capped at 0.95. The record itself asked for this (the share of a rain volume that
+showed up as storage change rose steadily with antecedent rain for Pong and Ranjit Sagar),
+and it is fitted jointly with the lag weights by non-negative least squares, leaving out
+days the cap would bind. The base component today is the observed BBMB inflow minus the
+quick response the recent rain explains, decaying at a fitted daily recession. The recession is estimated from the residuals as the lag-2 to lag-1
 autocovariance ratio, which is unbiased under white measurement noise; where the residual
 drifts through the season instead of recessing the ratio exceeds one and the estimate sits
 at its 0.99 clip, and the parameter file keeps the raw ratio so the report can say so.
@@ -54,10 +58,14 @@ BBMB can release earlier and lower, and did in 2025; the verification scores bot
 
 **Release to control point.** Pure translation with the WRD's Annexure Z travel times, no
 attenuation, no tributaries; Harike sums the Sutlej and Beas arrivals; Ferozepur is Harike
-plus twelve hours; Dhilwan is placed on the Tanda to Harike reach by distance. Bhakra's river
-release is its outflow minus the Nangal canal off-takes (12,500 plus 10,150 cusecs), which do
-not return above Ropar. Arrivals are classed Low, Medium, High with the WRD section 3.2
-limits, printed inconsistencies kept as printed.
+plus twelve hours; Dhilwan is placed on the Tanda to Harike reach by distance. Each river
+loses its diversion first: Bhakra's outflow minus the Nangal canal off-takes (12,500 plus
+10,150 cusecs), which do not return above Ropar; Pong's outflow minus the Mukerian Hydel
+Channel's 11,500 cusecs taken at the Shah Nehar barrage (PSPCL). On a day the spillway is
+forced, a full reservoir passes its inflow, so the river gets the spill plus the turbine
+passage less that diversion; this is the lower bound on the river release and is what the
+product and the event test route. Arrivals are classed Low, Medium, High with the WRD
+section 3.2 limits, printed inconsistencies kept as printed.
 
 **Rain-fed pathway.** For the Ghaggar there is no public gauge history, so the product
 publishes the catchment QPF above Bhankarpur and Khanauri, the recent rain, and the
@@ -85,8 +93,12 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    storage change understates the inflow, and the largest daily changes are excluded from
    the fit as implausible, so the coefficient is an ordinary-day coefficient.
 3. Live season. The one-day inflow prediction against every 2026 BBMB bulletin: bias,
-   correlation, mean absolute error. 2026 is a deficit season, so this leg supplies
-   false-alarm and calibration evidence only.
+   correlation, mean absolute error, beside the same numbers for persistence (tomorrow
+   equals today), which any one-day prediction has to beat. 2026 is a deficit season, so
+   this leg supplies false-alarm and calibration evidence only.
+4. Rain input check. ERA5 catchment rain against the IMD grid over the 2023 and 2025 event
+   windows, because the forecast models share ERA5's physics and resolution; a reanalysis
+   that misses the mountain rain of an event says the forecasts will too.
 
 As-issued skill (forecast rather than observed rain) is measured on the 2024 to 2026
 seasons, the period for which Open-Meteo archives the lead 1 to 7 forecasts of GFS and
@@ -95,10 +107,13 @@ of 30 mm or more.
 
 ## Known limits and the data that lift them
 
-- Extreme-event inflow is underestimated by the storage-change calibration (see the event
-  section of `docs/verification.md`). The daily CWC record from 1991 (pull in progress) adds
-  the large filling days of 1988 to 2014, and BBMB's 2023 and 2025 release chronologies
-  would let the coefficient be fitted on inflow rather than on storage change.
+The full list, ordered by expected effect, is `roadmap.md`.
+
+- Extreme-event inflow is still underestimated by the storage-change calibration even with
+  the wetness term (see the event section of `docs/verification.md`): on days the dam
+  releases heavily the storage change understates the inflow. The daily CWC record from
+  1991 (pull in progress) adds the large filling days of 1988 to 2014, and any daily inflow
+  series for 2023 or 2025 would let the coefficient be fitted on inflow itself.
 - The storage record is sparse exactly in the event weeks; the model carry is a bridge, not
   a measurement. BBMB keeps no bulletin archive, so 2026 is the first season with daily
   measured state in this project.

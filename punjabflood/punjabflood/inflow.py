@@ -34,7 +34,17 @@ from punjabflood import constants as C
 
 LAGS = (0, 1, 2, 3)
 SPILL_FRACTION = 0.97
-MAX_ABS_DS_BCM = 0.45  # about 184,000 cusecs sustained for a day; larger jumps are data errors
+# A one-day storage change above this is treated as a data error rather than an event. It is
+# set above the largest genuine consecutive-day rises in the record (Pong 0.54 BCM on
+# 2018-08-14 after 99 mm the day before) so that event days stay in the fit; stale rows and
+# level slips are removed earlier by the reconciliation in ``reservoirs``.
+MAX_ABS_DS_BCM = 1.0
+# Wetness dependence of the runoff coefficient: c_t = c + c_wet * API_t / API_REF_MM, where
+# API_t is the catchment rain over the previous API_DAYS days (today excluded), capped at
+# C_MAX (a saturated catchment passes nearly all of its rain).
+API_DAYS = 5
+API_REF_MM = 100.0
+C_MAX = 0.95
 # storage bases that are measurements (the CWC table, or the CWC level through the dam's own
 # rating); storage read off the rating from a bulletin level has flat-step artefacts that
 # make the day-to-day changes unusable for calibration
@@ -54,6 +64,8 @@ class InflowParams:
     r2: float = float("nan")
     rmse_bcm: float = float("nan")
     rho_raw: float = float("nan")  # the unclipped autocovariance ratio; nan when defaulted
+    c_wet: float = 0.0  # extra runoff coefficient per API_REF_MM of antecedent rain
+    api_days: int = API_DAYS
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -74,6 +86,17 @@ def rain_volume_bcm(rain_mm, area_km2: float) -> np.ndarray:
 
 def lagged_matrix(series: pd.Series, lags=LAGS) -> pd.DataFrame:
     return pd.DataFrame({f"lag{k}": series.shift(k) for k in lags}, index=series.index)
+
+
+def antecedent_mm(rain_mm: pd.Series, days: int = API_DAYS) -> pd.Series:
+    """Rain over the previous ``days`` days, today excluded (the antecedent precipitation
+    index that carries catchment wetness)."""
+    return rain_mm.shift(1).rolling(days, min_periods=1).sum()
+
+
+def coefficient(p: InflowParams, api_mm: float) -> float:
+    """The runoff coefficient in force today given the antecedent rain."""
+    return float(min(p.c + p.c_wet * api_mm / API_REF_MM, C_MAX))
 
 
 def calibrate(
@@ -102,6 +125,7 @@ def calibrate(
     r = r.set_index("date").sort_index()
     rv = pd.Series(rain_volume_bcm(r["rain_mm"], area_km2), index=r.index)
     X = lagged_matrix(rv, lags)
+    X["api_mm"] = antecedent_mm(r["rain_mm"])
 
     ds = s.diff()
     gap = s.index.to_series().diff().dt.days
@@ -115,17 +139,36 @@ def calibrate(
     if len(df) < 60:
         raise ValueError(f"{dam}: only {len(df)} usable days for calibration")
 
-    # NNLS with a free intercept: solve for positive and negative intercept parts
-    A = np.column_stack(
-        [df[[f"lag{k}" for k in lags]].to_numpy(), np.ones(len(df)), -np.ones(len(df))]
+    # Joint NNLS: ds = sum_k (beta_k + delta_k * api / API_REF_MM) * rv_{t-k} + intercept,
+    # with beta_k = c * w_k and delta_k = c_wet * w_k (the wetness factor multiplies the whole
+    # lagged response). The intercept is free through its positive and negative parts. Days
+    # whose coefficient the cap C_MAX would bind are left out and the fit repeated until that
+    # set is stable, so the linear fit is never asked to explain a capped day.
+    L = df[[f"lag{k}" for k in lags]].to_numpy()
+    api = df["api_mm"].to_numpy()
+    y = df["ds"].to_numpy()
+    ones = np.ones(len(df))
+    A = np.column_stack([L, L * (api / API_REF_MM)[:, None], ones, -ones])
+    use = np.ones(len(df), dtype=bool)
+    for _ in range(6):
+        coef, _ = nnls(A[use], y[use])
+        beta, delta = coef[: len(lags)], coef[len(lags) : 2 * len(lags)]
+        c, c_wet = float(beta.sum()), float(delta.sum())
+        new_use = c + c_wet * api / API_REF_MM <= C_MAX
+        if new_use.sum() < 60 or np.array_equal(new_use, use):
+            break
+        use = new_use
+    intercept = coef[2 * len(lags)] - coef[2 * len(lags) + 1]
+    total = beta + delta
+    w = (
+        tuple(float(x / total.sum()) for x in total)
+        if total.sum() > 0
+        else tuple(1.0 / len(lags) for _ in lags)
     )
-    coef, _ = nnls(A, df["ds"].to_numpy())
-    beta = coef[: len(lags)]
-    intercept = coef[len(lags)] - coef[len(lags) + 1]
-    c = float(beta.sum())
-    w = tuple(float(b / c) for b in beta) if c > 0 else tuple(1.0 / len(lags) for _ in lags)
-    pred = A @ coef
-    resid = df["ds"].to_numpy() - pred
+    q = L @ np.asarray(w)
+    c_used = np.minimum(c + c_wet * api / API_REF_MM, C_MAX)
+    pred = c_used * q + intercept
+    resid = y - pred
     ss_tot = float(((df["ds"] - df["ds"].mean()) ** 2).sum())
     r2 = 1.0 - float((resid**2).sum()) / ss_tot if ss_tot > 0 else float("nan")
     rmse = float(np.sqrt((resid**2).mean()))
@@ -144,6 +187,8 @@ def calibrate(
         r2=r2,
         rmse_bcm=rmse,
         rho_raw=recession_ratio(res),
+        c_wet=c_wet,
+        api_days=API_DAYS,
     )
     if "sm_0_7" in r.columns and r["sm_0_7"].notna().sum() > 60:
         params.gamma = _fit_gamma(df, r, rv, params, lags)
@@ -210,14 +255,28 @@ def _fit_gamma(df: pd.DataFrame, r: pd.DataFrame, rv: pd.Series, p: InflowParams
     return float(min(max(g, -0.9), 3.0))
 
 
+def history_days(p: InflowParams) -> int:
+    """How many days of rain (today included) the quick response needs: the lag window or
+    the antecedent window plus today, whichever is longer."""
+    return max(len(p.w), p.api_days + 1)
+
+
 def quick_response_bcm(p: InflowParams, rain_mm_history: np.ndarray, sm_anom: float = 0.0) -> float:
-    """Quick-flow volume today from the last ``len(w)`` days of rain (index -1 = today)."""
-    rv = rain_volume_bcm(rain_mm_history, p.area_km2)
+    """Quick-flow volume today from the recent rain (index -1 = today). The coefficient in
+    force is ``coefficient(p, api)`` with the antecedent index summed over the days before
+    today that the history holds (up to ``p.api_days``)."""
+    hist = np.asarray(rain_mm_history, dtype=float)
+    rv = rain_volume_bcm(hist, p.area_km2)
     q = 0.0
     for k, wk in enumerate(p.w):
         if k < len(rv):
             q += wk * rv[-1 - k]
-    return float(p.c * (1.0 + p.gamma * sm_anom) * q)
+    api = (
+        float(hist[max(len(hist) - 1 - p.api_days, 0) : len(hist) - 1].sum())
+        if len(hist) > 1
+        else 0.0
+    )
+    return float(coefficient(p, api) * (1.0 + p.gamma * sm_anom) * q)
 
 
 def predict_daily_bcm(
@@ -236,9 +295,10 @@ def predict_daily_bcm(
     hist = list(rain_mm_recent)
     base = C.cusec_days_to_bcm(base_cusecs)
     out = []
+    n = history_days(p)
     for d, rmm in enumerate(rain_mm_forecast, start=1):
         hist.append(float(rmm))
-        q = quick_response_bcm(p, np.asarray(hist[-len(p.w) :]), sm_anom)
+        q = quick_response_bcm(p, np.asarray(hist[-n:]), sm_anom)
         out.append(base * (p.rho**d) + q)
     return np.asarray(out)
 

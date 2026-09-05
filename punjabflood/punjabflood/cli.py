@@ -278,11 +278,15 @@ def run_verify(horizon_days: int = 5):
                 state_measured, rain_daily, "Pong", "Pong", params["Pong"], horizon_days, "model"
             )
             pp_event.to_csv(out / "perfect_prog_event_pong.csv", index=False)
-            arr = verify.routed_next_day_release(pp_event, "Pong")
+            arr = verify.routed_next_day_release(pp_event, "Pong", passage=True)
             arr.to_csv(out / "routed_pong_perfect_prog.csv", index=False)
             results["event_timing"] = verify.event_timing_test(arr, peaks_d).to_dict(
                 orient="records"
             )
+            spill_only = verify.routed_next_day_release(pp_event, "Pong", passage=False)
+            results["event_timing_spill_only"] = verify.event_timing_test(
+                spill_only, peaks_d
+            ).to_dict(orient="records")
 
     for dam in ("Bhakra", "Pong"):
         if dam not in params:
@@ -297,12 +301,13 @@ def run_verify(horizon_days: int = 5):
         r = rain_daily[rain_daily["catchment"] == dam].copy()
         r["date"] = pd.to_datetime(r["date"])
         rs = r.set_index("date")["rain_mm"].sort_index()
-        preds = {}
+        preds, persist = {}, {}
+        n_hist = inflow.history_days(params[dam])
         for d in b.index:
             prev = d - pd.Timedelta(days=1)
             if prev not in b.index:
                 continue
-            hist = rs.reindex(pd.date_range(d - pd.Timedelta(days=4), prev))
+            hist = rs.reindex(pd.date_range(prev - pd.Timedelta(days=n_hist - 1), prev))
             fut = rs.reindex([d])
             if hist.isna().any() or fut.isna().any():
                 continue
@@ -313,9 +318,14 @@ def run_verify(horizon_days: int = 5):
                 params[dam], fut.to_numpy(), base, rain_mm_recent=hist.to_numpy()
             )
             preds[d] = C.bcm_to_cusec_days(float(vol[0]))
-        results["live_2026"][dam] = verify.live_test(
-            pd.Series(preds), b["inflow_cusecs"].astype(float)
-        )
+            persist[d] = float(b.loc[prev, "inflow_cusecs"])  # the naive baseline
+        obs = b["inflow_cusecs"].astype(float)
+        live = verify.live_test(pd.Series(preds), obs)
+        base_line = verify.live_test(pd.Series(persist), obs)
+        for k in ("bias_pct", "pearson_r", "mae_cusecs"):
+            if k in base_line:
+                live[f"persistence_{k}"] = base_line[k]
+        results["live_2026"][dam] = live
 
     if QPF_CSV.exists():
         qs = verify.qpf_skill(pd.read_csv(QPF_CSV), rain_daily)

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from punjabflood import constants as C
 from punjabflood import inflow, routing, verify
 
 
@@ -212,19 +213,30 @@ def test_routed_next_day_release_places_release_on_the_following_day():
             "release_day1_cusecs": [0.0, 200_000.0],
         }
     )
-    arr = verify.routed_next_day_release(pp, "Pong")
+    arr = verify.routed_next_day_release(pp, "Pong", passage=False)
     dh = arr[arr.station == "Dhilwan"].set_index("date")["cusecs"]
     # the run issued on Aug 13 forces a release on Aug 14; Pong to Dhilwan is about 41 h,
     # so nothing reaches Dhilwan before Aug 15 and the gap day (Aug 12) carries zero
     assert dh.loc[:"2023-08-14"].max() == 0.0
     assert dh.idxmax() == pd.Timestamp("2023-08-15")
     assert dh.max() == pytest.approx(200_000.0)
-    # only the forced spill is routed (lower bound): Bhakra's spill reaches Ropar whole,
-    # 18 h downstream, so the Aug 14 release shows at Ropar on Aug 14 (from 18:00) and Aug 15
+    # with the passage: spill plus turbines (45,600) less the Mukerian Hydel Channel (11,500)
+    arr2 = verify.routed_next_day_release(pp, "Pong", passage=True)
+    dh2 = arr2[arr2.station == "Dhilwan"].set_index("date")["cusecs"]
+    assert dh2.max() == pytest.approx(200_000.0 + 45_600.0 - 11_500.0)
+    assert dh2.loc[:"2023-08-14"].max() == 0.0  # no passage is added on days without spill
+    # spill only: Bhakra's spill reaches Ropar whole, 18 h downstream, so the Aug 14 release
+    # shows at Ropar on Aug 14 (from 18:00) and Aug 15
     ppb = pp.assign(dam="Bhakra", release_day1_cusecs=[0.0, 50_000.0])
-    rop = verify.routed_next_day_release(ppb, "Bhakra")
+    rop = verify.routed_next_day_release(ppb, "Bhakra", passage=False)
     rop = rop[rop.station == "Ropar Head Works"].set_index("date")["cusecs"]
     assert rop.max() == pytest.approx(50_000.0)
     assert rop.idxmax() == pd.Timestamp("2023-08-14")
     assert rop.loc["2023-08-13"] == 0.0
     assert routing.BHAKRA_CANAL_DRAW_CUSECS == pytest.approx(12_500 + 10_150)
+    # Bhakra with passage: turbines minus the Nangal canals is what the Sutlej gets extra
+    ropp = verify.routed_next_day_release(ppb, "Bhakra", passage=True)
+    ropp = ropp[ropp.station == "Ropar Head Works"]["cusecs"].max()
+    assert ropp == pytest.approx(
+        50_000.0 + C.BHAKRA.turbine_capacity_cusecs.value - routing.BHAKRA_CANAL_DRAW_CUSECS
+    )

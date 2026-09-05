@@ -97,6 +97,10 @@ SRC_PUNJAB_WRD_DAMS = (
     "wrd.punjab.gov.in/en/page/damsadministration, Ranjit Sagar salient features "
     "(fetched 2026-09-05)"
 )
+SRC_PSPCL_MHP = (
+    "PSPCL, Mukerian Hydel Project Stage-I page, pspcl.in/Otherlinks/mukerian-hydel-project-"
+    "stage-i.aspx (page dated 04-09-2026, fetched 2026-09-05)"
+)
 SRC_HYDROBASINS = (
     "HydroBASINS v1c Asia level 8 (Lehner & Grill 2013), hybas_as_lev08_v1c.zip, "
     "sha256 878c56bb4253a7c8...; upstream set of the sub-basin containing the dam"
@@ -261,6 +265,15 @@ PONG = Dam(
             35_700.0, SRC_PONG_EAP, "4 outlets x 253 m3/s (8925 cusecs)"
         ),
         "avg_annual_runoff_bcm": Sourced(15.3, SRC_PONG_EAP, "15300 x 10^6 m3"),
+        # the Beas is diverted below Pong at the Shah Nehar barrage into the Mukerian Hydel
+        # Channel; what the channel can take is the most that can leave the river before
+        # Naushera Mirthal and Dhilwan
+        "mukerian_hydel_channel_cusecs": Sourced(
+            11_500.0,
+            SRC_PSPCL_MHP,
+            "37 km lined channel from the Shah Nehar barrage, maximum carrying capacity 11500 "
+            "cusecs (Stage-II channel, 3.5 km, also 11500 cusecs, takes off from it)",
+        ),
         "eap_blue_alert": (
             "RWL about 1380 ft with inflows 75,000 cusecs on 31 August (EAP alert table)"
         ),

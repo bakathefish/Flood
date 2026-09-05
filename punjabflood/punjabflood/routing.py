@@ -104,13 +104,35 @@ BHAKRA_CANAL_DRAW_CUSECS = (
 )
 
 
+# The most that can leave each river between the dam and the first control point: Bhakra's
+# turbine water feeds the Nangal canals; the Beas is diverted at the Shah Nehar barrage into
+# the Mukerian Hydel Channel. Ranjit Sagar's turbine water reaches Madhopur, where the UBDC
+# and the Kashmir canal take off; that draw is not in the sourced constants, so none is
+# subtracted (its routed release is an upper side by that amount).
+DIVERSION_CUSECS = {
+    "Bhakra": BHAKRA_CANAL_DRAW_CUSECS,
+    "Pong": C.PONG.extra["mukerian_hydel_channel_cusecs"].value,
+    "Ranjit Sagar": 0.0,
+}
+
+
 def river_release(dam: str, outflow_cusecs, canal_draw_cusecs: float | None = None):
-    """What reaches the river below the dam. Bhakra loses the Nangal canal off-takes."""
+    """What reaches the river below the dam from a total outflow: the diversion capacity
+    (``DIVERSION_CUSECS``) is taken off first."""
     q = np.asarray(outflow_cusecs, dtype=float)
-    if dam == "Bhakra":
-        draw = BHAKRA_CANAL_DRAW_CUSECS if canal_draw_cusecs is None else canal_draw_cusecs
-        return np.maximum(q - draw, 0.0)
-    return q
+    draw = DIVERSION_CUSECS.get(dam, 0.0) if canal_draw_cusecs is None else canal_draw_cusecs
+    return np.maximum(q - draw, 0.0)
+
+
+def river_release_when_spilling(dam: str, spill_cusecs) -> np.ndarray:
+    """Lower bound on the river release on days the spillway is forced: the spill plus the
+    turbine passage (a full reservoir passes its inflow, so the turbines are running) less the
+    diversion capacity. Zero on days without spill, when the dam may hold water back."""
+    spill = np.asarray(spill_cusecs, dtype=float)
+    passage = C.DAMS[dam].turbine_capacity_cusecs
+    passage_cusecs = passage.value if passage is not None else 0.0
+    river = spill + np.maximum(passage_cusecs - DIVERSION_CUSECS.get(dam, 0.0), 0.0)
+    return np.where(spill > 0, river, 0.0)
 
 
 def daily_to_hourly(daily: pd.Series) -> pd.Series:

@@ -34,6 +34,7 @@ DISCLAIMER = (
     "Water Resources Department, CWC, BBMB and IMD issue those."
 )
 HORIZONS = (1, 2, 3, 4, 5)
+RECENT_DAYS = 6  # observed days before the issue date carried into the quick response and API
 DETERMINISTIC_MODELS = ("gfs_seamless", "ecmwf_ifs025", "icon_seamless", "best_match")
 DAM_CATCHMENT = {"Bhakra": "Bhakra", "Pong": "Pong", "Ranjit Sagar": "Ranjit Sagar"}
 GHAGGAR_CATCHMENTS = ("Ghaggar Bhankarpur", "Ghaggar Khanauri")
@@ -438,7 +439,7 @@ def run(
             models=("best_match",),
             days=1,
             issue_date=issue_date,
-            past_days=3,
+            past_days=RECENT_DAYS,
             weight_col=wc,
         )
         past = past.sort_values("target_date")

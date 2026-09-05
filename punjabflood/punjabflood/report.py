@@ -11,6 +11,7 @@ import pandas as pd
 from punjabflood import constants as C
 
 OUT = Path("outputs/verification")
+ERA5_IMD_CSV = Path("data/reference/rain/era5_vs_imd_event_windows.csv")
 KEY_PREDICTORS = (
     "Pong_max3d_bcm",
     "Pong_max5d_bcm",
@@ -33,7 +34,35 @@ def _fmt(x, nd=2):
     return str(x)
 
 
-def render_verification(out_dir: Path = OUT, params_path: Path | None = None) -> str:
+def rain_input_rows(era5_imd: pd.DataFrame) -> pd.DataFrame:
+    """Per catchment and event window: IMD and ERA5 totals, their ratio, and ERA5 on the
+    IMD-wettest day. ``era5_imd`` has columns event, date, catchment, era5_mm, imd_mm."""
+    df = era5_imd.dropna(subset=["era5_mm", "imd_mm"]).copy()
+    df["date"] = pd.to_datetime(df["date"])
+    rows = []
+    for (catchment, event), g in df.groupby(["catchment", "event"], sort=True):
+        i = g["imd_mm"].idxmax()
+        rows.append(
+            {
+                "catchment": catchment,
+                "event": int(event),
+                "window": f"{g['date'].min().date()} to {g['date'].max().date()}",
+                "days": int(len(g)),
+                "imd_mm": float(g["imd_mm"].sum()),
+                "era5_mm": float(g["era5_mm"].sum()),
+                "ratio": float(g["era5_mm"].sum() / g["imd_mm"].sum()),
+                "imd_wettest_mm": float(g.loc[i, "imd_mm"]),
+                "era5_on_wettest_mm": float(g.loc[i, "era5_mm"]),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def render_verification(
+    out_dir: Path = OUT,
+    params_path: Path | None = None,
+    era5_imd_path: Path | None = ERA5_IMD_CSV,
+) -> str:
     results = json.loads((out_dir / "results.json").read_text(encoding="utf-8"))
     peaks = pd.read_csv(out_dir / "peak_tests.csv")
     lines = [
@@ -57,17 +86,22 @@ def render_verification(out_dir: Path = OUT, params_path: Path | None = None) ->
             "season (base flow and outflow both move slowly) rather than recessing, so the "
             "base is carried as nearly constant over the horizon.",
             "",
-            "| dam | area used (km2) | runoff coefficient c | lag weights w0..w3 | recession (raw ratio) | gamma | R2 | RMSE (BCM/day) | days |",
-            "|---|---|---|---|---|---|---|---|---|",
+            "| dam | area used (km2) | runoff coefficient c (dry) | c_wet per 100 mm antecedent | lag weights w0..w3 | recession (raw ratio) | gamma | R2 | RMSE (BCM/day) | days |",
+            "|---|---|---|---|---|---|---|---|---|---|",
         ]
         for dam, p in params.items():
             w = ", ".join(f"{x:.2f}" for x in p["w"])
             raw = p.get("rho_raw")
             raw_s = f"{raw:.3f}" if isinstance(raw, int | float) and raw == raw else "n/a"
             lines.append(
-                f"| {dam} | {p['area_km2']:,.0f} | {p['c']:.3f} | {w} | {p['rho']:.3f} ({raw_s}) | "
-                f"{p['gamma']:.2f} | {p['r2']:.3f} | {p['rmse_bcm']:.4f} | {p['n_days']} |"
+                f"| {dam} | {p['area_km2']:,.0f} | {p['c']:.3f} | {p.get('c_wet', 0.0):.3f} | {w} | "
+                f"{p['rho']:.3f} ({raw_s}) | {p['gamma']:.2f} | {p['r2']:.3f} | {p['rmse_bcm']:.4f} | "
+                f"{p['n_days']} |"
             )
+        lines.append(
+            "The coefficient in force on a day is c plus c_wet times the previous five days' "
+            "catchment rain over 100 mm, capped at 0.95."
+        )
         lines.append("")
 
     lines += [
@@ -114,30 +148,35 @@ def render_verification(out_dir: Path = OUT, params_path: Path | None = None) ->
         "",
         "The forced release of a full Pong reservoir under the observed rain (one-day-ahead "
         "spill of each day's run, placed on the day it happens) is routed to Dhilwan with the "
-        "Annexure Z travel times and compared with the department's dated peak. Only the "
-        "spill is routed; turbine passage that also reaches the river is left out, so the "
-        "predicted magnitude is a lower bound. The storage that drives the index comes from "
-        "the public record, which is weekly in August 2023 and a handful of press points in "
-        "August 2025; between measurements the reservoir is carried by the model's own water "
-        "balance under the observed rain (one-day inflow less the non-spill passage), and "
-        "every measurement re-anchors it.",
+        "Annexure Z travel times and compared with the department's dated peak. The river "
+        "release on a spill day is the spill plus the turbine passage less the Mukerian Hydel "
+        "Channel's capacity (a full reservoir passes its inflow, so the turbines run); this is "
+        "the lower bound on what the dam sends down the Beas, and the spill-only row below it "
+        "is the lower bound of that. Tributaries between Pong and Dhilwan are not modelled. "
+        "The storage that drives the index comes from the public record, which is weekly in "
+        "August 2023 and a handful of press points in August 2025; between measurements the "
+        "reservoir is carried by the model's own water balance under the observed rain "
+        "(one-day inflow less the non-spill passage), and every measurement re-anchors it.",
         "",
     ]
     et = results.get("event_timing") or []
+    et_spill = results.get("event_timing_spill_only") or []
     if et:
         lines += [
-            "| year | predicted peak date | predicted peak (cusecs) | observed peak date | observed peak (cusecs) | lag (days) | magnitude ratio |",
-            "|---|---|---|---|---|---|---|",
+            "| year | release routed | predicted peak date | predicted peak (cusecs) | observed peak date | observed peak (cusecs) | lag (days) | magnitude ratio |",
+            "|---|---|---|---|---|---|---|---|",
         ]
-        for r in et:
-            if "note" in r:
-                lines.append(f"| {r['year']} | {r['note']} | | | | | |")
-            else:
-                lines.append(
-                    f"| {r['year']} | {r['predicted_peak_date']} | {r['predicted_peak_cusecs']:,.0f} | "
-                    f"{r['observed_peak_date']} | {r['observed_peak_cusecs']:,.0f} | {r['lag_days']:+d} | "
-                    f"{r['magnitude_ratio']:.2f} |"
-                )
+        for label, rows in (("spill + passage", et), ("spill only", et_spill)):
+            for r in rows:
+                if r.get("note") and r["note"] == r["note"]:
+                    lines.append(f"| {r['year']} | {label} | {r['note']} | | | | | |")
+                else:
+                    lines.append(
+                        f"| {r['year']} | {label} | {r['predicted_peak_date']} | "
+                        f"{r['predicted_peak_cusecs']:,.0f} | {r['observed_peak_date']} | "
+                        f"{r['observed_peak_cusecs']:,.0f} | {int(r['lag_days']):+d} | "
+                        f"{r['magnitude_ratio']:.2f} |"
+                    )
     else:
         lines.append("Not run (no perfect-prognosis series).")
     lines.append("")
@@ -189,6 +228,29 @@ def render_verification(out_dir: Path = OUT, params_path: Path | None = None) ->
                 )
             lines.append("")
 
+    if era5_imd_path is not None and Path(era5_imd_path).exists():
+        ri = rain_input_rows(pd.read_csv(era5_imd_path))
+        lines += [
+            "## Rain input check: ERA5 against the IMD grid over the event windows",
+            "",
+            "ERA5 (0.25 degree reanalysis, through Open-Meteo) is the rain record the product "
+            "uses for the current season, and the forecast models it ingests share its "
+            "resolution and physics over these mountain catchments. The IMD gridded analysis "
+            "is the observed record the model is calibrated on. A reanalysis that misses the "
+            "rain of an event says the forecasts will too; the ratio column is the size of "
+            "that miss over each event window.",
+            "",
+            "| catchment | event | window | days | IMD total (mm) | ERA5 total (mm) | ERA5 / IMD | IMD wettest day (mm) | ERA5 that day (mm) |",
+            "|---|---|---|---|---|---|---|---|---|",
+        ]
+        for _, r in ri.iterrows():
+            lines.append(
+                f"| {r['catchment']} | {r['event']} | {r['window']} | {r['days']} | "
+                f"{r['imd_mm']:.0f} | {r['era5_mm']:.0f} | {r['ratio']:.2f} | "
+                f"{r['imd_wettest_mm']:.0f} | {r['era5_on_wettest_mm']:.0f} |"
+            )
+        lines.append("")
+
     qpf_path = out_dir / "qpf_skill.csv"
     if qpf_path.exists():
         qs = pd.read_csv(qpf_path)
@@ -210,20 +272,34 @@ def render_verification(out_dir: Path = OUT, params_path: Path | None = None) ->
             )
         lines.append("")
 
-    lines += ["## Live 2026: one-day inflow prediction against the BBMB bulletins", ""]
+    lines += [
+        "## Live 2026: one-day inflow prediction against the BBMB bulletins",
+        "",
+        "Persistence (tomorrow's inflow equals today's) is the baseline any one-day "
+        "prediction has to beat; the model's base component is that persistence with the "
+        "rain response added, so the difference between the two rows is what the rain "
+        "brings.",
+        "",
+    ]
     live = results.get("live_2026") or {}
     if live:
         lines += [
-            "| dam | days | mean observed (cusecs) | mean predicted (cusecs) | bias | Pearson r | MAE (cusecs) |",
-            "|---|---|---|---|---|---|---|",
+            "| dam | days | mean observed (cusecs) | mean predicted (cusecs) | bias | Pearson r | MAE (cusecs) | persistence bias | persistence r | persistence MAE |",
+            "|---|---|---|---|---|---|---|---|---|---|",
         ]
         for dam, m in live.items():
             if "note" in m:
-                lines.append(f"| {dam} | {m['n']} | {m['note']} | | | | |")
+                lines.append(f"| {dam} | {m['n']} | {m['note']} | | | | | | | |")
             else:
+                pb = m.get("persistence_bias_pct")
+                pr = m.get("persistence_pearson_r")
+                pm = m.get("persistence_mae_cusecs")
                 lines.append(
                     f"| {dam} | {m['n']} | {m['mean_obs_cusecs']:,.0f} | {m['mean_pred_cusecs']:,.0f} | "
-                    f"{m['bias_pct']:+.0f}% | {m['pearson_r']:+.2f} | {m['mae_cusecs']:,.0f} |"
+                    f"{m['bias_pct']:+.0f}% | {m['pearson_r']:+.2f} | {m['mae_cusecs']:,.0f} | "
+                    f"{'n/a' if pb is None else f'{pb:+.0f}%'} | "
+                    f"{'n/a' if pr is None else f'{pr:+.2f}'} | "
+                    f"{'n/a' if pm is None else f'{pm:,.0f}'} |"
                 )
     else:
         lines.append("Not run.")
