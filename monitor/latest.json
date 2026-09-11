@@ -1,70 +1,35 @@
 {
- "generated_utc": "2026-09-11T03:03:02Z",
+ "generated_utc": "2026-09-11T15:53:13Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-09-10",
- "latest_pass_utc": "2026-09-10T13:04:17.335973Z",
+ "latest_pass": "2026-09-11",
+ "latest_pass_utc": "2026-09-11T01:07:59.624589Z",
  "new_scenes": 3,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.71,
- "total_flooded_km2": 80.8,
+ "coverage_fraction": 0.018,
+ "total_flooded_km2": 0.0,
  "passes": [
   {
-   "date": "2026-09-10",
+   "date": "2026-09-11",
    "scenes": 3,
-   "total_flooded_km2": 80.8,
-   "flagged": 1,
-   "coverage_fraction": 0.71
+   "total_flooded_km2": 0.0,
+   "flagged": 0,
+   "coverage_fraction": 0.018
   }
  ],
  "districts": [
   {
-   "district": "Sangrur",
-   "flooded_km2": 39.9,
-   "flooded_fraction": 0.0111
-  },
-  {
-   "district": "Moga",
-   "flooded_km2": 16.2,
-   "flooded_fraction": 0.0069
-  },
-  {
-   "district": "Barnala",
-   "flooded_km2": 11.5,
-   "flooded_fraction": 0.0077
-  },
-  {
-   "district": "Ludhiana",
-   "flooded_km2": 5.2,
-   "flooded_fraction": 0.0015
-  },
-  {
-   "district": "Mansa",
-   "flooded_km2": 3.9,
-   "flooded_fraction": 0.0018
-  },
-  {
-   "district": "Jalandhar",
-   "flooded_km2": 3.4,
-   "flooded_fraction": 0.0013
-  },
-  {
    "district": "Amritsar",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Firozpur",
-   "flooded_km2": 0.2,
+   "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
   {
-   "district": "Patiala",
-   "flooded_km2": 0.2,
-   "flooded_fraction": 0.0001
+   "district": "Barnala",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
   },
   {
    "district": "Bathinda",
@@ -82,6 +47,11 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Firozpur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Gurdaspur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
@@ -92,7 +62,27 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Jalandhar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Kapurthala",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Ludhiana",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Mansa",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Moga",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
@@ -107,6 +97,11 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Patiala",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Rupnagar",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
@@ -117,27 +112,20 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Sangrur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Tarn Taran",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   }
  ],
- "flagged": [
-  {
-   "district": "Sangrur",
-   "flooded_km2": 39.9,
-   "flooded_fraction": 0.0111
-  }
- ],
+ "flagged": [],
  "alerts": {
-  "pa": [
-   "ਹੜ੍ਹ ਚੇਤਾਵਨੀ: Sangrur ਜ਼ਿਲ੍ਹੇ ਵਿੱਚ ~39.9 ਵਰਗ ਕਿਲੋਮੀਟਰ ਖੇਤਰ ਪਾਣੀ ਹੇਠ ਹੈ (ਸੈਟੇਲਾਈਟ ਦੁਆਰਾ ਪਛਾਣਿਆ)। ਰੁਝਾਨ: ਸਥਿਰ। ਹੈਲਪਲਾਈਨ: 1070"
-  ],
-  "hi": [
-   "बाढ़ चेतावनी: Sangrur जिले में ~39.9 वर्ग किमी क्षेत्र जलमग्न है (सैटेलाइट द्वारा पहचाना गया)। रुझान: स्थिर। हेल्पलाइन: 1070"
-  ],
-  "en": [
-   "FLOOD ALERT: ~39.9 sq km under water in Sangrur district (satellite-detected). Trend: stable. Helpline: 1070"
-  ]
+  "pa": [],
+  "hi": [],
+  "en": []
  }
 }
