@@ -19,7 +19,12 @@ non-negative (rain cannot remove water) by non-negative least squares.
 
 Soil moisture modulates the coefficient as ``c_t = c * (1 + gamma * sm_anom_t)`` where
 ``sm_anom`` is the fractional anomaly of ERA5-Land 0-7 cm soil moisture against its
-day-of-season climatology; ``gamma`` is fitted in a second stage and may be zero.
+day-of-year climatology (a 31-day centred window over the pulled years, carried in the
+parameters as ``sm_clim``); ``gamma`` is fitted in a second stage on the residual of the
+rain fit. The wetness carrier is chosen by ``calibrate(..., wetness=...)``: ``"api"`` (the
+antecedent rain index alone, gamma zero), ``"api+sm"`` (both) or ``"sm"`` (soil moisture
+alone, ``c_wet`` zero). The verification fits and scores all three; the product uses the
+one in the parameter file.
 """
 
 from __future__ import annotations
@@ -82,11 +87,16 @@ class InflowParams:
     c_excess: float = 0.0
     w_excess: tuple[float, ...] = ()
     excess_threshold_mm: float = float("nan")
+    # the wetness carrier ("api", "api+sm" or "sm") and the day-of-year climatology of the
+    # 0-7 cm soil moisture (366 values) the anomaly is measured against; empty without one
+    wetness: str = "api"
+    sm_clim: tuple[float, ...] = ()
 
     def to_dict(self) -> dict:
         d = asdict(self)
         d["w"] = list(self.w)
         d["w_excess"] = list(self.w_excess)
+        d["sm_clim"] = [round(float(x), 6) for x in self.sm_clim]
         return d
 
     @classmethod
@@ -95,7 +105,13 @@ class InflowParams:
         d["w"] = tuple(d["w"])
         if "w_excess" in d:
             d["w_excess"] = tuple(d["w_excess"])
+        if "sm_clim" in d:
+            d["sm_clim"] = tuple(float(x) for x in d["sm_clim"])
         return cls(**d)
+
+    @property
+    def uses_sm(self) -> bool:
+        return self.gamma != 0.0 and len(self.sm_clim) == 366
 
     @property
     def has_excess(self) -> bool:
@@ -122,6 +138,46 @@ def coefficient(p: InflowParams, api_mm: float) -> float:
     return float(min(p.c + p.c_wet * api_mm / API_REF_MM, C_MAX))
 
 
+# --------------------------------------------------------------------------- #
+# soil moisture: climatology and anomaly
+# --------------------------------------------------------------------------- #
+SM_CLIM_WINDOW_DAYS = 31
+SM_ANOM_CLIP = (-0.9, 3.0)
+WETNESS_CARRIERS = ("api", "api+sm", "sm")
+
+
+def sm_climatology(sm: pd.Series, window: int = SM_CLIM_WINDOW_DAYS) -> np.ndarray:
+    """Day-of-year climatology of a daily soil-moisture series: the mean by day of year over
+    the years given, smoothed with a centred circular window (366 values; 29 February takes
+    the smoothed value of its neighbours)."""
+    s = sm.dropna()
+    by_doy = s.groupby(s.index.dayofyear).mean().reindex(range(1, 367))
+    v = by_doy.to_numpy(dtype=float)
+    if np.isnan(v[365]):  # no leap day in the record
+        v[365] = np.nanmean(v[[364, 0]])
+    half = window // 2
+    ext = np.concatenate([v[-half:], v, v[:half]])
+    out = np.array([np.nanmean(ext[i : i + 2 * half + 1]) for i in range(366)], dtype=float)
+    return out
+
+
+def sm_anomaly_series(sm: pd.Series, clim) -> pd.Series:
+    """Fractional anomaly ``(sm - clim) / clim`` by date, clipped to ``SM_ANOM_CLIP``; NaN
+    where the series is."""
+    c = np.asarray(clim, dtype=float)[sm.index.dayofyear.to_numpy() - 1]
+    a = (sm.to_numpy(dtype=float) - c) / c
+    return pd.Series(np.clip(a, *SM_ANOM_CLIP), index=sm.index)
+
+
+def sm_anomaly(p: InflowParams, value: float, date) -> float:
+    """Today's anomaly for the product: zero when the parameters carry no climatology or the
+    value is missing."""
+    if len(p.sm_clim) != 366 or value is None or value != value:
+        return 0.0
+    c = p.sm_clim[pd.Timestamp(date).dayofyear - 1]
+    return float(np.clip((float(value) - c) / c, *SM_ANOM_CLIP))
+
+
 def split_excess(rain_mm, threshold_mm: float | None) -> tuple[np.ndarray, np.ndarray]:
     """A day's rain as the part up to the threshold and the part above it (all of it and
     zeros when there is no threshold)."""
@@ -140,11 +196,14 @@ def design_matrix(
     lags=LAGS,
     spill_fraction: float = SPILL_FRACTION,
     excess_threshold_mm: float | None = None,
+    sm_clim=None,
 ) -> pd.DataFrame:
     """The calibration table, one row per usable consecutive-day pair: the storage change
     ``ds`` (BCM), the lagged rain volumes ``lag{k}`` (of the rain up to the threshold when
     one is given), the lagged excess volumes ``ex{k}`` (rain above the threshold; zeros
-    without one), the antecedent index ``api_mm`` and the day's rain ``rain_mm``.
+    without one), the antecedent index ``api_mm``, the day's rain ``rain_mm`` and, when
+    ``sm_clim`` is given and ``rain`` carries ``sm_0_7``, the soil-moisture anomaly
+    ``sm_anom`` (zero otherwise, and on days the soil-moisture record lacks).
 
     ``state``: columns date, dam, storage_bcm and, if present, basis (only rows whose basis
     is in ``MEASURED_BASES`` are used). ``rain``: columns date, rain_mm for this dam's
@@ -165,6 +224,10 @@ def design_matrix(
     X = X.join(ex)
     X["api_mm"] = antecedent_mm(r["rain_mm"])
     X["rain_mm"] = r["rain_mm"]
+    if sm_clim is not None and "sm_0_7" in r.columns:
+        X["sm_anom"] = sm_anomaly_series(r["sm_0_7"].astype(float), sm_clim).fillna(0.0)
+    else:
+        X["sm_anom"] = 0.0
 
     ds = s.diff()
     gap = s.index.to_series().diff().dt.days
@@ -186,15 +249,34 @@ def calibrate(
     lags=LAGS,
     spill_fraction: float = SPILL_FRACTION,
     excess_threshold_mm: float | None = None,
+    wetness: str = "api",
+    clim_exclude_year: int | None = None,
 ) -> InflowParams:
     """Fit ``c``, ``w`` and the intercept on daily storage changes (``design_matrix``).
 
     With ``excess_threshold_mm`` the rain above the threshold gets its own coefficient and
     lag weights (``c_excess``, ``w_excess``), fitted jointly; without it the whole rain goes
-    through ``c`` and ``w`` as before.
+    through ``c`` and ``w`` as before. ``wetness`` picks the carrier of catchment wetness
+    (``WETNESS_CARRIERS``); with soil moisture in it the climatology is built from the
+    ``sm_0_7`` column of ``rain`` (``clim_exclude_year`` keeps a held-out season out of it)
+    and ``gamma`` is fitted on the residual of the rain fit.
     """
+    if wetness not in WETNESS_CARRIERS:
+        raise ValueError(f"wetness must be one of {WETNESS_CARRIERS}, not {wetness!r}")
+    use_sm = wetness != "api"
+    sm_clim = None
+    if use_sm:
+        r_sm = rain.copy()
+        r_sm["date"] = pd.to_datetime(r_sm["date"])
+        r_sm = r_sm.set_index("date").sort_index()
+        if "sm_0_7" not in r_sm.columns or r_sm["sm_0_7"].notna().sum() < MIN_CALIBRATION_DAYS:
+            raise ValueError(f"{dam}: no soil-moisture record to fit the {wetness!r} carrier")
+        s_sm = r_sm["sm_0_7"].astype(float)
+        if clim_exclude_year is not None:
+            s_sm = s_sm[s_sm.index.year != clim_exclude_year]
+        sm_clim = sm_climatology(s_sm)
     df = design_matrix(
-        state, rain, dam, area_km2, season, lags, spill_fraction, excess_threshold_mm
+        state, rain, dam, area_km2, season, lags, spill_fraction, excess_threshold_mm, sm_clim
     )
     if len(df) < MIN_CALIBRATION_DAYS:
         raise ValueError(f"{dam}: only {len(df)} usable days for calibration")
@@ -213,7 +295,10 @@ def calibrate(
     api = df["api_mm"].to_numpy()
     y = df["ds"].to_numpy()
     ones = np.ones(len(df))
-    blocks = [L, L * (api / API_REF_MM)[:, None]] + ([E] if with_excess else [])
+    # the "sm" carrier drops the antecedent-rain block: its columns are zeroed, so NNLS
+    # returns zero for them and the rest of the bookkeeping is unchanged
+    api_block = L * (api / API_REF_MM)[:, None] if wetness != "sm" else np.zeros_like(L)
+    blocks = [L, api_block] + ([E] if with_excess else [])
     A = np.column_stack([*blocks, ones, -ones])
     use = np.ones(len(df), dtype=bool)
     for _ in range(6):
@@ -252,7 +337,12 @@ def calibrate(
         c_excess=c_ex,
         w_excess=w_ex,
         excess_threshold_mm=float(excess_threshold_mm) if with_excess else float("nan"),
+        wetness=wetness,
+        sm_clim=tuple(float(x) for x in sm_clim) if sm_clim is not None else (),
     )
+    if use_sm:
+        # second stage: the residual of the rain fit against the response times the anomaly
+        params.gamma = _fit_gamma(df, params)
     resid = y - predict_storage_change(params, df)
     ss_tot = float(((df["ds"] - df["ds"].mean()) ** 2).sum())
     params.r2 = 1.0 - float((resid**2).sum()) / ss_tot if ss_tot > 0 else float("nan")
@@ -261,24 +351,29 @@ def calibrate(
     params.rho = estimate_recession(res)
     params.rho_raw = recession_ratio(res)
     params.resid_acf1 = residual_acf1(res)
-    r = rain.copy()
-    r["date"] = pd.to_datetime(r["date"])
-    r = r.set_index("date").sort_index()
-    if "sm_0_7" in r.columns and r["sm_0_7"].notna().sum() > MIN_CALIBRATION_DAYS:
-        rv = pd.Series(rain_volume_bcm(r["rain_mm"], area_km2), index=r.index)
-        params.gamma = _fit_gamma(df, r, rv, params, lags)
     return params
 
 
-def predict_storage_change(p: InflowParams, df: pd.DataFrame) -> np.ndarray:
-    """The fitted storage-change relation on the rows of a ``design_matrix`` built with the
-    same threshold as ``p``: the wetness-dependent coefficient times the lagged response,
-    plus the excess response where the parameters carry one, plus the intercept."""
+def _quick_from_design(p: InflowParams, df: pd.DataFrame) -> np.ndarray:
+    """The rain response on the rows of a design matrix, before the soil-moisture factor:
+    the wetness-dependent coefficient times the lagged response."""
     lags = range(len(p.w))
     L = df[[f"lag{k}" for k in lags]].to_numpy()
     api = df["api_mm"].to_numpy()
     c_used = np.minimum(p.c + p.c_wet * api / API_REF_MM, C_MAX)
-    pred = c_used * (L @ np.asarray(p.w)) + p.intercept_bcm_per_day
+    return c_used * (L @ np.asarray(p.w))
+
+
+def predict_storage_change(p: InflowParams, df: pd.DataFrame) -> np.ndarray:
+    """The fitted storage-change relation on the rows of a ``design_matrix`` built with the
+    same threshold and climatology as ``p``: the wetness-dependent coefficient times the
+    lagged response, times the soil-moisture factor where ``gamma`` is non-zero, plus the
+    excess response where the parameters carry one, plus the intercept."""
+    lags = range(len(p.w))
+    quick = _quick_from_design(p, df)
+    if p.gamma != 0.0 and "sm_anom" in df.columns:
+        quick = quick * (1.0 + p.gamma * df["sm_anom"].to_numpy(dtype=float))
+    pred = quick + p.intercept_bcm_per_day
     if p.has_excess:
         E = df[[f"ex{k}" for k in lags]].to_numpy()
         pred = pred + p.c_excess * (E @ np.asarray(p.w_excess))
@@ -292,13 +387,16 @@ def loso_score(
     area_km2: float,
     excess_threshold_mm: float | None = None,
     heavy_mm: float = EXCESS_THRESHOLD_MM,
+    wetness: str = "api",
 ) -> dict:
     """Leave-one-season-out score of the calibration: for every season in the record the
     model is fitted on the other seasons and its storage-change prediction scored on the
     held-out one. Returns the days scored, the root-mean-square error (BCM per day), and the
     same on the heavy days (the day's catchment rain at or above ``heavy_mm``) with their
     mean residual (observed minus predicted: positive when heavy days are under-predicted).
-    Seasons whose training set is too short for a fit are skipped."""
+    Seasons whose training set is too short for a fit are skipped. With a soil-moisture
+    carrier each fold's climatology leaves the held-out season out, and the held-out rows
+    take their anomaly from that fold's climatology."""
     df = design_matrix(state, rain, dam, area_km2, excess_threshold_mm=excess_threshold_mm)
     st = state.copy()
     st["date"] = pd.to_datetime(st["date"])
@@ -311,10 +409,23 @@ def loso_score(
                 dam,
                 area_km2,
                 excess_threshold_mm=excess_threshold_mm,
+                wetness=wetness,
+                clim_exclude_year=y if wetness != "api" else None,
             )
         except ValueError:
             continue
-        held = df[df.index.year == y]
+        if p.sm_clim:
+            fold = design_matrix(
+                state,
+                rain,
+                dam,
+                area_km2,
+                excess_threshold_mm=excess_threshold_mm,
+                sm_clim=p.sm_clim,
+            )
+            held = fold[fold.index.year == y]
+        else:
+            held = df[df.index.year == y]
         resid.append(held["ds"].to_numpy() - predict_storage_change(p, held))
         heavy.append(held["rain_mm"].to_numpy() >= heavy_mm)
     if not resid:
@@ -393,20 +504,22 @@ def estimate_recession(res: pd.Series, default: float = DEFAULT_RHO) -> float:
     return float(min(max(ratio, RHO_CLIP[0]), RHO_CLIP[1]))
 
 
-def _fit_gamma(df: pd.DataFrame, r: pd.DataFrame, rv: pd.Series, p: InflowParams, lags) -> float:
-    """Second stage: does the residual scale with the rain response times the soil-moisture
-    anomaly? ``gamma`` is the least-squares slope, clipped to [-0.9, 3]."""
-    sm = r["sm_0_7"]
-    clim = sm.groupby(sm.index.dayofyear).transform("mean")
-    anom = ((sm - clim) / clim).reindex(df.index)
-    quick = sum(p.c * p.w[i] * df[f"lag{k}"] for i, k in enumerate(lags))
-    x = (quick * anom).to_numpy()
-    resid = df["ds"].to_numpy() - (quick.to_numpy() + p.intercept_bcm_per_day)
+def _fit_gamma(df: pd.DataFrame, p: InflowParams) -> float:
+    """Second stage: does the residual of the rain fit scale with the rain response times
+    the soil-moisture anomaly (the ``sm_anom`` column of the design matrix)? ``gamma`` is
+    the least-squares slope through the origin, clipped to ``SM_ANOM_CLIP``'s range."""
+    quick = _quick_from_design(p, df)
+    if p.has_excess:
+        lags = range(len(p.w))
+        E = df[[f"ex{k}" for k in lags]].to_numpy()
+        quick = quick + p.c_excess * (E @ np.asarray(p.w_excess))
+    x = quick * df["sm_anom"].to_numpy(dtype=float)
+    resid = df["ds"].to_numpy() - (quick + p.intercept_bcm_per_day)
     ok = ~(np.isnan(x) | np.isnan(resid))
-    if ok.sum() < 60 or float((x[ok] ** 2).sum()) == 0:
+    if ok.sum() < MIN_CALIBRATION_DAYS or float((x[ok] ** 2).sum()) == 0:
         return 0.0
     g = float((x[ok] * resid[ok]).sum() / (x[ok] ** 2).sum())
-    return float(min(max(g, -0.9), 3.0))
+    return float(np.clip(g, *SM_ANOM_CLIP))
 
 
 def history_days(p: InflowParams) -> int:

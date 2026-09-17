@@ -194,3 +194,31 @@ def test_climatology_round_trip_and_missing_file(tmp_path):
     assert back["Ghaggar Khanauri"] == pytest.approx(clim["Ghaggar Khanauri"], abs=0.005)
     assert json.loads(p.read_text(encoding="utf-8"))["years"] == "2001-2001"
     assert forecast.load_climatology(tmp_path / "absent.json") is None
+
+
+def test_build_product_takes_the_soil_moisture_anomaly_and_records_it():
+    states, det, ens, params = _inputs(storage_frac=0.8, qpf_mm=40.0)
+    wet = inflow.InflowParams(
+        "Pong", 12560.0, c=0.6, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0,
+        rmse_bcm=0.03, resid_acf1=0.3, gamma=1.0, wetness="api+sm", sm_clim=tuple([0.3] * 366),
+    )
+    soil = {"Pong": {"date": "2026-09-01", "sm_0_7": 0.6}}
+    dry = forecast.build_product("2026-09-04", states, det, ens, {"Pong": [0.0] * 6}, params)
+    sm = forecast.build_product(
+        "2026-09-04", states, det, ens, {"Pong": [0.0] * 6}, {"Pong": wet}, soil_moisture=soil
+    )
+    e = sm["dams"]["Pong"]
+    assert e["soil_moisture"] == {
+        "date": "2026-09-01", "sm_0_7": 0.6, "anomaly": 1.0, "age_days": 3, "wetness": "api+sm"
+    }
+    a = dry["dams"]["Pong"]["deterministic"]["ecmwf_ifs025"]["inflow_bcm_by_day"]
+    b = e["deterministic"]["ecmwf_ifs025"]["inflow_bcm_by_day"]
+    assert b[0] > a[0]  # the quick response doubles; the base is the bulletin's, unchanged here
+    assert "soil_moisture" not in dry["dams"]["Pong"]
+    md = forecast.render_markdown(sm)
+    assert "soil moisture" in md.lower() and "2026-09-01" in md
+    # no record for the dam: nothing recorded, anomaly zero
+    none = forecast.build_product(
+        "2026-09-04", states, det, ens, {}, {"Pong": wet}, soil_moisture={}
+    )
+    assert "soil_moisture" not in none["dams"]["Pong"]

@@ -35,7 +35,20 @@ DISCLAIMER = (
 )
 HORIZONS = (1, 2, 3, 4, 5)
 RECENT_DAYS = 6  # observed days before the issue date carried into the quick response and API
-DETERMINISTIC_MODELS = ("gfs_seamless", "ecmwf_ifs025", "icon_seamless", "best_match")
+DETERMINISTIC_MODELS = (
+    "gfs_seamless",
+    "ecmwf_ifs025",
+    "ecmwf_aifs025_single",
+    "icon_seamless",
+    "best_match",
+)
+# the deterministic model that drives the local term and the deterministic fallback release
+# (the spill probability comes from the IFS ensemble either way). It changes only under the
+# rule in `verify.qpf_model_comparison`, with the numbers in the verification report:
+# switched from ecmwf_ifs025 to AIFS on 2026-09-17 (heavy-day hit rate higher, false-alarm
+# ratio not higher, on the 2,034 dam-catchment rows both had at leads 1 to 3).
+INCUMBENT_DETERMINISTIC = "ecmwf_ifs025"
+PRIMARY_DETERMINISTIC = "ecmwf_aifs025_single"
 DAM_CATCHMENT = {"Bhakra": "Bhakra", "Pong": "Pong", "Ranjit Sagar": "Ranjit Sagar"}
 GHAGGAR_CATCHMENTS = ("Ghaggar Bhankarpur", "Ghaggar Khanauri")
 
@@ -170,11 +183,16 @@ def build_product(
     ghaggar_climatology: dict[str, np.ndarray] | None = None,
     horizons=HORIZONS,
     local_areas: dict[str, float] | None = None,
+    soil_moisture: dict[str, dict] | None = None,
 ) -> dict:
     """Assemble the hazard product from already-pulled inputs (pure; tested with fakes).
     ``local_areas``: IMD-covered area (km2) per local catchment (``constants.LOCAL_CATCHMENTS``)
     whose QPF is in ``qpf_det``; with it the local inflow term is computed from the
-    transferred response and added at the control points that catchment feeds."""
+    transferred response and added at the control points that catchment feeds.
+    ``soil_moisture``: per dam catchment the latest ERA5-Land day on record
+    (``{"date", "sm_0_7"}``); its anomaly against the parameters' climatology multiplies
+    the rain response where the parameters carry a soil-moisture sensitivity, and the day,
+    value, anomaly and age are recorded on the product."""
     product = {
         "issue_date": issue_date,
         "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -201,7 +219,11 @@ def build_product(
         cat = DAM_CATCHMENT[dam]
         absorb = hei.absorption_cusecs(dam)
         recent = recent_rain.get(cat, [])
-        base = inflow.base_from_observed(p, float(st["inflow_cusecs"] or 0.0), recent)
+        sm_anom = 0.0
+        sm_rec = (soil_moisture or {}).get(cat)
+        if sm_rec and p.uses_sm and sm_rec.get("sm_0_7") == sm_rec.get("sm_0_7"):
+            sm_anom = inflow.sm_anomaly(p, float(sm_rec["sm_0_7"]), sm_rec["date"])
+        base = inflow.base_from_observed(p, float(st["inflow_cusecs"] or 0.0), recent, sm_anom)
         entry = {
             "state": st,
             "storage_fraction": st["storage_bcm"] / C.DAMS[dam].live_capacity_bcm.value,
@@ -211,12 +233,22 @@ def build_product(
             "deterministic": {},
             "ensemble": {},
         }
+        if sm_rec and p.uses_sm:
+            entry["soil_moisture"] = {
+                "date": str(sm_rec["date"]),
+                "sm_0_7": float(sm_rec["sm_0_7"]),
+                "anomaly": sm_anom,
+                "age_days": int((pd.Timestamp(issue_date) - pd.Timestamp(sm_rec["date"])).days),
+                "wetness": p.wetness,
+            }
         det_daily = {}
         for model in DETERMINISTIC_MODELS:
             fc = _series_by_model(qpf_det, cat, model)
             if len(fc) == 0:
                 continue
-            daily = inflow.predict_daily_bcm(p, fc[: max(horizons)], base, rain_mm_recent=recent)
+            daily = inflow.predict_daily_bcm(
+                p, fc[: max(horizons)], base, rain_mm_recent=recent, sm_anom=sm_anom
+            )
             det_daily[model] = daily
             entry["deterministic"][model] = {
                 "qpf_mm_by_day": [float(x) for x in fc[: max(horizons)]],
@@ -234,7 +266,9 @@ def build_product(
             # the daily prediction is causal, so one run per member over the longest horizon
             # serves every shorter one by slicing
             member_daily = [
-                inflow.predict_daily_bcm(p, fc[:h_max], base, rain_mm_recent=recent)
+                inflow.predict_daily_bcm(
+                    p, fc[:h_max], base, rain_mm_recent=recent, sm_anom=sm_anom
+                )
                 for fc in members.values()
             ]
             res_max: list[hei.HEIResult] = []
@@ -257,7 +291,11 @@ def build_product(
             outflow = float(st.get("outflow_cusecs") or 0.0)
             release_series[dam] = _river_series(dam, median_rel, outflow, absorb, dates)
         elif det_daily:
-            model = "ecmwf_ifs025" if "ecmwf_ifs025" in det_daily else next(iter(det_daily))
+            model = (
+                PRIMARY_DETERMINISTIC
+                if PRIMARY_DETERMINISTIC in det_daily
+                else next(iter(det_daily))
+            )
             res = hei.headroom_exhaustion(dam, st["storage_bcm"], det_daily[model], absorb)
             outflow = float(st.get("outflow_cusecs") or 0.0)
             release_series[dam] = _river_series(
@@ -267,7 +305,7 @@ def build_product(
 
     # the land between the dams and the head works: its forecast rain through a dam's
     # transferred response, added at the control points it feeds (no base flow, a lower
-    # bound); ECMWF IFS where present, else the first deterministic model on file
+    # bound); the primary deterministic model where present, else the first on file
     local_series: dict[str, pd.Series] = {}
     for name, lc in C.LOCAL_CATCHMENTS.items():
         if not local_areas or name not in local_areas or lc.transfer_dam not in params:
@@ -276,7 +314,7 @@ def build_product(
         det = {m: v for m, v in det.items() if len(v)}
         if not det:
             continue
-        model = "ecmwf_ifs025" if "ecmwf_ifs025" in det else next(iter(det))
+        model = PRIMARY_DETERMINISTIC if PRIMARY_DETERMINISTIC in det else next(iter(det))
         fc = det[model][: max(horizons)]
         recent = recent_rain.get(name, [])
         cusecs = inflow.local_inflow_forecast_cusecs(
@@ -345,6 +383,14 @@ def render_markdown(product: dict) -> str:
             f"inflow {st.get('inflow_cusecs')} cusecs, outflow {st.get('outflow_cusecs')} cusecs "
             f"({st.get('basis')})."
         )
+        if e.get("soil_moisture"):
+            s = e["soil_moisture"]
+            lines.append(
+                f"Soil moisture (ERA5-Land 0-7 cm, catchment mean) {s['sm_0_7']:.3f} on "
+                f"{s['date']}, {s['anomaly']:+.2f} against its day-of-year climatology "
+                f"({s['age_days']} days before issue); the rain response carries it "
+                f"(wetness carrier {s['wetness']})."
+            )
         if e["ensemble"]:
             lines.append("")
             lines.append(
@@ -453,6 +499,51 @@ def load_climatology(path: Path) -> dict[str, np.ndarray] | None:
     return {k: np.asarray(v, dtype=float) for k, v in obj["totals"].items()}
 
 
+SOIL_LOOKBACK_DAYS = 14  # the ERA5-Land archive lags about five days; look back far enough
+
+
+def latest_soil_moisture(
+    client: OpenMeteo,
+    catchments: dict[str, Catchment],
+    params: dict[str, inflow.InflowParams],
+    issue_date: str,
+) -> dict[str, dict]:
+    """The latest ERA5-Land 0-7 cm soil-moisture day on record for each dam catchment whose
+    parameters carry a soil-moisture sensitivity, as ``{"date", "sm_0_7"}``. One archive
+    call per point per issue date (the cache key carries the end date); catchments without
+    a value in the window are left out."""
+    out = {}
+    end = pd.Timestamp(issue_date)
+    start = (end - pd.Timedelta(days=SOIL_LOOKBACK_DAYS)).date().isoformat()
+    for dam, cat_name in DAM_CATCHMENT.items():
+        p = params.get(dam)
+        cat = catchments.get(cat_name)
+        if p is None or cat is None or not p.uses_sm:
+            continue
+        try:
+            df = rain.era5_catchment_daily(
+                client,
+                cat,
+                start,
+                end.date().isoformat(),
+                years_per_chunk=1,
+                daily=("soil_moisture_0_to_7cm_mean",),
+                weight_col=IMD_WEIGHT_COL,
+            )
+        except Exception as exc:  # the product must not fail for want of the anomaly
+            log.warning("soil moisture pull failed for %s: %s", cat_name, exc)
+            continue
+        good = df[df["sm_0_7"].notna()].sort_values("date")
+        if good.empty:
+            continue
+        last = good.iloc[-1]
+        out[cat_name] = {
+            "date": pd.Timestamp(last["date"]).date().isoformat(),
+            "sm_0_7": float(last["sm_0_7"]),
+        }
+    return out
+
+
 def run(
     client: OpenMeteo,
     catchments: dict[str, Catchment],
@@ -519,8 +610,17 @@ def run(
         for name, cat in catchments.items()
         if name in C.LOCAL_CATCHMENTS and IMD_WEIGHT_COL in cat.points
     }
+    soil = latest_soil_moisture(client, catchments, params, issue_date)
     product = build_product(
-        issue_date, states, qpf_det, qpf_ens, recent, params, clim, local_areas=local_areas or None
+        issue_date,
+        states,
+        qpf_det,
+        qpf_ens,
+        recent,
+        params,
+        clim,
+        local_areas=local_areas or None,
+        soil_moisture=soil or None,
     )
     product["bulletin"] = {k: v for k, v in rec.items() if k != "raw_text"}
     write_outputs(product, out_dir)

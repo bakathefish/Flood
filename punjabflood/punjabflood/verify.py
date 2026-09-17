@@ -96,6 +96,26 @@ def storage_predictors(state: pd.DataFrame, dam: str) -> pd.DataFrame:
 MAX_CARRY_DAYS = 21  # longest gap between measurements the model is allowed to bridge
 
 
+def sm_anomaly_series_for(
+    rain_daily: pd.DataFrame, catchment: str, params: inflow.InflowParams
+) -> pd.Series | None:
+    """The soil-moisture anomaly by date for a catchment, against the climatology the
+    parameters carry; None when the parameters use no soil moisture or the record has
+    none. Days without a value carry no anomaly (zero) so a gap never stops a run."""
+    if not params.uses_sm or "sm_0_7" not in rain_daily.columns:
+        return None
+    r = rain_daily[rain_daily["catchment"] == catchment].copy()
+    r["date"] = pd.to_datetime(r["date"])
+    s = r.set_index("date")["sm_0_7"].astype(float).sort_index()
+    if s.notna().sum() == 0:
+        return None
+    return inflow.sm_anomaly_series(s, params.sm_clim).fillna(0.0)
+
+
+def _anom(sm: pd.Series | None, d) -> float:
+    return float(sm.get(d, 0.0)) if sm is not None else 0.0
+
+
 def carry_storage(
     measured: pd.Series,
     basis: dict,
@@ -103,6 +123,7 @@ def carry_storage(
     dam: str,
     params: inflow.InflowParams,
     max_carry_days: int = MAX_CARRY_DAYS,
+    sm: pd.Series | None = None,
 ) -> tuple[pd.Series, dict, dict]:
     """Daily storage between measurements from the model's own water balance.
 
@@ -140,7 +161,11 @@ def carry_storage(
             return float("nan")
         inflow_bcm = float(
             inflow.predict_daily_bcm(
-                params, [hist.iloc[-1]], base_cusecs, rain_mm_recent=hist.iloc[:-1].to_numpy()
+                params,
+                [hist.iloc[-1]],
+                base_cusecs,
+                rain_mm_recent=hist.iloc[:-1].to_numpy(),
+                sm_anom=_anom(sm, d),
             )[0]
         )
         return float(min(max(prev_value + inflow_bcm - a_bcm, 0.0), cap))
@@ -186,7 +211,7 @@ def perfect_prog_hei(
     ``carry='given'`` uses the storage rows as supplied (the caller may have interpolated
     gaps, basis ``interp``). ``carry='model'`` drops interpolated rows and bridges the gaps
     between measurements with ``carry_storage`` (basis ``model``)."""
-    s, basis, rain, gaps = _event_series(state, rain_daily, dam, catchment, params, carry)
+    s, basis, rain, gaps, sm = _event_series(state, rain_daily, dam, catchment, params, carry)
     absorb = hei.absorption_cusecs(dam)
     rows = []
     for d, storage in s.items():
@@ -198,7 +223,9 @@ def perfect_prog_hei(
         )
         if fut.isna().any() or past.isna().any():
             continue
-        row = _hei_row(dam, d, storage, fut.to_numpy(), past.to_numpy(), params, absorb)
+        row = _hei_row(
+            dam, d, storage, fut.to_numpy(), past.to_numpy(), params, absorb, _anom(sm, d)
+        )
         row["storage_basis"] = basis.get(d, "")
         row["reanchor_gap_bcm"] = gaps.get(d, float("nan"))
         rows.append(row)
@@ -212,10 +239,10 @@ def _event_series(
     catchment: str,
     params: inflow.InflowParams,
     carry: str,
-) -> tuple[pd.Series, dict, pd.Series, dict]:
+) -> tuple[pd.Series, dict, pd.Series, dict, pd.Series | None]:
     """The storage series (measured, or measured and model-carried), its basis per day, the
-    observed catchment rain series, and the re-anchor gaps of ``carry_storage`` (empty
-    without the model carry)."""
+    observed catchment rain series, the re-anchor gaps of ``carry_storage`` (empty without
+    the model carry), and the soil-moisture anomaly series (None when unused)."""
     s = state[(state["dam"] == dam) & state["storage_bcm"].notna()].copy()
     s["date"] = pd.to_datetime(s["date"])
     if carry == "model" and "basis" in s:
@@ -225,20 +252,28 @@ def _event_series(
     r = rain_daily[rain_daily["catchment"] == catchment].copy()
     r["date"] = pd.to_datetime(r["date"])
     rain = r.set_index("date")["rain_mm"].sort_index()
+    sm = sm_anomaly_series_for(rain_daily, catchment, params)
     gaps: dict = {}
     if carry == "model" and len(s):
-        s, basis, gaps = carry_storage(s, basis, rain, dam, params)
-    return s, basis, rain, gaps
+        s, basis, gaps = carry_storage(s, basis, rain, dam, params, sm=sm)
+    return s, basis, rain, gaps, sm
 
 
-def _hei_row(dam, d, storage, fut, past, params: inflow.InflowParams, absorb: float) -> dict:
-    """One day's index from a storage, a rain path over the horizon (``fut``, mm per day) and
-    the recent observed rain (``past``). The base flow the product takes from the bulletin is
-    unknown historically, so the calibration intercept plus the non-spill passage stands in
-    for it (the storage-change relation the model was fitted on)."""
+def _hei_row(
+    dam, d, storage, fut, past, params: inflow.InflowParams, absorb: float, sm_anom: float = 0.0
+) -> dict:
+    """One day's index from a storage, a rain path over the horizon (``fut``, mm per day),
+    the recent observed rain (``past``) and the day's soil-moisture anomaly. The base flow
+    the product takes from the bulletin is unknown historically, so the calibration
+    intercept plus the non-spill passage stands in for it (the storage-change relation the
+    model was fitted on)."""
     base_bcm = max(params.intercept_bcm_per_day + C.cusec_days_to_bcm(absorb), 0.0)
     daily = inflow.predict_daily_bcm(
-        params, np.asarray(fut, dtype=float), C.bcm_to_cusec_days(base_bcm), rain_mm_recent=past
+        params,
+        np.asarray(fut, dtype=float),
+        C.bcm_to_cusec_days(base_bcm),
+        rain_mm_recent=past,
+        sm_anom=sm_anom,
     )
     res = hei.headroom_exhaustion(dam, float(storage), daily, absorb)
     return {
@@ -255,7 +290,7 @@ def _hei_row(dam, d, storage, fut, past, params: inflow.InflowParams, absorb: fl
     }
 
 
-AS_ISSUED_MODELS = ("ecmwf_ifs025", "gfs_seamless")
+AS_ISSUED_MODELS = ("ecmwf_ifs025", "gfs_seamless", "ecmwf_aifs025_single")
 
 
 def as_issued_hei(
@@ -273,7 +308,7 @@ def as_issued_hei(
     archived lead 1 to ``horizon_days`` QPF of ``model``) and the recorded or model-carried
     storage: what the product would have said, day by day, with the base flow stand-in of
     ``_hei_row``. Rows carry the forecast and the observed rain over the horizon."""
-    s, basis, rain, _ = _event_series(state, rain_daily, dam, catchment, params, carry)
+    s, basis, rain, _, sm = _event_series(state, rain_daily, dam, catchment, params, carry)
     q = qpf_leads[(qpf_leads["catchment"] == catchment) & (qpf_leads["model"] == model)]
     fc = {
         (pd.Timestamp(t), int(k)): float(v)
@@ -291,7 +326,7 @@ def as_issued_hei(
         if any(v is None or v != v for v in fut) or past.isna().any():
             continue
         obs_fut = rain.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=horizon_days))
-        row = _hei_row(dam, d, storage, fut, past.to_numpy(), params, absorb)
+        row = _hei_row(dam, d, storage, fut, past.to_numpy(), params, absorb, _anom(sm, d))
         row.update(
             {
                 "model": model,
@@ -672,8 +707,11 @@ def live_horizon_test(
     catchment: str | None = None,
     horizons=LIVE_HORIZONS,
     models=AS_ISSUED_MODELS,
+    sm: pd.Series | None = None,
 ) -> pd.DataFrame:
-    """The live season's inflow prediction by horizon, against persistence.
+    """The live season's inflow prediction by horizon, against persistence. ``sm`` is the
+    soil-moisture anomaly by date (``sm_anomaly_series_for``); the issue day's anomaly
+    holds over the horizon.
 
     ``bulletins``: one row per day (index date) with ``inflow_cusecs``, the season's BBMB
     figures. From every bulletin day d the base flow is the observed inflow less the quick
@@ -707,12 +745,13 @@ def live_horizon_test(
             hist = rs.reindex(pd.date_range(d - pd.Timedelta(days=n_hist - 1), d))
             if hist.isna().any():
                 continue
-            base = inflow.base_from_observed(params, float(obs.loc[d]), hist.to_numpy())
+            a = _anom(sm, d)
+            base = inflow.base_from_observed(params, float(obs.loc[d]), hist.to_numpy(), a)
             preds["persistence"][target] = float(obs.loc[d])
             fut = rs.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=h))
             if not fut.isna().any():
                 vol = inflow.predict_daily_bcm(
-                    params, fut.to_numpy(), base, rain_mm_recent=hist.to_numpy()
+                    params, fut.to_numpy(), base, rain_mm_recent=hist.to_numpy(), sm_anom=a
                 )
                 preds["observed rain"][target] = C.bcm_to_cusec_days(float(vol[-1]))
             for m in models:
@@ -720,7 +759,11 @@ def live_horizon_test(
                 if any(v is None or v != v for v in f):
                     continue
                 vol = inflow.predict_daily_bcm(
-                    params, np.asarray(f, dtype=float), base, rain_mm_recent=hist.to_numpy()
+                    params,
+                    np.asarray(f, dtype=float),
+                    base,
+                    rain_mm_recent=hist.to_numpy(),
+                    sm_anom=a,
                 )
                 preds[m][target] = C.bcm_to_cusec_days(float(vol[-1]))
         for source, p in preds.items():
@@ -958,3 +1001,47 @@ def _json_default(o):
     if isinstance(o, pd.Timestamp):
         return o.isoformat()
     return str(o)
+
+
+def qpf_model_comparison(
+    qpf_leads: pd.DataFrame,
+    rain_daily: pd.DataFrame,
+    incumbent: str,
+    challenger: str,
+    catchments=tuple(C.DAMS),
+    leads=(1, 2, 3),
+    heavy_mm: float = 30.0,
+) -> dict:
+    """Two rain sources scored on exactly the same (catchment, target day, lead) rows over
+    the dam catchments at the product's short leads, pooled. The rule for the product's
+    primary deterministic model: the challenger replaces the incumbent only if its heavy-day
+    hit rate is higher and its false-alarm ratio is not higher, on those common rows."""
+    df = _qpf_merge(qpf_leads, rain_daily)
+    df = df[df["catchment"].isin(list(catchments)) & df["lead_days"].isin(list(leads))]
+    key = ["catchment", "target_date", "lead_days"]
+    a = df[df["model"] == incumbent][key + ["rain_mm", "obs_mm"]]
+    b = df[df["model"] == challenger][key + ["rain_mm"]]
+    both = a.merge(b, on=key, suffixes=("_inc", "_chal"))
+    out = {
+        "incumbent_model": incumbent,
+        "challenger_model": challenger,
+        "catchments": list(catchments),
+        "leads": list(leads),
+        "n_common_days": int(len(both)),
+        "incumbent": {},
+        "challenger": {},
+        "switch": False,
+    }
+    if both.empty:
+        return out
+    o = both["obs_mm"].to_numpy()
+    out["incumbent"] = _qpf_scores(both["rain_mm_inc"].to_numpy(), o, heavy_mm)
+    out["challenger"] = _qpf_scores(both["rain_mm_chal"].to_numpy(), o, heavy_mm)
+    hi, hc = out["incumbent"]["hit_rate"], out["challenger"]["hit_rate"]
+    fi, fc = out["incumbent"]["false_alarm_ratio"], out["challenger"]["false_alarm_ratio"]
+    hit_better = hc == hc and hi == hi and hc > hi
+    far_ok = fc != fc or fi != fi or fc <= fi
+    out["hit_rate_higher"] = bool(hit_better)
+    out["false_alarm_not_higher"] = bool(far_ok)
+    out["switch"] = bool(hit_better and far_ok)
+    return out

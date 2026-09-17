@@ -573,3 +573,105 @@ def test_flood_scale_inflow_check_compares_like_days():
     # no 2023 run was supplied: the figure is kept, the model value is missing
     assert rd["truth_cusecs"] == 734_000.0 and rd["n_days"] == 0
     assert rd["model_cusecs"] != rd["model_cusecs"] and rd["ratio"] != rd["ratio"]
+
+
+# --- the soil-moisture anomaly reaches every predictor path -------------------------
+def _sm_inputs():
+    st, rain, p = _event_inputs()
+    rain = rain.copy()
+    rain["sm_0_7"] = 0.6  # twice a flat climatology of 0.3: anomaly +1 every day
+    wet = inflow.InflowParams(
+        "Pong", 12560.0, c=0.6, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0,
+        gamma=1.0, wetness="api+sm", sm_clim=tuple([0.3] * 366),
+    )
+    return st, rain, p, wet
+
+
+def test_perfect_prog_and_as_issued_double_the_quick_response_under_a_unit_anomaly():
+    st, rain, p, wet = _sm_inputs()
+    dry = verify.perfect_prog_hei(st, rain, "Pong", "Pong", p, horizon_days=5)
+    sm = verify.perfect_prog_hei(st, rain, "Pong", "Pong", wet, horizon_days=5)
+    m = dry.merge(sm, on="date", suffixes=("_dry", "_sm"))
+    absorb = verify.hei.absorption_cusecs("Pong")
+    base = C.bcm_to_cusec_days(p.intercept_bcm_per_day + C.cusec_days_to_bcm(absorb))
+    quick_dry = m["inflow_day1_cusecs_dry"] - base
+    quick_sm = m["inflow_day1_cusecs_sm"] - base
+    spell = m[m["rain_day1_mm_dry"] > 100]
+    assert (quick_sm[spell.index] > 1.9 * quick_dry[spell.index]).all()
+    # a params object without a climatology ignores the column entirely
+    plain = verify.perfect_prog_hei(st, rain.drop(columns="sm_0_7"), "Pong", "Pong", p, 5)
+    assert m["inflow_day1_cusecs_dry"].to_numpy() == pytest.approx(
+        plain["inflow_day1_cusecs"].to_numpy()
+    )
+    exact = _qpf_archive(rain, "ecmwf_ifs025", 0, 1.0)
+    ai = verify.as_issued_hei(st, rain, exact, "Pong", "Pong", wet, "ecmwf_ifs025", carry="given")
+    m2 = ai.merge(sm, on="date", suffixes=("_ai", "_pp"))
+    assert m2["hei_ai"].to_numpy() == pytest.approx(m2["hei_pp"].to_numpy())
+
+
+def test_carry_storage_and_live_horizons_take_the_anomaly():
+    st, rain, p, wet = _sm_inputs()
+    rs = rain.set_index("date")["rain_mm"]
+    sm = verify.sm_anomaly_series_for(rain, "Pong", wet)
+    assert sm is not None and (sm == 1.0).all()
+    assert verify.sm_anomaly_series_for(rain, "Pong", p) is None
+    two = pd.Series([3.0, 3.5], index=pd.to_datetime(["2025-08-10", "2025-08-28"]))
+    s_dry, _, _ = verify.carry_storage(two, {}, rs, "Pong", p)
+    s_wet, _, _ = verify.carry_storage(two, {}, rs, "Pong", wet, sm=sm)
+    assert s_wet.loc["2025-08-27"] > s_dry.loc["2025-08-27"]  # more of the spell reaches the lake
+    days = pd.date_range("2025-08-05", "2025-08-31", freq="D")
+    b = pd.DataFrame({"inflow_cusecs": [50_000.0] * len(days)}, index=days)
+    out_dry = verify.live_horizon_test(b, rs, wet, None, None, horizons=(1,), models=())
+    out_wet = verify.live_horizon_test(b, rs, wet, None, None, horizons=(1,), models=(), sm=sm)
+    d = out_dry.set_index("rain").loc["observed rain", "mean_pred_cusecs"]
+    w = out_wet.set_index("rain").loc["observed rain", "mean_pred_cusecs"]
+    assert w != d  # the anomaly changed both the base removal and the response
+
+
+# --- two rain sources compared on the days both have ---------------------------------
+def test_qpf_model_comparison_pools_common_days_and_applies_the_switch_rule():
+    days = pd.date_range("2025-07-01", "2025-08-31")
+    obs = pd.DataFrame({"date": days, "catchment": "Pong", "rain_mm": 0.0})
+    obs.loc[obs.index % 7 == 0, "rain_mm"] = 50.0  # nine heavy days
+    rows = []
+    for k in (1, 2, 3):
+        for m, hit_every in (("ecmwf_ifs025", 3), ("ecmwf_aifs025_single", 1)):
+            f = obs["rain_mm"].to_numpy().copy()
+            heavy = np.where(f >= 30)[0]
+            f[heavy[::hit_every]] = 40.0  # the hit days
+            f[heavy[np.arange(len(heavy)) % hit_every != 0]] = 5.0  # the missed ones
+            rows.append(
+                pd.DataFrame(
+                    {
+                        "target_date": days,
+                        "lead_days": k,
+                        "model": m,
+                        "rain_mm": f,
+                        "catchment": "Pong",
+                    }
+                )
+            )
+    # AIFS also has a season the other model lacks: it must not count
+    extra = rows[-1].copy()
+    extra["target_date"] = extra["target_date"] + pd.DateOffset(years=1)
+    extra["rain_mm"] = 40.0
+    obs2 = obs.copy()
+    obs2["date"] = obs2["date"] + pd.DateOffset(years=1)
+    archive = pd.concat(rows + [extra], ignore_index=True)
+    ifs, aifs = "ecmwf_ifs025", "ecmwf_aifs025_single"
+    cmp = verify.qpf_model_comparison(
+        archive, pd.concat([obs, obs2]), ifs, aifs, catchments=("Pong",)
+    )
+    assert cmp["n_common_days"] == 3 * len(days)
+    assert cmp["challenger"]["hit_rate"] == pytest.approx(1.0)
+    assert 0.3 < cmp["incumbent"]["hit_rate"] < 0.5
+    assert cmp["switch"] is True
+    # a challenger with more false alarms does not switch even with the higher hit rate
+    noisy = archive.copy()
+    noisy.loc[(noisy["model"] == aifs) & (noisy["rain_mm"] == 0.0), "rain_mm"] = 45.0
+    cmp2 = verify.qpf_model_comparison(noisy, obs, ifs, aifs, catchments=("Pong",))
+    assert cmp2["challenger"]["false_alarm_ratio"] > cmp2["incumbent"]["false_alarm_ratio"]
+    assert cmp2["switch"] is False
+    # nothing in common: no verdict
+    none = verify.qpf_model_comparison(archive, obs, ifs, "no_such_model", catchments=("Pong",))
+    assert none["n_common_days"] == 0 and none["switch"] is False

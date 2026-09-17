@@ -306,3 +306,110 @@ def test_residual_acf1_recovers_ar1_persistence():
     # only consecutive days count: a series sampled every other day has no lag-1 pairs
     sparse = pd.Series(e[:200], index=pd.date_range("2000-01-01", periods=200, freq="2D"))
     assert np.isnan(inflow.residual_acf1(sparse))
+
+
+# --- soil moisture as the wetness carrier ------------------------------------------
+def _params(**kw):
+    base = dict(
+        dam="Pong", area_km2=12560.0, c=0.5, w=(1.0, 0.0, 0.0, 0.0), rho=0.9,
+        intercept_bcm_per_day=0.0,
+    )
+    base.update(kw)
+    return inflow.InflowParams(**base)
+
+
+def test_sm_climatology_and_anomaly():
+    idx = pd.date_range("2015-01-01", "2017-12-31")
+    flat = pd.Series(0.3, index=idx)
+    clim = inflow.sm_climatology(flat)
+    assert clim.shape == (366,) and np.allclose(clim, 0.3)
+    assert np.allclose(inflow.sm_anomaly_series(flat, clim), 0.0)
+    s = flat.copy()
+    s.loc["2016-07-15"] = 0.6
+    clim2 = inflow.sm_climatology(s)
+    doy = pd.Timestamp("2016-07-15").dayofyear - 1
+    assert 0.3 < clim2[doy] < 0.31  # a 31-day window over three years barely moves it
+    a = inflow.sm_anomaly_series(s, clim2)
+    assert 0.9 < a.loc["2016-07-15"] < 1.0 and abs(a.loc["2016-07-14"]) < 0.02
+    # the anomaly is clipped to [-0.9, 3] and missing values give no anomaly
+    big = pd.Series([10.0, np.nan], index=pd.to_datetime(["2016-01-01", "2016-01-02"]))
+    assert inflow.sm_anomaly_series(big, clim).iloc[0] == 3.0
+    assert np.isnan(inflow.sm_anomaly_series(big, clim).iloc[1])
+    p = _params(sm_clim=tuple(clim))
+    assert inflow.sm_anomaly(p, 0.6, pd.Timestamp("2016-07-15")) == pytest.approx(1.0)
+    assert inflow.sm_anomaly(p, float("nan"), pd.Timestamp("2016-07-15")) == 0.0
+    assert inflow.sm_anomaly(_params(), 0.6, pd.Timestamp("2016-07-15")) == 0.0  # no climatology
+
+
+def _synthetic_sm(gamma=1.0, c=0.45, seed=7, years=range(2001, 2011), c_wet=0.0):
+    """Like ``_synthetic`` with a seasonal soil-moisture series whose fractional anomaly
+    multiplies the coefficient by ``1 + gamma * anomaly``: wet years run wetter all season."""
+    rng = np.random.default_rng(seed)
+    area = 12560.0
+    w = (0.5, 0.3, 0.15, 0.05)
+    days_all = pd.date_range(f"{min(years)}-01-01", f"{max(years)}-12-31")
+    season_curve = 0.25 + 0.08 * np.sin(2 * np.pi * (days_all.dayofyear - 120) / 365.25)
+    year_offset = {y: rng.uniform(-0.35, 0.35) for y in years}
+    scale = np.array([1 + year_offset[d.year] for d in days_all])
+    sm = pd.Series(season_curve * scale, index=days_all)
+    sm = sm * (1 + 0.03 * rng.standard_normal(len(sm)))
+    clim = inflow.sm_climatology(sm)
+    anom = inflow.sm_anomaly_series(sm, clim)
+    rows_state, rows_rain = [], []
+    for y in years:
+        days = pd.date_range(f"{y}-05-25", f"{y}-09-30", freq="D")
+        rain = rng.gamma(0.6, 12.0, size=len(days))
+        rain[rng.random(len(days)) < 0.45] = 0.0
+        rv = inflow.rain_volume_bcm(rain, area)
+        storage, base = 2.0, 0.05
+        for i, d in enumerate(days):
+            api = float(rain[max(i - inflow.API_DAYS, 0) : i].sum())
+            ci = min(c + c_wet * api / 100.0, inflow.C_MAX) * (1 + gamma * float(anom.loc[d]))
+            quick = sum(ci * w[k] * rv[i - k] for k in range(4) if i - k >= 0)
+            base = base * 0.9 + 0.05 * 0.1
+            storage = storage + base + quick - 0.03
+            rows_state.append({"date": d, "dam": "Pong", "storage_bcm": storage, "basis": "cwc"})
+        for d in pd.date_range(f"{y}-01-01", f"{y}-12-31"):
+            r = rain[(days == d).argmax()] if d in days else 0.0
+            rows_rain.append({"date": d, "rain_mm": r, "sm_0_7": sm.loc[d]})
+    return pd.DataFrame(rows_state), pd.DataFrame(rows_rain)
+
+
+def test_calibration_recovers_soil_moisture_sensitivity_under_each_wetness_carrier():
+    state, rain = _synthetic_sm(gamma=1.0)
+    p_api = inflow.calibrate(state, rain, "Pong", 12560.0)
+    assert p_api.wetness == "api" and p_api.gamma == 0.0 and p_api.sm_clim == ()
+    p_both = inflow.calibrate(state, rain, "Pong", 12560.0, wetness="api+sm")
+    assert p_both.wetness == "api+sm" and len(p_both.sm_clim) == 366
+    assert abs(p_both.gamma - 1.0) < 0.3, p_both.gamma
+    assert abs(p_both.c - 0.45) < 0.08
+    p_sm = inflow.calibrate(state, rain, "Pong", 12560.0, wetness="sm")
+    assert p_sm.wetness == "sm" and p_sm.c_wet == 0.0 and abs(p_sm.gamma - 1.0) < 0.3
+    # the soil-moisture carrier explains what the rain index cannot: lower in-sample error
+    assert p_both.rmse_bcm < p_api.rmse_bcm
+    # round trip keeps the climatology and the carrier
+    back = inflow.InflowParams.from_dict(p_both.to_dict())
+    assert back.wetness == "api+sm" and np.allclose(back.sm_clim, p_both.sm_clim)
+
+
+def test_predict_storage_change_and_quick_response_apply_gamma():
+    p = _params(gamma=1.0, sm_clim=tuple([0.3] * 366))
+    df = pd.DataFrame(
+        {"lag0": [0.1], "lag1": [0.0], "lag2": [0.0], "lag3": [0.0], "api_mm": [0.0]}
+    )
+    df["sm_anom"] = 0.5
+    assert inflow.predict_storage_change(p, df)[0] == pytest.approx(0.5 * 0.1 * 1.5)
+    df["sm_anom"] = 0.0
+    assert inflow.predict_storage_change(p, df)[0] == pytest.approx(0.05)
+    assert inflow.predict_storage_change(p, df.drop(columns="sm_anom"))[0] == pytest.approx(0.05)
+    q0 = inflow.quick_response_bcm(p, np.array([0.0, 0.0, 0.0, 10.0]))
+    q1 = inflow.quick_response_bcm(p, np.array([0.0, 0.0, 0.0, 10.0]), sm_anom=1.0)
+    assert q1 == pytest.approx(2 * q0)
+
+
+def test_loso_score_takes_the_wetness_carrier_and_scores_each_fold_with_its_own_climatology():
+    state, rain = _synthetic_sm(gamma=1.0, years=range(2001, 2007))
+    base = inflow.loso_score(state, rain, "Pong", 12560.0)
+    both = inflow.loso_score(state, rain, "Pong", 12560.0, wetness="api+sm")
+    assert base["n_seasons"] == both["n_seasons"] >= 5
+    assert both["rmse_bcm"] < base["rmse_bcm"]
