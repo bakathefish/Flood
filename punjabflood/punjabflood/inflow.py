@@ -91,6 +91,9 @@ class InflowParams:
     # 0-7 cm soil moisture (366 values) the anomaly is measured against; empty without one
     wetness: str = "api"
     sm_clim: tuple[float, ...] = ()
+    # what the fit was made on: "storage" (day-to-day storage change, the intercept is base
+    # minus passage) or "inflow" (measured daily inflow, the intercept is the base itself)
+    basis: str = "storage"
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -634,3 +637,129 @@ def volume_bcm(
         p, list(rain_mm_forecast)[:horizon_days], base_cusecs, rain_mm_recent, sm_anom
     )
     return float(daily.sum())
+
+
+# --- calibration on measured inflow ------------------------------------------------------
+
+
+def inflow_design(inflow_daily: pd.Series, rain: pd.DataFrame, area_km2: float, lags=LAGS):
+    """One row per day with a measured inflow and a full rain history: the daily inflow
+    volume ``y`` (BCM), the lagged rain volumes ``lag{k}``, the antecedent index ``api_mm``
+    and the day's rain. ``inflow_daily``: cusecs indexed by date (one value per day)."""
+    r = rain.copy()
+    r["date"] = pd.to_datetime(r["date"])
+    r = r.set_index("date").sort_index()
+    X = lagged_matrix(pd.Series(rain_volume_bcm(r["rain_mm"], area_km2), index=r.index), lags)
+    X["api_mm"] = antecedent_mm(r["rain_mm"])
+    X["rain_mm"] = r["rain_mm"]
+    y = pd.Series(inflow_daily, dtype=float)
+    y.index = pd.to_datetime(y.index)
+    y = C.cusec_days_to_bcm(y.sort_index())
+    df = X.join(y.rename("y"), how="inner").dropna()
+    return df
+
+
+def calibrate_on_inflow(
+    inflow_daily: pd.Series,
+    rain: pd.DataFrame,
+    dam: str,
+    area_km2: float,
+    lags=LAGS,
+    min_days: int = 20,
+) -> InflowParams:
+    """Fit ``c``, ``c_wet``, ``w`` and a constant base on measured daily inflow: the same
+    non-negative least squares as ``calibrate`` with the inflow volume as the target and the
+    base as a non-negative constant (``basis='inflow'``). One season of bulletins is enough
+    for the fit and for nothing more; the caller says what it is used for."""
+    df = inflow_design(inflow_daily, rain, area_km2, lags)
+    if len(df) < min_days:
+        raise ValueError(f"{dam}: only {len(df)} inflow days with a rain history")
+    nl = len(lags)
+    L = df[[f"lag{k}" for k in lags]].to_numpy()
+    api = df["api_mm"].to_numpy()
+    y = df["y"].to_numpy()
+    A = np.column_stack([L, L * (api / API_REF_MM)[:, None], np.ones(len(df))])
+    use = np.ones(len(df), dtype=bool)
+    for _ in range(6):
+        coef, _ = nnls(A[use], y[use])
+        beta, delta = coef[:nl], coef[nl : 2 * nl]
+        c, c_wet = float(beta.sum()), float(delta.sum())
+        new_use = c + c_wet * api / API_REF_MM <= C_MAX
+        if new_use.sum() < min_days or np.array_equal(new_use, use):
+            break
+        use = new_use
+    total = beta + delta
+    w = (
+        tuple(float(x / total.sum()) for x in total)
+        if total.sum() > 0
+        else tuple(1.0 / nl for _ in lags)
+    )
+    p = InflowParams(
+        dam=dam,
+        area_km2=area_km2,
+        c=c,
+        w=w,
+        rho=DEFAULT_RHO,
+        intercept_bcm_per_day=float(coef[2 * nl]),
+        n_days=int(len(df)),
+        c_wet=c_wet,
+        api_days=API_DAYS,
+        basis="inflow",
+    )
+    pred = _quick_from_design(p, df) + p.intercept_bcm_per_day
+    resid = y - pred
+    ss_tot = float(((y - y.mean()) ** 2).sum())
+    p.r2 = 1.0 - float((resid**2).sum()) / ss_tot if ss_tot > 0 else float("nan")
+    p.rmse_bcm = float(np.sqrt((resid**2).mean()))
+    p.resid_acf1 = residual_acf1(pd.Series(resid, index=df.index))
+    return p
+
+
+def score_on_inflow(
+    p: InflowParams,
+    inflow_daily: pd.Series,
+    rain: pd.DataFrame,
+    area_km2: float,
+    absorption_cusecs: float,
+    base_from_intercept: bool = False,
+    fitted_base: bool = False,
+) -> dict:
+    """A parameter set against measured daily inflow: base plus quick response on every
+    day with a rain history. The base is the intercept plus the non-spill passage for a
+    storage-change fit (its intercept is base minus passage, the convention of the
+    verification runs), the intercept itself with ``base_from_intercept`` (an inflow fit),
+    or with ``fitted_base`` the constant that makes the set unbiased on these days (the
+    response judged on its own, the base convention set aside). Returns days, bias,
+    Pearson r, MAE (cusecs), the mean observed and predicted inflow, and
+    ``coefficient_ratio``: the coefficient an inflow fit on the same days gives over this
+    set's, the measure of what the storage-change fit cannot see."""
+    df = inflow_design(inflow_daily, rain, area_km2, range(len(p.w)))
+    if df.empty:
+        return {"n_days": 0, "note": "no days"}
+    base = (
+        max(p.intercept_bcm_per_day, 0.0)
+        if base_from_intercept
+        else max(p.intercept_bcm_per_day + C.cusec_days_to_bcm(absorption_cusecs), 0.0)
+    )
+    quick = _quick_from_design(p, df)
+    if fitted_base:
+        base = float(max((df["y"].to_numpy() - quick).mean(), 0.0))
+    pred = C.bcm_to_cusec_days(quick + base)
+    obs = C.bcm_to_cusec_days(df["y"].to_numpy())
+    out = {
+        "n_days": int(len(df)),
+        "bias_pct": float((pred.mean() - obs.mean()) / obs.mean() * 100) if obs.mean() > 0 else float("nan"),
+        "pearson_r": float(np.corrcoef(pred, obs)[0, 1]) if pred.std() > 0 and obs.std() > 0 else float("nan"),
+        "mae_cusecs": float(np.abs(pred - obs).mean()),
+        "mean_obs_cusecs": float(obs.mean()),
+        "mean_pred_cusecs": float(pred.mean()),
+        "base_cusecs": float(C.bcm_to_cusec_days(base)),
+    }
+    try:
+        fit = calibrate_on_inflow(inflow_daily, rain, p.dam, area_km2, lags=range(len(p.w)))
+        out["coefficient_ratio"] = float(fit.c / p.c) if p.c > 0 else float("nan")
+        out["wet_coefficient_ratio"] = float(fit.c_wet / p.c_wet) if p.c_wet > 0 else float("nan")
+    except ValueError:
+        out["coefficient_ratio"] = float("nan")
+    return out
+

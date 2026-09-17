@@ -601,6 +601,19 @@ Persistence (tomorrow's inflow equals today's) is the baseline any one-day predi
 | Bhakra | 30 | 41,926 | 41,459 | -1% | +0.57 | 4,006 | +0% | +0.56 | 4,148 |
 | Pong | 30 | 35,571 | 35,608 | +0% | +0.86 | 5,904 | +3% | +0.37 | 12,135 |
 
+### The response fitted on measured inflow, 2026 bulletins
+
+The runoff response in force is fitted on day-to-day storage change, which is inflow minus a release the record does not show. The bulletin capture that began in August 2026 is the first daily inflow record this project has had, so the same response (coefficient, wetness term, lag weights, a constant base) is fitted on the daily mean of the bulletins' inflow and the storage-change fit is scored against that inflow out of sample (its base is the intercept plus the non-spill passage, as in every verification run, and again with the base fitted on these days so the response is judged on its own). One deficit season, in-sample for the inflow fit: the product keeps the storage-change parameters, and the live product takes its base from the bulletin, not from the intercept; the ratio of the two coefficients is the measure of what the storage record cannot see.
+
+| dam | bulletin days | fit | c (dry) | c_wet | lag weights | base (cusecs) | R2 | bias against measured inflow | r | MAE (cusecs) | c ratio, inflow fit over storage fit |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Bhakra | 37 | storage change, 2015 to 2025 | 0.170 | 0.250 | 0.54, 0.27, 0.10, 0.09 | 35,920 | 0.212 | +24% | 0.63 | 9,868 | 1.32 |
+| Bhakra | 35 | storage change, base fitted on 2026 | 0.170 | 0.250 | 0.54, 0.27, 0.10, 0.09 | 26,294 | | -0% | 0.63 | 5,153 | |
+| Bhakra | 35 | measured inflow, 2026 (in sample) | 0.224 | 0.000 | 0.35, 0.23, 0.24, 0.18 | 27,525 | 0.474 | -0% | 0.69 | 4,643 | |
+| Pong | 37 | storage change, 2015 to 2025 | 0.203 | 0.328 | 0.35, 0.48, 0.09, 0.08 | 40,229 | 0.777 | +95% | 0.87 | 32,658 | 1.21 |
+| Pong | 35 | storage change, base fitted on 2026 | 0.203 | 0.328 | 0.35, 0.48, 0.09, 0.08 | 7,572 | | +0% | 0.87 | 6,773 | |
+| Pong | 35 | measured inflow, 2026 (in sample) | 0.246 | 0.160 | 0.27, 0.54, 0.19, 0.00 | 11,768 | 0.807 | -0% | 0.90 | 5,496 | |
+
 ### By horizon, with observed and with forecast rain
 
 From each bulletin day, the inflow one to five days ahead: predicted with the observed catchment rain of the days in between (what the hydrology alone can do), with the rain forecast issued that day (what the product does, per model), and by persistence (the inflow stays at the day's value). Scored on the days a bulletin exists for the target day.
@@ -608,22 +621,22 @@ From each bulletin day, the inflow one to five days ahead: predicted with the ob
 | dam | horizon (days) | rain | days | bias | Pearson r | MAE (cusecs) |
 |---|---|---|---|---|---|---|
 | Bhakra | 1 | observed rain | 30 | -1% | +0.57 | 4,006 |
-| Bhakra | 1 | persistence | 30 | +0% | +0.56 | 4,148 |
-| Bhakra | 1 | ecmwf_ifs025 | 30 | -9% | +0.43 | 4,633 |
-| Bhakra | 1 | gfs_seamless | 30 | -7% | +0.44 | 4,956 |
-| Bhakra | 1 | ecmwf_aifs025_single | 30 | -6% | +0.38 | 4,603 |
-| Bhakra | 2 | observed rain | 29 | -2% | +0.38 | 5,703 |
-| Bhakra | 2 | persistence | 29 | +0% | +0.32 | 5,796 |
-| Bhakra | 2 | ecmwf_ifs025 | 29 | -12% | +0.21 | 6,205 |
-| Bhakra | 2 | gfs_seamless | 29 | -11% | +0.20 | 6,754 |
-| Bhakra | 2 | ecmwf_aifs025_single | 29 | -8% | +0.14 | 5,891 |
+| Bhakra | 1 | persistence | 31 | +0% | +0.61 | 4,082 |
+| Bhakra | 1 | ecmwf_ifs025 | 31 | -9% | +0.51 | 4,554 |
+| Bhakra | 1 | gfs_seamless | 31 | -7% | +0.51 | 4,852 |
+| Bhakra | 1 | ecmwf_aifs025_single | 31 | -6% | +0.47 | 4,518 |
+| Bhakra | 2 | observed rain | 30 | -2% | +0.45 | 5,617 |
+| Bhakra | 2 | persistence | 31 | -0% | +0.45 | 5,594 |
+| Bhakra | 2 | ecmwf_ifs025 | 30 | -12% | +0.31 | 6,260 |
+| Bhakra | 2 | gfs_seamless | 30 | -11% | +0.30 | 6,826 |
+| Bhakra | 2 | ecmwf_aifs025_single | 30 | -9% | +0.26 | 5,955 |
 | Bhakra | 3 | observed rain | 28 | -3% | +0.35 | 6,278 |
-| Bhakra | 3 | persistence | 28 | +0% | +0.19 | 6,762 |
-| Bhakra | 3 | ecmwf_ifs025 | 28 | -12% | +0.27 | 6,405 |
-| Bhakra | 3 | gfs_seamless | 28 | -12% | +0.18 | 8,008 |
-| Bhakra | 3 | ecmwf_aifs025_single | 28 | -9% | +0.06 | 7,103 |
+| Bhakra | 3 | persistence | 29 | +0% | +0.31 | 6,582 |
+| Bhakra | 3 | ecmwf_ifs025 | 29 | -12% | +0.39 | 6,396 |
+| Bhakra | 3 | gfs_seamless | 29 | -12% | +0.30 | 8,008 |
+| Bhakra | 3 | ecmwf_aifs025_single | 29 | -9% | +0.21 | 7,095 |
 | Bhakra | 4 | observed rain | 27 | -5% | +0.30 | 6,021 |
-| Bhakra | 4 | persistence | 27 | +0% | +0.10 | 7,551 |
+| Bhakra | 4 | persistence | 28 | -0% | +0.21 | 7,471 |
 | Bhakra | 4 | ecmwf_ifs025 | 27 | -15% | +0.10 | 7,876 |
 | Bhakra | 4 | gfs_seamless | 27 | -13% | +0.18 | 8,388 |
 | Bhakra | 4 | ecmwf_aifs025_single | 27 | -12% | -0.10 | 8,037 |
@@ -633,22 +646,22 @@ From each bulletin day, the inflow one to five days ahead: predicted with the ob
 | Bhakra | 5 | gfs_seamless | 26 | -12% | +0.30 | 8,120 |
 | Bhakra | 5 | ecmwf_aifs025_single | 26 | -11% | -0.09 | 8,199 |
 | Pong | 1 | observed rain | 30 | +0% | +0.86 | 5,904 |
-| Pong | 1 | persistence | 30 | +3% | +0.37 | 12,135 |
-| Pong | 1 | ecmwf_ifs025 | 30 | -12% | +0.79 | 7,835 |
-| Pong | 1 | gfs_seamless | 30 | -13% | +0.77 | 8,229 |
-| Pong | 1 | ecmwf_aifs025_single | 30 | -10% | +0.77 | 7,455 |
-| Pong | 2 | observed rain | 29 | -0% | +0.81 | 7,773 |
-| Pong | 2 | persistence | 29 | +4% | -0.20 | 17,175 |
-| Pong | 2 | ecmwf_ifs025 | 29 | -28% | +0.33 | 14,072 |
-| Pong | 2 | gfs_seamless | 29 | -32% | +0.32 | 14,930 |
-| Pong | 2 | ecmwf_aifs025_single | 29 | -27% | +0.28 | 13,276 |
+| Pong | 1 | persistence | 31 | +3% | +0.42 | 11,842 |
+| Pong | 1 | ecmwf_ifs025 | 31 | -12% | +0.81 | 7,602 |
+| Pong | 1 | gfs_seamless | 31 | -12% | +0.78 | 8,063 |
+| Pong | 1 | ecmwf_aifs025_single | 31 | -9% | +0.79 | 7,245 |
+| Pong | 2 | observed rain | 30 | -0% | +0.82 | 7,594 |
+| Pong | 2 | persistence | 31 | +5% | -0.05 | 16,265 |
+| Pong | 2 | ecmwf_ifs025 | 30 | -29% | +0.38 | 13,811 |
+| Pong | 2 | gfs_seamless | 30 | -32% | +0.37 | 14,680 |
+| Pong | 2 | ecmwf_aifs025_single | 30 | -27% | +0.33 | 13,026 |
 | Pong | 3 | observed rain | 28 | -0% | +0.79 | 8,770 |
-| Pong | 3 | persistence | 28 | +4% | +0.03 | 16,235 |
-| Pong | 3 | ecmwf_ifs025 | 28 | -26% | +0.43 | 13,923 |
-| Pong | 3 | gfs_seamless | 28 | -32% | +0.34 | 14,793 |
-| Pong | 3 | ecmwf_aifs025_single | 28 | -32% | +0.30 | 13,577 |
+| Pong | 3 | persistence | 29 | +5% | +0.10 | 15,922 |
+| Pong | 3 | ecmwf_ifs025 | 29 | -26% | +0.47 | 13,576 |
+| Pong | 3 | gfs_seamless | 29 | -32% | +0.40 | 14,510 |
+| Pong | 3 | ecmwf_aifs025_single | 29 | -32% | +0.37 | 13,289 |
 | Pong | 4 | observed rain | 27 | -0% | +0.77 | 8,438 |
-| Pong | 4 | persistence | 27 | +7% | +0.31 | 14,265 |
+| Pong | 4 | persistence | 28 | +7% | +0.36 | 13,975 |
 | Pong | 4 | ecmwf_ifs025 | 27 | -32% | +0.37 | 13,994 |
 | Pong | 4 | gfs_seamless | 27 | -30% | +0.40 | 14,960 |
 | Pong | 4 | ecmwf_aifs025_single | 27 | -36% | +0.13 | 14,937 |

@@ -129,6 +129,23 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             "note": "too few days",
         },
     ]
+    results["inflow_calibration_2026"] = {
+        "Pong": {
+            "n_bulletin_days": 39,
+            "storage_fit": {"c": 0.203, "c_wet": 0.328, "w": [0.35, 0.48, 0.09, 0.08], "r2": 0.61},
+            "storage_fit_on_inflow": {
+                "n_days": 30, "bias_pct": -12.3, "pearson_r": 0.81, "mae_cusecs": 4100.0,
+                "base_cusecs": 25000.0, "coefficient_ratio": 1.4,
+            },
+            "storage_fit_on_inflow_fitted_base": {
+                "n_days": 30, "bias_pct": 0.0, "pearson_r": 0.81, "mae_cusecs": 3900.0, "base_cusecs": 21000.0,
+            },
+            "inflow_fit": {"c": 0.284, "c_wet": 0.3, "w": [0.4, 0.4, 0.1, 0.1], "r2": 0.77, "n_days": 30},
+            "inflow_fit_in_sample": {
+                "n_days": 30, "bias_pct": 0.1, "pearson_r": 0.88, "mae_cusecs": 3200.0, "base_cusecs": 24000.0,
+            },
+        }
+    }
     results["flood_scale_error"] = {
         "n_periods": 6, "log_bias": -0.02, "log_sd": 0.13, "n_dated_days": 29, "dated_log_sd": 0.44,
     }
@@ -394,6 +411,10 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     # the dated figures summarised by year; the uncovered record day does not count
     assert "Dated figures by year" in md
     assert "spread of the model's log ratio to the 6 period means" in md and "0.13" in md
+    assert "### The response fitted on measured inflow, 2026 bulletins" in md
+    assert "| Pong | 39 | storage change, 2015 to 2025 | 0.203 | 0.328 | 0.35, 0.48, 0.09, 0.08 | 25,000 | 0.610 | -12% | 0.81 | 4,100 | 1.40 |" in md
+    assert "| Pong | 30 | storage change, base fitted on 2026 | 0.203 | 0.328 | 0.35, 0.48, 0.09, 0.08 | 21,000 | | +0% | 0.81 | 3,900 | |" in md
+    assert "| Pong | 30 | measured inflow, 2026 (in sample) | 0.284 | 0.300 | 0.40, 0.40, 0.10, 0.10 | 24,000 | 0.770 | +0% | 0.88 | 3,200 | |" in md
     assert "2025: 1 dated figures" in md and "median 0.92" in md and "2023:" not in md.split("Dated figures by year")[1].split(")")[0]
     assert (
         "the model's mean is 0.82 of the reported mean; its largest day of the season is 0.50 "

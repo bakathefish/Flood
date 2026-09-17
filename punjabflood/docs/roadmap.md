@@ -169,7 +169,9 @@ numbers that motivate them are in `verification.md`, never repeated here.
    two of BBMB's daily sheets from September 2025 (15 and 24 September) and none from
    August 2023 or August 2025. With any daily inflow series for an event, the coefficient can
    be fitted on inflow rather than on storage change, and the release-during-event bias
-   disappears. Effort: data hunt plus one calibration mode.
+   disappears. The calibration mode exists (2026-09-18, `inflow.calibrate_on_inflow`) and
+   runs on the 2026 bulletins in `verification.md`, one deficit season, in-sample; what it
+   waits for is an event's daily inflow. Effort: data hunt.
    *Hunt of 2026-09-17:* a sweep of the English and Hindi press (The Tribune, Hindustan
    Times, Indian Express, Times of India, Babushahi, Diary Times, Rozana Spokesman, Himachal
    Tonite, SANDRP, Down To Earth, The Wire) for 10 to 25 August 2023 and 15 August to

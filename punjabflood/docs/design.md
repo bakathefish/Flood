@@ -53,7 +53,13 @@ and it is fitted jointly with the lag weights by non-negative least squares, lea
 days the cap would bind. A threshold-excess response (rain above the heavy-day threshold
 with its own coefficient and lag weights) was fitted on the same record and scored
 leave-one-season-out beside this one; it did not lower the held-out error and is not used
-(`verification.md`; the rule is in `roadmap.md`). The rain index is a proxy for the
+(`verification.md`; the rule is in `roadmap.md`). Since August 2026 the bulletin capture
+gives a daily inflow series, and the same response is fitted on it beside the storage-change
+fit (`inflow.calibrate_on_inflow`; the base is then a fitted constant rather than the
+intercept plus passage), with the storage-change fit scored against the measured inflow
+out of sample; the ratio of the two coefficients measures what the storage record cannot
+see. One deficit season and in-sample, so the product keeps the storage-change parameters
+(the section in `verification.md`). The rain index is a proxy for the
 ground's wetness; the direct quantity, ERA5-Land soil moisture (0 to 7 cm, daily catchment
 mean over the same IMD-covered points, 2015 onward from the keyless Open-Meteo archive), is
 carried as a fractional anomaly against a 31-day day-of-year climatology and multiplies the

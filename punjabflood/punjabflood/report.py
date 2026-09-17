@@ -810,6 +810,62 @@ def render_verification(
         lines.append("Not run.")
     lines.append("")
 
+    ic = results.get("inflow_calibration_2026") or {}
+    if ic:
+        lines += [
+            "### The response fitted on measured inflow, 2026 bulletins",
+            "",
+            "The runoff response in force is fitted on day-to-day storage change, which is "
+            "inflow minus a release the record does not show. The bulletin capture that began "
+            "in August 2026 is the first daily inflow record this project has had, so the same "
+            "response (coefficient, wetness term, lag weights, a constant base) is fitted on "
+            "the daily mean of the bulletins' inflow and the storage-change fit is scored "
+            "against that inflow out of sample (its base is the intercept plus the non-spill "
+            "passage, as in every verification run, and again with the base fitted on these "
+            "days so the response is judged on its own). One deficit season, in-sample for "
+            "the inflow fit: the product keeps the storage-change parameters, and the live "
+            "product takes its base from the bulletin, not from the intercept; the ratio of "
+            "the two coefficients is the measure of what the storage record cannot see.",
+            "",
+            "| dam | bulletin days | fit | c (dry) | c_wet | lag weights | base (cusecs) | R2 | "
+            "bias against measured inflow | r | MAE (cusecs) | c ratio, inflow fit over storage fit |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|",
+        ]
+        for dam, e in ic.items():
+            s_fit = e.get("storage_fit") or {}
+            s_sc = e.get("storage_fit_on_inflow") or {}
+            i_fit = e.get("inflow_fit")
+            i_sc = e.get("inflow_fit_in_sample") or {}
+            w_s = ", ".join(f"{x:.2f}" for x in s_fit.get("w", []))
+            lines.append(
+                f"| {dam} | {e.get('n_bulletin_days', 0)} | storage change, 2015 to 2025 | "
+                f"{s_fit.get('c', float('nan')):.3f} | {s_fit.get('c_wet', 0.0):.3f} | {w_s} | "
+                f"{_num(s_sc.get('base_cusecs'), ',.0f')} | {_num(s_fit.get('r2'), '.3f')} | "
+                f"{_num(s_sc.get('bias_pct'), '+.0f')}% | {_num(s_sc.get('pearson_r'), '.2f')} | "
+                f"{_num(s_sc.get('mae_cusecs'), ',.0f')} | {_num(s_sc.get('coefficient_ratio'), '.2f')} |"
+            )
+            s_fb = e.get("storage_fit_on_inflow_fitted_base") or {}
+            if s_fb:
+                lines.append(
+                    f"| {dam} | {s_fb.get('n_days', 0)} | storage change, base fitted on 2026 | "
+                    f"{s_fit.get('c', float('nan')):.3f} | {s_fit.get('c_wet', 0.0):.3f} | {w_s} | "
+                    f"{_num(s_fb.get('base_cusecs'), ',.0f')} | | "
+                    f"{_num(s_fb.get('bias_pct'), '+.0f')}% | {_num(s_fb.get('pearson_r'), '.2f')} | "
+                    f"{_num(s_fb.get('mae_cusecs'), ',.0f')} | |"
+                )
+            if i_fit:
+                w_i = ", ".join(f"{x:.2f}" for x in i_fit.get("w", []))
+                lines.append(
+                    f"| {dam} | {i_fit.get('n_days', 0)} | measured inflow, 2026 (in sample) | "
+                    f"{i_fit['c']:.3f} | {i_fit.get('c_wet', 0.0):.3f} | {w_i} | "
+                    f"{_num(i_sc.get('base_cusecs'), ',.0f')} | {_num(i_fit.get('r2'), '.3f')} | "
+                    f"{_num(i_sc.get('bias_pct'), '+.0f')}% | {_num(i_sc.get('pearson_r'), '.2f')} | "
+                    f"{_num(i_sc.get('mae_cusecs'), ',.0f')} | |"
+                )
+            elif e.get("note"):
+                lines.append(f"| {dam} | {e.get('n_bulletin_days', 0)} | measured inflow | {e['note']} | | | | | | | | |")
+        lines.append("")
+
     lh = results.get("live_horizons") or []
     if lh:
         lines += [

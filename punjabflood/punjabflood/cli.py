@@ -23,7 +23,7 @@ import typer
 
 from punjabflood import catchments as catchments_mod
 from punjabflood import constants as C
-from punjabflood import cwc, guidebook, imdrain, inflow, rain, reservoirs, verify
+from punjabflood import cwc, guidebook, hei, imdrain, inflow, rain, reservoirs, verify
 from punjabflood.openmeteo import OpenMeteo
 
 app = typer.Typer(add_completion=False, help=__doc__)
@@ -698,6 +698,59 @@ def run_verify(horizon_days: int = 5):
         results["live_horizons"] += lh.to_dict(orient="records")
     if results["live_horizons"]:
         pd.DataFrame(results["live_horizons"]).to_csv(out / "live_horizons.csv", index=False)
+
+    # the same response fitted on the bulletins' measured inflow (the first daily inflow
+    # record this project has; one deficit season, in-sample), and the storage-change fit
+    # scored against that inflow out of sample; the product keeps the storage-change fit
+    results["inflow_calibration_2026"] = {}
+    ic_rows = []
+    for dam in ("Bhakra", "Pong"):
+        if dam not in params:
+            continue
+        b = bulletins[bulletins["dam"] == dam].copy()
+        b["date"] = pd.to_datetime(b["date"])
+        daily = b.groupby("date")["inflow_cusecs"].mean().dropna()
+        daily = daily[daily.index.year == pd.Timestamp.utcnow().year]
+        r = rain_daily[rain_daily["catchment"] == dam]
+        area = _covered_area(rain_daily, dam, cats[dam].area_km2)
+        absorb = hei.absorption_cusecs(dam)
+        entry = {"n_bulletin_days": int(len(daily))}
+        try:
+            fit = inflow.calibrate_on_inflow(daily, r, dam, area)
+            entry["inflow_fit"] = fit.to_dict()
+            entry["inflow_fit_in_sample"] = inflow.score_on_inflow(
+                fit, daily, r, area, absorb, base_from_intercept=True
+            )
+        except ValueError as e:
+            entry["note"] = str(e)
+        entry["storage_fit"] = params[dam].to_dict()
+        entry["storage_fit_on_inflow"] = inflow.score_on_inflow(params[dam], daily, r, area, absorb)
+        entry["storage_fit_on_inflow_fitted_base"] = inflow.score_on_inflow(
+            params[dam], daily, r, area, absorb, fitted_base=True
+        )
+        results["inflow_calibration_2026"][dam] = entry
+        df = inflow.inflow_design(daily, r, area)
+        if len(df):
+            base_s = max(
+                params[dam].intercept_bcm_per_day + C.cusec_days_to_bcm(absorb), 0.0
+            )
+            ic = pd.DataFrame(
+                {
+                    "date": df.index,
+                    "dam": dam,
+                    "observed_cusecs": C.bcm_to_cusec_days(df["y"].to_numpy()),
+                    "storage_fit_cusecs": C.bcm_to_cusec_days(
+                        inflow._quick_from_design(params[dam], df) + base_s
+                    ),
+                }
+            )
+            if "inflow_fit" in entry:
+                ic["inflow_fit_cusecs"] = C.bcm_to_cusec_days(
+                    inflow._quick_from_design(fit, df) + fit.intercept_bcm_per_day
+                )
+            ic_rows.append(ic)
+    if ic_rows:
+        pd.concat(ic_rows, ignore_index=True).to_csv(out / "inflow_calibration_2026.csv", index=False)
 
     if QPF_CSV.exists():
         qpf_leads = pd.read_csv(QPF_CSV)
