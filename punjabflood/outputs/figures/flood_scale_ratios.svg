@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="602.267984pt" height="487.066844pt" viewBox="0 0 602.267984 487.066844" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-17T21:45:49.636684</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 487.066844 
+L 602.267984 487.066844 
+L 602.267984 0 
+L 0 0 
+z
+" style="fill: #fcfcfb"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 141.24125 399.757375 
+L 543.00125 399.757375 
+L 543.00125 28.309375 
+L 141.24125 28.309375 
+z
+" style="fill: #fcfcfb"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 141.24125 399.757375 
+L 141.24125 28.309375 
+" clip-path="url(#p806a8d2fcf)" style="fill: none; stroke: #e1e0d9; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2"/>
+     <g id="text_1">
+      <text style="font-size: 9px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: middle; fill: #52514e" x="141.24125" y="409.920188" transform="rotate(-0 141.24125 409.920188)">0.0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 218.598503 399.757375 
+L 218.598503 28.309375 
+" clip-path="url(#p806a8d2fcf)" style="fill: none; stroke: #e1e0d9; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4"/>
+     <g id="text_2">
+      <text style="font-size: 9px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: middle; fill: #52514e" x="218.598503" y="409.920188" transform="rotate(-0 218.598503 409.920188)">0.5</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 295.955756 399.757375 
+L 295.955756 28.309375 
+" clip-path="url(#p806a8d2fcf)" style="fill: none; stroke: #e1e0d9; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6"/>
+     <g id="text_3">
+      <text style="font-size: 9px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: middle; fill: #52514e" x="295.955756" y="409.920188" transform="rotate(-0 295.955756 409.920188)">1.0</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 373.313009 399.757375 
+L 373.313009 28.309375 
+" clip-path="url(#p806a8d2fcf)" style="fill: none; stroke: #e1e0d9; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8"/>
+     <g id="text_4">
+      <text style="font-size: 9px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: middle; fill: #52514e" x="373.313009" y="409.920188" transform="rotate(-0 373.313009 409.920188)">1.5</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_9">
+      <path d="M 450.670262 399.757375 
+L 450.670262 28.309375 
+" clip-path="url(#p806a8d2fcf)" style="fill: none; stroke: #e1e0d9; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10"/>
+     <g id="text_5">
+      <text style="font-size: 9px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: middle; fill: #52514e" x="450.670262" y="409.920188" transform="rotate(-0 450.670262 409.920188)">2.0</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_11">
+      <path d="M 528.027515 399.757375 
+L 528.027515 28.309375 
+" clip-path="url(#p806a8d2fcf)" style="fill: none; stroke: #e1e0d9; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12"/>
+     <g id="text_6">
+      <text style="font-size: 9px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: middle; fill: #52514e" x="528.027515" y="409.920188" transform="rotate(-0 528.027515 409.920188)">2.5</text>
+     </g>
+    </g>
+    <g id="text_7">
+     <text style="font-size: 9px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: middle; fill: #52514e" x="342.12125" y="422.748625" transform="rotate(-0 342.12125 422.748625)">model inflow / reported inflow</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_13"/>
+     <g id="text_8">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="53.018974" transform="rotate(-0 137.74125 53.018974)">Bhakra, 01 Aug to 24 Aug 2025</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_14"/>
+     <g id="text_9">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="68.710424" transform="rotate(-0 137.74125 68.710424)">Bhakra, 25 Aug to 04 Sep 2025</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_15"/>
+     <g id="text_10">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="84.380624" transform="rotate(-0 137.74125 84.380624)">Pong, 01 Aug to 24 Aug 2025</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_16"/>
+     <g id="text_11">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="100.072074" transform="rotate(-0 137.74125 100.072074)">Pong, 25 Aug to 04 Sep 2025</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_17"/>
+     <g id="text_12">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="115.763524" transform="rotate(-0 137.74125 115.763524)">Ranjit Sagar, 01 Aug to 24 Aug 2025</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_18"/>
+     <g id="text_13">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="131.454974" transform="rotate(-0 137.74125 131.454974)">Ranjit Sagar, 25 Aug to 04 Sep 2025</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_19"/>
+     <g id="text_14">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="183.258008" transform="rotate(-0 137.74125 183.258008)">Bhakra, 05 Sep 2025</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_20"/>
+     <g id="text_15">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="198.949458" transform="rotate(-0 137.74125 198.949458)">Bhakra, 15 Sep 2025</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_21"/>
+     <g id="text_16">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="214.640908" transform="rotate(-0 137.74125 214.640908)">Bhakra, 24 Sep 2025</text>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_22"/>
+     <g id="text_17">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="230.311107" transform="rotate(-0 137.74125 230.311107)">Pong, 26 Aug 2025</text>
+     </g>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_23"/>
+     <g id="text_18">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="246.002557" transform="rotate(-0 137.74125 246.002557)">Pong, 15 Sep 2025</text>
+     </g>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_24"/>
+     <g id="text_19">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="261.694007" transform="rotate(-0 137.74125 261.694007)">Pong, 24 Sep 2025</text>
+     </g>
+    </g>
+    <g id="ytick_13">
+     <g id="line2d_25"/>
+     <g id="text_20">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="313.497041" transform="rotate(-0 137.74125 313.497041)">Bhakra, 2025 season, undated</text>
+     </g>
+    </g>
+    <g id="ytick_14">
+     <g id="line2d_26"/>
+     <g id="text_21">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="329.188491" transform="rotate(-0 137.74125 329.188491)">Pong, 2025 season, undated</text>
+     </g>
+    </g>
+    <g id="ytick_15">
+     <g id="line2d_27"/>
+     <g id="text_22">
+      <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: end; fill: #52514e" x="137.74125" y="380.949026" transform="rotate(-0 137.74125 380.949026)">Pong, 14 Aug 2023</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 141.24125 399.757375 
+L 543.00125 399.757375 
+" style="fill: none; stroke: #c3c2b7; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 7.5px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #52514e" x="141.24125" y="38.653586" transform="rotate(-0 141.24125 38.653586)">Period mean inflow (BBMB data released by the Public Action Committee)</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 7.5px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #52514e" x="141.24125" y="168.852776" transform="rotate(-0 141.24125 168.852776)">Single dated readings (press, BBMB sheets)</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 7.5px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #52514e" x="141.24125" y="299.131653" transform="rotate(-0 141.24125 299.131653)">Season peak inflow (Rajya Sabha reply)</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 7.5px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #52514e" x="141.24125" y="366.604887" transform="rotate(-0 141.24125 366.604887)">Record inflow day (Pong EAP)</text>
+   </g>
+   <g id="patch_4">
+    <path d="M 141.24125 45.193375 
+L 291.86799 45.193375 
+L 291.86799 54.922074 
+L 141.24125 54.922074 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 141.24125 60.884825 
+L 313.117707 60.884825 
+L 313.117707 70.613524 
+L 141.24125 70.613524 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 141.24125 76.576275 
+L 308.036252 76.576275 
+L 308.036252 86.304974 
+L 141.24125 86.304974 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 141.24125 92.267724 
+L 315.90925 92.267724 
+L 315.90925 101.996423 
+L 141.24125 101.996423 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 141.24125 107.959174 
+L 261.474253 107.959174 
+L 261.474253 117.687873 
+L 141.24125 117.687873 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 141.24125 123.650624 
+L 289.80196 123.650624 
+L 289.80196 133.379323 
+L 141.24125 133.379323 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 141.24125 175.432408 
+L 277.308783 175.432408 
+L 277.308783 185.161107 
+L 141.24125 185.161107 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 141.24125 191.123858 
+L 268.18151 191.123858 
+L 268.18151 200.852557 
+L 141.24125 200.852557 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 141.24125 206.815308 
+L 296.612206 206.815308 
+L 296.612206 216.544007 
+L 141.24125 216.544007 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 141.24125 222.506758 
+L 257.582377 222.506758 
+L 257.582377 232.235457 
+L 141.24125 232.235457 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 141.24125 238.198208 
+L 309.356064 238.198208 
+L 309.356064 247.926907 
+L 141.24125 247.926907 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 141.24125 253.889658 
+L 499.955536 253.889658 
+L 499.955536 263.618356 
+L 141.24125 263.618356 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 141.24125 305.671442 
+L 229.409006 305.671442 
+L 229.409006 315.400141 
+L 141.24125 315.400141 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 141.24125 321.362892 
+L 231.336266 321.362892 
+L 231.336266 331.091591 
+L 141.24125 331.091591 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 141.24125 373.144676 
+L 190.412909 373.144676 
+L 190.412909 382.873375 
+L 141.24125 382.873375 
+z
+" clip-path="url(#p806a8d2fcf)" style="fill: #2a78d6"/>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="296.509425" y="52.098974" transform="rotate(-0 296.509425 52.098974)">0.97</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="317.759142" y="67.790424" transform="rotate(-0 317.759142 67.790424)">1.11</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="312.677687" y="83.481874" transform="rotate(-0 312.677687 83.481874)">1.08</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="320.550685" y="99.173324" transform="rotate(-0 320.550685 99.173324)">1.13</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="266.115688" y="114.864774" transform="rotate(-0 266.115688 114.864774)">0.78</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="294.443395" y="130.556224" transform="rotate(-0 294.443395 130.556224)">0.96</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="281.950218" y="182.338008" transform="rotate(-0 281.950218 182.338008)">0.88</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="272.822946" y="198.029458" transform="rotate(-0 272.822946 198.029458)">0.82</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="301.253641" y="213.720908" transform="rotate(-0 301.253641 213.720908)">1.00</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="262.223813" y="229.412357" transform="rotate(-0 262.223813 229.412357)">0.75</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="313.9975" y="245.103807" transform="rotate(-0 313.9975 245.103807)">1.09</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="504.596971" y="260.795257" transform="rotate(-0 504.596971 260.795257)">2.32</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="234.050441" y="312.577041" transform="rotate(-0 234.050441 312.577041)">0.57</text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="235.977701" y="328.268491" transform="rotate(-0 235.977701 328.268491)">0.58</text>
+   </g>
+   <g id="text_41">
+    <text style="font-size: 8px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="195.054344" y="380.050276" transform="rotate(-0 195.054344 380.050276)">0.32</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 10px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; text-anchor: start; fill: #0b0b0b" x="141.24125" y="18.309375" transform="rotate(-0 141.24125 18.309375)">Flood-scale check: model one-day inflow against the figures the public record holds</text>
+   </g>
+   <g id="line2d_28">
+    <path d="M 295.955756 399.757375 
+L 295.955756 28.309375 
+" clip-path="url(#p806a8d2fcf)" style="fill: none; stroke: #52514e; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+  </g>
+  <g id="text_43">
+   <text style="font-size: 6.5px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; fill: #898781" transform="translate(81.62525 467.350469)">Volumes over the flood periods sit near the reported means; the model's largest days fall short of the stated peaks. Reported peaks are readings at a moment and the model's day is</text>
+   <text style="font-size: 6.5px; font-family: 'Segoe UI', 'DejaVu Sans', 'Arial', sans-serif; fill: #898781" transform="translate(81.62525 474.737313)">a daily volume, so the peak ratios are lower bounds. Pong 24 Sep 2025 is a recession day where the base-flow stand-in runs high.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p806a8d2fcf">
+   <rect x="141.24125" y="28.309375" width="401.76" height="371.448"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -75,6 +75,7 @@ punjabflood verify
 punjabflood report                     # renders docs/verification.md
 punjabflood forecast                   # one live cycle: outputs/forecast/<date>.{json,md}
 python scripts/sync_bulletins.py       # new BBMB captures from the hourly task into data/reference
+python scripts/make_figures.py         # board figures from outputs/verification into outputs/figures
 ```
 
 HydroBASINS: `https://data.hydrosheds.org/file/HydroBASINS/standard/hybas_as_lev08_v1c.zip`
@@ -98,6 +99,7 @@ climatology, plus the live BBMB bulletin and keyless Open-Meteo forecasts. Each 
 | `punjabflood/verify.py`, `report.py`, `forecast.py`, `cli.py` | verification, report, daily product, commands |
 | `data/reference/` | committed, sourced tables: WRD digitisation (with `VERIFICATION.md`), catchment GeoJSON, BBMB bulletins captured in 2026, CWC seed files, fitted parameters |
 | `docs/` | design, data sources, verification report, the implementation plan |
+| `outputs/figures/` | the three board figures (2025 event at Dhilwan, flood-scale ratios, error by lead), PNG and SVG, drawn by `scripts/make_figures.py` from `outputs/verification/` |
 
 ## Attribution
 
