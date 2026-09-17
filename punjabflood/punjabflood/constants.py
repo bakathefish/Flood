@@ -459,6 +459,81 @@ ANNEXURE_Z_TOTALS = {
 }
 ANNEXURE_Z_TOTAL_KM = {"Sutlej": 219.0, "Beas": 215.0, "Ghaggar": 236.0}
 
+
+# --------------------------------------------------------------------------------------
+# the land between the dams and the head works (roadmap, done in the first round)
+# --------------------------------------------------------------------------------------
+@dataclass(frozen=True)
+class LocalCatchment:
+    """An intermediate catchment: the HydroBASINS sub-basins that drain to a control point
+    below the dams, with the dam sets (and any local set built before it) removed. Its
+    runoff is added at the control points it feeds, on the day, with a dam's calibrated
+    response transferred, because no gauge history exists to fit one on."""
+
+    name: str
+    river: str
+    outlet: int  # the HydroBASINS level 8 sub-basin holding the control point
+    outlet_station: str
+    outlet_lat: float
+    outlet_lon: float
+    coord_source: str
+    exclude: tuple[str, ...]  # dam names and earlier local names whose upstream sets go
+    stations: tuple[str, ...]  # control points whose arrivals receive this runoff
+    transfer_dam: str = "Pong"  # whose calibrated runoff response is transferred
+    source: str = SRC_HYDROBASINS
+    note: str = ""
+
+
+SRC_WIKIPEDIA_COORDS = (
+    "Wikipedia article coordinates (MediaWiki API, prop=coordinates), read 2026-09-14"
+)
+SRC_OSM_NOMINATIM = "OpenStreetMap Nominatim search (nominatim.openstreetmap.org), read 2026-09-14"
+
+LOCAL_CATCHMENTS: dict[str, LocalCatchment] = {
+    lc.name: lc
+    for lc in (
+        LocalCatchment(
+            name="Sutlej local",
+            river="Sutlej",
+            outlet=4080735710,
+            outlet_station="Ropar Head Works",
+            outlet_lat=30.9667,
+            outlet_lon=76.5236,
+            coord_source=SRC_WIKIPEDIA_COORDS + "; Rupnagar 30.9667 N 76.5236 E",
+            exclude=("Bhakra",),
+            stations=("Ropar Head Works", "Railway Bridge Phillaur", "Harike Head Works"),
+            note="the Swan, the Sirsa and the Kandi torrents between Bhakra and Phillaur; the "
+            "level 8 sub-basin holding Ropar also holds Phillaur (31.03 N 75.78 E, same "
+            "source), so both stations receive the whole set",
+        ),
+        LocalCatchment(
+            name="Beas local",
+            river="Beas",
+            outlet=4080729700,
+            outlet_station="Dhilwan",
+            outlet_lat=31.52,
+            outlet_lon=75.35,
+            coord_source=SRC_WIKIPEDIA_COORDS + "; Dhilwan 31.52 N 75.35 E",
+            exclude=("Pong",),
+            stations=("Dhilwan", "Harike Head Works"),
+            note="the Chakki and the Kandi torrents between Pong and Dhilwan",
+        ),
+        LocalCatchment(
+            name="Harike local",
+            river="Sutlej+Beas",
+            outlet=4080730060,
+            outlet_station="Harike Head Works",
+            outlet_lat=31.1455,
+            outlet_lon=74.9464,
+            coord_source=SRC_OSM_NOMINATIM + "; 'Harike Barrage' (dam) 31.1455 N 74.9464 E",
+            exclude=("Bhakra", "Pong", "Sutlej local", "Beas local"),
+            stations=("Harike Head Works",),
+            note="the plains between Phillaur, Dhilwan and the Harike head works on both "
+            "rivers; the level 8 sub-basin at the confluence is about 12 km2",
+        ),
+    )
+}
+
 # Dhilwan is not an Annexure Z node. It lies between Tanda Bridge and Harike on the Beas;
 # the WRD peak table dates put its 2023 and 2025 peaks two days after the Pong releases.
 # We place it on the Tanda-Harike reach by distance (Dhilwan railway bridge is about 40 km

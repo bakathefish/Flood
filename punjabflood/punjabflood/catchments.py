@@ -48,6 +48,7 @@ class Catchment:
     area_km2: float
     upstream_ids: frozenset[int]
     points: pd.DataFrame  # columns lat, lon, weight_km2 (+ optional extra weight columns)
+    role: str = "upstream"  # "upstream" (dam or index point) or "local" (dam to control point)
 
     @property
     def n_points(self) -> int:
@@ -153,9 +154,42 @@ def targets() -> dict[str, int]:
     return t
 
 
+def build_local(
+    lc: C.LocalCatchment,
+    recs,
+    geoms,
+    exclude_sets: dict[str, set[int] | frozenset[int]],
+    step_deg: float = GRID_STEP,
+) -> Catchment:
+    """The sub-basins draining to ``lc.outlet`` with the upstream sets named in
+    ``lc.exclude`` removed. ``exclude_sets`` maps each name to its ids; a missing name is a
+    KeyError, never a silent empty set."""
+    ids = upstream_set(lc.outlet, recs)
+    for name in lc.exclude:
+        ids -= set(exclude_sets[name])
+    poly = unary_union([geoms[h] for h in ids if h in geoms])
+    return Catchment(
+        name=lc.name,
+        outlet=lc.outlet,
+        polygon=poly,
+        area_km2=geodesic_area_km2(poly),
+        upstream_ids=frozenset(ids),
+        points=sample_grid(poly, step_deg),
+        role="local",
+    )
+
+
 def build_all(shp_path: Path = DEFAULT_SHP, step_deg: float = GRID_STEP) -> dict[str, Catchment]:
+    """The dam and Ghaggar catchments, then the local catchments of
+    ``constants.LOCAL_CATCHMENTS`` in order, each exclusion resolved from the sets already
+    built."""
     recs, geoms = load_hydrobasins(shp_path)
-    return {name: build(name, outlet, recs, geoms, step_deg) for name, outlet in targets().items()}
+    cats = {name: build(name, outlet, recs, geoms, step_deg) for name, outlet in targets().items()}
+    for lc in C.LOCAL_CATCHMENTS.values():
+        cats[lc.name] = build_local(
+            lc, recs, geoms, {n: c.upstream_ids for n, c in cats.items()}, step_deg
+        )
+    return cats
 
 
 def save_geojson(cats: dict[str, Catchment], out_dir: Path = DEFAULT_OUT) -> list[Path]:
@@ -175,6 +209,7 @@ def save_geojson(cats: dict[str, Catchment], out_dir: Path = DEFAULT_OUT) -> lis
                     "outlet": c.outlet,
                     "area_km2": round(c.area_km2, 1),
                     "n_subbasins": len(c.upstream_ids),
+                    "role": c.role,
                     "source": C.SRC_HYDROBASINS,
                 },
             }
@@ -222,5 +257,6 @@ def load_geojson(out_dir: Path = DEFAULT_OUT) -> dict[str, Catchment]:
             area_km2=float(p["area_km2"]),
             upstream_ids=frozenset(),
             points=points,
+            role=str(p.get("role", "upstream")),
         )
     return cats
