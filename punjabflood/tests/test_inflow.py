@@ -464,3 +464,25 @@ def test_calibrate_on_inflow_recovers_the_response_and_scores_the_storage_fit():
     with pytest.raises(ValueError):
         inflow.calibrate_on_inflow(obs.iloc[:10], rain, "Pong", area)
 
+
+def test_inflow_fit_in_storage_convention_scores_the_storage_record_out_of_sample():
+    state, rain = _synthetic(c=0.55, outflow_bcm=0.03)
+    absorb = C.bcm_to_cusec_days(0.03)
+    p_store = inflow.calibrate(state, rain, "Pong", 12560.0)
+    # an inflow-basis set with the true response and the true base
+    p_in = inflow.InflowParams(
+        "Pong", 12560.0, c=0.55, w=(0.5, 0.3, 0.15, 0.05), rho=0.9,
+        intercept_bcm_per_day=0.05, basis="inflow",
+    )
+    q = inflow.as_storage_basis(p_in, absorb)
+    assert q.basis == "storage" and q.intercept_bcm_per_day == pytest.approx(0.05 - 0.03)
+    assert inflow.as_storage_basis(p_store, absorb) is p_store
+    s_true = inflow.storage_change_score(q, state, rain, "Pong", 12560.0)
+    s_fit = inflow.storage_change_score(p_store, state, rain, "Pong", 12560.0)
+    assert s_true["n_seasons"] == 5 and s_true["n_days"] > 300
+    # the true response scores about as well as the fit on its own record
+    assert s_true["rmse_bcm"] < s_fit["rmse_bcm"] * 1.2
+    # a wrong response scores worse
+    bad = inflow.InflowParams("Pong", 12560.0, c=0.2, w=(0.25,) * 4, rho=0.9, intercept_bcm_per_day=0.02)
+    assert inflow.storage_change_score(bad, state, rain, "Pong", 12560.0)["rmse_bcm"] > s_true["rmse_bcm"] * 1.5
+

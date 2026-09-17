@@ -47,6 +47,9 @@ DAM_NAMES = ("Bhakra", "Pong", "Ranjit Sagar")
 # docs/data-sources.md); the model is checked against them in `verify`
 PAC_PERIODS_CSV = REF / "bbmb" / "pac_period_means_2025.csv"
 INFLOW_POINTS_CSV = REF / "bbmb" / "inflow_points.csv"
+PRESS_READINGS_CSV = REF / "bbmb" / "press_readings.csv"  # every dated press reading the
+# sweeps found (scripts/ingest_readings.py); supersedes inflow_points.csv where present
+PRESS_VARIANT = "press inflow fit"
 SEASON_PEAKS_CSV = REF / "bbmb" / "season_peak_inflows_2025.csv"
 # the inflow-response variant the verification fits and scores beside the response in use
 EXCESS_VARIANT = f"excess above {inflow.EXCESS_THRESHOLD_MM:.0f} mm"
@@ -310,6 +313,34 @@ def _covered_area(rain_daily: pd.DataFrame, name: str, fallback: float) -> float
     return fallback
 
 
+def load_press_points() -> pd.DataFrame:
+    """The dated press readings with an inflow figure, for the flood-scale check: the merged
+    sweep table where it exists (every year, ambiguous rows left out), else the hand-checked
+    2023 and 2025 rows. Columns date, dam, inflow_cusecs, source."""
+    if PRESS_READINGS_CSV.exists():
+        pr = pd.read_csv(PRESS_READINGS_CSV)
+        pr = pr[pr["inflow_cusecs"].notna() & ~pr["ambiguous"].astype(bool)].copy()
+        pr["source"] = pr["source_title"].fillna("").str.slice(0, 70)
+        return pr[["date", "dam", "inflow_cusecs", "source"]].reset_index(drop=True)
+    points = pd.read_csv(INFLOW_POINTS_CSV)
+    points["source"] = points["source_short"]
+    return points[["date", "dam", "inflow_cusecs", "source"]]
+
+
+def press_inflow_daily(dam: str, up_to_year: int | None = None) -> pd.Series:
+    """The dated press readings of a dam's inflow as one value per day (the mean of the
+    day's readings, ambiguous rows left out), cusecs indexed by date; empty without the
+    merged table."""
+    if not PRESS_READINGS_CSV.exists():
+        return pd.Series(dtype=float)
+    pr = pd.read_csv(PRESS_READINGS_CSV)
+    pr = pr[(pr["dam"] == dam) & pr["inflow_cusecs"].notna() & ~pr["ambiguous"].astype(bool)]
+    pr["date"] = pd.to_datetime(pr["date"])
+    if up_to_year is not None:
+        pr = pr[pr["date"].dt.year <= up_to_year]
+    return pr.groupby("date")["inflow_cusecs"].mean().sort_index()
+
+
 def _flood_scale_truth(
     state: pd.DataFrame, event_year: int = 2025
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -320,8 +351,7 @@ def _flood_scale_truth(
     Each carries its short source label; the full citations are in the reference tables."""
     periods = pd.read_csv(PAC_PERIODS_CSV)
     periods["source"] = periods["source_short"]
-    points = pd.read_csv(INFLOW_POINTS_CSV)
-    points["source"] = points["source_short"]
+    points = load_press_points()
     sheets = state[
         (state["basis"] == "bbmb")
         & (pd.to_datetime(state["date"]).dt.year == event_year)
@@ -591,6 +621,49 @@ def run_verify(horizon_days: int = 5):
                         pp_variant[name][dam] = verify.perfect_prog_hei(
                             state_measured, rain_daily, dam, dam, p_v, horizon_days, "model"
                         )
+            # the response fitted on the dated press readings of inflow across seasons (moment
+            # readings; the years the storage record covers), scored on the storage record
+            # fully out of sample and under the same rule as the other variants
+            pp_variant[PRESS_VARIANT] = {}
+            results["press_inflow_fit"] = {}
+            for dam in DAM_NAMES:
+                if dam not in params:
+                    continue
+                daily = press_inflow_daily(dam, up_to_year=pd.Timestamp.utcnow().year - 1)
+                r = rain_daily[rain_daily["catchment"] == dam]
+                area = _covered_area(rain_daily, dam, cats[dam].area_km2)
+                absorb = hei.absorption_cusecs(dam)
+                try:
+                    p_press = inflow.calibrate_on_inflow(daily, r, dam, area, min_days=30)
+                except ValueError as exc:
+                    results["press_inflow_fit"][dam] = {"note": str(exc), "n_readings": int(len(daily))}
+                    continue
+                p_use = inflow.as_storage_basis(p_press, absorb)
+                results["press_inflow_fit"][dam] = {
+                    "n_readings": int(len(daily)),
+                    "params": p_press.to_dict(),
+                    "in_sample": inflow.score_on_inflow(
+                        p_press, daily, r, area, absorb, base_from_intercept=True
+                    ),
+                }
+                variant_rows.append(
+                    {
+                        "dam": dam,
+                        "variant": PRESS_VARIANT,
+                        **inflow.storage_change_score(p_use, state_measured, r, dam, area),
+                        "in_sample_rmse_bcm": p_press.rmse_bcm,
+                        "c": p_press.c,
+                        "c_wet": p_press.c_wet,
+                        "w": " ".join(f"{x:.2f}" for x in p_press.w),
+                        "c_excess": 0.0,
+                        "w_excess": "",
+                        "wetness": p_press.wetness,
+                        "gamma": 0.0,
+                    }
+                )
+                pp_variant[PRESS_VARIANT][dam] = verify.perfect_prog_hei(
+                    state_measured, rain_daily, dam, dam, p_use, horizon_days, "model"
+                )
             if variant_rows:
                 loso_df = pd.DataFrame(variant_rows)
                 loso_df.to_csv(out / "inflow_variants.csv", index=False)

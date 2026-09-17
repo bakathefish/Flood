@@ -763,3 +763,41 @@ def score_on_inflow(
         out["coefficient_ratio"] = float("nan")
     return out
 
+
+def as_storage_basis(p: InflowParams, absorption_cusecs: float) -> InflowParams:
+    """An inflow-basis parameter set expressed in the storage-change convention (intercept =
+    base minus the non-spill passage), so the verification runs and the product, which add
+    the passage back, read the same base. A storage-basis set is returned unchanged."""
+    if p.basis != "inflow":
+        return p
+    q = InflowParams.from_dict(p.to_dict())
+    q.intercept_bcm_per_day = p.intercept_bcm_per_day - C.cusec_days_to_bcm(absorption_cusecs)
+    q.basis = "storage"
+    return q
+
+
+def storage_change_score(
+    p: InflowParams,
+    state: pd.DataFrame,
+    rain: pd.DataFrame,
+    dam: str,
+    area_km2: float,
+    heavy_mm: float = EXCESS_THRESHOLD_MM,
+) -> dict:
+    """A fixed parameter set scored on the storage-change record, the same keys as
+    ``loso_score``. For a set not fitted on that record (an inflow fit) every season is out
+    of sample, so no leave-one-out is needed; ``n_seasons`` counts the seasons scored."""
+    df = design_matrix(state, rain, dam, area_km2)
+    if df.empty:
+        return {"n_seasons": 0, "n_days": 0, "rmse_bcm": float("nan"), "n_heavy_days": 0}
+    r = df["ds"].to_numpy() - predict_storage_change(p, df)
+    h = df["rain_mm"].to_numpy() >= heavy_mm
+    return {
+        "n_seasons": int(len(set(df.index.year))),
+        "n_days": int(len(r)),
+        "rmse_bcm": float(np.sqrt(np.mean(r**2))),
+        "n_heavy_days": int(h.sum()),
+        "heavy_rmse_bcm": float(np.sqrt(np.mean(r[h] ** 2))) if h.any() else float("nan"),
+        "heavy_bias_bcm": float(np.mean(r[h])) if h.any() else float("nan"),
+    }
+
