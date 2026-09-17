@@ -447,6 +447,31 @@ def run_verify(horizon_days: int = 5):
             results["event_timing"] = verify.event_timing_test(arr, peaks_d).to_dict(
                 orient="records"
             )
+            if C.flood_cushion("Pong") is not None:
+                # the same run with the reservoir allowed to rise to the top of the flood
+                # cushion before the spillway must open: the other end of the bracket
+                pp_cushion = verify.perfect_prog_hei(
+                    state_measured,
+                    rain_daily,
+                    "Pong",
+                    "Pong",
+                    params["Pong"],
+                    horizon_days,
+                    "model",
+                    capacity_bcm=C.cushion_capacity_bcm("Pong"),
+                )
+                pp_cushion.to_csv(out / "perfect_prog_event_pong_cushion.csv", index=False)
+                arr_c = verify.routed_next_day_release(pp_cushion, "Pong", passage=True)
+                arr_c.to_csv(out / "routed_pong_perfect_prog_cushion.csv", index=False)
+                results["event_timing_cushion"] = verify.event_timing_test(
+                    arr_c, peaks_d
+                ).to_dict(orient="records")
+                results["flood_cushion"] = {
+                    "dam": "Pong",
+                    "top_level_ft": C.flood_cushion("Pong")[0] / C.FOOT_M,
+                    "capacity_bcm": C.cushion_capacity_bcm("Pong"),
+                    "live_capacity_bcm": C.PONG.live_capacity_bcm.value,
+                }
             spill_only = verify.routed_next_day_release(pp_event, "Pong", passage=False)
             results["event_timing_spill_only"] = verify.event_timing_test(
                 spill_only, peaks_d

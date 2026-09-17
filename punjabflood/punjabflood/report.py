@@ -319,7 +319,20 @@ def render_verification(
         "(one-day inflow less the non-spill passage), and every measurement re-anchors it.",
         "",
     ]
+    fcush = results.get("flood_cushion")
+    if fcush:
+        lines += [
+            f"The rows marked flood cushion let {fcush['dam']} rise to {fcush['top_level_ft']:.0f} ft "
+            f"({fcush['capacity_bcm']:.3f} BCM live, the design pair in the emergency action plan) "
+            f"before the spillway must open, against {fcush['live_capacity_bcm']:.3f} BCM at the "
+            "reduced FRL in the other rows; the storage above FRL is rated on the straight line "
+            "between the two published points. The dam did rise into the cushion in both events, "
+            "so the two settings bracket what BBMB did: the FRL bound fires early and high, the "
+            "cushion bound late and low.",
+            "",
+        ]
     et = results.get("event_timing") or []
+    et_cushion = results.get("event_timing_cushion") or []
     et_spill = results.get("event_timing_spill_only") or []
     et_local = results.get("event_timing_local") or []
     et_local_rs = results.get("event_timing_local_ranjit_sagar") or []
@@ -330,6 +343,7 @@ def render_verification(
         ]
         for label, rows in (
             ("spill + passage", et),
+            ("spill + passage, flood cushion", et_cushion),
             ("spill only", et_spill),
             ("spill + passage + local inflow, Pong response", et_local),
             ("spill + passage + local inflow, Ranjit Sagar response", et_local_rs),

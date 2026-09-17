@@ -299,3 +299,35 @@ def test_markdown_names_the_source_of_each_recent_day():
         forecast.build_product("2026-09-04", states, det, ens, recent, params)
     )
 
+
+def test_product_prints_the_cushion_scenario_beside_the_frl_bound():
+    states, det, ens, params = _inputs(storage_frac=0.99, qpf_mm=80.0)
+    prod = forecast.build_product("2026-09-04", states, det, ens, {}, params)
+    e = prod["dams"]["Pong"]
+    c = e["cushion"]
+    assert c["capacity_bcm"] == pytest.approx(C.cushion_capacity_bcm("Pong"))
+    assert c["top_level_ft"] == pytest.approx(1400.0)
+    # the FRL bound spills at every horizon; the cushion absorbs the first days
+    frl = e["ensemble"]
+    for H in frl:
+        assert c["ensemble"][H]["p_exhaustion"] <= frl[H]["p_exhaustion"]
+        assert c["ensemble"][H]["peak_release_q50_cusecs"] <= frl[H]["peak_release_q50_cusecs"]
+    assert c["ensemble"]["1"]["p_exhaustion"] == 0.0
+    assert "deterministic" in c and all("hei" in v for v in c["deterministic"].values())
+    md = forecast.render_markdown(prod)
+    assert "flood cushion" in md and "1400" in md
+    # the routed arrivals stay the FRL bound
+    assert prod["reaches"] and "cushion" not in str(prod["reaches"])
+
+
+def test_no_cushion_block_for_a_dam_without_a_published_top():
+    states, det, ens, params = _inputs()
+    st = dict(states["Pong"])
+    st["storage_bcm"] = C.BHAKRA.live_capacity_bcm.value * 0.99
+    states2 = {"Bhakra": st}
+    det2 = det.assign(catchment="Bhakra")
+    ens2 = ens.assign(catchment="Bhakra")
+    prod = forecast.build_product("2026-09-04", states2, det2, ens2, {}, {"Bhakra": params["Pong"]})
+    assert "cushion" not in prod["dams"]["Bhakra"]
+    assert "no published storage figure above" in forecast.render_markdown(prod)
+

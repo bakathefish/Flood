@@ -733,3 +733,34 @@ def test_realtime_vs_final_scores_both_records_and_applies_the_switch_rule():
     # a dam with no real-time rows cannot pass
     cmp3 = verify.realtime_vs_final(final_df, rt[rt["catchment"] == "Pong"], era5, catchments=("Pong", "Bhakra"))
     assert not cmp3["switch"] and cmp3["dams_missing"] == ["Bhakra"]
+
+
+def test_perfect_prog_hei_takes_a_capacity_and_a_full_reservoir_keeps_filling_into_it():
+    cap = C.PONG.live_capacity_bcm.value
+    days = pd.date_range("2025-08-20", periods=12)
+    state = pd.DataFrame(
+        {"date": days, "dam": "Pong", "storage_bcm": cap, "basis": "cwc"}
+    )
+    rain_days = pd.date_range(days[0] - pd.Timedelta(days=10), days[-1])
+    rain = pd.DataFrame({"date": rain_days, "catchment": "Pong", "rain_mm": 25.0})
+    p = inflow.InflowParams(
+        "Pong", 12560.0, c=0.6, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0
+    )
+    at_frl = verify.perfect_prog_hei(state, rain, "Pong", "Pong", p, 3)
+    with_cushion = verify.perfect_prog_hei(
+        state, rain, "Pong", "Pong", p, 3, capacity_bcm=C.cushion_capacity_bcm("Pong")
+    )
+    assert (at_frl["forced_release_bcm"] > 0).all()
+    # the same days, the same inflow, no spill while the cushion holds the volume
+    assert (with_cushion["forced_release_bcm"] == 0).all()
+    assert with_cushion["inflow_day1_cusecs"].tolist() == pytest.approx(
+        at_frl["inflow_day1_cusecs"].tolist()
+    )
+    # the model carry clamps at the capacity it is given
+    s, basis, gaps = verify.carry_storage(
+        pd.Series([cap], index=[days[0]]), {days[0]: "cwc"},
+        rain.set_index("date")["rain_mm"], "Pong", p,
+        capacity_bcm=C.cushion_capacity_bcm("Pong"),
+    )
+    assert s.max() > cap and s.max() <= C.cushion_capacity_bcm("Pong") + 1e-9
+

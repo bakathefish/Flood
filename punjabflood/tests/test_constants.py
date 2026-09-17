@@ -92,3 +92,15 @@ def test_extra_constants_carry_sources_and_the_rule_curve_is_ordered():
     # nothing of the kind is claimed for Pong or Ranjit Sagar
     assert not any(k.startswith("rule_curve") for k in C.PONG.extra)
     assert not any(k.startswith("rule_curve") for k in C.RANJIT_SAGAR.extra)
+
+
+def test_flood_cushion_is_published_for_pong_only():
+    top_m, top_bcm = C.flood_cushion("Pong")
+    assert top_m == pytest.approx(1400.0 * C.FOOT_M)
+    assert top_bcm == pytest.approx(7.290)
+    assert top_bcm > C.PONG.live_capacity_bcm.value
+    assert C.cushion_capacity_bcm("Pong") == pytest.approx(7.290)
+    for dam in ("Bhakra", "Ranjit Sagar"):
+        assert C.flood_cushion(dam) is None
+        assert C.cushion_capacity_bcm(dam) == C.DAMS[dam].live_capacity_bcm.value
+

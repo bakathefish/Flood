@@ -21,22 +21,22 @@ For each WRD peak table, the predictors ranked by area under the ROC curve for t
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Ranjit Sagar_frac_aug01 | 10 | 1 | +0.71 | 1.00 | -0.04 |
-| Pong_hei_pp_max | 11 | 2 | +0.75 | 1.00 | +0.45 |
-| Pong_release_pp_max | 11 | 2 | +0.62 | 1.00 | +0.84 |
-| Pong_days_above_95pct | 11 | 2 | +0.62 | 1.00 | +0.54 |
+| Pong_days_above_95pct | 11 | 2 | +0.62 | 1.00 | +0.55 |
+| Pong_frac_max | 11 | 2 | +0.76 | 1.00 | +0.30 |
+| Pong_release_pp_max | 11 | 2 | +0.63 | 1.00 | +0.72 |
+| Pong_hei_pp_max | 11 | 2 | +0.75 | 1.00 | +0.51 |
 | Pong_frac_aug01 | 10 | 1 | +0.48 | 1.00 | -0.04 |
+| Ranjit Sagar_frac_aug01 | 10 | 1 | +0.71 | 1.00 | -0.04 |
 | Ranjit Sagar_max10d_bcm | 38 | 5 | +0.36 | 0.99 | +0.62 |
 | Ranjit Sagar_max5d_bcm | 38 | 5 | +0.33 | 0.98 | +0.49 |
 | Beas local_season_bcm | 38 | 5 | +0.51 | 0.98 | +0.36 |
 | Ranjit Sagar_max3d_bcm | 38 | 5 | +0.34 | 0.96 | +0.45 |
-| Sutlej local_season_bcm | 38 | 5 | +0.62 | 0.96 | +0.42 |
 
 Other pre-named predictors:
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Pong_frac_aug15 | 11 | 2 | +0.93 | 0.94 | +0.18 |
+| Pong_frac_aug15 | 11 | 2 | +0.93 | 0.94 | +0.25 |
 | Bhakra_hei_pp_max | 11 | 2 | +0.69 | 0.89 | +0.05 |
 | Pong_max3d_bcm | 38 | 5 | +0.40 | 0.87 | +0.26 |
 | Pong_max5d_bcm | 38 | 5 | +0.44 | 0.87 | +0.22 |
@@ -49,22 +49,22 @@ Other pre-named predictors:
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Ranjit Sagar_frac_aug01 | 10 | 1 | +0.73 | 1.00 | -0.04 |
-| Pong_hei_pp_max | 11 | 2 | +0.88 | 1.00 | +0.45 |
-| Pong_release_pp_max | 11 | 2 | +0.68 | 1.00 | +0.84 |
-| Pong_days_above_95pct | 11 | 2 | +0.68 | 1.00 | +0.54 |
+| Pong_days_above_95pct | 11 | 2 | +0.68 | 1.00 | +0.55 |
+| Pong_frac_max | 11 | 2 | +0.87 | 1.00 | +0.30 |
+| Pong_release_pp_max | 11 | 2 | +0.67 | 1.00 | +0.72 |
+| Pong_hei_pp_max | 11 | 2 | +0.88 | 1.00 | +0.51 |
 | Pong_frac_aug01 | 10 | 1 | +0.49 | 1.00 | -0.04 |
+| Ranjit Sagar_frac_aug01 | 10 | 1 | +0.73 | 1.00 | -0.04 |
 | Ranjit Sagar_max10d_bcm | 38 | 5 | +0.62 | 0.99 | +0.62 |
 | Ranjit Sagar_max5d_bcm | 38 | 5 | +0.56 | 0.98 | +0.49 |
 | Beas local_season_bcm | 38 | 5 | +0.67 | 0.98 | +0.36 |
 | Ranjit Sagar_max3d_bcm | 38 | 5 | +0.57 | 0.96 | +0.45 |
-| Sutlej local_season_bcm | 38 | 5 | +0.83 | 0.96 | +0.42 |
 
 Other pre-named predictors:
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Pong_frac_aug15 | 11 | 2 | +0.75 | 0.94 | +0.18 |
+| Pong_frac_aug15 | 11 | 2 | +0.75 | 0.94 | +0.25 |
 | Bhakra_hei_pp_max | 11 | 2 | +0.84 | 0.89 | +0.05 |
 | Pong_max3d_bcm | 38 | 5 | +0.47 | 0.87 | +0.26 |
 | Pong_max5d_bcm | 38 | 5 | +0.57 | 0.87 | +0.22 |
@@ -77,22 +77,22 @@ Other pre-named predictors:
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Ranjit Sagar_frac_aug01 | 10 | 1 | +0.56 | 1.00 | -0.04 |
-| Pong_hei_pp_max | 11 | 2 | +0.69 | 1.00 | +0.45 |
-| Pong_release_pp_max | 11 | 2 | +0.57 | 1.00 | +0.84 |
-| Pong_days_above_95pct | 11 | 2 | +0.57 | 1.00 | +0.54 |
+| Pong_days_above_95pct | 11 | 2 | +0.57 | 1.00 | +0.55 |
+| Pong_frac_max | 11 | 2 | +0.70 | 1.00 | +0.30 |
+| Pong_release_pp_max | 11 | 2 | +0.58 | 1.00 | +0.72 |
+| Pong_hei_pp_max | 11 | 2 | +0.69 | 1.00 | +0.51 |
 | Pong_frac_aug01 | 10 | 1 | +0.56 | 1.00 | -0.04 |
+| Ranjit Sagar_frac_aug01 | 10 | 1 | +0.56 | 1.00 | -0.04 |
 | Ranjit Sagar_max10d_bcm | 38 | 5 | +0.52 | 0.99 | +0.62 |
 | Ranjit Sagar_max5d_bcm | 38 | 5 | +0.49 | 0.98 | +0.49 |
 | Beas local_season_bcm | 38 | 5 | +0.62 | 0.98 | +0.36 |
 | Ranjit Sagar_max3d_bcm | 38 | 5 | +0.49 | 0.96 | +0.45 |
-| Sutlej local_season_bcm | 38 | 5 | +0.67 | 0.96 | +0.42 |
 
 Other pre-named predictors:
 
 | predictor | years | High years | Spearman rho | AUROC (High) | Brier skill |
 |---|---|---|---|---|---|
-| Pong_frac_aug15 | 11 | 2 | +0.59 | 0.94 | +0.18 |
+| Pong_frac_aug15 | 11 | 2 | +0.59 | 0.94 | +0.25 |
 | Bhakra_hei_pp_max | 11 | 2 | +0.68 | 0.89 | +0.05 |
 | Pong_max3d_bcm | 38 | 5 | +0.31 | 0.87 | +0.26 |
 | Pong_max5d_bcm | 38 | 5 | +0.40 | 0.87 | +0.22 |
@@ -105,16 +105,20 @@ Other pre-named predictors:
 
 The forced release of a full Pong reservoir under the observed rain (one-day-ahead spill of each day's run, placed on the day it happens) is routed to Dhilwan with the Annexure Z travel times and compared with the department's dated peak. The river release on a spill day is the spill plus the turbine passage less the Mukerian Hydel Channel's capacity (a full reservoir passes its inflow, so the turbines run); this is the lower bound on what the dam sends down the Beas, and the spill-only row below it is the lower bound of that. The rows with the local term add the runoff of the land between Pong and Dhilwan (the Beas local catchment, the HydroBASINS sub-basins that drain to Dhilwan below the dam) from its own IMD rain, with a dam's calibrated response transferred because no gauge exists to fit one on: Pong's response as the primary, Ranjit Sagar's (the lowest fitted coefficient) as the sensitivity; no base flow, so the term is a lower bound, and it arrives on the day it runs off. The storage that drives the index comes from the public record, which is weekly in August 2023 and a handful of press points in August 2025; between measurements the reservoir is carried by the model's own water balance under the observed rain (one-day inflow less the non-spill passage), and every measurement re-anchors it.
 
+The rows marked flood cushion let Pong rise to 1400 ft (7.290 BCM live, the design pair in the emergency action plan) before the spillway must open, against 6.157 BCM at the reduced FRL in the other rows; the storage above FRL is rated on the straight line between the two published points. The dam did rise into the cushion in both events, so the two settings bracket what BBMB did: the FRL bound fires early and high, the cushion bound late and low.
+
 | year | release routed | predicted peak date | predicted peak (cusecs) | observed peak date | observed peak (cusecs) | lag (days) | magnitude ratio |
 |---|---|---|---|---|---|---|---|
 | 2023 | spill + passage | 2023-08-17 | 181,686 | 2023-08-17 | 237,500 | +0 | 0.76 |
-| 2025 | spill + passage | 2025-08-28 | 173,501 | 2025-08-31 | 235,494 | -3 | 0.74 |
+| 2025 | spill + passage | 2025-08-28 | 192,037 | 2025-08-31 | 235,494 | -3 | 0.82 |
+| 2023 | spill + passage, flood cushion | no predicted release | | | | | |
+| 2025 | spill + passage, flood cushion | 2025-09-04 | 140,329 | 2025-08-31 | 235,494 | +4 | 0.60 |
 | 2023 | spill only | 2023-08-17 | 147,586 | 2023-08-17 | 237,500 | +0 | 0.62 |
-| 2025 | spill only | 2025-08-28 | 139,401 | 2025-08-31 | 235,494 | -3 | 0.59 |
+| 2025 | spill only | 2025-08-28 | 157,937 | 2025-08-31 | 235,494 | -3 | 0.67 |
 | 2023 | spill + passage + local inflow, Pong response | 2023-08-17 | 186,401 | 2023-08-17 | 237,500 | +0 | 0.78 |
-| 2025 | spill + passage + local inflow, Pong response | 2025-08-28 | 200,816 | 2025-08-31 | 235,494 | -3 | 0.85 |
+| 2025 | spill + passage + local inflow, Pong response | 2025-08-28 | 219,352 | 2025-08-31 | 235,494 | -3 | 0.93 |
 | 2023 | spill + passage + local inflow, Ranjit Sagar response | 2023-08-17 | 184,154 | 2023-08-17 | 237,500 | +0 | 0.78 |
-| 2025 | spill + passage + local inflow, Ranjit Sagar response | 2025-08-28 | 189,045 | 2025-08-31 | 235,494 | -3 | 0.80 |
+| 2025 | spill + passage + local inflow, Ranjit Sagar response | 2025-08-28 | 207,581 | 2025-08-31 | 235,494 | -3 | 0.88 |
 
 Local inflow at Dhilwan on the department's peak days (Pong response transferred; the routed dam release is the spill-plus-passage row above):
 
@@ -221,9 +225,9 @@ For each issue date the recorded or model-carried storage and the rain forecast 
 | 2024 | Pong | ecmwf_aifs025_single | 0 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | 2024-08-12 | n/a | nan | 0 |
 | 2024 | Pong | ecmwf_ifs025 | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | 2024-08-12 | n/a | 0 | 0 |
 | 2024 | Pong | gfs_seamless | 46 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | 2024-08-12 | n/a | 0 | 0 |
-| 2025 | Pong | ecmwf_aifs025_single | 41 | 23 (23 hits, 0 false) | 6 | 2025-08-17 | 2025-08-17, day 3 | 2025-08-14 | 2025-08-27 | +10 | 2025-08-31 | +14 | 133,607 | 139,401 |
-| 2025 | Pong | ecmwf_ifs025 | 41 | 25 (25 hits, 0 false) | 4 | 2025-08-15 | 2025-08-15, day 5 | 2025-08-14 | 2025-08-27 | +12 | 2025-08-31 | +16 | 173,377 | 139,401 |
-| 2025 | Pong | gfs_seamless | 41 | 23 (23 hits, 0 false) | 6 | 2025-08-17 | 2025-08-17, day 4 | 2025-08-14 | 2025-08-27 | +10 | 2025-08-31 | +14 | 120,955 | 139,401 |
+| 2025 | Pong | ecmwf_aifs025_single | 41 | 23 (23 hits, 0 false) | 6 | 2025-08-17 | 2025-08-17, day 3 | 2025-08-14 | 2025-08-27 | +10 | 2025-08-31 | +14 | 142,449 | 157,937 |
+| 2025 | Pong | ecmwf_ifs025 | 41 | 25 (25 hits, 0 false) | 4 | 2025-08-15 | 2025-08-15, day 5 | 2025-08-14 | 2025-08-27 | +12 | 2025-08-31 | +16 | 173,377 | 157,937 |
+| 2025 | Pong | gfs_seamless | 41 | 23 (23 hits, 0 false) | 6 | 2025-08-17 | 2025-08-17, day 4 | 2025-08-14 | 2025-08-27 | +10 | 2025-08-31 | +14 | 139,491 | 157,937 |
 | 2026 | Pong | ecmwf_aifs025_single | 42 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
 | 2026 | Pong | ecmwf_ifs025 | 42 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |
 | 2026 | Pong | gfs_seamless | 42 | 0 (0 hits, 0 false) | 0 | none | none | none | none | n/a | none | n/a | 0 | 0 |

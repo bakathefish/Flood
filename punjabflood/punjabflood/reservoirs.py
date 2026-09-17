@@ -231,8 +231,27 @@ class Rating:
         grid = np.unique(x)
         return cls(dam, grid, iso.predict(grid))
 
+    def with_cushion(self, dam: str) -> Rating:
+        """The same curve below FRL, then a straight line from ``(FRL, storage(FRL))`` to
+        the published top of the flood cushion (``constants.flood_cushion``). The CWC
+        live-storage column is capped at the FRL figure, so the fitted curve is flat above
+        FRL; the line replaces that flat top. Returns ``self`` where nothing is published."""
+        c = C.flood_cushion(dam) if dam in C.DAMS else None
+        if c is None:
+            return self
+        top_m, top_bcm = c
+        frl = C.DAMS[dam].frl_m.value
+        if top_m <= frl:
+            return self
+        s_frl = float(self.storage(frl))
+        keep = self.levels_m < frl
+        levels = np.r_[self.levels_m[keep], frl, top_m]
+        storage = np.r_[self.storage_bcm[keep], s_frl, max(top_bcm, s_frl)]
+        return Rating(self.dam, levels, storage)
+
     def storage(self, level_m) -> np.ndarray:
-        """Storage in BCM; clamps to the observed level range (no vertical extrapolation)."""
+        """Storage in BCM; clamps to the level range of the curve (no vertical
+        extrapolation), which with a flood cushion runs to the cushion's top."""
         return np.interp(np.asarray(level_m, dtype=float), self.levels_m, self.storage_bcm)
 
     def level(self, storage_bcm) -> np.ndarray:
@@ -247,7 +266,7 @@ def fit_ratings(cwc: pd.DataFrame) -> dict[str, Rating]:
     out = {}
     for dam, g in cwc.groupby("dam"):
         try:
-            out[dam] = Rating.fit(dam, g["level_m"], g["storage_bcm"])
+            out[dam] = Rating.fit(dam, g["level_m"], g["storage_bcm"]).with_cushion(dam)
         except ValueError:
             continue
     return out
@@ -268,8 +287,10 @@ def reconcile_cwc(
     take the rating's storage and ``basis='cwc_level'``. A level outside ``level_gate_m``
     is a mistyped level (the feed has 100 m digit slips): it is blanked and the storage
     kept, unless the storage is stale too, in which case both fields are untrustworthy and
-    the row is dropped. A level above the fitted range but inside the gate (a record season)
-    is kept and rated at the curve's top value. Rows without a rating pass unchanged."""
+    the row is dropped. A level above FRL inside the gate (a record season) is rated on the
+    flood-cushion line where the dam has one, else at the curve's top value; the feed's
+    capped storage on such days counts as inconsistent and takes the rating's. Rows without
+    a rating pass unchanged."""
     out = []
     for dam, g in cwc.groupby("dam", sort=False):
         g = g.sort_values("date").copy()

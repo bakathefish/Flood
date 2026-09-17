@@ -124,6 +124,7 @@ def carry_storage(
     params: inflow.InflowParams,
     max_carry_days: int = MAX_CARRY_DAYS,
     sm: pd.Series | None = None,
+    capacity_bcm: float | None = None,
 ) -> tuple[pd.Series, dict, dict]:
     """Daily storage between measurements from the model's own water balance.
 
@@ -138,8 +139,10 @@ def carry_storage(
     Returns the series, the basis per day, and the re-anchor gaps: on each measurement day
     the path reaches, the model's carried value for that day minus the measurement. A
     positive gap means the reservoir gained less than the model's balance says, which is the
-    dam passing more than its turbines, the inflow over-predicted, or both."""
-    cap = C.DAMS[dam].live_capacity_bcm.value
+    dam passing more than its turbines, the inflow over-predicted, or both. ``capacity_bcm``
+    is the ceiling the carry clamps at (the live capacity at FRL by default; the top of the
+    flood cushion for that scenario)."""
+    cap = C.DAMS[dam].live_capacity_bcm.value if capacity_bcm is None else float(capacity_bcm)
     absorb = hei.absorption_cusecs(dam)
     a_bcm = C.cusec_days_to_bcm(absorb)
     base_bcm = max(params.intercept_bcm_per_day + a_bcm, 0.0)
@@ -203,6 +206,7 @@ def perfect_prog_hei(
     params: inflow.InflowParams,
     horizon_days: int = 5,
     carry: str = "given",
+    capacity_bcm: float | None = None,
 ) -> pd.DataFrame:
     """Daily headroom-exhaustion index using observed rain as a perfect forecast and the
     recorded storage as the state. Returns date, dam, hei, forced_release_bcm, the horizon
@@ -210,8 +214,12 @@ def perfect_prog_hei(
 
     ``carry='given'`` uses the storage rows as supplied (the caller may have interpolated
     gaps, basis ``interp``). ``carry='model'`` drops interpolated rows and bridges the gaps
-    between measurements with ``carry_storage`` (basis ``model``)."""
-    s, basis, rain, gaps, sm = _event_series(state, rain_daily, dam, catchment, params, carry)
+    between measurements with ``carry_storage`` (basis ``model``). ``capacity_bcm`` runs
+    the balance against another ceiling than the live capacity at FRL (the flood-cushion
+    scenario)."""
+    s, basis, rain, gaps, sm = _event_series(
+        state, rain_daily, dam, catchment, params, carry, capacity_bcm
+    )
     absorb = hei.absorption_cusecs(dam)
     rows = []
     for d, storage in s.items():
@@ -224,7 +232,15 @@ def perfect_prog_hei(
         if fut.isna().any() or past.isna().any():
             continue
         row = _hei_row(
-            dam, d, storage, fut.to_numpy(), past.to_numpy(), params, absorb, _anom(sm, d)
+            dam,
+            d,
+            storage,
+            fut.to_numpy(),
+            past.to_numpy(),
+            params,
+            absorb,
+            _anom(sm, d),
+            capacity_bcm=capacity_bcm,
         )
         row["storage_basis"] = basis.get(d, "")
         row["reanchor_gap_bcm"] = gaps.get(d, float("nan"))
@@ -239,6 +255,7 @@ def _event_series(
     catchment: str,
     params: inflow.InflowParams,
     carry: str,
+    capacity_bcm: float | None = None,
 ) -> tuple[pd.Series, dict, pd.Series, dict, pd.Series | None]:
     """The storage series (measured, or measured and model-carried), its basis per day, the
     observed catchment rain series, the re-anchor gaps of ``carry_storage`` (empty without
@@ -255,12 +272,22 @@ def _event_series(
     sm = sm_anomaly_series_for(rain_daily, catchment, params)
     gaps: dict = {}
     if carry == "model" and len(s):
-        s, basis, gaps = carry_storage(s, basis, rain, dam, params, sm=sm)
+        s, basis, gaps = carry_storage(
+            s, basis, rain, dam, params, sm=sm, capacity_bcm=capacity_bcm
+        )
     return s, basis, rain, gaps, sm
 
 
 def _hei_row(
-    dam, d, storage, fut, past, params: inflow.InflowParams, absorb: float, sm_anom: float = 0.0
+    dam,
+    d,
+    storage,
+    fut,
+    past,
+    params: inflow.InflowParams,
+    absorb: float,
+    sm_anom: float = 0.0,
+    capacity_bcm: float | None = None,
 ) -> dict:
     """One day's index from a storage, a rain path over the horizon (``fut``, mm per day),
     the recent observed rain (``past``) and the day's soil-moisture anomaly. The base flow
@@ -275,7 +302,7 @@ def _hei_row(
         rain_mm_recent=past,
         sm_anom=sm_anom,
     )
-    res = hei.headroom_exhaustion(dam, float(storage), daily, absorb)
+    res = hei.headroom_exhaustion(dam, float(storage), daily, absorb, capacity_bcm=capacity_bcm)
     return {
         "date": d,
         "dam": dam,

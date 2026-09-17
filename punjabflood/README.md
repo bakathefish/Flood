@@ -22,7 +22,8 @@ turns that mechanism into a daily hazard watch:
    turbines can pass, per dam and horizon (1 to 5 days). Positive means the spillway must
    open: a full reservoir passes its inflow. The probability that it opens is printed twice,
    from the 51-member rain ensemble alone and with the inflow model's own error sampled on
-   top.
+   top. For Pong a second scenario lets the reservoir rise into its published flood
+   cushion (to 1400 ft) before the spillway must open; the two bracket the operator.
 5. **Routing.** The forced release travels with the Water Resources Department's Annexure Z
    times to Ropar, Phillaur, Harike, Dhilwan and Ferozepur, the runoff of the land between
    the dams and the head works (three HydroBASINS local catchments, a dam's calibrated

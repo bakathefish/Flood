@@ -286,6 +286,41 @@ def build_product(
                 entry["ensemble"][str(H)] = summary
                 if H == h_max:
                     res_max = res
+            cushion = C.flood_cushion(dam)
+            if cushion is not None:
+                # the same members against the top of the flood cushion: what the dam can
+                # hold before the spillway must open if BBMB lets it rise above FRL
+                cap_c = cushion[1]
+                ens_c = {}
+                for H in horizons:
+                    daily_h = [d[:H] for d in member_daily if len(d) >= H]
+                    res_c = [
+                        hei.headroom_exhaustion(dam, st["storage_bcm"], d, absorb, capacity_bcm=cap_c)
+                        for d in daily_h
+                    ]
+                    summary_c = hei.ensemble_summary(res_c)
+                    summary_c.update(
+                        hei.ensemble_summary_with_error(
+                            dam, st["storage_bcm"], daily_h, absorb, p.rmse_bcm, p.resid_acf1,
+                            capacity_bcm=cap_c,
+                        )
+                    )
+                    ens_c[str(H)] = summary_c
+                entry["cushion"] = {
+                    "top_level_ft": cushion[0] / C.FOOT_M,
+                    "capacity_bcm": cap_c,
+                    "headroom_bcm": max(cap_c - st["storage_bcm"], 0.0),
+                    "deterministic": {
+                        str(H): hei.headroom_exhaustion(
+                            dam, st["storage_bcm"], det_daily[m][:H], absorb, capacity_bcm=cap_c
+                        ).to_dict()
+                        for m in [PRIMARY_DETERMINISTIC if PRIMARY_DETERMINISTIC in det_daily else next(iter(det_daily))]
+                        for H in horizons
+                    }
+                    if det_daily
+                    else {},
+                    "ensemble": ens_c,
+                }
             rel = np.array([r.release_by_day_cusecs for r in res_max])
             median_rel = np.median(rel, axis=0)
             entry["forced_release_median_cusecs_by_day"] = [float(x) for x in median_rel]
@@ -399,6 +434,27 @@ def render_markdown(product: dict) -> str:
                 f"{s['date']}, {s['anomaly']:+.2f} against its day-of-year climatology "
                 f"({s['age_days']} days before issue); the rain response carries it "
                 f"(wetness carrier {s['wetness']})."
+            )
+        if e.get("cushion"):
+            c = e["cushion"]
+            lines.append(
+                f"With the flood cushion to {c['top_level_ft']:.0f} ft ({c['capacity_bcm']:.3f} BCM, "
+                f"headroom {c['headroom_bcm']:.3f} BCM), P(spillway forced) by horizon: "
+                + ", ".join(
+                    f"{H} d {s['p_exhaustion']:.2f}"
+                    + (
+                        f" ({s['p_exhaustion_model_error']:.2f} with model error)"
+                        if s.get("p_exhaustion_model_error") is not None
+                        else ""
+                    )
+                    for H, s in c["ensemble"].items()
+                )
+                + ". The table below and the routed arrivals are the FRL bound."
+            )
+        elif dam in C.DAMS and C.flood_cushion(dam) is None:
+            lines.append(
+                "No flood-cushion scenario: no published storage figure above FRL for this dam; "
+                "the FRL bound below is an early, upper bound."
             )
         if e["ensemble"]:
             lines.append("")

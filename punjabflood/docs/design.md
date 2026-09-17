@@ -25,6 +25,19 @@ best-match model's past day otherwise, and records the source of every day; the 
 put the real-time grid in front of the model's past days is in the verification section
 below (item 4) and the switch is `forecast.OBSERVED_RECORD`.
 
+**The flood cushion.** BBMB lets Pong rise above its reduced FRL in a flood (1398 ft in
+August 2023, 1394.7 ft in September 2025), and the CWC record's live-storage column is
+capped at the FRL figure, so a rating fitted on that record is flat above 1390 ft. The
+emergency action plan publishes the design pair, 1400 ft with 7,290 MCM live, which fixes
+the storage above FRL: the rating keeps its fitted curve below FRL and runs on a straight
+line from the fitted value at FRL to that point (`reservoirs.Rating.with_cushion`). Every
+consumer of a level above FRL, the state record, the bulletin state and the reconciliation
+of the feed's capped rows, rates on the line. The headroom-exhaustion functions take the
+capacity as a parameter, so the product prints two scenarios for Pong: the FRL bound (the
+spillway opens at 1390 ft; the routed arrivals use this, the early upper bound) and the
+cushion scenario (the spillway opens at 1400 ft), and the event-timing test runs both. No
+figure above FRL is published for Bhakra or Ranjit Sagar, so they have the FRL bound only.
+
 **Catchment to reservoir.** Inflow is a base component plus a quick response to the last
 four days of catchment rain. The quick response is calibrated on what the public record
 holds, the CWC storage series: during filling season the day-to-day storage change is
@@ -238,8 +251,11 @@ The full list, ordered by expected effect, is `roadmap.md`.
   AIFS (single, no ensemble). AIFS is scored beside IFS on exactly the days both have; the
   product's primary deterministic model changes only under the rule in `verify.py`, and the
   spill probability keeps the IFS ensemble because AIFS has none there.
-- The ratings clamp at the highest level each dam has printed; above that the flood cushion
-  above full reservoir level is not resolved, and headroom is simply zero.
+- Above full reservoir level only Pong is resolved: its rating runs on a straight line from
+  the fitted value at 1390 ft to the emergency action plan's design pair (1400 ft, 7,290 MCM
+  live), and the product prints a flood-cushion scenario beside the FRL bound. Bhakra's
+  bulletin prints an MWL of 1690 ft and Ranjit Sagar none, with no storage figure above FRL
+  for either, so their ratings clamp at FRL and their forced release is the FRL bound only.
 - The local inflow term is not fitted on anything local: the intermediate catchments carry a
   dam's runoff response, and the plains and the Shivalik torrents need not respond like a
   Himalayan catchment. Daily gauge readings at Ropar, Dhilwan or Harike during a flood (the

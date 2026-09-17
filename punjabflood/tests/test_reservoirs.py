@@ -196,3 +196,34 @@ def test_headroom_floors_at_zero():
     assert reservoirs.headroom_bcm([7.0], "Bhakra")[0] == 0.0
     assert reservoirs.headroom_bcm([6.0], "Bhakra")[0] == pytest.approx(0.229)
     assert reservoirs.storage_fraction([3.1145], "Bhakra")[0] == pytest.approx(0.5)
+
+
+def test_rating_with_cushion_runs_a_line_from_frl_to_the_published_top():
+    frl = C.PONG.frl_m.value
+    levels = np.linspace(frl - 30.0, frl + 2.0, 200)
+    cap = C.PONG.live_capacity_bcm.value
+    # the record's live-storage column is capped at the FRL figure above FRL
+    storage = np.minimum(cap - (frl - levels) * 0.1, cap)
+    base = reservoirs.Rating.fit("Pong", levels, storage)
+    assert float(base.storage(frl + 1.9)) == pytest.approx(float(base.storage(frl)), abs=0.01)
+    r = base.with_cushion("Pong")
+    top_m, top_bcm = C.flood_cushion("Pong")
+    # below FRL nothing moves
+    for lv in (frl - 20.0, frl - 5.0, frl - 0.5):
+        assert float(r.storage(lv)) == pytest.approx(float(base.storage(lv)), abs=1e-9)
+    # at FRL the fitted value, at the top the published value, between them the line
+    s_frl = float(base.storage(frl))
+    assert float(r.storage(frl)) == pytest.approx(s_frl, abs=1e-9)
+    assert float(r.storage(top_m)) == pytest.approx(top_bcm)
+    mid = frl + (top_m - frl) / 2
+    assert float(r.storage(mid)) == pytest.approx((s_frl + top_bcm) / 2, rel=1e-6)
+    assert r.level_range_m[1] == pytest.approx(top_m)
+    # the 2023 record level (1398 ft) rates well above the FRL capacity
+    assert float(r.storage(1398.0 * C.FOOT_M)) > cap + 0.8
+    # a dam without a published cushion is returned unchanged
+    b = reservoirs.Rating.fit("Bhakra", levels + 90.0, storage)
+    assert b.with_cushion("Bhakra") is b
+    # fit_ratings applies it
+    df = pd.DataFrame({"dam": "Pong", "level_m": levels, "storage_bcm": storage})
+    assert reservoirs.fit_ratings(df)["Pong"].level_range_m[1] == pytest.approx(top_m)
+

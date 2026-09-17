@@ -37,5 +37,10 @@ def test_event_figure_carries_the_verification_numbers(figs):
     text = png.with_suffix(".svg").read_text(encoding="utf-8")
     # the observed peak and the model peak from results.json / the WRD table
     assert "235,494" in text
-    assert "ratio 0.85" in text
+    # the model-peak ratio the figure prints is the one verification recorded, not a typed one
+    import json
+
+    et = json.load(open("outputs/verification/results.json", encoding="utf-8"))["event_timing_local"]
+    ratio = next(r["magnitude_ratio"] for r in et if r["year"] == 2025)
+    assert f"ratio {ratio:.2f}" in text
     assert "first ECMWF flag 15 Aug" in text

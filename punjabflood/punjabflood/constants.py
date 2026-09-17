@@ -291,6 +291,12 @@ PONG = Dam(
             "37 km lined channel from the Shah Nehar barrage, maximum carrying capacity 11500 "
             "cusecs (Stage-II channel, 3.5 km, also 11500 cusecs, takes off from it)",
         ),
+        # the flood cushion above the reduced FRL: the EAP's design pair fixes the storage
+        # at 1400 ft; between 1390 and 1400 ft the rating runs on a straight line to it
+        "cushion_top_ft": Sourced(1400.0, SRC_PONG_EAP, "design FRL 1400 ft (426.72 m)"),
+        "cushion_top_live_bcm": Sourced(
+            7.290, SRC_PONG_EAP, "design live storage 7,290 MCM at 1400 ft"
+        ),
         "eap_blue_alert": (
             "RWL about 1380 ft with inflows 75,000 cusecs on 31 August (EAP alert table)"
         ),
@@ -348,6 +354,23 @@ RANJIT_SAGAR = Dam(
 )
 
 DAMS: dict[str, Dam] = {d.name: d for d in (BHAKRA, PONG, RANJIT_SAGAR)}
+
+
+def flood_cushion(dam: str) -> tuple[float, float] | None:
+    """The published storage above FRL: ``(top level in metres, live storage in BCM at that
+    level)``, or None where no figure above FRL is published (Bhakra's bulletin prints an
+    MWL of 1690 ft and Ranjit Sagar none, with no storage for either)."""
+    x = DAMS[dam].extra
+    if "cushion_top_ft" not in x or "cushion_top_live_bcm" not in x:
+        return None
+    return float(x["cushion_top_ft"].value) * FOOT_M, float(x["cushion_top_live_bcm"].value)
+
+
+def cushion_capacity_bcm(dam: str) -> float:
+    """Live storage at the top of the flood cushion, or the live capacity at FRL where no
+    cushion is published."""
+    c = flood_cushion(dam)
+    return DAMS[dam].live_capacity_bcm.value if c is None else c[1]
 
 
 # --------------------------------------------------------------------------------------

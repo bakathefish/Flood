@@ -129,6 +129,20 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             "note": "too few days",
         },
     ]
+    results["flood_cushion"] = {
+        "dam": "Pong", "top_level_ft": 1400.0, "capacity_bcm": 7.29, "live_capacity_bcm": 6.157,
+    }
+    results["event_timing_cushion"] = [
+        {
+            "year": 2025,
+            "predicted_peak_date": "2025-08-27",
+            "predicted_peak_cusecs": 90000.0,
+            "observed_peak_date": "2025-08-27",
+            "observed_peak_cusecs": 300000.0,
+            "lag_days": 0,
+            "magnitude_ratio": 0.3,
+        }
+    ]
     results["realtime_rain"] = {
         "season": 2025,
         "heavy_mm": 30.0,
@@ -402,6 +416,8 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     assert "### The machine-learned model against the primary deterministic model" in md
     # the in-season observed-rain records against the final grid, and the verdict
     assert "### The in-season observed rain: IMD real-time grid and ERA5 against the final grid" in md
+    assert "| 2025 | spill + passage, flood cushion | 2025-08-27 | 90,000 | 2025-08-27 | 300,000 | +0 | 0.30 |" in md
+    assert "let Pong rise to 1400 ft (7.290 BCM live" in md
     assert "| Pong | imd_rt | 122 | 9.4 | -5% | 0.91 | 1.8 | 12 | 0.83 | 0.09 |" in md
     assert "| Pong | era5 | 122 | 9.4 | -26% | 0.70 | 4.2 | 12 | 0.25 | 0.40 |" in md
     assert "Verdict: the product's observed record switches to the IMD real-time grid" in md

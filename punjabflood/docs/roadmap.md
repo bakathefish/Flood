@@ -128,6 +128,23 @@ numbers that motivate them are in `verification.md`, never repeated here.
   lacks, and the final grid replaces both when the year arrives. The switch is
   `forecast.OBSERVED_RECORD`. This settles the in-season half of item 4; the forecast
   half (the models' heavy-day totals) stays open below.
+- **The flood cushion above FRL at Pong.** The CWC record's live-storage column is capped at
+  the FRL figure, so the fitted rating was flat above 1390 ft and every reading of the 2023
+  and 2025 floods (1398 ft, 1394.7 ft) rated as "full": zero storage change on the flood
+  days, and a forced release that fires the moment the reservoir touches FRL. The Pong
+  emergency action plan publishes the design pair, 1400 ft with 7,290 MCM live, and the
+  rating now runs on a straight line from its fitted value at FRL to that point
+  (`reservoirs.Rating.with_cushion`), which every consumer of a level above FRL uses. The
+  headroom functions take the capacity as a parameter; the product prints a cushion scenario
+  beside the FRL bound (spill probability and peak release by horizon with the spillway
+  opening at 1400 ft), and the event-timing test runs both settings, which bracket what BBMB
+  did in each event. Outcome (`verification.md`, event timing): the FRL bound keeps the
+  timing it had, and the cushion bound fires late in 2025 and not at all in 2023, so BBMB
+  opened the spillway before the cushion was used up in both floods; the FRL bound stays
+  the product's routed scenario and the cushion scenario is printed as the other end of
+  the bracket. The storage-change calibration was rerun on the corrected record and the
+  fitted parameters did not move to the third decimal (the fit uses filling days below
+  FRL). Bhakra and Ranjit Sagar have no published figure above FRL; that remains item 7.
 
 ## Next, in order
 
@@ -204,11 +221,12 @@ numbers that motivate them are in `verification.md`, never repeated here.
    flood scale can be measured and the probability made an outer estimate instead of an
    inner one; the flood-scale check in `verification.md` already brackets it from the period
    means and season peaks the record holds. Effort: small once item 1 lands.
-7. **Flood cushion above FRL.** Pong went to 1398 ft in 2023 and 1394.7 ft in 2025, above the
-   1390 ft FRL; that storage absorbed part of the peak. The rating clamps at the highest
-   level in the record, so the model treats FRL as the ceiling, which makes the forced
-   release an early, upper bound. A published elevation-capacity table above FRL (the EAP has
-   the gross figure at design FRL) would resolve it. Effort: small once the table is found.
+7. **Flood cushion above FRL, Bhakra and Ranjit Sagar.** Pong's is done (above). Bhakra's
+   bulletin header prints an MWL of 1690 ft and Ranjit Sagar has none in hand, and no
+   storage figure above FRL is published for either, so their ratings clamp at FRL and
+   their forced release stays the FRL bound. An elevation-capacity table above FRL for
+   either dam (BBMB, the CWC dam register, a right-to-information reply) is what a cushion
+   scenario there needs. Effort: small once a table is found.
 8. **A second observed-rain record.** CHIRPS through the keyless ClimateSERV polygon API
    would give an independent 1981-onward series to cross-check the IMD grid in the mountains.
    Effort: medium; another dependency and quota.
