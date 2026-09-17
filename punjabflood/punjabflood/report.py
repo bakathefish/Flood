@@ -304,7 +304,12 @@ def render_verification(
         "release on a spill day is the spill plus the turbine passage less the Mukerian Hydel "
         "Channel's capacity (a full reservoir passes its inflow, so the turbines run); this is "
         "the lower bound on what the dam sends down the Beas, and the spill-only row below it "
-        "is the lower bound of that. Tributaries between Pong and Dhilwan are not modelled. "
+        "is the lower bound of that. The rows with the local term add the runoff of the land "
+        "between Pong and Dhilwan (the Beas local catchment, the HydroBASINS sub-basins that "
+        "drain to Dhilwan below the dam) from its own IMD rain, with a dam's calibrated "
+        "response transferred because no gauge exists to fit one on: Pong's response as the "
+        "primary, Ranjit Sagar's (the lowest fitted coefficient) as the sensitivity; no base "
+        "flow, so the term is a lower bound, and it arrives on the day it runs off. "
         "The storage that drives the index comes from the public record, which is weekly in "
         "August 2023 and a handful of press points in August 2025; between measurements the "
         "reservoir is carried by the model's own water balance under the observed rain "
@@ -313,12 +318,19 @@ def render_verification(
     ]
     et = results.get("event_timing") or []
     et_spill = results.get("event_timing_spill_only") or []
+    et_local = results.get("event_timing_local") or []
+    et_local_rs = results.get("event_timing_local_ranjit_sagar") or []
     if et:
         lines += [
             "| year | release routed | predicted peak date | predicted peak (cusecs) | observed peak date | observed peak (cusecs) | lag (days) | magnitude ratio |",
             "|---|---|---|---|---|---|---|---|",
         ]
-        for label, rows in (("spill + passage", et), ("spill only", et_spill)):
+        for label, rows in (
+            ("spill + passage", et),
+            ("spill only", et_spill),
+            ("spill + passage + local inflow, Pong response", et_local),
+            ("spill + passage + local inflow, Ranjit Sagar response", et_local_rs),
+        ):
             for r in rows:
                 if r.get("note") and r["note"] == r["note"]:
                     lines.append(f"| {r['year']} | {label} | {r['note']} | | | | | |")
@@ -332,6 +344,31 @@ def render_verification(
     else:
         lines.append("Not run (no perfect-prognosis series).")
     lines.append("")
+    ls = results.get("local_inflow_summary") or []
+    if ls:
+        lines += [
+            "Local inflow at Dhilwan on the department's peak days (Pong response "
+            "transferred; the routed dam release is the spill-plus-passage row above):",
+            "",
+            "| year | observed peak date | local inflow that day (cusecs) | share of the "
+            "observed peak | largest within 3 days (cusecs, date) | routed dam release that "
+            "day (cusecs) | dam plus local, ratio to observed |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for r in ls:
+            note = r.get("note")
+            if note and note == note:
+                lines.append(
+                    f"| {r['year']} | {r.get('observed_peak_date', '')} | {note} | | | | |"
+                )
+                continue
+            lines.append(
+                f"| {r['year']} | {r['observed_peak_date']} | "
+                f"{r['local_on_peak_day_cusecs']:,.0f} | {r['local_share_of_observed_peak']:.2f} | "
+                f"{r['local_max_within_3_days_cusecs']:,.0f} ({r['local_max_date']}) | "
+                f"{r['routed_dam_on_peak_day_cusecs']:,.0f} | {r['dam_plus_local_ratio']:.2f} |"
+            )
+        lines.append("")
     pp_path = out_dir / "perfect_prog_event_pong.csv"
     if not pp_path.exists():
         pp_path = out_dir / "perfect_prog_hei_daily.csv"

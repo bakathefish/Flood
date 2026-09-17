@@ -80,16 +80,24 @@ def build_catchments(shp: Path = RAW / "hydrobasins" / "hybas_as_lev08_v1c", imd
 
 
 @app.command("build-rain")
-def build_rain(start_year: int = 1961, end_year: int = 2025):
-    """IMD gridded rain as catchment means (IMD-covered part), one row per catchment-day."""
+def build_rain(start_year: int = 1961, end_year: int = 2025, only: str = ""):
+    """IMD gridded rain as catchment means (IMD-covered part), one row per catchment-day.
+    ``--only "A,B"`` rebuilds those catchments and keeps every other catchment's rows."""
     _log()
     cats = catchments_mod.load_geojson()
-    df = imdrain.catchment_daily(range(start_year, end_year + 1), cats)
+    names = [n.strip() for n in only.split(",") if n.strip()] if only else list(cats)
+    missing = [n for n in names if n not in cats]
+    if missing:
+        raise typer.BadParameter(f"unknown catchment(s): {missing}")
+    df = imdrain.catchment_daily(range(start_year, end_year + 1), {n: cats[n] for n in names})
     RAIN_CSV.parent.mkdir(parents=True, exist_ok=True)
     if RAIN_CSV.exists():
         old = pd.read_csv(RAIN_CSV)
-        old = old[old["source"] != "imd"]
-        df = pd.concat([df, old], ignore_index=True)
+        keep = ~((old["source"] == "imd") & old["catchment"].isin(names))
+        df = pd.concat([df, old[keep]], ignore_index=True)
+    # one date format on disk: a partial rebuild mixes fresh Timestamps with the file's
+    # strings, and a mixed column would print some rows with a time of day
+    df["date"] = pd.to_datetime(df["date"], format="ISO8601").dt.strftime("%Y-%m-%d")
     df = df.sort_values(["catchment", "date"])
     df.to_csv(RAIN_CSV, index=False)
     typer.echo(f"wrote {RAIN_CSV}: {len(df)} rows")
@@ -126,8 +134,8 @@ def pull_rain_recent(start: str | None = None, end: str | None = None):
     new = pd.concat(frames, ignore_index=True)
     if RAIN_CSV.exists():
         old = pd.read_csv(RAIN_CSV)
-        old["date"] = pd.to_datetime(old["date"])
-        new["date"] = pd.to_datetime(new["date"])
+        old["date"] = pd.to_datetime(old["date"], format="ISO8601")
+        new["date"] = pd.to_datetime(new["date"], format="ISO8601")
         keep = ~(
             (old["source"] == "era5") & old["date"].between(new["date"].min(), new["date"].max())
         )
@@ -331,6 +339,42 @@ def run_verify(horizon_days: int = 5):
             results["event_timing_spill_only"] = verify.event_timing_test(
                 spill_only, peaks_d
             ).to_dict(orient="records")
+            # the land between Pong and Dhilwan (roadmap, done in the first round): its own
+            # rain through a transferred response, added at Dhilwan on the day; Pong's
+            # response as the primary transfer, Ranjit Sagar's (the lowest coefficient) as
+            # the sensitivity
+            local_areas = {
+                n: _covered_area(rain_daily, n, cats[n].area_km2)
+                for n in C.LOCAL_CATCHMENTS
+                if n in cats
+            }
+            local_by_dam = verify.local_inflow_series(rain_daily, local_areas, params)
+            if "Pong" in local_by_dam:
+                pd.concat(
+                    {
+                        f"{n} ({dam})": s
+                        for dam, by_cat in local_by_dam.items()
+                        for n, s in by_cat.items()
+                    },
+                    axis=1,
+                ).to_csv(out / "local_inflow_daily.csv", index_label="date")
+                arr_local = verify.routed_next_day_release(
+                    pp_event, "Pong", passage=True, local=local_by_dam["Pong"]
+                )
+                arr_local.to_csv(out / "routed_pong_perfect_prog_local.csv", index=False)
+                results["event_timing_local"] = verify.event_timing_test(
+                    arr_local, peaks_d
+                ).to_dict(orient="records")
+                results["local_inflow_summary"] = verify.local_inflow_summary(
+                    local_by_dam["Pong"], arr, peaks_d
+                ).to_dict(orient="records")
+                if "Ranjit Sagar" in local_by_dam:
+                    arr_rs = verify.routed_next_day_release(
+                        pp_event, "Pong", passage=True, local=local_by_dam["Ranjit Sagar"]
+                    )
+                    results["event_timing_local_ranjit_sagar"] = verify.event_timing_test(
+                        arr_rs, peaks_d
+                    ).to_dict(orient="records")
             # the same run under observed rain for the other dams, saved beside Pong's
             pp_by_dam = {"Pong": pp_event}
             for dam in ("Bhakra", "Ranjit Sagar"):

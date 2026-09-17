@@ -22,7 +22,7 @@ import requests
 from punjabflood import constants as C
 from punjabflood import hei, inflow, rain, routing
 from punjabflood.catchments import Catchment
-from punjabflood.imdrain import IMD_WEIGHT_COL
+from punjabflood.imdrain import IMD_WEIGHT_COL, covered_area_km2
 from punjabflood.openmeteo import OpenMeteo
 
 log = logging.getLogger(__name__)
@@ -169,8 +169,12 @@ def build_product(
     params: dict[str, inflow.InflowParams],
     ghaggar_climatology: dict[str, np.ndarray] | None = None,
     horizons=HORIZONS,
+    local_areas: dict[str, float] | None = None,
 ) -> dict:
-    """Assemble the hazard product from already-pulled inputs (pure; tested with fakes)."""
+    """Assemble the hazard product from already-pulled inputs (pure; tested with fakes).
+    ``local_areas``: IMD-covered area (km2) per local catchment (``constants.LOCAL_CATCHMENTS``)
+    whose QPF is in ``qpf_det``; with it the local inflow term is computed from the
+    transferred response and added at the control points that catchment feeds."""
     product = {
         "issue_date": issue_date,
         "generated_utc": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -178,6 +182,7 @@ def build_product(
         "dams": {},
         "reaches": [],
         "ghaggar": {},
+        "local_inflow": {},
         "attribution": [
             "Weather data by Open-Meteo.com",
             "HydroBASINS (Lehner & Grill 2013)",
@@ -260,8 +265,36 @@ def build_product(
             )
         product["dams"][dam] = entry
 
-    if release_series:
-        arr = routing.arrivals(release_series)
+    # the land between the dams and the head works: its forecast rain through a dam's
+    # transferred response, added at the control points it feeds (no base flow, a lower
+    # bound); ECMWF IFS where present, else the first deterministic model on file
+    local_series: dict[str, pd.Series] = {}
+    for name, lc in C.LOCAL_CATCHMENTS.items():
+        if not local_areas or name not in local_areas or lc.transfer_dam not in params:
+            continue
+        det = {m: _series_by_model(qpf_det, name, m) for m in DETERMINISTIC_MODELS}
+        det = {m: v for m, v in det.items() if len(v)}
+        if not det:
+            continue
+        model = "ecmwf_ifs025" if "ecmwf_ifs025" in det else next(iter(det))
+        fc = det[model][: max(horizons)]
+        recent = recent_rain.get(name, [])
+        cusecs = inflow.local_inflow_forecast_cusecs(
+            params[lc.transfer_dam], local_areas[name], recent, fc
+        )
+        local_series[name] = pd.Series(cusecs, index=dates[: len(cusecs)])
+        product["local_inflow"][name] = {
+            "model": model,
+            "transfer_dam": lc.transfer_dam,
+            "area_km2": float(local_areas[name]),
+            "stations": list(lc.stations),
+            "qpf_mm_by_day": [float(x) for x in fc],
+            "recent_rain_mm": [float(x) for x in recent],
+            "cusecs_by_day": [float(x) for x in cusecs],
+        }
+
+    if release_series or local_series:
+        arr = routing.arrivals(release_series, local=local_series or None)
         arr = arr[arr["date"] > pd.Timestamp(issue_date)]
         for st_name, g in arr.groupby("station"):
             g = g.sort_values("date")
@@ -333,6 +366,19 @@ def render_markdown(product: dict) -> str:
         for r in product["reaches"]:
             lines.append(
                 f"| {r['station']} | {r['peak_cusecs']:,.0f} | {r['peak_date']} | {r['peak_class'] or 'below low'} |"
+            )
+        lines.append("")
+    if product.get("local_inflow"):
+        lines.append(
+            "Local inflow added at the control points (runoff of the HydroBASINS sub-basins "
+            "between the dams and the head works from their own forecast rain, with a dam's "
+            "calibrated response transferred; no base flow, so a lower bound):"
+        )
+        for name, li in product["local_inflow"].items():
+            peak = max(li["cusecs_by_day"]) if li["cusecs_by_day"] else 0.0
+            lines.append(
+                f"- {name} ({li['area_km2']:,.0f} km2, {li['transfer_dam']} response, "
+                f"{li['model']}): peak {peak:,.0f} cusecs, added at {', '.join(li['stations'])}"
             )
         lines.append("")
     if product["ghaggar"]:
@@ -428,7 +474,8 @@ def run(
     states = dam_state_from_bulletin(rec, ratings)
     det_frames, ens_frames, recent = [], [], {}
     for name, cat in catchments.items():
-        wc = IMD_WEIGHT_COL if name in DAM_CATCHMENT.values() else rain.WEIGHT_COL
+        calibrated_index = name in DAM_CATCHMENT.values() or name in C.LOCAL_CATCHMENTS
+        wc = IMD_WEIGHT_COL if calibrated_index else rain.WEIGHT_COL
         det_frames.append(
             rain.forecast_catchment(
                 client,
@@ -467,7 +514,14 @@ def run(
     if len(qpf_ens):
         qpf_ens = qpf_ens[qpf_ens["target_date"] > pd.Timestamp(issue_date)]
     clim = ghaggar_climatology(rain_daily) if rain_daily is not None else climatology
-    product = build_product(issue_date, states, qpf_det, qpf_ens, recent, params, clim)
+    local_areas = {
+        name: covered_area_km2(cat)
+        for name, cat in catchments.items()
+        if name in C.LOCAL_CATCHMENTS and IMD_WEIGHT_COL in cat.points
+    }
+    product = build_product(
+        issue_date, states, qpf_det, qpf_ens, recent, params, clim, local_areas=local_areas or None
+    )
     product["bulletin"] = {k: v for k, v in rec.items() if k != "raw_text"}
     write_outputs(product, out_dir)
     return product

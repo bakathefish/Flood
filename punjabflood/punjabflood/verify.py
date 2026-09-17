@@ -616,6 +616,32 @@ def event_timing_test(
     return pd.DataFrame(rows)
 
 
+def local_inflow_series(
+    rain_daily: pd.DataFrame,
+    areas: dict[str, float],
+    params: dict[str, inflow.InflowParams],
+    sensitivity_dam: str = "Ranjit Sagar",
+) -> dict[str, dict[str, pd.Series]]:
+    """Daily local inflow (cusecs) of every local catchment with rain on file, keyed by the
+    dam whose response is transferred: ``{dam: {catchment: series}}``. Each catchment's own
+    transfer dam (``constants.LOCAL_CATCHMENTS``) is the primary; ``sensitivity_dam`` (the
+    lowest fitted coefficient) is run beside it."""
+    out: dict[str, dict[str, pd.Series]] = {}
+    for name, area in areas.items():
+        if name not in C.LOCAL_CATCHMENTS:
+            continue
+        r = rain_daily[rain_daily["catchment"] == name].copy()
+        if r.empty:
+            continue
+        r["date"] = pd.to_datetime(r["date"])
+        rs = r.sort_values("date").drop_duplicates("date", keep="last").set_index("date")
+        rs = rs["rain_mm"].astype(float)
+        for dam in dict.fromkeys((C.LOCAL_CATCHMENTS[name].transfer_dam, sensitivity_dam)):
+            if dam in params:
+                out.setdefault(dam, {})[name] = inflow.local_inflow_cusecs(params[dam], area, rs)
+    return out
+
+
 def live_test(predicted_cusecs: pd.Series, observed_cusecs: pd.Series) -> dict:
     df = pd.DataFrame({"pred": predicted_cusecs, "obs": observed_cusecs}).dropna()
     if len(df) < 3:
@@ -829,7 +855,12 @@ def routed_forced_release(pp: pd.DataFrame, dam: str) -> pd.DataFrame:
     return routing.arrivals({dam: s})
 
 
-def routed_next_day_release(pp: pd.DataFrame, dam: str, passage: bool = True) -> pd.DataFrame:
+def routed_next_day_release(
+    pp: pd.DataFrame,
+    dam: str,
+    passage: bool = True,
+    local: dict[str, pd.Series] | None = None,
+) -> pd.DataFrame:
     """Route the perfect-prog forced release placed on the day it happens: the release on
     day d+1 is the first-day forced spill of the run issued on day d (today's storage,
     tomorrow's observed rain).
@@ -845,7 +876,75 @@ def routed_next_day_release(pp: pd.DataFrame, dam: str, passage: bool = True) ->
     s = s.reindex(full).fillna(0.0)
     if passage:
         s = pd.Series(routing.river_release_when_spilling(dam, s.to_numpy()), index=s.index)
-    return routing.arrivals({dam: s})
+    return routing.arrivals({dam: s}, local=local)
+
+
+def local_inflow_summary(
+    local_cusecs: dict[str, pd.Series],
+    arrivals_dam_only: pd.DataFrame,
+    peaks: pd.DataFrame,
+    years=(2023, 2025),
+    station: str = "Dhilwan",
+    window_days: int = 3,
+) -> pd.DataFrame:
+    """What the local term is worth on the observed peak days: per event year, the local
+    inflow at ``station`` on the department's peak day, its largest value within
+    ``window_days`` of it, the routed dam release that day (``arrivals_dam_only``), and
+    both as ratios to the observed peak. Only the local catchments that feed ``station``
+    count (``constants.LOCAL_CATCHMENTS``)."""
+    from punjabflood import constants as C
+
+    feeders = [
+        n for n, lc in C.LOCAL_CATCHMENTS.items() if station in lc.stations and n in local_cusecs
+    ]
+    total = (
+        pd.concat([local_cusecs[n] for n in feeders], axis=1).fillna(0.0).sum(axis=1)
+        if feeders
+        else pd.Series(dtype=float)
+    )
+    total.index = pd.to_datetime(total.index)
+    a = arrivals_dam_only[arrivals_dam_only["station"] == station].copy()
+    a["date"] = pd.to_datetime(a["date"])
+    dam = a.set_index("date")["cusecs"]
+    obs = peaks.set_index("year")
+    rows = []
+    max_col = f"local_max_within_{window_days}_days_cusecs"
+    for y in years:
+        od = pd.Timestamp(obs.loc[y, "date"])
+        op = float(obs.loc[y, "discharge_cusecs"])
+        win = pd.date_range(
+            od - pd.Timedelta(days=window_days), od + pd.Timedelta(days=window_days)
+        )
+        t = total.reindex(win)
+        if t.isna().all():
+            rows.append(
+                {
+                    "year": y,
+                    "station": station,
+                    "observed_peak_date": od.date().isoformat(),
+                    "observed_peak_cusecs": op,
+                    "note": "no local series for the event window",
+                }
+            )
+            continue
+        on_day = float(t.get(od, float("nan")))
+        dam_day = float(dam.get(od, 0.0))
+        rows.append(
+            {
+                "year": y,
+                "station": station,
+                "local_catchments": ", ".join(feeders),
+                "observed_peak_date": od.date().isoformat(),
+                "observed_peak_cusecs": op,
+                "local_on_peak_day_cusecs": on_day,
+                max_col: float(t.max()),
+                "local_max_date": t.idxmax().date().isoformat(),
+                "routed_dam_on_peak_day_cusecs": dam_day,
+                "local_share_of_observed_peak": on_day / op,
+                "dam_plus_local_ratio": (dam_day + on_day) / op,
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def write_json(obj, path: Path) -> None:
