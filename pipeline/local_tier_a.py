@@ -33,7 +33,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import planetary_computer as pc
 import pystac_client
+import pystac_client.exceptions
 import rasterio
+import requests
 from rasterio.enums import Resampling
 from rasterio.transform import from_origin
 from rasterio.vrt import WarpedVRT
@@ -78,17 +80,46 @@ MAX_WORKERS = 8  # parallel COG reads (IO-bound; each read opens its own handle)
 # --------------------------------------------------------------------------- #
 # STAC search
 # --------------------------------------------------------------------------- #
+# Back-off before each retry of a STAC call. The anonymous Planetary Computer
+# endpoint has failed the six-hourly monitor twice in a month, both times on a
+# transient the next run did not see (a server-side timeout, a certificate
+# hostname mismatch); the run is 25 minutes, so a few minutes of waiting is cheap.
+STAC_RETRY_DELAYS = (15, 30, 60)
+STAC_TRANSIENT = (pystac_client.exceptions.APIError, requests.RequestException, OSError)
+
+
+def _with_retry(fn, what, delays=STAC_RETRY_DELAYS):
+    """Call ``fn()``; on a transient STAC/network error wait and try again,
+    once per delay, then raise the last error. ``OSError`` covers ``ssl`` and
+    socket failures raised below ``requests``."""
+    for i, delay in enumerate(delays + (None,)):
+        try:
+            return fn()
+        except STAC_TRANSIENT as err:
+            if delay is None:
+                raise
+            print(
+                f"  WARN STAC {what} failed (attempt {i + 1}): {err}; retry in {delay}s"
+            )
+            time.sleep(delay)
+
+
 def open_client():
-    return pystac_client.Client.open(STAC_URL, modifier=pc.sign_inplace)
+    return _with_retry(
+        lambda: pystac_client.Client.open(STAC_URL, modifier=pc.sign_inplace), "open"
+    )
 
 
 def search_window(client, bbox, window, collection=COLLECTION):
-    search = client.search(
-        collections=[collection],
-        bbox=bbox,
-        datetime=f"{window[0]}/{window[1]}",
-    )
-    return list(search.items())
+    def _search():
+        search = client.search(
+            collections=[collection],
+            bbox=bbox,
+            datetime=f"{window[0]}/{window[1]}",
+        )
+        return list(search.items())
+
+    return _with_retry(_search, "search")
 
 
 def group_by_orbit(items):
