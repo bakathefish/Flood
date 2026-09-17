@@ -169,6 +169,7 @@ def ensemble_summary_with_error(
     n_draws: int = 200,
     seed: int = 0,
     capacity_bcm: float | None = None,
+    scale_log_sd: float | None = None,
 ) -> dict:
     """Probability of exhaustion and forced-release quantiles when the inflow model's own
     error is sampled on top of every QPF member.
@@ -179,7 +180,12 @@ def ensemble_summary_with_error(
     RMSE is measured on the ordinary filling days the model was fitted on, so this is the
     model's ordinary-day error, not its flood-scale error, and the widened probability is
     still an inner estimate of the uncertainty. Seeded, so a product is reproducible. Empty
-    when ``sd_bcm`` is not a non-negative number or there are no members."""
+    when ``sd_bcm`` is not a non-negative number or there are no members.
+
+    ``scale_log_sd`` adds the flood-scale volume error on top: one multiplicative factor per
+    path, lognormal with that log standard deviation and no bias, applied to the whole
+    perturbed path (a volume error persists through an event). The keys ending in
+    ``_flood_scale`` carry that outer estimate; they are absent when no spread is given."""
     members = [np.asarray(m, dtype=float) for m in member_inflows]
     members = [m for m in members if len(m)]
     if not members or sd_bcm != sd_bcm or sd_bcm < 0:
@@ -187,15 +193,21 @@ def ensemble_summary_with_error(
     cap = capacity_bcm if capacity_bcm is not None else C.DAMS[dam].live_capacity_bcm.value
     a = C.cusec_days_to_bcm(absorption_cusecs_value)
     rng = np.random.default_rng(seed)
-    ex_all, peak_all = [], []
+    with_scale = scale_log_sd is not None and scale_log_sd == scale_log_sd and scale_log_sd >= 0
+    ex_all, peak_all, ex_fs, peak_fs = [], [], [], []
     for m in members:
         paths = np.maximum(m[None, :] + error_paths(len(m), n_draws, sd_bcm, acf1, rng), 0.0)
         ex, peak = _balance_matrix(storage_bcm, cap, a, paths)
         ex_all.append(ex)
         peak_all.append(peak)
+        if with_scale:
+            factor = np.exp(rng.standard_normal(n_draws) * float(scale_log_sd))
+            ex2, peak2 = _balance_matrix(storage_bcm, cap, a, paths * factor[:, None])
+            ex_fs.append(ex2)
+            peak_fs.append(peak2)
     ex = np.concatenate(ex_all)
     peak = np.concatenate(peak_all)
-    return {
+    out = {
         "p_exhaustion_model_error": float(ex.mean()),
         "peak_release_q50_model_error_cusecs": float(np.quantile(peak, 0.5)),
         "peak_release_q90_model_error_cusecs": float(np.quantile(peak, 0.9)),
@@ -203,3 +215,15 @@ def ensemble_summary_with_error(
         "error_sd_bcm_per_day": float(sd_bcm),
         "error_acf1": None if acf1 != acf1 else float(acf1),
     }
+    if with_scale:
+        ex2 = np.concatenate(ex_fs)
+        peak2 = np.concatenate(peak_fs)
+        out.update(
+            {
+                "p_exhaustion_flood_scale": float(ex2.mean()),
+                "peak_release_q50_flood_scale_cusecs": float(np.quantile(peak2, 0.5)),
+                "peak_release_q90_flood_scale_cusecs": float(np.quantile(peak2, 0.9)),
+                "flood_scale_log_sd": float(scale_log_sd),
+            }
+        )
+    return out

@@ -182,6 +182,8 @@ The runoff coefficient is fitted on ordinary filling days (the storage-change re
 
 Dated figures by year (readings at a time of day against the model's daily volume; 2023: 11 dated figures, the model at 0.32 to 1.08 of the reading, median 0.47; 2025: 18 dated figures, the model at 0.67 to 2.32 of the reading, median 0.90).
 
+The spread of the model's log ratio to the 6 period means (sample standard deviation) is 0.14, with a mean log ratio of -0.00; the dated readings (29) spread 0.44, wider because they are moments, not daily means. The product samples the period-mean spread as a multiplicative volume error on every inflow path for its third spill probability (an outer estimate), and does not apply the bias.
+
 Where the run covers at least 10 of a period's days, the model's mean is 0.78 to 1.13 of the reported mean; its largest day of the season is 0.57 to 0.58 of the stated peak. The flood's volume is close to right and its peak day is not: the model spreads the volume over more days than the river does, which is consistent with lag weights fitted on ordinary days.
 
 ### Response variants, tested out of sample

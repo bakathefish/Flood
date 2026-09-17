@@ -38,6 +38,8 @@ QPF_CSV = RAW / "rain" / "qpf_leads_catchment_daily.csv"
 ERA5_SEASON_CSV = RAW / "rain" / "era5_dams_{year}_season.csv"  # ERA5 over the dam
 # catchments for one season, the reference the real-time grid is judged against
 PARAMS_JSON = REF / "inflow_params.json"
+FLOOD_SCALE_ERROR_JSON = REF / "flood_scale_error.json"  # committed; the flood-scale
+# spread verify measured, for the product's third spill probability
 GHAGGAR_CLIM_JSON = REF / "ghaggar_season_3day_totals.json"  # committed; lets a runner without
 # the raw rain archive place the Ghaggar forecast in the record's percentiles
 DAM_NAMES = ("Bhakra", "Pong", "Ranjit Sagar")
@@ -541,6 +543,17 @@ def run_verify(horizon_days: int = 5):
             variant_rows: list[dict] = []
             pp_variant: dict[str, dict] = {n: {} for n, _ in variants if n != "baseline"}
             summaries = {"baseline": verify.flood_scale_summary(fs)}
+            fse = verify.flood_scale_error(fs)
+            results["flood_scale_error"] = fse
+            verify.write_json(
+                {
+                    **fse,
+                    "basis": "log(model / reported) over the Public Action Committee period "
+                    "means covered on at least 10 days, 2025; the product samples the spread, "
+                    "not the bias",
+                },
+                FLOOD_SCALE_ERROR_JSON,
+            )
             for dam in DAM_NAMES:
                 if dam not in params:
                     continue
@@ -761,6 +774,7 @@ def run_forecast(issue_date: str | None = None):
         issue_date=issue_date,
         rain_daily=rain_daily,
         climatology=clim,
+        flood_scale_log_sd=fc.load_flood_scale_error(FLOOD_SCALE_ERROR_JSON),
     )
     typer.echo(fc.render_markdown(product))
 

@@ -91,6 +91,7 @@ def prospective_rows(forecast_dir: Path) -> pd.DataFrame:
             row[f"{dam}_storage_fraction"] = e.get("storage_fraction")
             row[f"{dam}_p_spill"] = top.get("p_exhaustion")
             row[f"{dam}_p_spill_model_error"] = top.get("p_exhaustion_model_error")
+            row[f"{dam}_p_spill_flood_scale"] = top.get("p_exhaustion_flood_scale")
         worst_class, worst_station = None, None
         for r in prod.get("reaches") or []:
             c = r.get("peak_class")
@@ -133,7 +134,7 @@ def _prospective_lines(forecast_dir: Path) -> list[str]:
     head = "| issue date | bulletin as on |"
     sep = "|---|---|"
     for dam in dams:
-        head += f" {dam} storage | {dam} P(spill), QPF spread / with model error |"
+        head += f" {dam} storage | {dam} P(spill), QPF spread / with model error / with flood-scale error |"
         sep += "|---|---|"
     lines += [head + " worst class (station) |", sep + "---|"]
     for _, r in flagged.iterrows():
@@ -142,11 +143,14 @@ def _prospective_lines(forecast_dir: Path) -> list[str]:
             sf = r.get(f"{dam}_storage_fraction")
             p1 = r.get(f"{dam}_p_spill")
             p2 = r.get(f"{dam}_p_spill_model_error")
+            p3 = r.get(f"{dam}_p_spill_flood_scale")
             cells.append("n/a" if sf is None or sf != sf else f"{sf * 100:.0f}%")
             cells.append(
                 ("n/a" if p1 is None or p1 != p1 else f"{p1:.2f}")
                 + " / "
                 + ("n/a" if p2 is None or p2 != p2 else f"{p2:.2f}")
+                + " / "
+                + ("n/a" if p3 is None or p3 != p3 else f"{p3:.2f}")
             )
         wc = r["worst_class"]
         cells.append("none" if wc is None or wc != wc else f"{wc} ({r['worst_station']})")
@@ -456,6 +460,20 @@ def render_verification(
                 "",
                 "Dated figures by year (readings at a time of day against the model's daily "
                 "volume; " + "; ".join(parts) + ").",
+            ]
+        fse = results.get("flood_scale_error")
+        if fse and fse.get("n_periods"):
+            sd = fse.get("log_sd")
+            lines += [
+                "",
+                f"The spread of the model's log ratio to the {fse['n_periods']} period means "
+                f"(sample standard deviation) is "
+                f"{'not defined, fewer than three periods' if sd is None or sd != sd else f'{sd:.2f}'}"
+                f", with a mean log ratio of {fse['log_bias']:+.2f}; the dated readings "
+                f"({fse['n_dated_days']}) spread {_num(fse.get('dated_log_sd'), '.2f')}, wider "
+                "because they are moments, not daily means. The product samples the period-mean "
+                "spread as a multiplicative volume error on every inflow path for its third spill "
+                "probability (an outer estimate), and does not apply the bias.",
             ]
         pm = fs[(fs["kind"] == "period mean") & (fs["n_days"] >= 10)].dropna(subset=["ratio"])
         pk = fs[fs["kind"] == "season peak"].dropna(subset=["ratio"])

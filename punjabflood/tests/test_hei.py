@@ -114,3 +114,30 @@ def test_absorption_lookup():
         C.BHAKRA.turbine_capacity_cusecs.value - 22_650
     )
     assert hei.absorption_cusecs("Pong", canal_draw_cusecs=1e6) == 0.0
+
+
+def test_flood_scale_volume_error_widens_the_probability():
+    cap = C.PONG.live_capacity_bcm.value
+    # 0.6 BCM of headroom, members whose three-day volume sits just under it after passage
+    a = C.cusec_days_to_bcm(45_600)
+    members = [[0.18 + a, 0.18 + a, 0.18 + a] for _ in range(20)]
+    plain = hei.ensemble_summary_with_error("Pong", cap - 0.6, members, 45_600, 0.001, 0.0)
+    assert plain["p_exhaustion_model_error"] == 0.0
+    assert "p_exhaustion_flood_scale" not in plain
+    wide = hei.ensemble_summary_with_error(
+        "Pong", cap - 0.6, members, 45_600, 0.001, 0.0, scale_log_sd=0.3
+    )
+    assert wide["p_exhaustion_flood_scale"] > 0.0
+    assert wide["peak_release_q90_flood_scale_cusecs"] > 0.0
+    assert wide["flood_scale_log_sd"] == 0.3
+    # seeded: the same call gives the same numbers
+    again = hei.ensemble_summary_with_error(
+        "Pong", cap - 0.6, members, 45_600, 0.001, 0.0, scale_log_sd=0.3
+    )
+    assert again["p_exhaustion_flood_scale"] == wide["p_exhaustion_flood_scale"]
+    # a zero spread adds nothing
+    zero = hei.ensemble_summary_with_error(
+        "Pong", cap - 0.6, members, 45_600, 0.001, 0.0, scale_log_sd=0.0
+    )
+    assert zero["p_exhaustion_flood_scale"] == plain["p_exhaustion_model_error"]
+

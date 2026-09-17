@@ -764,3 +764,26 @@ def test_perfect_prog_hei_takes_a_capacity_and_a_full_reservoir_keeps_filling_in
     )
     assert s.max() > cap and s.max() <= C.cushion_capacity_bcm("Pong") + 1e-9
 
+
+def test_flood_scale_error_from_the_period_means():
+    cols = verify.FLOOD_SCALE_COLS
+    rows = []
+    for i, ratio in enumerate((0.8, 1.0, 1.25, 1.1)):
+        rows.append(["Pong", "period mean", "2025-08-01", "2025-08-24", 100.0, 100.0 * ratio, ratio, 20, "s"])
+    rows.append(["Pong", "period mean", "2025-09-01", "2025-09-04", 100.0, 300.0, 3.0, 4, "s"])  # too short
+    rows.append(["Pong", "day", "2025-08-31", "2025-08-31", 100.0, 50.0, 0.5, 1, "s"])
+    rows.append(["Pong", "day", "2025-09-04", "2025-09-04", 100.0, 200.0, 2.0, 1, "s"])
+    rows.append(["Pong", "day", "2025-09-05", "2025-09-05", 100.0, 100.0, 1.0, 1, "s"])
+    rows.append(["Pong", "record day", "2023-08-14", "2023-08-14", 100.0, np.nan, np.nan, 0, "s"])
+    fs = pd.DataFrame(rows, columns=cols)
+    e = verify.flood_scale_error(fs)
+    logs = np.log([0.8, 1.0, 1.25, 1.1])
+    assert e["n_periods"] == 4
+    assert e["log_bias"] == pytest.approx(logs.mean())
+    assert e["log_sd"] == pytest.approx(logs.std(ddof=1))
+    assert e["n_dated_days"] == 3
+    assert e["dated_log_sd"] == pytest.approx(np.log([0.5, 2.0, 1.0]).std(ddof=1))
+    # fewer than three usable periods: no spread
+    e2 = verify.flood_scale_error(fs.iloc[:2])
+    assert e2["n_periods"] == 2 and e2["log_sd"] != e2["log_sd"]
+

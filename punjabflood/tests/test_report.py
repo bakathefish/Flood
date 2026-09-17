@@ -129,6 +129,9 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             "note": "too few days",
         },
     ]
+    results["flood_scale_error"] = {
+        "n_periods": 6, "log_bias": -0.02, "log_sd": 0.13, "n_dated_days": 29, "dated_log_sd": 0.44,
+    }
     results["flood_cushion"] = {
         "dam": "Pong", "top_level_ft": 1400.0, "capacity_bcm": 7.29, "live_capacity_bcm": 6.157,
     }
@@ -390,6 +393,7 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     assert "| Pong | record day, 2023-08-14 | 0 | 734,000 | n/a | n/a | Pong EAP |" in md
     # the dated figures summarised by year; the uncovered record day does not count
     assert "Dated figures by year" in md
+    assert "spread of the model's log ratio to the 6 period means" in md and "0.13" in md
     assert "2025: 1 dated figures" in md and "median 0.92" in md and "2023:" not in md.split("Dated figures by year")[1].split(")")[0]
     assert (
         "the model's mean is 0.82 of the reported mean; its largest day of the season is 0.50 "
@@ -626,7 +630,7 @@ def test_prospective_record_section(tmp_path):
     assert "Bhakra: P(spillway forced) above zero on 0 of 3 days." in md
     assert "Days with any control point at or above the WRD low band: 1." in md
     assert (
-        "| 2026-09-06 | 06-09-2026 | 65% | 0.00 / 0.00 | 75% | 0.41 / 0.47 | medium (Dhilwan) |"
+        "| 2026-09-06 | 06-09-2026 | 65% | 0.00 / 0.00 / n/a | 75% | 0.41 / 0.47 / n/a | medium (Dhilwan) |"
         in md
     )
     assert "| 2026-09-05 |" not in md and "| 2026-09-07 |" not in md

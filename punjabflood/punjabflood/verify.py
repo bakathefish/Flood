@@ -569,6 +569,31 @@ def flood_scale_summary(fs: pd.DataFrame, min_period_days: int = 10) -> dict:
     }
 
 
+def flood_scale_error(fs: pd.DataFrame, min_period_days: int = 10) -> dict:
+    """The model's flood-scale error from the flood-scale table: over the period means the
+    run covers on at least ``min_period_days`` days (daily quantities, the scale of a
+    horizon's volume), the count, mean and sample standard deviation of log(model /
+    reported); the dated readings' count and log spread beside them for the record (moment
+    readings, noisier than a daily mean, not used by the product). The spread feeds the
+    product's third spill probability; fewer than three periods give no spread."""
+    pm = fs[(fs["kind"] == "period mean") & (fs["n_days"] >= min_period_days)].dropna(
+        subset=["ratio"]
+    )
+    pm = pm[pm["ratio"] > 0]
+    dd = fs[fs["kind"].isin(["day", "record day"])].dropna(subset=["ratio"])
+    dd = dd[dd["ratio"] > 0]
+    lp = np.log(pm["ratio"].to_numpy(dtype=float))
+    ld = np.log(dd["ratio"].to_numpy(dtype=float))
+    return {
+        "n_periods": int(len(pm)),
+        "log_bias": float(lp.mean()) if len(lp) else float("nan"),
+        "log_sd": float(lp.std(ddof=1)) if len(lp) >= 3 else float("nan"),
+        "n_dated_days": int(len(dd)),
+        "dated_log_sd": float(ld.std(ddof=1)) if len(ld) >= 3 else float("nan"),
+        "min_period_days": int(min_period_days),
+    }
+
+
 def variant_verdict(base: dict, variant: dict, loso: pd.DataFrame, variant_name: str) -> dict:
     """The adoption rule for an inflow-response variant, each condition on its own: the
     leave-one-season-out error may not rise at any dam, the season-peak ratios of the

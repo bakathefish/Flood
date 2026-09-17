@@ -184,6 +184,7 @@ def build_product(
     horizons=HORIZONS,
     local_areas: dict[str, float] | None = None,
     soil_moisture: dict[str, dict] | None = None,
+    flood_scale_log_sd: float | None = None,
 ) -> dict:
     """Assemble the hazard product from already-pulled inputs (pure; tested with fakes).
     ``local_areas``: IMD-covered area (km2) per local catchment (``constants.LOCAL_CATCHMENTS``)
@@ -201,6 +202,7 @@ def build_product(
         "reaches": [],
         "ghaggar": {},
         "local_inflow": {},
+        "flood_scale_log_sd": flood_scale_log_sd,
         "attribution": [
             "Weather data by Open-Meteo.com",
             "HydroBASINS (Lehner & Grill 2013)",
@@ -280,7 +282,13 @@ def build_product(
                 # the inflow model's own error, sampled on top of the QPF spread
                 summary.update(
                     hei.ensemble_summary_with_error(
-                        dam, st["storage_bcm"], daily_h, absorb, p.rmse_bcm, p.resid_acf1
+                        dam,
+                        st["storage_bcm"],
+                        daily_h,
+                        absorb,
+                        p.rmse_bcm,
+                        p.resid_acf1,
+                        scale_log_sd=flood_scale_log_sd,
                     )
                 )
                 entry["ensemble"][str(H)] = summary
@@ -301,8 +309,14 @@ def build_product(
                     summary_c = hei.ensemble_summary(res_c)
                     summary_c.update(
                         hei.ensemble_summary_with_error(
-                            dam, st["storage_bcm"], daily_h, absorb, p.rmse_bcm, p.resid_acf1,
+                            dam,
+                            st["storage_bcm"],
+                            daily_h,
+                            absorb,
+                            p.rmse_bcm,
+                            p.resid_acf1,
                             capacity_bcm=cap_c,
+                            scale_log_sd=flood_scale_log_sd,
                         )
                     )
                     ens_c[str(H)] = summary_c
@@ -460,13 +474,16 @@ def render_markdown(product: dict) -> str:
             lines.append("")
             lines.append(
                 "| horizon (days) | P(spillway forced), QPF spread | P(spillway forced), QPF spread "
-                "and model error | HEI median | peak forced release, median (cusecs) |"
+                "and model error | P(spillway forced), QPF spread, model error and flood-scale "
+                "volume error | HEI median | peak forced release, median (cusecs) |"
             )
-            lines.append("|---|---|---|---|---|")
+            lines.append("|---|---|---|---|---|---|")
             for H, s in e["ensemble"].items():
                 pe = s.get("p_exhaustion_model_error")
+                pf = s.get("p_exhaustion_flood_scale")
                 lines.append(
                     f"| {H} | {s['p_exhaustion']:.2f} | {'n/a' if pe is None else f'{pe:.2f}'} | "
+                    f"{'n/a' if pf is None else f'{pf:.2f}'} | "
                     f"{s['hei_q50']:+.3f} | {s['peak_release_q50_cusecs']:,.0f} |"
                 )
         lines.append("")
@@ -555,6 +572,21 @@ def save_climatology(clim: dict[str, np.ndarray], path: Path, years: str = "") -
         "totals": {k: [round(float(x), 2) for x in v] for k, v in clim.items()},
     }
     path.write_text(json.dumps(obj), encoding="utf-8")
+
+
+def load_flood_scale_error(path: Path) -> float | None:
+    """The flood-scale log spread ``verify`` committed (``data/reference/flood_scale_error.json``),
+    or None when the file is missing or holds no spread."""
+    path = Path(path)
+    if not path.exists():
+        return None
+    try:
+        v = json.loads(path.read_text(encoding="utf-8")).get("log_sd")
+    except (OSError, ValueError):
+        return None
+    if v is None or not isinstance(v, (int, float)) or v != v or v < 0:
+        return None
+    return float(v)
 
 
 def load_climatology(path: Path) -> dict[str, np.ndarray] | None:
@@ -701,6 +733,7 @@ def run(
     out_dir: Path = Path("outputs/forecast"),
     climatology: dict[str, np.ndarray] | None = None,
     rt_dir: Path | None = None,
+    flood_scale_log_sd: float | None = None,
 ) -> dict:
     """One live cycle: bulletin, deterministic and ensemble QPF for every catchment, recent
     rain from the best-match model's past days, then the product on disk. Dam catchments use
@@ -757,6 +790,7 @@ def run(
         clim,
         local_areas=local_areas or None,
         soil_moisture=soil or None,
+        flood_scale_log_sd=flood_scale_log_sd,
     )
     product["bulletin"] = {k: v for k, v in rec.items() if k != "raw_text"}
     product["recent_rain_source"] = recent_sources

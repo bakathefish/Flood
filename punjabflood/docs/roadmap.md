@@ -145,6 +145,13 @@ numbers that motivate them are in `verification.md`, never repeated here.
   the bracket. The storage-change calibration was rerun on the corrected record and the
   fitted parameters did not move to the third decimal (the fit uses filling days below
   FRL). Bhakra and Ranjit Sagar have no published figure above FRL; that remains item 7.
+- **Flood-scale error in the spill probability.** The product prints a third spill
+  probability: the ensemble spread, the inflow model's ordinary-day error, and on top a
+  multiplicative volume error per path drawn from the spread the flood-scale check measures
+  (the sample standard deviation of log model-over-reported across the Public Action
+  Committee's 2025 period means of at least 10 days, written by `verify` to
+  `data/reference/flood_scale_error.json` so the daily runner has it). The bias is reported,
+  not applied. The prospective record carries the third column.
 
 ## Next, in order
 
@@ -216,11 +223,11 @@ numbers that motivate them are in `verification.md`, never repeated here.
    timing; a linear reservoir per reach (one parameter each, fitted on nothing we have yet)
    would soften peaks. Only worth doing once daily gauge readings at the control points are
    available; the WRD publishes them during floods in its situation reports.
-6. **Flood-scale error for the second probability.** The model-error term uses the
-   ordinary-day RMSE. Once a daily inflow record for an event exists (item 1), the error at
-   flood scale can be measured and the probability made an outer estimate instead of an
-   inner one; the flood-scale check in `verification.md` already brackets it from the period
-   means and season peaks the record holds. Effort: small once item 1 lands.
+6. **Flood-scale error on a daily record.** Done on the record in hand (above): the third
+   spill probability samples the spread of the model's log ratio to the six 2025 period
+   means. Six means of one season are a thin basis; a daily inflow record for an event
+   (item 1) would give the spread by day and let the bias be tested as a correction rather
+   than only reported. Effort: small once item 1 lands.
 7. **Flood cushion above FRL, Bhakra and Ranjit Sagar.** Pong's is done (above). Bhakra's
    bulletin header prints an MWL of 1690 ft and Ranjit Sagar has none in hand, and no
    storage figure above FRL is published for either, so their ratings clamp at FRL and

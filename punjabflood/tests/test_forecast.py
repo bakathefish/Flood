@@ -331,3 +331,31 @@ def test_no_cushion_block_for_a_dam_without_a_published_top():
     assert "cushion" not in prod["dams"]["Bhakra"]
     assert "no published storage figure above" in forecast.render_markdown(prod)
 
+
+def test_product_carries_the_flood_scale_probability_and_loads_its_parameter(tmp_path):
+    states, det, ens, params = _inputs(storage_frac=0.9, qpf_mm=40.0)
+    prod = forecast.build_product(
+        "2026-09-04", states, det, ens, {}, params, flood_scale_log_sd=0.25
+    )
+    e = prod["dams"]["Pong"]
+    for H, s in e["ensemble"].items():
+        # a symmetric spread in log volume can move the probability either way; what it
+        # must do is exist, stay a probability, and carry its own peak quantiles
+        assert 0.0 <= s["p_exhaustion_flood_scale"] <= 1.0
+        assert s["peak_release_q90_flood_scale_cusecs"] >= s["peak_release_q50_flood_scale_cusecs"]
+        assert s["flood_scale_log_sd"] == 0.25
+    assert "p_exhaustion_flood_scale" in e["cushion"]["ensemble"]["5"]
+    assert prod["flood_scale_log_sd"] == 0.25
+    md = forecast.render_markdown(prod)
+    assert "flood-scale volume error" in md
+    # without the parameter the column reads n/a and the key is absent
+    prod0 = forecast.build_product("2026-09-04", states, det, ens, {}, params)
+    assert "p_exhaustion_flood_scale" not in prod0["dams"]["Pong"]["ensemble"]["5"]
+    # the loader: the committed file, or None when there is none or no spread
+    f = tmp_path / "fse.json"
+    assert forecast.load_flood_scale_error(f) is None
+    f.write_text(json.dumps({"log_sd": 0.13, "n_periods": 6}), encoding="utf-8")
+    assert forecast.load_flood_scale_error(f) == pytest.approx(0.13)
+    f.write_text(json.dumps({"log_sd": None, "n_periods": 2}), encoding="utf-8")
+    assert forecast.load_flood_scale_error(f) is None
+

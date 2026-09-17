@@ -102,7 +102,15 @@ lag-1 autocorrelation as its day-to-day persistence (`hei.ensemble_summary_with_
 the ordinary filling days the model was fitted on, so this is the model's ordinary-day
 error; at flood scale the error is larger (the event section of the verification report
 says by how much), and the second probability is therefore still an inner estimate of the
-uncertainty, not an outer one.
+uncertainty. The third samples the flood-scale volume error on top: one multiplicative
+factor per path, lognormal with the spread that the flood-scale check measures (the sample
+standard deviation of log model-over-reported across the Public Action Committee's period
+means of at least 10 days, committed by `verify` in `data/reference/flood_scale_error.json`),
+no bias, applied to the whole path because a volume error persists through an event. The
+bias the same check measures is not applied: the product's numbers stay the model's, and
+the report says how far below the reported volumes they sit. Six period means of one
+season are a thin basis for a spread; a daily inflow record for an event (roadmap item 1)
+would replace it.
 
 **Release to control point.** Pure translation with the WRD's Annexure Z travel times, no
 attenuation; the tributaries enter as the local term of the next paragraph; Harike sums the
