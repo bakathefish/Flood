@@ -238,3 +238,42 @@ def archived_leads_catchment(
     res = pd.concat(out, ignore_index=True)
     res["catchment"] = catchment.name
     return res
+
+
+# --------------------------------------------------------------------------- #
+# merging pulled series into the files on disk
+# --------------------------------------------------------------------------- #
+SM_COLS = ("sm_0_7", "sm_7_28")
+
+
+def merge_soil_moisture(old: pd.DataFrame, new: pd.DataFrame) -> pd.DataFrame:
+    """Fill ``sm_0_7`` / ``sm_7_28`` on the rain table's rows from a pulled table keyed by
+    (catchment, date). Rows of ``old`` are all kept; days ``old`` lacks are not added; a
+    pulled value replaces an existing one."""
+    out = old.copy()
+    out["date"] = pd.to_datetime(out["date"], format="ISO8601")
+    n = new.copy()
+    n["date"] = pd.to_datetime(n["date"], format="ISO8601")
+    cols = [c for c in SM_COLS if c in n.columns]
+    n = n[["catchment", "date", *cols]].drop_duplicates(["catchment", "date"], keep="last")
+    key = ["catchment", "date"]
+    merged = out.merge(n, on=key, how="left", suffixes=("", "_new"))
+    for c in cols:
+        if f"{c}_new" in merged.columns:
+            merged[c] = merged[f"{c}_new"].where(merged[f"{c}_new"].notna(), merged.get(c))
+            merged = merged.drop(columns=[f"{c}_new"])
+    return merged
+
+
+def merge_qpf_leads(old: pd.DataFrame, new: pd.DataFrame) -> pd.DataFrame:
+    """Replace, in the archived-QPF table, the rows of every (model, season year) the new
+    pull holds, and keep every other row."""
+    o = old.copy()
+    o["target_date"] = pd.to_datetime(o["target_date"], format="ISO8601")
+    n = new.copy()
+    n["target_date"] = pd.to_datetime(n["target_date"], format="ISO8601")
+    pulled = set(zip(n["model"], n["target_date"].dt.year, strict=True))
+    drop = [
+        (m, y) in pulled for m, y in zip(o["model"], o["target_date"].dt.year, strict=True)
+    ]
+    return pd.concat([o[~pd.Series(drop, index=o.index)], n], ignore_index=True)

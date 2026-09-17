@@ -140,3 +140,64 @@ def test_archived_leads_daily_sums_and_incomplete_days():
     lead3 = df[(df.lead_days == 3)].sort_values("target_date")
     assert np.isnan(lead3["rain_mm"].iloc[0])  # a missing hour voids the day
     assert lead3["rain_mm"].iloc[1] == 72.0
+
+
+# --- merging pulled series into the files on disk ---------------------------------
+def test_merge_soil_moisture_fills_columns_and_keeps_every_rain_row():
+    old = pd.DataFrame(
+        {
+            "date": ["2015-06-01", "2015-06-02", "2015-06-01"],
+            "catchment": ["Pong", "Pong", "Bhakra"],
+            "rain_mm": [1.0, 2.0, 3.0],
+            "source": ["imd", "imd", "imd"],
+        }
+    )
+    new = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2015-06-01", "2015-06-03"]),
+            "catchment": ["Pong", "Pong"],
+            "sm_0_7": [0.30, 0.31],
+            "sm_7_28": [0.20, 0.21],
+        }
+    )
+    out = rain.merge_soil_moisture(old, new)
+    assert len(out) == 3  # no rain row lost, no row invented for a day the record lacks
+    pong = out[out["catchment"] == "Pong"].sort_values("date")
+    assert pong["sm_0_7"].tolist()[0] == 0.30 and np.isnan(pong["sm_0_7"].tolist()[1])
+    assert np.isnan(out[out["catchment"] == "Bhakra"]["sm_0_7"].iloc[0])
+
+
+def test_merge_soil_moisture_overwrites_an_existing_value():
+    old = pd.DataFrame(
+        {"date": ["2026-01-01"], "catchment": ["Pong"], "rain_mm": [0.0], "sm_0_7": [0.5]}
+    )
+    new = pd.DataFrame({"date": ["2026-01-01"], "catchment": ["Pong"], "sm_0_7": [0.6]})
+    assert rain.merge_soil_moisture(old, new)["sm_0_7"].iloc[0] == 0.6
+
+
+def test_merge_qpf_leads_replaces_only_the_pulled_model_seasons():
+    old = pd.DataFrame(
+        {
+            "target_date": ["2025-07-01", "2025-07-01", "2024-07-01"],
+            "lead_days": [1, 1, 1],
+            "model": ["ecmwf_ifs025", "gfs_seamless", "gfs_seamless"],
+            "rain_mm": [1.0, 2.0, 3.0],
+            "catchment": ["Pong"] * 3,
+        }
+    )
+    new = pd.DataFrame(
+        {
+            "target_date": pd.to_datetime(["2025-07-01", "2025-07-02"]),
+            "lead_days": [1, 1],
+            "model": ["gfs_seamless"] * 2,
+            "rain_mm": [9.0, 8.0],
+            "catchment": ["Pong"] * 2,
+        }
+    )
+    out = rain.merge_qpf_leads(old, new)
+    assert len(out) == 4
+    year = pd.to_datetime(out["target_date"]).dt.year
+    g25 = out[(out["model"] == "gfs_seamless") & (year == 2025)]
+    assert sorted(g25["rain_mm"]) == [8.0, 9.0]  # the old 2025 GFS row is gone
+    assert (out["model"] == "ecmwf_ifs025").sum() == 1  # other models untouched
+    assert ((out["model"] == "gfs_seamless") & (year == 2024)).sum() == 1

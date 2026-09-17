@@ -4,7 +4,8 @@ punjabflood pull-cwc            CWC daily storage 1991 to date (resumable, slow)
 punjabflood build-catchments    HydroBASINS polygons, grid weights, IMD coverage weights
 punjabflood build-rain          IMD gridded rain 1961 to 2025 as catchment means
 punjabflood pull-rain-recent    ERA5 catchment rain for the current year (IMD lags a year)
-punjabflood pull-qpf-archive    as-issued lead 1..7 QPF, 2024 to date
+punjabflood pull-qpf-archive    as-issued lead 1..7 QPF, 2024 to date (merges by model and season)
+punjabflood pull-soil-moisture  ERA5-Land soil moisture 2015 to 2025 into the rain table
 punjabflood digitise-guidebook  WRD tables to CSV with page renders
 punjabflood calibrate           inflow parameters per dam -> data/reference/inflow_params.json
 punjabflood verify              38-year, event-timing and live tests -> outputs/verification
@@ -164,8 +165,43 @@ def pull_qpf_archive(models: str = "ecmwf_ifs025,gfs_seamless", seasons: str = "
                     rain.archived_leads_catchment(client, c, m, f"{y}-06-01", end, weight_col=wc)
                 )
     QPF_CSV.parent.mkdir(parents=True, exist_ok=True)
-    pd.concat(frames).to_csv(QPF_CSV, index=False)
-    typer.echo(f"wrote {QPF_CSV}")
+    new = pd.concat(frames, ignore_index=True)
+    if QPF_CSV.exists():
+        # keep the rows of the models and seasons this pull did not ask for
+        new = rain.merge_qpf_leads(pd.read_csv(QPF_CSV), new)
+    new.sort_values(["catchment", "model", "lead_days", "target_date"]).to_csv(QPF_CSV, index=False)
+    typer.echo(f"wrote {QPF_CSV} ({client.calls} calls, {client.cache_hits} cache hits)")
+
+
+@app.command("pull-soil-moisture")
+def pull_soil_moisture(start: str = "2015-01-01", end: str = "2025-12-31", only: str = ""):
+    """ERA5-Land soil moisture (0-7 and 7-28 cm daily means) as catchment means over the
+    IMD-covered points of the dam catchments, merged into the rain table's rows by
+    (catchment, date). One archive call per point; ``--only "A,B"`` limits the catchments."""
+    _log()
+    cats = catchments_mod.load_geojson()
+    names = [n.strip() for n in only.split(",") if n.strip()] or list(DAM_NAMES)
+    client = OpenMeteo()
+    frames = [
+        rain.era5_catchment_daily(
+            client,
+            cats[n],
+            start,
+            end,
+            years_per_chunk=11,
+            daily=("soil_moisture_0_to_7cm_mean", "soil_moisture_7_to_28cm_mean"),
+            weight_col=imdrain.IMD_WEIGHT_COL,
+        )
+        for n in names
+    ]
+    new = pd.concat(frames, ignore_index=True)
+    merged = rain.merge_soil_moisture(pd.read_csv(RAIN_CSV), new)
+    merged.sort_values(["catchment", "date"]).to_csv(RAIN_CSV, index=False)
+    filled = int(merged["sm_0_7"].notna().sum())
+    typer.echo(
+        f"wrote {RAIN_CSV}: {filled} rows carry soil moisture "
+        f"({client.calls} calls, {client.cache_hits} cache hits)"
+    )
 
 
 @app.command("digitise-guidebook")
@@ -237,8 +273,10 @@ def _flood_scale_truth(
 
 
 @app.command("calibrate")
-def calibrate():
-    """Fit the inflow model per dam on storage changes and catchment rain."""
+def calibrate(wetness: str = "api"):
+    """Fit the inflow model per dam on storage changes and catchment rain. ``--wetness``
+    picks the carrier of catchment wetness: api (the five-day rain index), api+sm (the index
+    and the ERA5-Land soil-moisture anomaly) or sm (the anomaly alone)."""
     _log()
     state, _, _ = _state()
     rain_daily = pd.read_csv(RAIN_CSV)
@@ -248,14 +286,15 @@ def calibrate():
         r = rain_daily[rain_daily["catchment"] == dam]
         area = _covered_area(rain_daily, dam, cats[dam].area_km2)
         try:
-            p = inflow.calibrate(state, r, dam, area)
+            p = inflow.calibrate(state, r, dam, area, wetness=wetness)
         except ValueError as exc:
             typer.echo(f"{dam}: {exc}")
             continue
         params[dam] = p.to_dict()
         typer.echo(
             f"{dam}: c={p.c:.3f} w={tuple(round(x, 2) for x in p.w)} rho={p.rho:.3f} "
-            f"gamma={p.gamma:.2f} r2={p.r2:.3f} rmse={p.rmse_bcm:.4f} BCM/day n={p.n_days} "
+            f"wetness={p.wetness} gamma={p.gamma:.2f} r2={p.r2:.3f} rmse={p.rmse_bcm:.4f} "
+            f"BCM/day n={p.n_days} "
             f"area={area:,.0f} km2"
         )
     PARAMS_JSON.write_text(json.dumps(params, indent=2), encoding="utf-8")
@@ -391,20 +430,27 @@ def run_verify(horizon_days: int = 5):
             fs = verify.flood_scale_inflow_check(pp_by_dam, *truth)
             fs.to_csv(out / "flood_scale_inflow.csv", index=False)
             results["flood_scale_inflow"] = fs.to_dict(orient="records")
-            # a sharper response to heavy rain, fitted and scored out of sample beside the
-            # response in use; verify.variant_verdict says whether it may replace it
-            variant_rows, pp_variant = [], {}
+            # the response variants, fitted and scored out of sample beside the response in
+            # use: a sharper response to heavy rain (threshold excess) and the two
+            # soil-moisture wetness carriers; verify.variant_verdict says whether any may
+            # replace it
+            variants = [
+                ("baseline", {}),
+                (EXCESS_VARIANT, {"excess_threshold_mm": inflow.EXCESS_THRESHOLD_MM}),
+                ("api+sm", {"wetness": "api+sm"}),
+                ("sm", {"wetness": "sm"}),
+            ]
+            variant_rows: list[dict] = []
+            pp_variant: dict[str, dict] = {n: {} for n, _ in variants if n != "baseline"}
             summaries = {"baseline": verify.flood_scale_summary(fs)}
             for dam in DAM_NAMES:
                 if dam not in params:
                     continue
                 r = rain_daily[rain_daily["catchment"] == dam]
                 area = _covered_area(rain_daily, dam, cats[dam].area_km2)
-                for name, thr in (("baseline", None), (EXCESS_VARIANT, inflow.EXCESS_THRESHOLD_MM)):
+                for name, kw in variants:
                     try:
-                        p_v = inflow.calibrate(
-                            state_measured, r, dam, area, excess_threshold_mm=thr
-                        )
+                        p_v = inflow.calibrate(state_measured, r, dam, area, **kw)
                     except ValueError as exc:
                         typer.echo(f"{dam} {name}: {exc}")
                         continue
@@ -412,31 +458,48 @@ def run_verify(horizon_days: int = 5):
                         {
                             "dam": dam,
                             "variant": name,
-                            **inflow.loso_score(state_measured, r, dam, area, thr),
+                            **inflow.loso_score(
+                                state_measured,
+                                r,
+                                dam,
+                                area,
+                                kw.get("excess_threshold_mm"),
+                                wetness=kw.get("wetness", "api"),
+                            ),
                             "in_sample_rmse_bcm": p_v.rmse_bcm,
                             "c": p_v.c,
                             "c_wet": p_v.c_wet,
                             "w": " ".join(f"{x:.2f}" for x in p_v.w),
                             "c_excess": p_v.c_excess,
                             "w_excess": " ".join(f"{x:.2f}" for x in p_v.w_excess),
+                            "wetness": p_v.wetness,
+                            "gamma": p_v.gamma,
                         }
                     )
-                    if thr is not None:
-                        pp_variant[dam] = verify.perfect_prog_hei(
+                    if name != "baseline":
+                        pp_variant[name][dam] = verify.perfect_prog_hei(
                             state_measured, rain_daily, dam, dam, p_v, horizon_days, "model"
                         )
             if variant_rows:
                 loso_df = pd.DataFrame(variant_rows)
                 loso_df.to_csv(out / "inflow_variants.csv", index=False)
-                summaries[EXCESS_VARIANT] = verify.flood_scale_summary(
-                    verify.flood_scale_inflow_check(pp_variant, *truth)
-                )
+                verdicts = []
+                for name, by_dam in pp_variant.items():
+                    if not by_dam:
+                        continue
+                    summaries[name] = verify.flood_scale_summary(
+                        verify.flood_scale_inflow_check(by_dam, *truth)
+                    )
+                    verdicts.append(
+                        verify.variant_verdict(
+                            summaries["baseline"], summaries[name], loso_df, name
+                        )
+                    )
                 results["inflow_variants"] = {
                     "loso": loso_df.to_dict(orient="records"),
                     "flood_scale": summaries,
-                    "verdict": verify.variant_verdict(
-                        summaries["baseline"], summaries[EXCESS_VARIANT], loso_df, EXCESS_VARIANT
-                    ),
+                    "verdict": next((v for v in verdicts if v["variant"] == EXCESS_VARIANT), None),
+                    "verdicts": verdicts,
                 }
             if QPF_CSV.exists():
                 # what the product would have said: the archived as-issued QPF through the
@@ -493,6 +556,7 @@ def run_verify(horizon_days: int = 5):
         rs = r.set_index("date")["rain_mm"].sort_index()
         preds, persist = {}, {}
         n_hist = inflow.history_days(params[dam])
+        sm = verify.sm_anomaly_series_for(rain_daily, dam, params[dam])
         for d in b.index:
             prev = d - pd.Timedelta(days=1)
             if prev not in b.index:
@@ -501,11 +565,12 @@ def run_verify(horizon_days: int = 5):
             fut = rs.reindex([d])
             if hist.isna().any() or fut.isna().any():
                 continue
+            a = float(sm.get(prev, 0.0)) if sm is not None else 0.0
             base = inflow.base_from_observed(
-                params[dam], float(b.loc[prev, "inflow_cusecs"]), hist.to_numpy()
+                params[dam], float(b.loc[prev, "inflow_cusecs"]), hist.to_numpy(), a
             )
             vol = inflow.predict_daily_bcm(
-                params[dam], fut.to_numpy(), base, rain_mm_recent=hist.to_numpy()
+                params[dam], fut.to_numpy(), base, rain_mm_recent=hist.to_numpy(), sm_anom=a
             )
             preds[d] = C.bcm_to_cusec_days(float(vol[0]))
             persist[d] = float(b.loc[prev, "inflow_cusecs"])  # the naive baseline
@@ -518,7 +583,7 @@ def run_verify(horizon_days: int = 5):
         results["live_2026"][dam] = live
         # the same season one to five days ahead, with observed rain, with the rain forecast
         # issued that day, and by persistence
-        lh = verify.live_horizon_test(b, rs, params[dam], qpf_live, dam)
+        lh = verify.live_horizon_test(b, rs, params[dam], qpf_live, dam, sm=sm)
         results["live_horizons"] += lh.to_dict(orient="records")
     if results["live_horizons"]:
         pd.DataFrame(results["live_horizons"]).to_csv(out / "live_horizons.csv", index=False)
@@ -531,6 +596,14 @@ def run_verify(horizon_days: int = 5):
         qb = verify.qpf_bias_test(qpf_leads, rain_daily)
         qb.to_csv(out / "qpf_bias_test.csv", index=False)
         results["qpf_bias_rows"] = int(len(qb))
+        # the machine-learned model against the primary deterministic model on the days both
+        # have; the rule for switching the product's primary is in the function
+        from punjabflood import forecast as fc
+
+        results["qpf_model_comparison"] = verify.qpf_model_comparison(
+            qpf_leads, rain_daily, fc.INCUMBENT_DETERMINISTIC, "ecmwf_aifs025_single"
+        )
+        results["qpf_model_comparison"]["primary_in_product"] = fc.PRIMARY_DETERMINISTIC
 
     verify.write_json(results, out / "results.json")
     typer.echo(
