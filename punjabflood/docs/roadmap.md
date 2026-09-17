@@ -99,6 +99,21 @@ numbers that motivate them are in `verification.md`, never repeated here.
   persistence at Pong at every lead. Item 4 below stays open for what it asked for, a
   correction conditional on the forecast amount, which needs more archive than exists.
 
+- **Soil moisture as the wetness carrier, tested and not adopted.** ERA5-Land soil
+  moisture (0 to 7 cm, daily catchment means over the same IMD-covered points, 2015 to 2025)
+  was pulled for the three dam catchments and carried as a fractional anomaly against a
+  31-day day-of-year climatology, multiplying the coefficient through a sensitivity fitted
+  on the residual of the rain fit. Two carriers were scored leave-one-season-out beside the
+  rain index in use, each fold's climatology leaving the held-out season out, under the rule
+  the threshold-excess test was held to: soil moisture beside the index, and soil moisture in
+  its place. Neither passes (`verification.md`): the held-out error is unchanged to the
+  third decimal at every dam, the season peaks of the flood-scale check fall rather than
+  rise, and at Pong the fitted sensitivity is negative, wetter soil giving less storage
+  change, which is the anomaly reading the dam's releases on the wet days, the same thing
+  that stopped the threshold-excess term. The five-day rain index stays the carrier; the
+  code path, the pull and the climatology remain, so a day-wise inflow record (item 1)
+  can re-run the test on inflow rather than storage change.
+
 ## Next, in order
 
 1. **Flood-scale inflow truth.** The one thing that would settle the runoff response at the
@@ -153,24 +168,20 @@ numbers that motivate them are in `verification.md`, never repeated here.
    timing; a linear reservoir per reach (one parameter each, fitted on nothing we have yet)
    would soften peaks. Only worth doing once daily gauge readings at the control points are
    available; the WRD publishes them during floods in its situation reports.
-6. **Soil moisture as the wetness carrier.** The API is a proxy. ERA5-Land soil moisture is
-   one archive pull away (the code path exists, `gamma`), and would let the coefficient
-   respond to snowmelt-wetted soils the rain index cannot see. Effort: one long, quota-bound
-   pull.
-7. **Flood-scale error for the second probability.** The model-error term uses the
+6. **Flood-scale error for the second probability.** The model-error term uses the
    ordinary-day RMSE. Once a daily inflow record for an event exists (item 1), the error at
    flood scale can be measured and the probability made an outer estimate instead of an
    inner one; the flood-scale check in `verification.md` already brackets it from the period
    means and season peaks the record holds. Effort: small once item 1 lands.
-8. **Flood cushion above FRL.** Pong went to 1398 ft in 2023 and 1394.7 ft in 2025, above the
+7. **Flood cushion above FRL.** Pong went to 1398 ft in 2023 and 1394.7 ft in 2025, above the
    1390 ft FRL; that storage absorbed part of the peak. The rating clamps at the highest
    level in the record, so the model treats FRL as the ceiling, which makes the forced
    release an early, upper bound. A published elevation-capacity table above FRL (the EAP has
    the gross figure at design FRL) would resolve it. Effort: small once the table is found.
-9. **A second observed-rain record.** CHIRPS through the keyless ClimateSERV polygon API
+8. **A second observed-rain record.** CHIRPS through the keyless ClimateSERV polygon API
    would give an independent 1981-onward series to cross-check the IMD grid in the mountains.
    Effort: medium; another dependency and quota.
-10. **Ghaggar gauge model.** Nothing public gives Ghaggar discharge history; the state's
+9. **Ghaggar gauge model.** Nothing public gives Ghaggar discharge history; the state's
     situation reports during floods do. A request to the department for the Khanauri and
     Chandpur gauge records would unlock the rain-fed pathway as a real model instead of a
     percentile.

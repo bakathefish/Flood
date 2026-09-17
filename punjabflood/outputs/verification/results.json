@@ -8154,7 +8154,7 @@
     "Pong": {
       "n": 30,
       "bias_pct": 0.08461978684878971,
-      "pearson_r": 0.420875085236517,
+      "pearson_r": 0.42087508523651707,
       "mae_cusecs": 11231.507083392798,
       "mean_obs_cusecs": 35570.666666666664,
       "mean_pred_cusecs": 35600.76648898069,
@@ -8457,6 +8457,42 @@
         "gamma": 0.0
       },
       {
+        "dam": "Bhakra",
+        "variant": "api+sm",
+        "n_seasons": 11,
+        "n_days": 1009,
+        "rmse_bcm": 0.04399404886995013,
+        "n_heavy_days": 2,
+        "heavy_rmse_bcm": 0.09510728695937819,
+        "heavy_bias_bcm": -0.08534944312133674,
+        "in_sample_rmse_bcm": 0.043354931766414126,
+        "c": 0.17033704612728234,
+        "c_wet": 0.24991984946245677,
+        "w": "0.54 0.27 0.10 0.09",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "api+sm",
+        "gamma": -0.15843820624309193
+      },
+      {
+        "dam": "Bhakra",
+        "variant": "sm",
+        "n_seasons": 11,
+        "n_days": 1009,
+        "rmse_bcm": 0.043601413839833396,
+        "n_heavy_days": 2,
+        "heavy_rmse_bcm": 0.068782451635661,
+        "heavy_bias_bcm": -0.05235651697421472,
+        "in_sample_rmse_bcm": 0.043034283081322774,
+        "c": 0.2775569514793656,
+        "c_wet": 0.0,
+        "w": "0.27 0.36 0.18 0.19",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "sm",
+        "gamma": 0.12648210018255232
+      },
+      {
         "dam": "Pong",
         "variant": "baseline",
         "n_seasons": 8,
@@ -8493,6 +8529,42 @@
         "gamma": 0.0
       },
       {
+        "dam": "Pong",
+        "variant": "api+sm",
+        "n_seasons": 8,
+        "n_days": 733,
+        "rmse_bcm": 0.029977709069044404,
+        "n_heavy_days": 28,
+        "heavy_rmse_bcm": 0.07739424526277972,
+        "heavy_bias_bcm": -0.005276293773958529,
+        "in_sample_rmse_bcm": 0.0294028103844524,
+        "c": 0.20252556951077164,
+        "c_wet": 0.32815516998502064,
+        "w": "0.35 0.48 0.09 0.08",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "api+sm",
+        "gamma": -0.3776830455329354
+      },
+      {
+        "dam": "Pong",
+        "variant": "sm",
+        "n_seasons": 8,
+        "n_days": 733,
+        "rmse_bcm": 0.033458165966706976,
+        "n_heavy_days": 28,
+        "heavy_rmse_bcm": 0.08660020934772926,
+        "heavy_bias_bcm": 0.011083877019427998,
+        "in_sample_rmse_bcm": 0.03257146228332439,
+        "c": 0.5089782541366086,
+        "c_wet": 0.0,
+        "w": "0.21 0.52 0.15 0.13",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "sm",
+        "gamma": -0.28127446811137613
+      },
+      {
         "dam": "Ranjit Sagar",
         "variant": "baseline",
         "n_seasons": 11,
@@ -8527,6 +8599,42 @@
         "w_excess": "0.46 0.48 0.00 0.07",
         "wetness": "api",
         "gamma": 0.0
+      },
+      {
+        "dam": "Ranjit Sagar",
+        "variant": "api+sm",
+        "n_seasons": 11,
+        "n_days": 1184,
+        "rmse_bcm": 0.022964537279434174,
+        "n_heavy_days": 29,
+        "heavy_rmse_bcm": 0.03850503074435731,
+        "heavy_bias_bcm": -0.016715572568294135,
+        "in_sample_rmse_bcm": 0.02240629674521293,
+        "c": 0.1313774408026632,
+        "c_wet": 0.26331892708888766,
+        "w": "0.62 0.24 0.08 0.05",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "api+sm",
+        "gamma": 0.26358099677118985
+      },
+      {
+        "dam": "Ranjit Sagar",
+        "variant": "sm",
+        "n_seasons": 11,
+        "n_days": 1184,
+        "rmse_bcm": 0.023039721394354583,
+        "n_heavy_days": 29,
+        "heavy_rmse_bcm": 0.04701704310348513,
+        "heavy_bias_bcm": -0.010003863531820223,
+        "in_sample_rmse_bcm": 0.022704696010881712,
+        "c": 0.34144046382873267,
+        "c_wet": 0.0,
+        "w": "0.34 0.45 0.11 0.10",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "sm",
+        "gamma": 1.306490433480914
       }
     ],
     "flood_scale": {
@@ -8541,6 +8649,18 @@
         "period_mean_worst_deviation": 0.2635423560682024,
         "season_peak_ratio_min": 0.5491850574655527,
         "season_peak_ratio_max": 0.5776685245303764
+      },
+      "api+sm": {
+        "n_period_means": 6,
+        "period_mean_worst_deviation": 0.219809396091746,
+        "season_peak_ratio_min": 0.5372729370869129,
+        "season_peak_ratio_max": 0.5653954057750852
+      },
+      "sm": {
+        "n_period_means": 6,
+        "period_mean_worst_deviation": 0.25713229531979065,
+        "season_peak_ratio_min": 0.4595692926446734,
+        "season_peak_ratio_max": 0.4996384998206146
       }
     },
     "verdict": {
@@ -8558,6 +8678,30 @@
     "verdicts": [
       {
         "variant": "excess above 30 mm",
+        "dams": [
+          "Bhakra",
+          "Pong",
+          "Ranjit Sagar"
+        ],
+        "loso_error_not_higher": false,
+        "season_peaks_higher": false,
+        "period_means_hold": false,
+        "adopt": false
+      },
+      {
+        "variant": "api+sm",
+        "dams": [
+          "Bhakra",
+          "Pong",
+          "Ranjit Sagar"
+        ],
+        "loso_error_not_higher": false,
+        "season_peaks_higher": false,
+        "period_means_hold": true,
+        "adopt": false
+      },
+      {
+        "variant": "sm",
         "dams": [
           "Bhakra",
           "Pong",
@@ -9334,7 +9478,7 @@
       "rain": "observed rain",
       "n": 30,
       "bias_pct": 0.08461978684878971,
-      "pearson_r": 0.420875085236517,
+      "pearson_r": 0.42087508523651707,
       "mae_cusecs": 11231.507083392798,
       "mean_obs_cusecs": 35570.666666666664,
       "mean_pred_cusecs": 35600.76648898069
@@ -9366,11 +9510,11 @@
       "horizon_days": 1,
       "rain": "gfs_seamless",
       "n": 30,
-      "bias_pct": -0.7296311139826438,
-      "pearson_r": 0.3999757672827331,
+      "bias_pct": -0.7296311139826233,
+      "pearson_r": 0.39997576728273293,
       "mae_cusecs": 11662.033445476467,
       "mean_obs_cusecs": 35570.666666666664,
-      "mean_pred_cusecs": 35311.13201521561
+      "mean_pred_cusecs": 35311.13201521562
     },
     {
       "dam": "Pong",
@@ -9378,7 +9522,7 @@
       "rain": "ecmwf_aifs025_single",
       "n": 30,
       "bias_pct": 1.8837636075834343,
-      "pearson_r": 0.3926909430969351,
+      "pearson_r": 0.39269094309693514,
       "mae_cusecs": 11449.255712572864,
       "mean_obs_cusecs": 35570.666666666664,
       "mean_pred_cusecs": 36240.73394030814
@@ -9389,7 +9533,7 @@
       "rain": "observed rain",
       "n": 29,
       "bias_pct": 0.2229450756852159,
-      "pearson_r": 0.06246387498618028,
+      "pearson_r": 0.06246387498618027,
       "mae_cusecs": 14649.223357046583,
       "mean_obs_cusecs": 35615.75862068965,
       "mean_pred_cusecs": 35695.16220070241
@@ -9433,7 +9577,7 @@
       "rain": "ecmwf_aifs025_single",
       "n": 29,
       "bias_pct": 5.110320407647349,
-      "pearson_r": -0.03984570252015934,
+      "pearson_r": -0.03984570252015939,
       "mae_cusecs": 15558.707746064692,
       "mean_obs_cusecs": 35615.75862068965,
       "mean_pred_cusecs": 37435.838001821176
@@ -9553,11 +9697,11 @@
       "horizon_days": 5,
       "rain": "observed rain",
       "n": 26,
-      "bias_pct": -3.473521474407346,
-      "pearson_r": 0.1180349701596998,
+      "bias_pct": -3.473521474407368,
+      "pearson_r": 0.11803497015969983,
       "mae_cusecs": 13869.556709530394,
       "mean_obs_cusecs": 34825.53846153846,
-      "mean_pred_cusecs": 33615.86590449893
+      "mean_pred_cusecs": 33615.865904498925
     },
     {
       "dam": "Pong",

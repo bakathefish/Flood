@@ -40,10 +40,13 @@ carried as a fractional anomaly against a 31-day day-of-year climatology and mul
 coefficient by `1 + gamma * anomaly`, gamma fitted in a second stage on the residual of the
 rain fit. Three wetness carriers are fitted and scored out of sample beside each other
 (`api`, the index alone; `api+sm`, both; `sm`, the anomaly alone, each fold's climatology
-leaving the held-out season out) under the rule the threshold-excess test used; the product
-uses the carrier in the parameter file, and the report says which one and why. In the daily
-product the anomaly is the latest ERA5-Land day on record, up to about six days before the
-issue date, labelled with its date; the issue day's anomaly holds over the horizon. The base component today is the observed BBMB inflow minus the
+leaving the held-out season out) under the rule the threshold-excess test used; neither
+passed (the held-out error did not fall, the season peaks fell, and Pong's fitted
+sensitivity came out negative), so the product's carrier is the rain index and the report
+records the refusal with the numbers. Should a carrier
+ever pass (on a day-wise inflow record, say), the daily product already takes the anomaly
+from the latest ERA5-Land day on record, up to about six days before the issue date,
+labelled with its date, and holds it over the horizon. The base component today is the observed BBMB inflow minus the
 quick response the recent rain explains, decaying at a fitted daily recession. The recession is estimated from the residuals as the lag-2 to lag-1
 autocovariance ratio, which is unbiased under white measurement noise; where the residual
 drifts through the season instead of recessing the ratio exceeds one and the estimate sits

@@ -162,17 +162,29 @@ Each variant is fitted on the same storage record beside the response in use and
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Bhakra | baseline | 11 | 1009 | 0.0439 | 2 | 0.1013 | -0.0908 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api | 0.00 |
 | Bhakra | excess above 30 mm | 11 | 1009 | 0.0668 | 2 | 0.0923 | -0.0773 | 0.194 | 0.207 | 0.55 0.21 0.12 0.12 | 0.303 | 0.00 1.00 0.00 0.00 | api | 0.00 |
+| Bhakra | api+sm | 11 | 1009 | 0.0440 | 2 | 0.0951 | -0.0853 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api+sm | -0.16 |
+| Bhakra | sm | 11 | 1009 | 0.0436 | 2 | 0.0688 | -0.0524 | 0.278 | 0.000 | 0.27 0.36 0.18 0.19 | 0.000 | none | sm | 0.13 |
 | Pong | baseline | 8 | 733 | 0.0302 | 28 | 0.0782 | -0.0158 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api | 0.00 |
 | Pong | excess above 30 mm | 8 | 733 | 0.0304 | 28 | 0.0773 | -0.0129 | 0.200 | 0.332 | 0.40 0.39 0.11 0.10 | 0.523 | 0.20 0.65 0.09 0.06 | api | 0.00 |
+| Pong | api+sm | 8 | 733 | 0.0300 | 28 | 0.0774 | -0.0053 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api+sm | -0.38 |
+| Pong | sm | 8 | 733 | 0.0335 | 28 | 0.0866 | +0.0111 | 0.509 | 0.000 | 0.21 0.52 0.15 0.13 | 0.000 | none | sm | -0.28 |
 | Ranjit Sagar | baseline | 11 | 1184 | 0.0229 | 29 | 0.0442 | -0.0113 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api | 0.00 |
 | Ranjit Sagar | excess above 30 mm | 11 | 1184 | 0.0229 | 29 | 0.0469 | -0.0074 | 0.156 | 0.166 | 0.47 0.27 0.15 0.11 | 0.469 | 0.46 0.48 0.00 0.07 | api | 0.00 |
+| Ranjit Sagar | api+sm | 11 | 1184 | 0.0230 | 29 | 0.0385 | -0.0167 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api+sm | 0.26 |
+| Ranjit Sagar | sm | 11 | 1184 | 0.0230 | 29 | 0.0470 | -0.0100 | 0.341 | 0.000 | 0.34 0.45 0.11 0.10 | 0.000 | none | sm | 1.31 |
 
 | variant | period means covered | worst deviation of a period mean from 1 | season-peak ratio, smallest | season-peak ratio, largest |
 |---|---|---|---|---|
 | baseline | 6 | 0.22 | 0.57 | 0.58 |
 | excess above 30 mm | 6 | 0.26 | 0.55 | 0.58 |
+| api+sm | 6 | 0.22 | 0.54 | 0.57 |
+| sm | 6 | 0.26 | 0.46 | 0.50 |
 
 Verdict on 'excess above 30 mm', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (fails); the period means hold (fails).
+
+Verdict on 'api+sm', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (fails); the period means hold (passes).
+
+Verdict on 'sm', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (fails); the period means hold (fails).
 
 ## As-issued hindcast: what the product would have said, each dam, 2024 to 2026
 
