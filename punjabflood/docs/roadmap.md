@@ -70,6 +70,21 @@ numbers that motivate them are in `verification.md`, never repeated here.
   storage-change target cannot carry a sharper heavy-day response; a day-wise inflow record
   could (item 1).
 
+- **Local inflow between the dams and the head works.** The Swan, Sirsa and Kandi torrents
+  above Ropar, the Chakki and Kandi torrents above Dhilwan, and the plains draining to Harike
+  are now three HydroBASINS local catchments (the sub-basins draining to the ones holding
+  Ropar and Phillaur, Dhilwan, and the Harike barrage, with the dam sets removed), each
+  carrying its own IMD rain through a dam's calibrated response transferred to its area,
+  Pong's as the primary and Ranjit Sagar's as the sensitivity, no base flow, same-day
+  arrival. The daily product adds the term at Ropar, Phillaur, Dhilwan and Harike before
+  classification; the event test reports the Dhilwan peaks with and without it. What it
+  showed (`verification.md`): the local term is a small share of the observed peak day in
+  both event years, larger in 2025 than in 2023, and it raises the routed magnitude ratio
+  by a few hundredths in 2023 and by about a tenth in 2025 while the timing is unchanged;
+  the gap that remains at the peaks is the dams' own peak-day response (item 2), not the
+  tributaries. The coefficient is fitted on nothing local (`design.md`, known limits); daily
+  gauge readings at the control points during a flood would let it be fitted on the river.
+
 ## Next, in order
 
 1. **Flood-scale inflow truth.** The one thing that would settle the runoff response at the
@@ -120,33 +135,28 @@ numbers that motivate them are in `verification.md`, never repeated here.
    quantile mapping, both of which need more than the three seasons of archive that exist;
    or a higher-resolution model (ICON-D2 does not cover India; the IMD's own NWP is not
    keyless). Effort: wait for archive, then small.
-5. **Local inflow between the dams and Harike.** The WRD peaks at Harike and Dhilwan include
-   tributaries (Swan and Sirsa on the Sutlej; Chakki and the Kandi torrents on the Beas) and
-   plains rain. The HydroBASINS intermediate sub-basins are in the archive; the same runoff
-   model with its own coefficient would add a local term at each control point. Effort:
-   medium; improves magnitude ratios, not timing.
-6. **Attenuation.** Pure translation is the department's own assumption and is right for
+5. **Attenuation.** Pure translation is the department's own assumption and is right for
    timing; a linear reservoir per reach (one parameter each, fitted on nothing we have yet)
    would soften peaks. Only worth doing once daily gauge readings at the control points are
    available; the WRD publishes them during floods in its situation reports.
-7. **Soil moisture as the wetness carrier.** The API is a proxy. ERA5-Land soil moisture is
+6. **Soil moisture as the wetness carrier.** The API is a proxy. ERA5-Land soil moisture is
    one archive pull away (the code path exists, `gamma`), and would let the coefficient
    respond to snowmelt-wetted soils the rain index cannot see. Effort: one long, quota-bound
    pull.
-8. **Flood-scale error for the second probability.** The model-error term uses the
+7. **Flood-scale error for the second probability.** The model-error term uses the
    ordinary-day RMSE. Once a daily inflow record for an event exists (item 1), the error at
    flood scale can be measured and the probability made an outer estimate instead of an
    inner one; the flood-scale check in `verification.md` already brackets it from the period
    means and season peaks the record holds. Effort: small once item 1 lands.
-9. **Flood cushion above FRL.** Pong went to 1398 ft in 2023 and 1394.7 ft in 2025, above the
+8. **Flood cushion above FRL.** Pong went to 1398 ft in 2023 and 1394.7 ft in 2025, above the
    1390 ft FRL; that storage absorbed part of the peak. The rating clamps at the highest
    level in the record, so the model treats FRL as the ceiling, which makes the forced
    release an early, upper bound. A published elevation-capacity table above FRL (the EAP has
    the gross figure at design FRL) would resolve it. Effort: small once the table is found.
-10. **A second observed-rain record.** CHIRPS through the keyless ClimateSERV polygon API
+9. **A second observed-rain record.** CHIRPS through the keyless ClimateSERV polygon API
    would give an independent 1981-onward series to cross-check the IMD grid in the mountains.
    Effort: medium; another dependency and quota.
-11. **Ghaggar gauge model.** Nothing public gives Ghaggar discharge history; the state's
+10. **Ghaggar gauge model.** Nothing public gives Ghaggar discharge history; the state's
     situation reports during floods do. A request to the department for the Khanauri and
     Chandpur gauge records would unlock the rain-fed pathway as a real model instead of a
     percentile.

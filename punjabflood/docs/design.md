@@ -72,8 +72,9 @@ says by how much), and the second probability is therefore still an inner estima
 uncertainty, not an outer one.
 
 **Release to control point.** Pure translation with the WRD's Annexure Z travel times, no
-attenuation, no tributaries; Harike sums the Sutlej and Beas arrivals; Ferozepur is Harike
-plus twelve hours; Dhilwan is placed on the Tanda to Harike reach by distance. Each river
+attenuation; the tributaries enter as the local term of the next paragraph; Harike sums the
+Sutlej and Beas arrivals; Ferozepur is Harike plus twelve hours; Dhilwan is placed on the
+Tanda to Harike reach by distance. Each river
 loses its diversion first: Bhakra's outflow minus the Nangal canal off-takes (12,500 plus
 10,150 cusecs), which do not return above Ropar; Pong's outflow minus the Mukerian Hydel
 Channel's 11,500 cusecs taken at the Shah Nehar barrage (PSPCL). On a day the spillway is
@@ -81,6 +82,24 @@ forced, a full reservoir passes its inflow, so the river gets the spill plus the
 passage less that diversion; this is the lower bound on the river release and is what the
 product and the event test route. Arrivals are classed Low, Medium, High with the WRD
 section 3.2 limits, printed inconsistencies kept as printed.
+
+**The land between the dams and the head works.** The Swan, the Sirsa and the Kandi
+torrents join the Sutlej above Ropar; the Chakki and more Kandi torrents join the Beas above
+Dhilwan; the plains drain to Harike. Three local catchments carry that water: the HydroBASINS
+sub-basins draining to the sub-basin that holds Ropar and Phillaur, to the one that holds
+Dhilwan, and to the one at the Harike barrage, each with the dam sets (and the local sets
+built before it) removed, so the three are disjoint and together are the nineteen sub-basins
+below Bhakra and Pong. All three lie inside the IMD grid. No gauge history exists for any of
+them, so no coefficient can be fitted on them; the runoff is their own daily rain through a
+dam's calibrated response (coefficient, wetness dependence and lag weights, `inflow.py`)
+transferred to their area, Pong's response as the primary and Ranjit Sagar's (the lowest
+fitted coefficient) as the sensitivity in the verification. No base flow is added, so the term
+is a lower bound on what the tributaries contribute; it arrives at its control point on the day
+it runs off, with no travel-time table for the tributaries and no attenuation, the same
+assumption the dam reaches carry. The daily product computes it from the deterministic QPF
+(ECMWF IFS where present) with the recent observed days feeding the lags and the antecedent
+index, and adds it at Ropar, Phillaur, Dhilwan and Harike before classification; the event
+test adds it from the IMD record and reports the Dhilwan peaks with and without it.
 
 **Rain-fed pathway.** For the Ghaggar there is no public gauge history, so the product
 publishes the catchment QPF above Bhankarpur and Khanauri, the recent rain, and the
@@ -189,6 +208,11 @@ The full list, ordered by expected effect, is `roadmap.md`.
   the observed rain record. It is one archive pull away.
 - The ratings clamp at the highest level each dam has printed; above that the flood cushion
   above full reservoir level is not resolved, and headroom is simply zero.
+- The local inflow term is not fitted on anything local: the intermediate catchments carry a
+  dam's runoff response, and the plains and the Shivalik torrents need not respond like a
+  Himalayan catchment. Daily gauge readings at Ropar, Dhilwan or Harike during a flood (the
+  WRD publishes them in its situation reports) would let the local coefficient be fitted, and
+  the routed dam release checked, on the river itself.
 
 ## What was measured before this design was fixed
 

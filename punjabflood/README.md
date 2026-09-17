@@ -23,8 +23,11 @@ turns that mechanism into a daily hazard watch:
    from the 51-member rain ensemble alone and with the inflow model's own error sampled on
    top.
 5. **Routing.** The forced release travels with the Water Resources Department's Annexure Z
-   times to Ropar, Phillaur, Harike, Dhilwan and Ferozepur and is classed Low, Medium or
-   High against the department's own thresholds.
+   times to Ropar, Phillaur, Harike, Dhilwan and Ferozepur, the runoff of the land between
+   the dams and the head works (three HydroBASINS local catchments, a dam's calibrated
+   response transferred, no base flow) is added on the day at the control point it drains
+   to, and the arrivals are classed Low, Medium or High against the department's own
+   thresholds.
 6. **Verification.** 38 years of annual peaks with the department's High/Medium/Low class,
    the dated 2023 and 2025 Dhilwan peaks, every flood-scale inflow figure the public record
    holds for 2023 and 2025 (BBMB's archived sheets, the Public Action Committee's period
