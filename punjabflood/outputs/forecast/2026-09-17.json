@@ -1,0 +1,1550 @@
+{
+  "issue_date": "2026-09-17",
+  "generated_utc": "2026-09-17T08:31:57+00:00",
+  "disclaimer": "Hazard watch computed from public data (BBMB bulletin, CWC storage, Open-Meteo rain forecasts, Punjab WRD travel times and thresholds). Not an official warning: the Punjab Water Resources Department, CWC, BBMB and IMD issue those.",
+  "dams": {
+    "Bhakra": {
+      "state": {
+        "level_ft": 1644.65,
+        "level_m": 501.28932000000003,
+        "storage_bcm": 4.162186381250007,
+        "inflow_cusecs": 28368,
+        "outflow_cusecs": 27119,
+        "basis": "bbmb bulletin as on 17-09-2026 06:00"
+      },
+      "storage_fraction": 0.6681949560523369,
+      "headroom_bcm": 2.0668136187499933,
+      "absorption_cusecs": 34995.95688313572,
+      "base_inflow_cusecs": 26675.7498224743,
+      "deterministic": {
+        "gfs_seamless": {
+          "qpf_mm_by_day": [
+            0.35726847228238207,
+            0.06336388383772264,
+            0.02582170184955431,
+            0.0,
+            0.007646260101464626
+          ],
+          "inflow_bcm_by_day": [
+            0.06703879993854149,
+            0.06542691641937363,
+            0.06373768069167406,
+            0.06290615629885095,
+            0.06212176084190665
+          ],
+          "horizons": {
+            "1": {
+              "dam": "Bhakra",
+              "horizon_days": 1,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.06703879993854149,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3347880993923281,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143604928885188
+              ]
+            },
+            "2": {
+              "dam": "Bhakra",
+              "horizon_days": 2,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.13246571635791513,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.33802992567005913,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143604928885188,
+                4.123411593001202
+              ]
+            },
+            "3": {
+              "dam": "Bhakra",
+              "horizon_days": 3,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.19620339704958917,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.34154294085896364,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143604928885188,
+                4.123411593001202,
+                4.101529021389516
+              ]
+            },
+            "4": {
+              "dam": "Bhakra",
+              "horizon_days": 4,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.2591095533484401,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.34518944848530964,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143604928885188,
+                4.123411593001202,
+                4.101529021389516,
+                4.078814925385007
+              ]
+            },
+            "5": {
+              "dam": "Bhakra",
+              "horizon_days": 5,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.32123131419034673,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3489618824974229,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143604928885188,
+                4.123411593001202,
+                4.101529021389516,
+                4.078814925385007,
+                4.0553164339235535
+              ]
+            }
+          }
+        },
+        "ecmwf_ifs025": {
+          "qpf_mm_by_day": [
+            0.49832534736469675,
+            0.1743373162448627,
+            0.2114166545398567,
+            0.19255323158561202,
+            0.18971872929765268
+          ],
+          "inflow_bcm_by_day": [
+            0.06741187461773157,
+            0.06588872650556958,
+            0.06439998535758551,
+            0.06371964566475809,
+            0.06292079579096513
+          ],
+          "horizons": {
+            "1": {
+              "dam": "Bhakra",
+              "horizon_days": 1,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.06741187461773157,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.33472820620254,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143978003564379
+              ]
+            },
+            "2": {
+              "dam": "Bhakra",
+              "horizon_days": 2,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.13330060112330117,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3378958937603808,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143978003564379,
+                4.124246477766588
+              ]
+            },
+            "3": {
+              "dam": "Bhakra",
+              "horizon_days": 3,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.19770058648088668,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.34130258294737303,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143978003564379,
+                4.124246477766588,
+                4.103026210820814
+              ]
+            },
+            "4": {
+              "dam": "Bhakra",
+              "horizon_days": 4,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.26142023214564475,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.34481849346890175,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143978003564379,
+                4.124246477766588,
+                4.103026210820814,
+                4.081125604182212
+              ]
+            },
+            "5": {
+              "dam": "Bhakra",
+              "horizon_days": 5,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.3243410279366099,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3484626508797855,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.143978003564379,
+                4.124246477766588,
+                4.103026210820814,
+                4.081125604182212,
+                4.058426147669817
+              ]
+            }
+          }
+        },
+        "icon_seamless": {
+          "qpf_mm_by_day": [
+            0.02776130183444707,
+            0.019322082267167102,
+            0.014013963020714205,
+            0.0037827224455164016,
+            0.007908874600839047
+          ],
+          "inflow_bcm_by_day": [
+            0.06616730195707864,
+            0.06489601053706028,
+            0.06350517124108335,
+            0.06273920700993926,
+            0.06210303032139957
+          ],
+          "horizons": {
+            "1": {
+              "dam": "Bhakra",
+              "horizon_days": 1,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.06616730195707864,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3349280091662024,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.142733430903726
+              ]
+            },
+            "2": {
+              "dam": "Bhakra",
+              "horizon_days": 2,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.1310633124941389,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.33825506676233336,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.142733430903726,
+                4.122009189137426
+              ]
+            },
+            "3": {
+              "dam": "Bhakra",
+              "horizon_days": 3,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.19456848373522226,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3418054088818191,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.142733430903726,
+                4.122009189137426,
+                4.09989410807515
+              ]
+            },
+            "4": {
+              "dam": "Bhakra",
+              "horizon_days": 4,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.2573076907451615,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3454787184489118,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.142733430903726,
+                4.122009189137426,
+                4.09989410807515,
+                4.077013062781729
+              ]
+            },
+            "5": {
+              "dam": "Bhakra",
+              "horizon_days": 5,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.3194107210665611,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.34925415944778176,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.142733430903726,
+                4.122009189137426,
+                4.09989410807515,
+                4.077013062781729,
+                4.053495840799768
+              ]
+            }
+          }
+        },
+        "best_match": {
+          "qpf_mm_by_day": [
+            0.5478910354776837,
+            0.18821289583295905,
+            0.18644805777022155,
+            0.2340699731629068,
+            0.2287308941605267
+          ],
+          "inflow_bcm_by_day": [
+            0.06754296856959176,
+            0.06598782260087487,
+            0.06437857023147127,
+            0.06381938534826417,
+            0.06306076502550775
+          ],
+          "horizons": {
+            "1": {
+              "dam": "Bhakra",
+              "horizon_days": 1,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.06754296856959176,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3347071604565358,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.144109097516239
+              ]
+            },
+            "2": {
+              "dam": "Bhakra",
+              "horizon_days": 2,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.13353079117046662,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.33785893918546267,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.144109097516239,
+                4.124476667813754
+              ]
+            },
+            "3": {
+              "dam": "Bhakra",
+              "horizon_days": 3,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.19790936140193788,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3412690663442182,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.144109097516239,
+                4.124476667813754,
+                4.1032349857418655
+              ]
+            },
+            "4": {
+              "dam": "Bhakra",
+              "horizon_days": 4,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.2617287467502021,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.3447689647155613,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.144109097516239,
+                4.124476667813754,
+                4.1032349857418655,
+                4.0814341187867695
+              ]
+            },
+            "5": {
+              "dam": "Bhakra",
+              "horizon_days": 5,
+              "storage_bcm": 4.162186381250007,
+              "capacity_bcm": 6.229,
+              "headroom_bcm": 2.0668136187499933,
+              "inflow_volume_bcm": 0.3247895117757098,
+              "absorption_bcm_per_day": 0.08562025230336007,
+              "hei": -0.34839065154777393,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.144109097516239,
+                4.124476667813754,
+                4.1032349857418655,
+                4.0814341187867695,
+                4.0588746315089175
+              ]
+            }
+          }
+        }
+      },
+      "ensemble": {
+        "1": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.33478638868479893,
+          "hei_q50": -0.33456629394239806,
+          "hei_q90": -0.3342262607493254,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.04337534845997248,
+          "error_acf1": 0.10292746419233867
+        },
+        "2": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.3379290808123607,
+          "hei_q50": -0.33757656908021094,
+          "hei_q90": -0.3371048801882222,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.04337534845997248,
+          "error_acf1": 0.10292746419233867
+        },
+        "3": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.34135669428526977,
+          "hei_q50": -0.34091981709858343,
+          "hei_q90": -0.34033546675205967,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.04337534845997248,
+          "error_acf1": 0.10292746419233867
+        },
+        "4": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.3448940551112058,
+          "hei_q50": -0.34434442136178384,
+          "hei_q90": -0.3435082982236954,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.04337534845997248,
+          "error_acf1": 0.10292746419233867
+        },
+        "5": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.34858295167969017,
+          "hei_q50": -0.3479359478072948,
+          "hei_q90": -0.3469780412085327,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.04337534845997248,
+          "error_acf1": 0.10292746419233867
+        }
+      },
+      "forced_release_median_cusecs_by_day": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "Pong": {
+      "state": {
+        "level_ft": 1371.98,
+        "level_m": 418.179504,
+        "storage_bcm": 4.605854285714286,
+        "inflow_cusecs": 11509,
+        "outflow_cusecs": 17532,
+        "basis": "bbmb bulletin as on 17-09-2026 06:00"
+      },
+      "storage_fraction": 0.7480679366110583,
+      "headroom_bcm": 1.5511457142857141,
+      "absorption_cusecs": 45600.0,
+      "base_inflow_cusecs": 8247.624323597549,
+      "deterministic": {
+        "gfs_seamless": {
+          "qpf_mm_by_day": [
+            0.6305197886378586,
+            0.19180702223810656,
+            0.08378167115883199,
+            0.06531366904670646,
+            0.03953063942246668
+          ],
+          "inflow_bcm_by_day": [
+            0.023392221890897638,
+            0.022114966690213136,
+            0.02032033055784637,
+            0.019782120918348217,
+            0.01938409217395701
+          ],
+          "horizons": {
+            "1": {
+              "dam": "Pong",
+              "horizon_days": 1,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.023392221890897638,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.26625261284259244,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517682662728158
+              ]
+            },
+            "2": {
+              "dam": "Pong",
+              "horizon_days": 2,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.045507188581110775,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.2807806099494322,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517682662728158,
+                4.428233784541346
+              ]
+            },
+            "3": {
+              "dam": "Pong",
+              "horizon_days": 3,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.06582751913895715,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.29560008604479987,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517682662728158,
+                4.428233784541346,
+                4.336990270222167
+              ]
+            },
+            "4": {
+              "dam": "Pong",
+              "horizon_days": 4,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.08560964005730537,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.3105069764067744,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517682662728158,
+                4.428233784541346,
+                4.336990270222167,
+                4.24520854626349
+              ]
+            },
+            "5": {
+              "dam": "Pong",
+              "horizon_days": 5,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.10499373223126238,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.3254785133083609,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517682662728158,
+                4.428233784541346,
+                4.336990270222167,
+                4.24520854626349,
+                4.153028793560422
+              ]
+            }
+          }
+        },
+        "ecmwf_ifs025": {
+          "qpf_mm_by_day": [
+            0.41014274885907887,
+            0.3290373630782946,
+            0.5998196289965416,
+            0.23071855018024998,
+            0.3409083899647785
+          ],
+          "inflow_bcm_by_day": [
+            0.023138784332788098,
+            0.02193095462808177,
+            0.02101420426587348,
+            0.0206826644419716,
+            0.020079991686072426
+          ],
+          "horizons": {
+            "1": {
+              "dam": "Pong",
+              "horizon_days": 1,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.023138784332788098,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.2662937753500002,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517429225170049
+              ]
+            },
+            "2": {
+              "dam": "Pong",
+              "horizon_days": 2,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.04506973896086987,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.2808516591000316,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517429225170049,
+                4.427796334921105
+              ]
+            },
+            "3": {
+              "dam": "Pong",
+              "horizon_days": 3,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.06608394322674335,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.2955584384749142,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517429225170049,
+                4.427796334921105,
+                4.337246694309953
+              ]
+            },
+            "4": {
+              "dam": "Pong",
+              "horizon_days": 4,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.08676660766871495,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.31031906547427324,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517429225170049,
+                4.427796334921105,
+                4.337246694309953,
+                4.246365513874899
+              ]
+            },
+            "5": {
+              "dam": "Pong",
+              "horizon_days": 5,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.10684659935478738,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.32517757663083535,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.517429225170049,
+                4.427796334921105,
+                4.337246694309953,
+                4.246365513874899,
+                4.154881660683946
+              ]
+            }
+          }
+        },
+        "icon_seamless": {
+          "qpf_mm_by_day": [
+            0.03637083979134804,
+            0.023046065733564353,
+            0.032673828173264384,
+            0.007352739849328102,
+            0.07596583876732939
+          ],
+          "inflow_bcm_by_day": [
+            0.022708939916967118,
+            0.02103297569691095,
+            0.019853787788457176,
+            0.019452209718636652,
+            0.019287645821870536
+          ],
+          "horizons": {
+            "1": {
+              "dam": "Pong",
+              "horizon_days": 1,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.022708939916967118,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.2663635892879279,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5169993807542275
+              ]
+            },
+            "2": {
+              "dam": "Pong",
+              "horizon_days": 2,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.043741915613878066,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.28106731986777433,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5169993807542275,
+                4.426468511574113
+              ]
+            },
+            "3": {
+              "dam": "Pong",
+              "horizon_days": 3,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.06359570340233524,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.29596257032880535,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5169993807542275,
+                4.426468511574113,
+                4.334758454485544
+              ]
+            },
+            "4": {
+              "dam": "Pong",
+              "horizon_days": 4,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.08304791312097189,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.3109230437993899,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5169993807542275,
+                4.426468511574113,
+                4.334758454485544,
+                4.242646819327155
+              ]
+            },
+            "5": {
+              "dam": "Pong",
+              "horizon_days": 5,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.10233555894284242,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.32591024520513207,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5169993807542275,
+                4.426468511574113,
+                4.334758454485544,
+                4.242646819327155,
+                4.1503706202720005
+              ]
+            }
+          }
+        },
+        "best_match": {
+          "qpf_mm_by_day": [
+            0.5295276821240809,
+            0.28849964366497627,
+            0.5585199487851354,
+            0.343511091188842,
+            0.4695720760637969
+          ],
+          "inflow_bcm_by_day": [
+            0.0232760791525757,
+            0.022067685433432096,
+            0.020944946849119458,
+            0.02076324304583464,
+            0.020345725228724333
+          ],
+          "horizons": {
+            "1": {
+              "dam": "Pong",
+              "horizon_days": 1,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.0232760791525757,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.266271476370012,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5175665199898365
+              ]
+            },
+            "2": {
+              "dam": "Pong",
+              "horizon_days": 2,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.04534376458600779,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.2808071527454535,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5175665199898365,
+                4.4280703605462435
+              ]
+            },
+            "3": {
+              "dam": "Pong",
+              "horizon_days": 3,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.06628871143512725,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.2955251806856688,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5175665199898365,
+                4.4280703605462435,
+                4.337451462518337
+              ]
+            },
+            "4": {
+              "dam": "Pong",
+              "horizon_days": 4,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.0870519544809619,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.3102727203691495,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5175665199898365,
+                4.4280703605462435,
+                4.337451462518337,
+                4.246650860687146
+              ]
+            },
+            "5": {
+              "dam": "Pong",
+              "horizon_days": 5,
+              "storage_bcm": 4.605854285714286,
+              "capacity_bcm": 6.157,
+              "headroom_bcm": 1.5511457142857141,
+              "inflow_volume_bcm": 0.10739767970968622,
+              "absorption_bcm_per_day": 0.1115638448770253,
+              "hei": -0.3250880719443161,
+              "forced_release_bcm": 0.0,
+              "day_of_exhaustion": null,
+              "release_by_day_cusecs": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "storage_by_day_bcm": [
+                4.5175665199898365,
+                4.4280703605462435,
+                4.337451462518337,
+                4.246650860687146,
+                4.155432741038845
+              ]
+            }
+          }
+        }
+      },
+      "ensemble": {
+        "1": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.26631290337984215,
+          "hei_q50": -0.2662065204672132,
+          "hei_q90": -0.2660672158877709,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.029594760927673373,
+          "error_acf1": 0.2812921360994265
+        },
+        "2": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.28089619144785166,
+          "hei_q50": -0.28065445215554524,
+          "hei_q90": -0.2803145682918554,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.029594760927673373,
+          "error_acf1": 0.2812921360994265
+        },
+        "3": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.29566879830746035,
+          "hei_q50": -0.2953400738897811,
+          "hei_q90": -0.2949617166875697,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.029594760927673373,
+          "error_acf1": 0.2812921360994265
+        },
+        "4": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.3105007937208232,
+          "hei_q50": -0.310077688575227,
+          "hei_q90": -0.30951824867075584,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.029594760927673373,
+          "error_acf1": 0.2812921360994265
+        },
+        "5": {
+          "n_members": 51,
+          "p_exhaustion": 0.0,
+          "hei_q10": -0.3254410896768621,
+          "hei_q50": -0.3249007382733686,
+          "hei_q90": -0.324181166904067,
+          "peak_release_q50_cusecs": 0.0,
+          "peak_release_q90_cusecs": 0.0,
+          "median_day_of_exhaustion": null,
+          "p_exhaustion_model_error": 0.0,
+          "peak_release_q50_model_error_cusecs": 0.0,
+          "peak_release_q90_model_error_cusecs": 0.0,
+          "n_error_draws": 200,
+          "error_sd_bcm_per_day": 0.029594760927673373,
+          "error_acf1": 0.2812921360994265
+        }
+      },
+      "forced_release_median_cusecs_by_day": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "reaches": [
+    {
+      "station": "Dhilwan",
+      "river": "Beas",
+      "peak_cusecs": 6032.0,
+      "peak_date": "2026-09-19",
+      "peak_class": null,
+      "by_day": [
+        {
+          "date": "2026-09-19",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-20",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-21",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-22",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-23",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-24",
+          "cusecs": 6032.0,
+          "class": null
+        }
+      ]
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "river": "Sutlej",
+      "peak_cusecs": 10501.0,
+      "peak_date": "2026-09-21",
+      "peak_class": null,
+      "by_day": [
+        {
+          "date": "2026-09-20",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-21",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-22",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-23",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-24",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-25",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-26",
+          "cusecs": 10501.0,
+          "class": null
+        }
+      ]
+    },
+    {
+      "station": "Harike Head Works",
+      "river": "Sutlej+Beas",
+      "peak_cusecs": 10501.0,
+      "peak_date": "2026-09-21",
+      "peak_class": null,
+      "by_day": [
+        {
+          "date": "2026-09-20",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-21",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-22",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-23",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-24",
+          "cusecs": 10501.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-25",
+          "cusecs": 10501.0,
+          "class": null
+        }
+      ]
+    },
+    {
+      "station": "Naushera Mirthal",
+      "river": "Beas",
+      "peak_cusecs": 6032.0,
+      "peak_date": "2026-09-18",
+      "peak_class": null,
+      "by_day": [
+        {
+          "date": "2026-09-18",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-19",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-20",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-21",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-22",
+          "cusecs": 6032.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-23",
+          "cusecs": 6032.0,
+          "class": null
+        }
+      ]
+    },
+    {
+      "station": "Railway Bridge Phillaur",
+      "river": "Sutlej",
+      "peak_cusecs": 4469.0,
+      "peak_date": "2026-09-19",
+      "peak_class": null,
+      "by_day": [
+        {
+          "date": "2026-09-19",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-20",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-21",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-22",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-23",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-24",
+          "cusecs": 4469.0,
+          "class": null
+        }
+      ]
+    },
+    {
+      "station": "Ropar Head Works",
+      "river": "Sutlej",
+      "peak_cusecs": 4469.0,
+      "peak_date": "2026-09-18",
+      "peak_class": null,
+      "by_day": [
+        {
+          "date": "2026-09-18",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-19",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-20",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-21",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-22",
+          "cusecs": 4469.0,
+          "class": null
+        },
+        {
+          "date": "2026-09-23",
+          "cusecs": 4469.0,
+          "class": null
+        }
+      ]
+    }
+  ],
+  "ghaggar": {
+    "Ghaggar Bhankarpur": {
+      "qpf_3day_mm": {
+        "gfs_seamless": 0.056792964001383915,
+        "ecmwf_ifs025": 0.6308726275529979,
+        "icon_seamless": 0.0,
+        "best_match": 0.2964178626187996
+      },
+      "recent_rain_mm": [
+        2.1493683085131123,
+        0.32797625237032013,
+        3.3884462610859143,
+        3.0090760336297135,
+        1.7834241601551792,
+        0.12648429775190617
+      ],
+      "qpf_3day_percentile": {
+        "gfs_seamless": 12.307692307692308,
+        "ecmwf_ifs025": 19.167717528373267,
+        "icon_seamless": 0.0,
+        "best_match": 16.292559899117276
+      }
+    },
+    "Ghaggar Khanauri": {
+      "qpf_3day_mm": {
+        "gfs_seamless": 0.08043177026520708,
+        "ecmwf_ifs025": 0.23774729576230536,
+        "icon_seamless": 0.0,
+        "best_match": 0.14316478947988276
+      },
+      "recent_rain_mm": [
+        2.0898375306630577,
+        0.6525127613794838,
+        3.8558529988759713,
+        2.953848037608802,
+        1.8319436010362768,
+        0.3101782959097432
+      ],
+      "qpf_3day_percentile": {
+        "gfs_seamless": 12.295081967213115,
+        "ecmwf_ifs025": 14.37578814627995,
+        "icon_seamless": 0.0,
+        "best_match": 13.203026481715005
+      }
+    }
+  },
+  "attribution": [
+    "Weather data by Open-Meteo.com",
+    "HydroBASINS (Lehner & Grill 2013)",
+    "BBMB reservoir bulletin",
+    "CWC daily reservoir data (data.gov.in)",
+    "IMD gridded rainfall (Pai et al. 2014)",
+    "Punjab WRD Flood Preparedness Guidebook 2026"
+  ],
+  "bulletin": {
+    "captured_utc": "20260917T083024Z",
+    "source_url": "https://bbmb.gov.in/writereaddata/Portal/images/pdf/res_data.pdf",
+    "bytes": 58662,
+    "sha256": "6407930592c5ceb7ad0a44e6e1952f7096e9c5cbb465b30936ab4b7fd14b6a35",
+    "as_on_date": "17-09-2026",
+    "as_on_time": "06:00",
+    "bhakra_level_ft": 1644.65,
+    "bhakra_inflow_cusecs": 28368,
+    "bhakra_outflow_cusecs": 27119,
+    "pong_level_ft": 1371.98,
+    "pong_inflow_cusecs": 11509,
+    "pong_outflow_cusecs": 17532
+  }
+}
