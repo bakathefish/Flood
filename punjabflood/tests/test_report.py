@@ -129,6 +129,23 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             "note": "too few days",
         },
     ]
+    results["realtime_rain"] = {
+        "season": 2025,
+        "heavy_mm": 30.0,
+        "rows": [
+            {"catchment": "Pong", "record": "imd_rt", "n_days": 122, "obs_mean_mm": 9.4,
+             "fc_mean_mm": 8.9, "bias_pct": -5.3, "pearson_r": 0.91, "mae_mm": 1.8,
+             "heavy_days_obs": 12, "hit_rate": 0.833, "false_alarm_ratio": 0.09},
+            {"catchment": "Pong", "record": "era5", "n_days": 122, "obs_mean_mm": 9.4,
+             "fc_mean_mm": 7.0, "bias_pct": -25.5, "pearson_r": 0.70, "mae_mm": 4.2,
+             "heavy_days_obs": 12, "hit_rate": 0.25, "false_alarm_ratio": 0.4},
+        ],
+        "dams_missing": [],
+        "mae_lower_everywhere": True,
+        "hit_rate_not_lower": True,
+        "switch": True,
+        "record_in_product": "imd_rt",
+    }
     results["qpf_model_comparison"] = {
         "incumbent_model": "ecmwf_ifs025",
         "challenger_model": "ecmwf_aifs025_single",
@@ -383,6 +400,12 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     assert "| baseline | 5 | 0.22 | 0.57 | 0.58 |" in md
     # the machine-learned model against the incumbent on the common rows, and the verdict
     assert "### The machine-learned model against the primary deterministic model" in md
+    # the in-season observed-rain records against the final grid, and the verdict
+    assert "### The in-season observed rain: IMD real-time grid and ERA5 against the final grid" in md
+    assert "| Pong | imd_rt | 122 | 9.4 | -5% | 0.91 | 1.8 | 12 | 0.83 | 0.09 |" in md
+    assert "| Pong | era5 | 122 | 9.4 | -26% | 0.70 | 4.2 | 12 | 0.25 | 0.40 |" in md
+    assert "Verdict: the product's observed record switches to the IMD real-time grid" in md
+    assert "The product's observed record is `imd_rt`." in md
     assert "(2,034 rows)" in md
     assert "| ecmwf_ifs025 | 7.6 | -16% | 0.65 | 4.1 | 84 | 0.24 | 0.54 |" in md
     assert "| ecmwf_aifs025_single | 7.6 | +0% | 0.60 | 3.9 | 84 | 0.33 | 0.49 |" in md

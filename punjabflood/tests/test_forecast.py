@@ -222,3 +222,80 @@ def test_build_product_takes_the_soil_moisture_anomaly_and_records_it():
         "2026-09-04", states, det, ens, {}, {"Pong": wet}, soil_moisture={}
     )
     assert "soil_moisture" not in none["dams"]["Pong"]
+
+
+def test_recent_rain_takes_imd_days_where_present_and_the_model_elsewhere(tmp_path):
+    from punjabflood import imdrain
+
+    class Client:
+        def forecast_daily(self, lat, lon, models, days, issue_date=None, past_days=0):
+            t = pd.date_range(pd.Timestamp(issue_date) - pd.Timedelta(days=past_days), periods=past_days + days)
+            return {
+                "time": [x.date().isoformat() for x in t],
+                "precipitation_sum": [1.0] * len(t),  # one model: the bare key
+            }
+
+    # one toy catchment with IMD weights on two lattice nodes
+    from shapely.geometry import box
+
+    from punjabflood import catchments as cm
+
+    poly = box(75.9, 30.9, 76.35, 31.35)
+    pts = cm.sample_grid(poly)
+    pts[imdrain.IMD_WEIGHT_COL] = pts["weight_km2"]
+    cat = cm.Catchment("Toy", 1, poly, cm.geodesic_area_km2(poly), frozenset({1}), pts)
+    issue = pd.Timestamp("2026-09-10")
+    want = [issue - pd.Timedelta(days=k) for k in range(forecast.RECENT_DAYS, 0, -1)]
+    # the real-time grid has the last three of the six days, 20 mm on every node
+    grid_days = want[-3:]
+
+    def fetch(days, rt_dir):
+        for d in grid_days:
+            g = np.full((imdrain.RT_LAT.size, imdrain.RT_LON.size), 20.0, dtype="<f4")
+            imdrain.realtime_path(d, rt_dir).write_bytes(g.tobytes())
+        return [d for d in days if d in grid_days]
+
+    def fake_client_daily(*a, **k):  # the FakeClient above wraps a dict under "daily"
+        return {"daily": Client().forecast_daily(*a, **k)}
+
+    class C2:
+        forecast_daily = staticmethod(fake_client_daily)
+
+    recent, sources = forecast.recent_rain(
+        C2(), {"Toy": cat}, issue.date().isoformat(), rt_dir=tmp_path, fetch=fetch, record="imd_rt"
+    )
+    assert recent["Toy"] == pytest.approx([1.0, 1.0, 1.0, 20.0, 20.0, 20.0])
+    assert sources["Toy"] == ["best_match"] * 3 + ["imd_rt"] * 3
+    # with the incumbent record the grid is not even consulted
+    calls = []
+    only_model, src_model = forecast.recent_rain(
+        C2(), {"Toy": cat}, issue.date().isoformat(), rt_dir=tmp_path,
+        fetch=lambda days, rt_dir: calls.append(1), record="best_match",
+    )
+    assert only_model["Toy"] == pytest.approx([1.0] * 6) and src_model["Toy"] == ["best_match"] * 6
+    assert calls == []
+    # a catchment without IMD weights is served by the model only
+    cat2 = cm.Catchment("Plain", 2, poly, cm.geodesic_area_km2(poly), frozenset({2}), pts.drop(columns=[imdrain.IMD_WEIGHT_COL]))
+    recent2, sources2 = forecast.recent_rain(
+        C2(), {"Plain": cat2}, issue.date().isoformat(), rt_dir=tmp_path, fetch=fetch, record="imd_rt"
+    )
+    assert sources2["Plain"] == ["best_match"] * 6
+
+
+def test_markdown_names_the_source_of_each_recent_day():
+    states, det, ens, params = _inputs()
+    recent = {d: [0.0, 0.0, 0.0, 5.0, 12.5, 30.0] for d in states}
+    prod = forecast.build_product("2026-09-04", states, det, ens, recent, params)
+    prod["recent_rain_source"] = {
+        d: ["best_match"] * 3 + ["imd_rt"] * 3 for d in states
+    }
+    md = forecast.render_markdown(prod)
+    assert (
+        "Observed rain of the previous 6 days: 3 from the IMD real-time grid, 3 from the "
+        "best_match model's past days (0.0, 0.0, 0.0, 5.0, 12.5, 30.0 mm)." in md
+    )
+    # a product without the record (older files, unit fixtures) renders without the line
+    assert "Observed rain of the previous" not in forecast.render_markdown(
+        forecast.build_product("2026-09-04", states, det, ens, recent, params)
+    )
+

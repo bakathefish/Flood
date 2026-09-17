@@ -113,6 +113,21 @@ numbers that motivate them are in `verification.md`, never repeated here.
   that stopped the threshold-excess term. The five-day rain index stays the carrier; the
   code path, the pull and the climatology remain, so a day-wise inflow record (item 1)
   can re-run the test on inflow rather than storage change.
+- **The in-season observed rain from IMD's own real-time grid.** The runoff model is
+  calibrated on the final IMD grid, which arrives after the season; in season the product
+  carried the previous six days from the best-match model's past days and the record on
+  disk was ERA5, both of which saw well under half of the IMD rain over the 2023 event.
+  IMD Pune serves a preliminary daily analysis on the same lattice, keyless, for recent days
+  (the endpoint `imdlib` uses). It was pulled for the 2025 and 2026 seasons and scored
+  beside ERA5 against the final 2025 grid on the dam catchments under a rule written first
+  (MAE lower than ERA5's at every dam, heavy-day hit rate not lower at any). It passed by a
+  wide margin (`verification.md`, the in-season observed rain section), so the product's
+  observed record is the real-time grid where the service has the day, with the model's
+  past days standing in otherwise and every day's source recorded on the product; the
+  current-season rows of the rain table are the real-time grid too, ERA5 for the days it
+  lacks, and the final grid replaces both when the year arrives. The switch is
+  `forecast.OBSERVED_RECORD`. This settles the in-season half of item 4; the forecast
+  half (the models' heavy-day totals) stays open below.
 
 ## Next, in order
 
@@ -177,7 +192,9 @@ numbers that motivate them are in `verification.md`, never repeated here.
    fix this (tested above). What would: a correction conditional on the forecast amount, or
    quantile mapping, both of which need more than the three seasons of archive that exist;
    or a higher-resolution model (ICON-D2 does not cover India; the IMD's own NWP is not
-   keyless). Effort: wait for archive, then small.
+   keyless). The observed-rain half of this item is done (above): in season the product
+   now reads IMD's real-time grid rather than a model's past days. Effort for the forecast
+   half: wait for archive, then small.
 5. **Attenuation.** Pure translation is the department's own assumption and is right for
    timing; a linear reservoir per reach (one parameter each, fitted on nothing we have yet)
    would soften peaks. Only worth doing once daily gauge readings at the control points are

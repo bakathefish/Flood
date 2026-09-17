@@ -268,198 +268,198 @@ Heavy day: 30 mm or more over the catchment in a day. Lead 0 is the archive's st
 
 | catchment | model | lead (days) | days | obs mean (mm) | bias | r | MAE (mm) | heavy days | hit rate | false-alarm ratio |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Beas local | ecmwf_aifs025_single | 0 | 226 | 6.9 | +3% | 0.82 | 3.5 | 8 | 0.75 | 0.25 |
-| Beas local | ecmwf_aifs025_single | 1 | 226 | 6.9 | +7% | 0.78 | 4.0 | 8 | 0.75 | 0.33 |
-| Beas local | ecmwf_aifs025_single | 2 | 226 | 6.9 | +18% | 0.76 | 4.3 | 8 | 0.75 | 0.25 |
-| Beas local | ecmwf_aifs025_single | 3 | 226 | 6.9 | +12% | 0.55 | 4.6 | 8 | 0.50 | 0.43 |
-| Beas local | ecmwf_aifs025_single | 4 | 226 | 6.9 | +8% | 0.38 | 5.1 | 8 | 0.25 | 0.60 |
-| Beas local | ecmwf_aifs025_single | 5 | 226 | 6.9 | +12% | 0.29 | 5.7 | 8 | 0.00 | 1.00 |
-| Beas local | ecmwf_aifs025_single | 6 | 226 | 6.9 | +13% | 0.29 | 5.9 | 8 | 0.00 | 1.00 |
-| Beas local | ecmwf_aifs025_single | 7 | 226 | 6.9 | +18% | 0.23 | 6.3 | 8 | 0.00 | 1.00 |
-| Beas local | ecmwf_ifs025 | 0 | 104 | 4.6 | -2% | 0.99 | 0.5 | 1 | 1.00 | 0.00 |
-| Beas local | ecmwf_ifs025 | 1 | 104 | 4.6 | +1% | 0.68 | 2.6 | 1 | 0.00 | n/a |
-| Beas local | ecmwf_ifs025 | 2 | 104 | 4.6 | +22% | 0.70 | 3.1 | 1 | 1.00 | 0.50 |
-| Beas local | ecmwf_ifs025 | 3 | 104 | 4.6 | +24% | 0.72 | 3.3 | 1 | 1.00 | 0.50 |
-| Beas local | ecmwf_ifs025 | 4 | 104 | 4.6 | +27% | 0.69 | 3.2 | 1 | 1.00 | 0.50 |
-| Beas local | ecmwf_ifs025 | 5 | 104 | 4.6 | +37% | 0.71 | 3.6 | 1 | 1.00 | 0.50 |
-| Beas local | ecmwf_ifs025 | 6 | 104 | 4.6 | +49% | 0.79 | 3.8 | 1 | 1.00 | 0.50 |
-| Beas local | ecmwf_ifs025 | 7 | 104 | 4.6 | +36% | 0.69 | 3.8 | 1 | 1.00 | 0.00 |
-| Beas local | gfs_seamless | 0 | 104 | 4.6 | -33% | 0.74 | 2.6 | 1 | 1.00 | 0.00 |
-| Beas local | gfs_seamless | 1 | 104 | 4.6 | -11% | 0.73 | 3.2 | 1 | 1.00 | 0.50 |
-| Beas local | gfs_seamless | 2 | 104 | 4.6 | -3% | 0.72 | 2.9 | 1 | 1.00 | 0.00 |
-| Beas local | gfs_seamless | 3 | 104 | 4.6 | +6% | 0.66 | 3.2 | 1 | 0.00 | n/a |
-| Beas local | gfs_seamless | 4 | 104 | 4.6 | +27% | 0.42 | 4.7 | 1 | 0.00 | 1.00 |
-| Beas local | gfs_seamless | 5 | 104 | 4.6 | +29% | 0.61 | 4.7 | 1 | 1.00 | 0.75 |
-| Beas local | gfs_seamless | 6 | 104 | 4.6 | +1% | 0.64 | 3.4 | 1 | 1.00 | 0.50 |
-| Beas local | gfs_seamless | 7 | 104 | 4.6 | -4% | 0.26 | 4.2 | 1 | 0.00 | n/a |
-| Bhakra | ecmwf_aifs025_single | 0 | 226 | 4.5 | -13% | 0.78 | 1.7 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_aifs025_single | 1 | 226 | 4.5 | -4% | 0.74 | 1.9 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_aifs025_single | 2 | 226 | 4.5 | +4% | 0.65 | 2.1 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_aifs025_single | 3 | 226 | 4.5 | +3% | 0.48 | 2.2 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_aifs025_single | 4 | 226 | 4.5 | +2% | 0.43 | 2.4 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_aifs025_single | 5 | 226 | 4.5 | +6% | 0.37 | 2.7 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_aifs025_single | 6 | 226 | 4.5 | +8% | 0.47 | 2.7 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_aifs025_single | 7 | 226 | 4.5 | +10% | 0.23 | 2.9 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_ifs025 | 0 | 348 | 4.3 | -16% | 0.71 | 1.9 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_ifs025 | 1 | 348 | 4.3 | -16% | 0.65 | 2.1 | 0 | n/a | n/a |
-| Bhakra | ecmwf_ifs025 | 2 | 348 | 4.3 | -12% | 0.66 | 2.2 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_ifs025 | 3 | 348 | 4.3 | -11% | 0.57 | 2.4 | 0 | n/a | n/a |
-| Bhakra | ecmwf_ifs025 | 4 | 348 | 4.3 | -10% | 0.52 | 2.6 | 0 | n/a | 1.00 |
-| Bhakra | ecmwf_ifs025 | 5 | 348 | 4.3 | -8% | 0.50 | 2.6 | 0 | n/a | n/a |
-| Bhakra | ecmwf_ifs025 | 6 | 348 | 4.3 | -8% | 0.52 | 2.6 | 0 | n/a | n/a |
-| Bhakra | ecmwf_ifs025 | 7 | 348 | 4.3 | +1% | 0.51 | 2.7 | 0 | n/a | 1.00 |
-| Bhakra | gfs_seamless | 0 | 348 | 4.3 | +3% | 0.67 | 2.4 | 0 | n/a | 1.00 |
-| Bhakra | gfs_seamless | 1 | 348 | 4.3 | -6% | 0.61 | 2.5 | 0 | n/a | 1.00 |
-| Bhakra | gfs_seamless | 2 | 348 | 4.3 | -4% | 0.48 | 2.8 | 0 | n/a | n/a |
-| Bhakra | gfs_seamless | 3 | 348 | 4.3 | +2% | 0.44 | 3.0 | 0 | n/a | n/a |
-| Bhakra | gfs_seamless | 4 | 348 | 4.3 | +13% | 0.50 | 3.0 | 0 | n/a | 1.00 |
-| Bhakra | gfs_seamless | 5 | 348 | 4.3 | -41% | 0.31 | 3.1 | 0 | n/a | n/a |
-| Bhakra | gfs_seamless | 6 | 348 | 4.3 | -51% | 0.23 | 3.4 | 0 | n/a | n/a |
-| Bhakra | gfs_seamless | 7 | 348 | 4.3 | -52% | 0.20 | 3.3 | 0 | n/a | n/a |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 0 | 226 | 6.2 | -6% | 0.65 | 4.1 | 9 | 0.33 | 0.25 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 1 | 226 | 6.2 | +11% | 0.70 | 4.3 | 9 | 0.44 | 0.43 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 2 | 226 | 6.2 | +28% | 0.62 | 5.1 | 9 | 0.44 | 0.33 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 3 | 226 | 6.2 | +33% | 0.48 | 5.7 | 9 | 0.44 | 0.43 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 4 | 226 | 6.2 | +34% | 0.34 | 6.2 | 9 | 0.33 | 0.57 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 5 | 226 | 6.2 | +40% | 0.28 | 6.9 | 9 | 0.11 | 0.80 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 6 | 226 | 6.2 | +43% | 0.35 | 6.9 | 9 | 0.22 | 0.71 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 7 | 226 | 6.2 | +46% | 0.29 | 7.1 | 9 | 0.22 | 0.67 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 0 | 348 | 5.9 | -18% | 0.52 | 4.3 | 12 | 0.25 | 0.25 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 1 | 348 | 5.9 | +2% | 0.59 | 5.1 | 12 | 0.42 | 0.17 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 2 | 348 | 5.9 | +10% | 0.53 | 5.6 | 12 | 0.33 | 0.33 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 3 | 348 | 5.9 | +16% | 0.43 | 5.9 | 12 | 0.33 | 0.56 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 4 | 348 | 5.9 | +24% | 0.34 | 6.3 | 12 | 0.17 | 0.82 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 5 | 348 | 5.9 | +24% | 0.31 | 6.6 | 12 | 0.17 | 0.82 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 6 | 348 | 5.9 | +30% | 0.42 | 6.6 | 12 | 0.17 | 0.78 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 7 | 348 | 5.9 | +34% | 0.32 | 7.1 | 12 | 0.08 | 0.92 |
-| Ghaggar Bhankarpur | gfs_seamless | 0 | 348 | 5.9 | -14% | 0.49 | 5.1 | 12 | 0.33 | 0.33 |
-| Ghaggar Bhankarpur | gfs_seamless | 1 | 348 | 5.9 | -8% | 0.47 | 5.2 | 12 | 0.17 | 0.71 |
-| Ghaggar Bhankarpur | gfs_seamless | 2 | 348 | 5.9 | +8% | 0.32 | 6.2 | 12 | 0.17 | 0.75 |
-| Ghaggar Bhankarpur | gfs_seamless | 3 | 348 | 5.9 | +33% | 0.24 | 7.7 | 12 | 0.17 | 0.87 |
-| Ghaggar Bhankarpur | gfs_seamless | 4 | 348 | 5.9 | +34% | 0.21 | 7.9 | 12 | 0.08 | 0.95 |
-| Ghaggar Bhankarpur | gfs_seamless | 5 | 348 | 5.9 | -31% | 0.19 | 5.5 | 12 | 0.00 | 1.00 |
-| Ghaggar Bhankarpur | gfs_seamless | 6 | 348 | 5.9 | -45% | 0.20 | 5.4 | 12 | 0.00 | 1.00 |
-| Ghaggar Bhankarpur | gfs_seamless | 7 | 348 | 5.9 | -47% | 0.10 | 5.7 | 12 | 0.00 | 1.00 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 0 | 226 | 5.8 | -3% | 0.72 | 3.3 | 6 | 0.33 | 0.33 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 1 | 226 | 5.8 | +15% | 0.74 | 3.8 | 6 | 0.50 | 0.57 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 2 | 226 | 5.8 | +33% | 0.67 | 4.5 | 6 | 0.50 | 0.57 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 3 | 226 | 5.8 | +37% | 0.52 | 5.0 | 6 | 0.50 | 0.57 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 4 | 226 | 5.8 | +39% | 0.38 | 5.6 | 6 | 0.50 | 0.57 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 5 | 226 | 5.8 | +44% | 0.32 | 6.1 | 6 | 0.17 | 0.80 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 6 | 226 | 5.8 | +48% | 0.33 | 6.3 | 6 | 0.33 | 0.71 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 7 | 226 | 5.8 | +50% | 0.27 | 6.4 | 6 | 0.33 | 0.71 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 0 | 348 | 5.7 | -15% | 0.57 | 3.8 | 11 | 0.27 | 0.25 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 1 | 348 | 5.7 | +5% | 0.61 | 4.7 | 11 | 0.36 | 0.33 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 2 | 348 | 5.7 | +12% | 0.55 | 5.0 | 11 | 0.36 | 0.43 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 3 | 348 | 5.7 | +21% | 0.45 | 5.5 | 11 | 0.27 | 0.67 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 4 | 348 | 5.7 | +23% | 0.38 | 5.7 | 11 | 0.18 | 0.85 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 5 | 348 | 5.7 | +26% | 0.32 | 6.1 | 11 | 0.00 | 1.00 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 6 | 348 | 5.7 | +34% | 0.45 | 6.0 | 11 | 0.18 | 0.78 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 7 | 348 | 5.7 | +35% | 0.36 | 6.4 | 11 | 0.09 | 0.90 |
-| Ghaggar Khanauri | gfs_seamless | 0 | 348 | 5.7 | -17% | 0.48 | 4.6 | 11 | 0.18 | 0.60 |
-| Ghaggar Khanauri | gfs_seamless | 1 | 348 | 5.7 | -10% | 0.44 | 4.8 | 11 | 0.18 | 0.67 |
-| Ghaggar Khanauri | gfs_seamless | 2 | 348 | 5.7 | +5% | 0.36 | 5.4 | 11 | 0.18 | 0.75 |
-| Ghaggar Khanauri | gfs_seamless | 3 | 348 | 5.7 | +28% | 0.27 | 6.9 | 11 | 0.18 | 0.86 |
-| Ghaggar Khanauri | gfs_seamless | 4 | 348 | 5.7 | +34% | 0.22 | 7.4 | 11 | 0.09 | 0.94 |
-| Ghaggar Khanauri | gfs_seamless | 5 | 348 | 5.7 | -33% | 0.24 | 5.0 | 11 | 0.09 | 0.67 |
-| Ghaggar Khanauri | gfs_seamless | 6 | 348 | 5.7 | -47% | 0.21 | 5.0 | 11 | 0.00 | 1.00 |
-| Ghaggar Khanauri | gfs_seamless | 7 | 348 | 5.7 | -49% | 0.14 | 5.2 | 11 | 0.00 | n/a |
-| Harike local | ecmwf_aifs025_single | 0 | 226 | 6.0 | -11% | 0.82 | 3.0 | 8 | 0.38 | 0.40 |
-| Harike local | ecmwf_aifs025_single | 1 | 226 | 6.0 | +2% | 0.81 | 3.3 | 8 | 0.50 | 0.33 |
-| Harike local | ecmwf_aifs025_single | 2 | 226 | 6.0 | +15% | 0.80 | 3.7 | 8 | 0.50 | 0.00 |
-| Harike local | ecmwf_aifs025_single | 3 | 226 | 6.0 | +13% | 0.55 | 4.2 | 8 | 0.38 | 0.25 |
-| Harike local | ecmwf_aifs025_single | 4 | 226 | 6.0 | +10% | 0.34 | 4.9 | 8 | 0.12 | 0.50 |
-| Harike local | ecmwf_aifs025_single | 5 | 226 | 6.0 | +15% | 0.26 | 5.5 | 8 | 0.00 | 1.00 |
-| Harike local | ecmwf_aifs025_single | 6 | 226 | 6.0 | +17% | 0.27 | 5.8 | 8 | 0.00 | 1.00 |
-| Harike local | ecmwf_aifs025_single | 7 | 226 | 6.0 | +20% | 0.26 | 6.0 | 8 | 0.00 | 1.00 |
-| Harike local | ecmwf_ifs025 | 0 | 104 | 3.6 | -0% | 0.99 | 0.3 | 0 | n/a | n/a |
-| Harike local | ecmwf_ifs025 | 1 | 104 | 3.6 | +14% | 0.58 | 2.6 | 0 | n/a | n/a |
-| Harike local | ecmwf_ifs025 | 2 | 104 | 3.6 | +32% | 0.59 | 2.9 | 0 | n/a | n/a |
-| Harike local | ecmwf_ifs025 | 3 | 104 | 3.6 | +37% | 0.67 | 2.8 | 0 | n/a | n/a |
-| Harike local | ecmwf_ifs025 | 4 | 104 | 3.6 | +43% | 0.61 | 3.2 | 0 | n/a | 1.00 |
-| Harike local | ecmwf_ifs025 | 5 | 104 | 3.6 | +52% | 0.59 | 3.5 | 0 | n/a | n/a |
-| Harike local | ecmwf_ifs025 | 6 | 104 | 3.6 | +59% | 0.62 | 3.7 | 0 | n/a | 1.00 |
-| Harike local | ecmwf_ifs025 | 7 | 104 | 3.6 | +59% | 0.60 | 3.5 | 0 | n/a | 1.00 |
-| Harike local | gfs_seamless | 0 | 104 | 3.6 | -42% | 0.56 | 2.4 | 0 | n/a | n/a |
-| Harike local | gfs_seamless | 1 | 104 | 3.6 | -26% | 0.60 | 2.4 | 0 | n/a | n/a |
-| Harike local | gfs_seamless | 2 | 104 | 3.6 | -0% | 0.66 | 2.7 | 0 | n/a | 1.00 |
-| Harike local | gfs_seamless | 3 | 104 | 3.6 | +16% | 0.54 | 3.4 | 0 | n/a | 1.00 |
-| Harike local | gfs_seamless | 4 | 104 | 3.6 | +34% | 0.54 | 3.6 | 0 | n/a | 1.00 |
-| Harike local | gfs_seamless | 5 | 104 | 3.6 | +26% | 0.48 | 3.8 | 0 | n/a | 1.00 |
-| Harike local | gfs_seamless | 6 | 104 | 3.6 | +7% | 0.43 | 3.3 | 0 | n/a | 1.00 |
-| Harike local | gfs_seamless | 7 | 104 | 3.6 | +12% | 0.23 | 3.7 | 0 | n/a | n/a |
-| Pong | ecmwf_aifs025_single | 0 | 226 | 9.5 | -12% | 0.72 | 4.1 | 15 | 0.40 | 0.45 |
-| Pong | ecmwf_aifs025_single | 1 | 226 | 9.5 | -5% | 0.67 | 4.5 | 15 | 0.27 | 0.50 |
-| Pong | ecmwf_aifs025_single | 2 | 226 | 9.5 | +3% | 0.63 | 4.7 | 15 | 0.47 | 0.30 |
-| Pong | ecmwf_aifs025_single | 3 | 226 | 9.5 | +1% | 0.39 | 5.2 | 15 | 0.27 | 0.43 |
-| Pong | ecmwf_aifs025_single | 4 | 226 | 9.5 | -2% | 0.31 | 5.6 | 15 | 0.00 | 1.00 |
-| Pong | ecmwf_aifs025_single | 5 | 226 | 9.5 | +2% | 0.31 | 6.1 | 15 | 0.07 | 0.80 |
-| Pong | ecmwf_aifs025_single | 6 | 226 | 9.5 | +4% | 0.34 | 6.4 | 15 | 0.07 | 0.67 |
-| Pong | ecmwf_aifs025_single | 7 | 226 | 9.5 | +7% | 0.19 | 6.6 | 15 | 0.07 | 0.80 |
-| Pong | ecmwf_ifs025 | 0 | 348 | 8.7 | -16% | 0.62 | 4.6 | 17 | 0.29 | 0.58 |
-| Pong | ecmwf_ifs025 | 1 | 348 | 8.7 | -21% | 0.61 | 4.8 | 17 | 0.24 | 0.56 |
-| Pong | ecmwf_ifs025 | 2 | 348 | 8.7 | -10% | 0.60 | 5.2 | 17 | 0.29 | 0.58 |
-| Pong | ecmwf_ifs025 | 3 | 348 | 8.7 | -11% | 0.50 | 5.7 | 17 | 0.12 | 0.78 |
-| Pong | ecmwf_ifs025 | 4 | 348 | 8.7 | -11% | 0.58 | 5.4 | 17 | 0.18 | 0.57 |
-| Pong | ecmwf_ifs025 | 5 | 348 | 8.7 | -8% | 0.54 | 5.7 | 17 | 0.18 | 0.70 |
-| Pong | ecmwf_ifs025 | 6 | 348 | 8.7 | -7% | 0.53 | 5.9 | 17 | 0.24 | 0.56 |
-| Pong | ecmwf_ifs025 | 7 | 348 | 8.7 | -2% | 0.57 | 5.7 | 17 | 0.18 | 0.77 |
-| Pong | gfs_seamless | 0 | 348 | 8.7 | -6% | 0.59 | 5.4 | 17 | 0.29 | 0.55 |
-| Pong | gfs_seamless | 1 | 348 | 8.7 | -19% | 0.50 | 5.6 | 17 | 0.12 | 0.75 |
-| Pong | gfs_seamless | 2 | 348 | 8.7 | -19% | 0.51 | 5.8 | 17 | 0.06 | 0.80 |
-| Pong | gfs_seamless | 3 | 348 | 8.7 | -8% | 0.47 | 6.2 | 17 | 0.12 | 0.75 |
-| Pong | gfs_seamless | 4 | 348 | 8.7 | +4% | 0.40 | 6.6 | 17 | 0.06 | 0.92 |
-| Pong | gfs_seamless | 5 | 348 | 8.7 | -46% | 0.31 | 6.7 | 17 | 0.00 | 1.00 |
-| Pong | gfs_seamless | 6 | 348 | 8.7 | -56% | 0.27 | 6.9 | 17 | 0.00 | 1.00 |
-| Pong | gfs_seamless | 7 | 348 | 8.7 | -55% | 0.19 | 7.0 | 17 | 0.00 | 1.00 |
-| Ranjit Sagar | ecmwf_aifs025_single | 0 | 226 | 8.9 | +1% | 0.80 | 4.0 | 13 | 0.46 | 0.25 |
-| Ranjit Sagar | ecmwf_aifs025_single | 1 | 226 | 8.9 | -1% | 0.75 | 4.3 | 13 | 0.31 | 0.56 |
-| Ranjit Sagar | ecmwf_aifs025_single | 2 | 226 | 8.9 | +5% | 0.67 | 4.9 | 13 | 0.46 | 0.40 |
-| Ranjit Sagar | ecmwf_aifs025_single | 3 | 226 | 8.9 | -0% | 0.42 | 5.4 | 13 | 0.23 | 0.50 |
-| Ranjit Sagar | ecmwf_aifs025_single | 4 | 226 | 8.9 | -4% | 0.31 | 5.6 | 13 | 0.15 | 0.50 |
-| Ranjit Sagar | ecmwf_aifs025_single | 5 | 226 | 8.9 | -2% | 0.24 | 6.0 | 13 | 0.00 | 1.00 |
-| Ranjit Sagar | ecmwf_aifs025_single | 6 | 226 | 8.9 | -2% | 0.25 | 6.2 | 13 | 0.00 | 1.00 |
-| Ranjit Sagar | ecmwf_aifs025_single | 7 | 226 | 8.9 | +0% | 0.17 | 6.4 | 13 | 0.00 | 1.00 |
-| Ranjit Sagar | ecmwf_ifs025 | 0 | 348 | 7.8 | -5% | 0.74 | 4.1 | 16 | 0.38 | 0.33 |
-| Ranjit Sagar | ecmwf_ifs025 | 1 | 348 | 7.8 | -25% | 0.72 | 4.5 | 16 | 0.25 | 0.20 |
-| Ranjit Sagar | ecmwf_ifs025 | 2 | 348 | 7.8 | -14% | 0.63 | 5.0 | 16 | 0.19 | 0.62 |
-| Ranjit Sagar | ecmwf_ifs025 | 3 | 348 | 7.8 | -17% | 0.60 | 5.1 | 16 | 0.25 | 0.50 |
-| Ranjit Sagar | ecmwf_ifs025 | 4 | 348 | 7.8 | -16% | 0.66 | 4.8 | 16 | 0.12 | 0.60 |
-| Ranjit Sagar | ecmwf_ifs025 | 5 | 348 | 7.8 | -12% | 0.54 | 5.2 | 16 | 0.12 | 0.75 |
-| Ranjit Sagar | ecmwf_ifs025 | 6 | 348 | 7.8 | -18% | 0.59 | 5.2 | 16 | 0.12 | 0.60 |
-| Ranjit Sagar | ecmwf_ifs025 | 7 | 348 | 7.8 | -14% | 0.61 | 5.2 | 16 | 0.12 | 0.60 |
-| Ranjit Sagar | gfs_seamless | 0 | 348 | 7.8 | +0% | 0.67 | 5.1 | 16 | 0.25 | 0.56 |
-| Ranjit Sagar | gfs_seamless | 1 | 348 | 7.8 | -13% | 0.62 | 4.9 | 16 | 0.19 | 0.50 |
-| Ranjit Sagar | gfs_seamless | 2 | 348 | 7.8 | -17% | 0.54 | 5.4 | 16 | 0.06 | 0.67 |
-| Ranjit Sagar | gfs_seamless | 3 | 348 | 7.8 | -11% | 0.45 | 5.6 | 16 | 0.06 | 0.67 |
-| Ranjit Sagar | gfs_seamless | 4 | 348 | 7.8 | +2% | 0.35 | 6.4 | 16 | 0.12 | 0.80 |
-| Ranjit Sagar | gfs_seamless | 5 | 348 | 7.8 | -43% | 0.40 | 5.6 | 16 | 0.06 | 0.67 |
-| Ranjit Sagar | gfs_seamless | 6 | 348 | 7.8 | -55% | 0.34 | 5.9 | 16 | 0.00 | 1.00 |
-| Ranjit Sagar | gfs_seamless | 7 | 348 | 7.8 | -56% | 0.27 | 6.0 | 16 | 0.00 | n/a |
-| Sutlej local | ecmwf_aifs025_single | 0 | 226 | 7.8 | -26% | 0.74 | 4.4 | 12 | 0.25 | 0.25 |
-| Sutlej local | ecmwf_aifs025_single | 1 | 226 | 7.8 | -16% | 0.76 | 4.4 | 12 | 0.25 | 0.50 |
-| Sutlej local | ecmwf_aifs025_single | 2 | 226 | 7.8 | -3% | 0.76 | 4.6 | 12 | 0.33 | 0.20 |
-| Sutlej local | ecmwf_aifs025_single | 3 | 226 | 7.8 | -3% | 0.52 | 5.5 | 12 | 0.17 | 0.60 |
-| Sutlej local | ecmwf_aifs025_single | 4 | 226 | 7.8 | -4% | 0.30 | 6.3 | 12 | 0.08 | 0.75 |
-| Sutlej local | ecmwf_aifs025_single | 5 | 226 | 7.8 | +1% | 0.27 | 6.9 | 12 | 0.00 | 1.00 |
-| Sutlej local | ecmwf_aifs025_single | 6 | 226 | 7.8 | +3% | 0.33 | 7.0 | 12 | 0.08 | 0.80 |
-| Sutlej local | ecmwf_aifs025_single | 7 | 226 | 7.8 | +7% | 0.31 | 7.1 | 12 | 0.08 | 0.80 |
-| Sutlej local | ecmwf_ifs025 | 0 | 104 | 4.0 | +0% | 0.99 | 0.3 | 0 | n/a | n/a |
-| Sutlej local | ecmwf_ifs025 | 1 | 104 | 4.0 | +23% | 0.69 | 2.5 | 0 | n/a | n/a |
-| Sutlej local | ecmwf_ifs025 | 2 | 104 | 4.0 | +43% | 0.64 | 3.2 | 0 | n/a | n/a |
-| Sutlej local | ecmwf_ifs025 | 3 | 104 | 4.0 | +55% | 0.66 | 3.5 | 0 | n/a | 1.00 |
-| Sutlej local | ecmwf_ifs025 | 4 | 104 | 4.0 | +61% | 0.64 | 3.9 | 0 | n/a | 1.00 |
-| Sutlej local | ecmwf_ifs025 | 5 | 104 | 4.0 | +65% | 0.62 | 4.2 | 0 | n/a | 1.00 |
-| Sutlej local | ecmwf_ifs025 | 6 | 104 | 4.0 | +63% | 0.62 | 3.9 | 0 | n/a | n/a |
-| Sutlej local | ecmwf_ifs025 | 7 | 104 | 4.0 | +73% | 0.57 | 4.5 | 0 | n/a | 1.00 |
-| Sutlej local | gfs_seamless | 0 | 104 | 4.0 | -25% | 0.56 | 2.9 | 0 | n/a | n/a |
-| Sutlej local | gfs_seamless | 1 | 104 | 4.0 | +6% | 0.54 | 3.4 | 0 | n/a | 1.00 |
-| Sutlej local | gfs_seamless | 2 | 104 | 4.0 | +27% | 0.51 | 3.8 | 0 | n/a | 1.00 |
-| Sutlej local | gfs_seamless | 3 | 104 | 4.0 | +52% | 0.46 | 4.8 | 0 | n/a | 1.00 |
-| Sutlej local | gfs_seamless | 4 | 104 | 4.0 | +73% | 0.47 | 5.5 | 0 | n/a | 1.00 |
-| Sutlej local | gfs_seamless | 5 | 104 | 4.0 | +77% | 0.49 | 6.1 | 0 | n/a | 1.00 |
-| Sutlej local | gfs_seamless | 6 | 104 | 4.0 | +42% | 0.37 | 5.0 | 0 | n/a | 1.00 |
-| Sutlej local | gfs_seamless | 7 | 104 | 4.0 | +47% | 0.22 | 5.2 | 0 | n/a | 1.00 |
+| Beas local | ecmwf_aifs025_single | 0 | 229 | 7.7 | -8% | 0.75 | 4.7 | 10 | 0.60 | 0.25 |
+| Beas local | ecmwf_aifs025_single | 1 | 229 | 7.7 | -5% | 0.71 | 4.9 | 10 | 0.60 | 0.33 |
+| Beas local | ecmwf_aifs025_single | 2 | 229 | 7.7 | +5% | 0.69 | 5.1 | 10 | 0.60 | 0.25 |
+| Beas local | ecmwf_aifs025_single | 3 | 229 | 7.7 | -0% | 0.51 | 5.3 | 10 | 0.40 | 0.43 |
+| Beas local | ecmwf_aifs025_single | 4 | 229 | 7.7 | -4% | 0.35 | 5.7 | 10 | 0.20 | 0.60 |
+| Beas local | ecmwf_aifs025_single | 5 | 229 | 7.7 | -1% | 0.27 | 6.3 | 10 | 0.00 | 1.00 |
+| Beas local | ecmwf_aifs025_single | 6 | 229 | 7.7 | +0% | 0.27 | 6.5 | 10 | 0.00 | 1.00 |
+| Beas local | ecmwf_aifs025_single | 7 | 229 | 7.7 | +5% | 0.21 | 6.9 | 10 | 0.00 | 1.00 |
+| Beas local | ecmwf_ifs025 | 0 | 107 | 6.4 | -31% | 0.56 | 4.1 | 3 | 0.33 | 0.00 |
+| Beas local | ecmwf_ifs025 | 1 | 107 | 6.4 | -29% | 0.49 | 4.4 | 3 | 0.00 | n/a |
+| Beas local | ecmwf_ifs025 | 2 | 107 | 6.4 | -14% | 0.47 | 4.5 | 3 | 0.33 | 0.50 |
+| Beas local | ecmwf_ifs025 | 3 | 107 | 6.4 | -13% | 0.49 | 4.5 | 3 | 0.33 | 0.50 |
+| Beas local | ecmwf_ifs025 | 4 | 107 | 6.4 | -10% | 0.52 | 4.4 | 3 | 0.33 | 0.50 |
+| Beas local | ecmwf_ifs025 | 5 | 107 | 6.4 | -3% | 0.56 | 4.8 | 3 | 0.33 | 0.50 |
+| Beas local | ecmwf_ifs025 | 6 | 107 | 6.4 | +6% | 0.52 | 4.9 | 3 | 0.33 | 0.50 |
+| Beas local | ecmwf_ifs025 | 7 | 107 | 6.4 | -3% | 0.44 | 5.2 | 3 | 0.33 | 0.00 |
+| Beas local | gfs_seamless | 0 | 107 | 6.4 | -53% | 0.48 | 4.7 | 3 | 0.33 | 0.00 |
+| Beas local | gfs_seamless | 1 | 107 | 6.4 | -37% | 0.45 | 5.0 | 3 | 0.33 | 0.50 |
+| Beas local | gfs_seamless | 2 | 107 | 6.4 | -30% | 0.53 | 4.5 | 3 | 0.33 | 0.00 |
+| Beas local | gfs_seamless | 3 | 107 | 6.4 | -20% | 0.48 | 4.7 | 3 | 0.00 | n/a |
+| Beas local | gfs_seamless | 4 | 107 | 6.4 | -7% | 0.55 | 5.1 | 3 | 0.33 | 0.50 |
+| Beas local | gfs_seamless | 5 | 107 | 6.4 | -7% | 0.30 | 6.4 | 3 | 0.33 | 0.75 |
+| Beas local | gfs_seamless | 6 | 107 | 6.4 | -28% | 0.53 | 4.6 | 3 | 0.33 | 0.50 |
+| Beas local | gfs_seamless | 7 | 107 | 6.4 | -32% | 0.40 | 5.3 | 3 | 0.00 | n/a |
+| Bhakra | ecmwf_aifs025_single | 0 | 229 | 5.4 | -27% | 0.68 | 2.7 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_aifs025_single | 1 | 229 | 5.4 | -20% | 0.66 | 2.5 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_aifs025_single | 2 | 229 | 5.4 | -13% | 0.59 | 2.6 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_aifs025_single | 3 | 229 | 5.4 | -14% | 0.44 | 2.7 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_aifs025_single | 4 | 229 | 5.4 | -15% | 0.40 | 2.8 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_aifs025_single | 5 | 229 | 5.4 | -11% | 0.33 | 3.1 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_aifs025_single | 6 | 229 | 5.4 | -9% | 0.44 | 3.1 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_aifs025_single | 7 | 229 | 5.4 | -8% | 0.22 | 3.3 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_ifs025 | 0 | 351 | 4.9 | -25% | 0.63 | 2.6 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_ifs025 | 1 | 351 | 4.9 | -26% | 0.61 | 2.6 | 0 | n/a | n/a |
+| Bhakra | ecmwf_ifs025 | 2 | 351 | 4.9 | -22% | 0.64 | 2.5 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_ifs025 | 3 | 351 | 4.9 | -21% | 0.57 | 2.6 | 0 | n/a | n/a |
+| Bhakra | ecmwf_ifs025 | 4 | 351 | 4.9 | -21% | 0.52 | 2.8 | 0 | n/a | 1.00 |
+| Bhakra | ecmwf_ifs025 | 5 | 351 | 4.9 | -19% | 0.52 | 2.7 | 0 | n/a | n/a |
+| Bhakra | ecmwf_ifs025 | 6 | 351 | 4.9 | -19% | 0.55 | 2.7 | 0 | n/a | n/a |
+| Bhakra | ecmwf_ifs025 | 7 | 351 | 4.9 | -11% | 0.54 | 2.8 | 0 | n/a | 1.00 |
+| Bhakra | gfs_seamless | 0 | 351 | 4.9 | -9% | 0.59 | 2.9 | 0 | n/a | 1.00 |
+| Bhakra | gfs_seamless | 1 | 351 | 4.9 | -17% | 0.56 | 2.8 | 0 | n/a | 1.00 |
+| Bhakra | gfs_seamless | 2 | 351 | 4.9 | -15% | 0.46 | 3.1 | 0 | n/a | n/a |
+| Bhakra | gfs_seamless | 3 | 351 | 4.9 | -10% | 0.44 | 3.2 | 0 | n/a | n/a |
+| Bhakra | gfs_seamless | 4 | 351 | 4.9 | -1% | 0.51 | 3.1 | 0 | n/a | 1.00 |
+| Bhakra | gfs_seamless | 5 | 351 | 4.9 | -48% | 0.43 | 3.2 | 0 | n/a | n/a |
+| Bhakra | gfs_seamless | 6 | 351 | 4.9 | -57% | 0.40 | 3.5 | 0 | n/a | n/a |
+| Bhakra | gfs_seamless | 7 | 351 | 4.9 | -57% | 0.38 | 3.4 | 0 | n/a | n/a |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 0 | 229 | 6.9 | -15% | 0.50 | 5.9 | 9 | 0.22 | 0.50 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 1 | 229 | 6.9 | +0% | 0.52 | 6.0 | 9 | 0.33 | 0.57 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 2 | 229 | 6.9 | +16% | 0.47 | 6.5 | 9 | 0.33 | 0.50 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 3 | 229 | 6.9 | +20% | 0.36 | 7.0 | 9 | 0.33 | 0.57 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 4 | 229 | 6.9 | +21% | 0.26 | 7.5 | 9 | 0.22 | 0.71 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 5 | 229 | 6.9 | +26% | 0.18 | 8.0 | 9 | 0.00 | 1.00 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 6 | 229 | 6.9 | +29% | 0.27 | 8.1 | 9 | 0.22 | 0.71 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 7 | 229 | 6.9 | +32% | 0.22 | 8.2 | 9 | 0.11 | 0.83 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 0 | 351 | 6.4 | -24% | 0.42 | 5.7 | 12 | 0.17 | 0.50 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 1 | 351 | 6.4 | -5% | 0.45 | 6.0 | 12 | 0.33 | 0.33 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 2 | 351 | 6.4 | +2% | 0.47 | 6.0 | 12 | 0.33 | 0.33 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 3 | 351 | 6.4 | +8% | 0.39 | 6.4 | 12 | 0.33 | 0.56 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 4 | 351 | 6.4 | +15% | 0.31 | 6.8 | 12 | 0.17 | 0.82 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 5 | 351 | 6.4 | +15% | 0.25 | 7.2 | 12 | 0.17 | 0.82 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 6 | 351 | 6.4 | +21% | 0.35 | 7.2 | 12 | 0.17 | 0.78 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 7 | 351 | 6.4 | +25% | 0.26 | 7.6 | 12 | 0.08 | 0.92 |
+| Ghaggar Bhankarpur | gfs_seamless | 0 | 351 | 6.4 | -20% | 0.43 | 5.7 | 12 | 0.33 | 0.33 |
+| Ghaggar Bhankarpur | gfs_seamless | 1 | 351 | 6.4 | -14% | 0.36 | 6.0 | 12 | 0.08 | 0.86 |
+| Ghaggar Bhankarpur | gfs_seamless | 2 | 351 | 6.4 | +1% | 0.28 | 6.6 | 12 | 0.17 | 0.75 |
+| Ghaggar Bhankarpur | gfs_seamless | 3 | 351 | 6.4 | +24% | 0.23 | 8.1 | 12 | 0.17 | 0.87 |
+| Ghaggar Bhankarpur | gfs_seamless | 4 | 351 | 6.4 | +24% | 0.19 | 8.3 | 12 | 0.08 | 0.95 |
+| Ghaggar Bhankarpur | gfs_seamless | 5 | 351 | 6.4 | -36% | 0.15 | 6.1 | 12 | 0.00 | 1.00 |
+| Ghaggar Bhankarpur | gfs_seamless | 6 | 351 | 6.4 | -49% | 0.16 | 5.9 | 12 | 0.00 | 1.00 |
+| Ghaggar Bhankarpur | gfs_seamless | 7 | 351 | 6.4 | -50% | 0.11 | 6.1 | 12 | 0.00 | 1.00 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 0 | 229 | 6.4 | -13% | 0.52 | 5.0 | 7 | 0.29 | 0.33 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 1 | 229 | 6.4 | +4% | 0.55 | 5.3 | 7 | 0.29 | 0.71 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 2 | 229 | 6.4 | +19% | 0.51 | 5.7 | 7 | 0.29 | 0.71 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 3 | 229 | 6.4 | +23% | 0.39 | 6.1 | 7 | 0.29 | 0.71 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 4 | 229 | 6.4 | +25% | 0.29 | 6.6 | 7 | 0.29 | 0.71 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 5 | 229 | 6.4 | +30% | 0.22 | 7.1 | 7 | 0.00 | 1.00 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 6 | 229 | 6.4 | +33% | 0.25 | 7.1 | 7 | 0.14 | 0.86 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 7 | 229 | 6.4 | +35% | 0.20 | 7.2 | 7 | 0.14 | 0.86 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 0 | 351 | 6.1 | -21% | 0.46 | 5.2 | 12 | 0.17 | 0.50 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 1 | 351 | 6.1 | -2% | 0.49 | 5.5 | 12 | 0.25 | 0.50 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 2 | 351 | 6.1 | +4% | 0.50 | 5.3 | 12 | 0.33 | 0.43 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 3 | 351 | 6.1 | +13% | 0.41 | 5.9 | 12 | 0.25 | 0.67 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 4 | 351 | 6.1 | +15% | 0.35 | 6.1 | 12 | 0.17 | 0.85 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 5 | 351 | 6.1 | +18% | 0.27 | 6.5 | 12 | 0.00 | 1.00 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 6 | 351 | 6.1 | +25% | 0.39 | 6.5 | 12 | 0.17 | 0.78 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 7 | 351 | 6.1 | +26% | 0.31 | 6.8 | 12 | 0.08 | 0.90 |
+| Ghaggar Khanauri | gfs_seamless | 0 | 351 | 6.1 | -23% | 0.43 | 5.1 | 12 | 0.17 | 0.60 |
+| Ghaggar Khanauri | gfs_seamless | 1 | 351 | 6.1 | -16% | 0.36 | 5.4 | 12 | 0.08 | 0.83 |
+| Ghaggar Khanauri | gfs_seamless | 2 | 351 | 6.1 | -2% | 0.33 | 5.8 | 12 | 0.17 | 0.75 |
+| Ghaggar Khanauri | gfs_seamless | 3 | 351 | 6.1 | +20% | 0.26 | 7.2 | 12 | 0.17 | 0.86 |
+| Ghaggar Khanauri | gfs_seamless | 4 | 351 | 6.1 | +25% | 0.22 | 7.6 | 12 | 0.08 | 0.94 |
+| Ghaggar Khanauri | gfs_seamless | 5 | 351 | 6.1 | -37% | 0.20 | 5.5 | 12 | 0.08 | 0.67 |
+| Ghaggar Khanauri | gfs_seamless | 6 | 351 | 6.1 | -51% | 0.20 | 5.4 | 12 | 0.00 | 1.00 |
+| Ghaggar Khanauri | gfs_seamless | 7 | 351 | 6.1 | -52% | 0.18 | 5.5 | 12 | 0.00 | n/a |
+| Harike local | ecmwf_aifs025_single | 0 | 229 | 6.0 | -12% | 0.76 | 3.8 | 8 | 0.38 | 0.40 |
+| Harike local | ecmwf_aifs025_single | 1 | 229 | 6.0 | +1% | 0.78 | 3.8 | 8 | 0.50 | 0.33 |
+| Harike local | ecmwf_aifs025_single | 2 | 229 | 6.0 | +13% | 0.77 | 4.2 | 8 | 0.50 | 0.00 |
+| Harike local | ecmwf_aifs025_single | 3 | 229 | 6.0 | +12% | 0.52 | 4.7 | 8 | 0.38 | 0.25 |
+| Harike local | ecmwf_aifs025_single | 4 | 229 | 6.0 | +9% | 0.32 | 5.3 | 8 | 0.12 | 0.50 |
+| Harike local | ecmwf_aifs025_single | 5 | 229 | 6.0 | +14% | 0.23 | 6.0 | 8 | 0.00 | 1.00 |
+| Harike local | ecmwf_aifs025_single | 6 | 229 | 6.0 | +16% | 0.25 | 6.1 | 8 | 0.00 | 1.00 |
+| Harike local | ecmwf_aifs025_single | 7 | 229 | 6.0 | +19% | 0.24 | 6.4 | 8 | 0.00 | 1.00 |
+| Harike local | ecmwf_ifs025 | 0 | 107 | 3.7 | -5% | 0.36 | 3.2 | 0 | n/a | n/a |
+| Harike local | ecmwf_ifs025 | 1 | 107 | 3.7 | +9% | 0.36 | 3.5 | 0 | n/a | n/a |
+| Harike local | ecmwf_ifs025 | 2 | 107 | 3.7 | +26% | 0.48 | 3.4 | 0 | n/a | n/a |
+| Harike local | ecmwf_ifs025 | 3 | 107 | 3.7 | +30% | 0.48 | 3.6 | 0 | n/a | n/a |
+| Harike local | ecmwf_ifs025 | 4 | 107 | 3.7 | +35% | 0.41 | 3.7 | 0 | n/a | 1.00 |
+| Harike local | ecmwf_ifs025 | 5 | 107 | 3.7 | +45% | 0.38 | 4.2 | 0 | n/a | n/a |
+| Harike local | ecmwf_ifs025 | 6 | 107 | 3.7 | +52% | 0.37 | 4.3 | 0 | n/a | 1.00 |
+| Harike local | ecmwf_ifs025 | 7 | 107 | 3.7 | +53% | 0.34 | 4.5 | 0 | n/a | 1.00 |
+| Harike local | gfs_seamless | 0 | 107 | 3.7 | -45% | 0.26 | 3.3 | 0 | n/a | n/a |
+| Harike local | gfs_seamless | 1 | 107 | 3.7 | -29% | 0.36 | 3.0 | 0 | n/a | n/a |
+| Harike local | gfs_seamless | 2 | 107 | 3.7 | -3% | 0.40 | 3.5 | 0 | n/a | 1.00 |
+| Harike local | gfs_seamless | 3 | 107 | 3.7 | +14% | 0.35 | 3.8 | 0 | n/a | 1.00 |
+| Harike local | gfs_seamless | 4 | 107 | 3.7 | +33% | 0.38 | 4.3 | 0 | n/a | 1.00 |
+| Harike local | gfs_seamless | 5 | 107 | 3.7 | +23% | 0.22 | 4.7 | 0 | n/a | 1.00 |
+| Harike local | gfs_seamless | 6 | 107 | 3.7 | +3% | 0.21 | 4.3 | 0 | n/a | 1.00 |
+| Harike local | gfs_seamless | 7 | 107 | 3.7 | +6% | 0.24 | 3.9 | 0 | n/a | n/a |
+| Pong | ecmwf_aifs025_single | 0 | 229 | 10.7 | -23% | 0.65 | 5.8 | 17 | 0.35 | 0.45 |
+| Pong | ecmwf_aifs025_single | 1 | 229 | 10.7 | -17% | 0.60 | 5.8 | 17 | 0.24 | 0.50 |
+| Pong | ecmwf_aifs025_single | 2 | 229 | 10.7 | -9% | 0.56 | 5.9 | 17 | 0.41 | 0.30 |
+| Pong | ecmwf_aifs025_single | 3 | 229 | 10.7 | -12% | 0.35 | 6.4 | 17 | 0.24 | 0.43 |
+| Pong | ecmwf_aifs025_single | 4 | 229 | 10.7 | -14% | 0.28 | 6.6 | 17 | 0.00 | 1.00 |
+| Pong | ecmwf_aifs025_single | 5 | 229 | 10.7 | -10% | 0.27 | 7.1 | 17 | 0.06 | 0.80 |
+| Pong | ecmwf_aifs025_single | 6 | 229 | 10.7 | -9% | 0.31 | 7.3 | 17 | 0.06 | 0.67 |
+| Pong | ecmwf_aifs025_single | 7 | 229 | 10.7 | -6% | 0.17 | 7.6 | 17 | 0.06 | 0.80 |
+| Pong | ecmwf_ifs025 | 0 | 351 | 9.5 | -24% | 0.57 | 5.9 | 19 | 0.26 | 0.58 |
+| Pong | ecmwf_ifs025 | 1 | 351 | 9.5 | -29% | 0.58 | 5.7 | 19 | 0.21 | 0.56 |
+| Pong | ecmwf_ifs025 | 2 | 351 | 9.5 | -18% | 0.56 | 5.9 | 19 | 0.26 | 0.58 |
+| Pong | ecmwf_ifs025 | 3 | 351 | 9.5 | -19% | 0.47 | 6.3 | 19 | 0.11 | 0.78 |
+| Pong | ecmwf_ifs025 | 4 | 351 | 9.5 | -19% | 0.55 | 6.0 | 19 | 0.16 | 0.57 |
+| Pong | ecmwf_ifs025 | 5 | 351 | 9.5 | -17% | 0.53 | 6.2 | 19 | 0.16 | 0.70 |
+| Pong | ecmwf_ifs025 | 6 | 351 | 9.5 | -15% | 0.52 | 6.3 | 19 | 0.21 | 0.56 |
+| Pong | ecmwf_ifs025 | 7 | 351 | 9.5 | -10% | 0.58 | 6.0 | 19 | 0.21 | 0.69 |
+| Pong | gfs_seamless | 0 | 351 | 9.5 | -15% | 0.54 | 6.2 | 19 | 0.26 | 0.55 |
+| Pong | gfs_seamless | 1 | 351 | 9.5 | -26% | 0.47 | 6.4 | 19 | 0.11 | 0.75 |
+| Pong | gfs_seamless | 2 | 351 | 9.5 | -26% | 0.50 | 6.4 | 19 | 0.05 | 0.80 |
+| Pong | gfs_seamless | 3 | 351 | 9.5 | -16% | 0.48 | 6.7 | 19 | 0.11 | 0.75 |
+| Pong | gfs_seamless | 4 | 351 | 9.5 | -5% | 0.41 | 7.0 | 19 | 0.05 | 0.92 |
+| Pong | gfs_seamless | 5 | 351 | 9.5 | -50% | 0.37 | 7.1 | 19 | 0.00 | 1.00 |
+| Pong | gfs_seamless | 6 | 351 | 9.5 | -59% | 0.38 | 7.2 | 19 | 0.00 | 1.00 |
+| Pong | gfs_seamless | 7 | 351 | 9.5 | -59% | 0.32 | 7.2 | 19 | 0.00 | 1.00 |
+| Ranjit Sagar | ecmwf_aifs025_single | 0 | 229 | 9.5 | -6% | 0.71 | 5.8 | 18 | 0.33 | 0.25 |
+| Ranjit Sagar | ecmwf_aifs025_single | 1 | 229 | 9.5 | -8% | 0.68 | 5.8 | 18 | 0.22 | 0.56 |
+| Ranjit Sagar | ecmwf_aifs025_single | 2 | 229 | 9.5 | -2% | 0.61 | 6.2 | 18 | 0.39 | 0.30 |
+| Ranjit Sagar | ecmwf_aifs025_single | 3 | 229 | 9.5 | -7% | 0.37 | 6.7 | 18 | 0.17 | 0.50 |
+| Ranjit Sagar | ecmwf_aifs025_single | 4 | 229 | 9.5 | -11% | 0.28 | 6.9 | 18 | 0.11 | 0.50 |
+| Ranjit Sagar | ecmwf_aifs025_single | 5 | 229 | 9.5 | -9% | 0.21 | 7.4 | 18 | 0.00 | 1.00 |
+| Ranjit Sagar | ecmwf_aifs025_single | 6 | 229 | 9.5 | -9% | 0.22 | 7.6 | 18 | 0.00 | 1.00 |
+| Ranjit Sagar | ecmwf_aifs025_single | 7 | 229 | 9.5 | -7% | 0.15 | 7.6 | 18 | 0.00 | 1.00 |
+| Ranjit Sagar | ecmwf_ifs025 | 0 | 351 | 8.2 | -10% | 0.67 | 5.5 | 21 | 0.24 | 0.44 |
+| Ranjit Sagar | ecmwf_ifs025 | 1 | 351 | 8.2 | -29% | 0.66 | 5.3 | 21 | 0.19 | 0.20 |
+| Ranjit Sagar | ecmwf_ifs025 | 2 | 351 | 8.2 | -19% | 0.56 | 5.9 | 21 | 0.14 | 0.62 |
+| Ranjit Sagar | ecmwf_ifs025 | 3 | 351 | 8.2 | -21% | 0.55 | 5.9 | 21 | 0.24 | 0.38 |
+| Ranjit Sagar | ecmwf_ifs025 | 4 | 351 | 8.2 | -21% | 0.62 | 5.5 | 21 | 0.10 | 0.60 |
+| Ranjit Sagar | ecmwf_ifs025 | 5 | 351 | 8.2 | -17% | 0.51 | 5.9 | 21 | 0.10 | 0.75 |
+| Ranjit Sagar | ecmwf_ifs025 | 6 | 351 | 8.2 | -23% | 0.57 | 5.8 | 21 | 0.10 | 0.60 |
+| Ranjit Sagar | ecmwf_ifs025 | 7 | 351 | 8.2 | -19% | 0.58 | 5.7 | 21 | 0.14 | 0.40 |
+| Ranjit Sagar | gfs_seamless | 0 | 351 | 8.2 | -5% | 0.61 | 6.0 | 21 | 0.19 | 0.56 |
+| Ranjit Sagar | gfs_seamless | 1 | 351 | 8.2 | -18% | 0.55 | 5.8 | 21 | 0.14 | 0.50 |
+| Ranjit Sagar | gfs_seamless | 2 | 351 | 8.2 | -21% | 0.50 | 6.1 | 21 | 0.05 | 0.67 |
+| Ranjit Sagar | gfs_seamless | 3 | 351 | 8.2 | -16% | 0.45 | 6.1 | 21 | 0.05 | 0.67 |
+| Ranjit Sagar | gfs_seamless | 4 | 351 | 8.2 | -3% | 0.33 | 7.0 | 21 | 0.10 | 0.80 |
+| Ranjit Sagar | gfs_seamless | 5 | 351 | 8.2 | -46% | 0.39 | 6.3 | 21 | 0.10 | 0.33 |
+| Ranjit Sagar | gfs_seamless | 6 | 351 | 8.2 | -58% | 0.42 | 6.2 | 21 | 0.00 | 1.00 |
+| Ranjit Sagar | gfs_seamless | 7 | 351 | 8.2 | -58% | 0.35 | 6.4 | 21 | 0.00 | n/a |
+| Sutlej local | ecmwf_aifs025_single | 0 | 229 | 8.6 | -33% | 0.67 | 5.8 | 14 | 0.21 | 0.25 |
+| Sutlej local | ecmwf_aifs025_single | 1 | 229 | 8.6 | -25% | 0.70 | 5.4 | 14 | 0.21 | 0.50 |
+| Sutlej local | ecmwf_aifs025_single | 2 | 229 | 8.6 | -13% | 0.70 | 5.7 | 14 | 0.29 | 0.20 |
+| Sutlej local | ecmwf_aifs025_single | 3 | 229 | 8.6 | -13% | 0.46 | 6.4 | 14 | 0.14 | 0.60 |
+| Sutlej local | ecmwf_aifs025_single | 4 | 229 | 8.6 | -14% | 0.28 | 7.1 | 14 | 0.07 | 0.75 |
+| Sutlej local | ecmwf_aifs025_single | 5 | 229 | 8.6 | -9% | 0.23 | 7.7 | 14 | 0.00 | 1.00 |
+| Sutlej local | ecmwf_aifs025_single | 6 | 229 | 8.6 | -7% | 0.30 | 7.7 | 14 | 0.07 | 0.80 |
+| Sutlej local | ecmwf_aifs025_single | 7 | 229 | 8.6 | -3% | 0.29 | 7.8 | 14 | 0.07 | 0.80 |
+| Sutlej local | ecmwf_ifs025 | 0 | 107 | 5.9 | -33% | 0.34 | 4.5 | 2 | 0.00 | n/a |
+| Sutlej local | ecmwf_ifs025 | 1 | 107 | 5.9 | -17% | 0.38 | 4.5 | 2 | 0.00 | n/a |
+| Sutlej local | ecmwf_ifs025 | 2 | 107 | 5.9 | -4% | 0.39 | 4.7 | 2 | 0.00 | n/a |
+| Sutlej local | ecmwf_ifs025 | 3 | 107 | 5.9 | +4% | 0.38 | 4.8 | 2 | 0.00 | 1.00 |
+| Sutlej local | ecmwf_ifs025 | 4 | 107 | 5.9 | +7% | 0.32 | 5.3 | 2 | 0.00 | 1.00 |
+| Sutlej local | ecmwf_ifs025 | 5 | 107 | 5.9 | +11% | 0.38 | 5.3 | 2 | 0.00 | 1.00 |
+| Sutlej local | ecmwf_ifs025 | 6 | 107 | 5.9 | +10% | 0.35 | 5.3 | 2 | 0.00 | n/a |
+| Sutlej local | ecmwf_ifs025 | 7 | 107 | 5.9 | +18% | 0.33 | 6.0 | 2 | 0.00 | 1.00 |
+| Sutlej local | gfs_seamless | 0 | 107 | 5.9 | -50% | 0.29 | 4.8 | 2 | 0.00 | n/a |
+| Sutlej local | gfs_seamless | 1 | 107 | 5.9 | -28% | 0.35 | 4.7 | 2 | 0.00 | 1.00 |
+| Sutlej local | gfs_seamless | 2 | 107 | 5.9 | -14% | 0.42 | 4.8 | 2 | 0.00 | 1.00 |
+| Sutlej local | gfs_seamless | 3 | 107 | 5.9 | +3% | 0.29 | 5.9 | 2 | 0.00 | 1.00 |
+| Sutlej local | gfs_seamless | 4 | 107 | 5.9 | +17% | 0.32 | 6.3 | 2 | 0.00 | 1.00 |
+| Sutlej local | gfs_seamless | 5 | 107 | 5.9 | +20% | 0.21 | 7.4 | 2 | 0.00 | 1.00 |
+| Sutlej local | gfs_seamless | 6 | 107 | 5.9 | -4% | 0.24 | 6.0 | 2 | 0.00 | 1.00 |
+| Sutlej local | gfs_seamless | 7 | 107 | 5.9 | -1% | 0.31 | 5.7 | 2 | 0.00 | 1.00 |
 
 ### Multiplicative bias correction, tested out of sample
 
@@ -467,109 +467,124 @@ One factor per catchment, model and lead (observed season rain over forecast sea
 
 | catchment | model | lead (days) | days | held-out factors | bias raw / corrected | MAE (mm) raw / corrected | hit rate raw / corrected | false-alarm ratio raw / corrected |
 |---|---|---|---|---|---|---|---|---|
-| Beas local | ecmwf_aifs025_single | 1 | 226 | 0.83 to 0.99 | +7% / -5% | 4.0 / 3.9 | 0.75 / 0.50 | 0.33 / 0.33 |
-| Beas local | ecmwf_aifs025_single | 2 | 226 | 0.82 to 0.86 | +18% / -2% | 4.3 / 3.9 | 0.75 / 0.62 | 0.25 / 0.17 |
-| Beas local | ecmwf_aifs025_single | 3 | 226 | 0.80 to 0.94 | +12% / -5% | 4.6 / 4.4 | 0.50 / 0.38 | 0.43 / 0.40 |
-| Beas local | ecmwf_aifs025_single | 4 | 226 | 0.75 to 1.05 | +8% / -7% | 5.1 / 5.0 | 0.25 / 0.00 | 0.60 / 1.00 |
-| Beas local | ecmwf_aifs025_single | 5 | 226 | 0.71 to 1.01 | +12% / -7% | 5.7 / 5.4 | 0.00 / 0.00 | 1.00 / 1.00 |
-| Bhakra | ecmwf_aifs025_single | 1 | 226 | 0.90 to 1.15 | -4% / -5% | 1.9 / 2.0 | n/a / n/a | 1.00 / n/a |
-| Bhakra | ecmwf_aifs025_single | 2 | 226 | 0.85 to 1.03 | +4% / -4% | 2.1 / 2.1 | n/a / n/a | 1.00 / 1.00 |
-| Bhakra | ecmwf_aifs025_single | 3 | 226 | 0.82 to 1.07 | +3% / -5% | 2.2 / 2.3 | n/a / n/a | 1.00 / 1.00 |
-| Bhakra | ecmwf_aifs025_single | 4 | 226 | 0.81 to 1.11 | +2% / -5% | 2.4 / 2.6 | n/a / n/a | 1.00 / 1.00 |
-| Bhakra | ecmwf_aifs025_single | 5 | 226 | 0.78 to 1.07 | +6% / -5% | 2.7 / 2.8 | n/a / n/a | 1.00 / 1.00 |
-| Bhakra | ecmwf_ifs025 | 1 | 348 | 1.08 to 1.25 | -16% / -1% | 2.1 / 2.2 | n/a / n/a | n/a / n/a |
-| Bhakra | ecmwf_ifs025 | 2 | 348 | 1.07 to 1.20 | -12% / -1% | 2.2 / 2.3 | n/a / n/a | 1.00 / 1.00 |
-| Bhakra | ecmwf_ifs025 | 3 | 348 | 1.05 to 1.22 | -11% / -1% | 2.4 / 2.5 | n/a / n/a | n/a / 1.00 |
-| Bhakra | ecmwf_ifs025 | 4 | 348 | 1.03 to 1.19 | -10% / -1% | 2.6 / 2.7 | n/a / n/a | 1.00 / 1.00 |
-| Bhakra | ecmwf_ifs025 | 5 | 348 | 0.98 to 1.18 | -8% / -1% | 2.6 / 2.8 | n/a / n/a | n/a / n/a |
-| Bhakra | gfs_seamless | 1 | 348 | 1.02 to 1.10 | -6% / -1% | 2.5 / 2.5 | n/a / n/a | 1.00 / 1.00 |
-| Bhakra | gfs_seamless | 2 | 348 | 0.93 to 1.11 | -4% / -1% | 2.8 / 2.9 | n/a / n/a | n/a / n/a |
-| Bhakra | gfs_seamless | 3 | 348 | 0.86 to 1.04 | +2% / -1% | 3.0 / 3.1 | n/a / n/a | n/a / n/a |
-| Bhakra | gfs_seamless | 4 | 348 | 0.78 to 0.94 | +13% / -1% | 3.0 / 2.8 | n/a / n/a | 1.00 / n/a |
-| Bhakra | gfs_seamless | 5 | 348 | 1.35 to 2.00 | -41% / -0% | 3.1 / 3.7 | n/a / n/a | n/a / 1.00 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 1 | 226 | 0.73 to 1.00 | +11% / -8% | 4.3 / 4.2 | 0.44 / 0.44 | 0.43 / 0.00 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 2 | 226 | 0.62 to 0.87 | +28% / -8% | 5.1 / 4.5 | 0.44 / 0.33 | 0.33 / 0.25 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 3 | 226 | 0.56 to 0.89 | +33% / -9% | 5.7 / 5.0 | 0.44 / 0.22 | 0.43 / 0.50 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 4 | 226 | 0.52 to 0.91 | +34% / -8% | 6.2 / 5.5 | 0.33 / 0.11 | 0.57 / 0.75 |
-| Ghaggar Bhankarpur | ecmwf_aifs025_single | 5 | 226 | 0.50 to 0.87 | +40% / -8% | 6.9 / 5.8 | 0.11 / 0.11 | 0.80 / 0.75 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 1 | 348 | 0.94 to 1.04 | +2% / -1% | 5.1 / 5.1 | 0.42 / 0.33 | 0.17 / 0.20 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 2 | 348 | 0.82 to 0.98 | +10% / +1% | 5.6 / 5.4 | 0.33 / 0.33 | 0.33 / 0.33 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 3 | 348 | 0.82 to 0.91 | +16% / -1% | 5.9 / 5.5 | 0.33 / 0.33 | 0.56 / 0.50 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 4 | 348 | 0.77 to 0.86 | +24% / -1% | 6.3 / 5.7 | 0.17 / 0.08 | 0.82 / 0.86 |
-| Ghaggar Bhankarpur | ecmwf_ifs025 | 5 | 348 | 0.77 to 0.86 | +24% / -2% | 6.6 / 5.9 | 0.17 / 0.00 | 0.82 / 1.00 |
-| Ghaggar Bhankarpur | gfs_seamless | 1 | 348 | 0.99 to 1.15 | -8% / +1% | 5.2 / 5.5 | 0.17 / 0.17 | 0.71 / 0.75 |
-| Ghaggar Bhankarpur | gfs_seamless | 2 | 348 | 0.81 to 1.01 | +8% / -1% | 6.2 / 5.9 | 0.17 / 0.17 | 0.75 / 0.71 |
-| Ghaggar Bhankarpur | gfs_seamless | 3 | 348 | 0.64 to 0.84 | +33% / -1% | 7.7 / 6.5 | 0.17 / 0.17 | 0.87 / 0.83 |
-| Ghaggar Bhankarpur | gfs_seamless | 4 | 348 | 0.63 to 0.84 | +34% / -0% | 7.9 / 6.7 | 0.08 / 0.08 | 0.95 / 0.86 |
-| Ghaggar Bhankarpur | gfs_seamless | 5 | 348 | 1.14 to 1.86 | -31% / +2% | 5.5 / 6.9 | 0.00 / 0.00 | 1.00 / 1.00 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 1 | 226 | 0.74 to 0.94 | +15% / -6% | 3.8 / 3.5 | 0.50 / 0.50 | 0.57 / 0.40 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 2 | 226 | 0.64 to 0.82 | +33% / -6% | 4.5 / 3.8 | 0.50 / 0.50 | 0.57 / 0.25 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 3 | 226 | 0.57 to 0.84 | +37% / -7% | 5.0 / 4.4 | 0.50 / 0.33 | 0.57 / 0.33 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 4 | 226 | 0.53 to 0.86 | +39% / -7% | 5.6 / 4.8 | 0.50 / 0.17 | 0.57 / 0.50 |
-| Ghaggar Khanauri | ecmwf_aifs025_single | 5 | 226 | 0.51 to 0.83 | +44% / -7% | 6.1 / 5.1 | 0.17 / 0.17 | 0.80 / 0.67 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 1 | 348 | 0.90 to 1.00 | +5% / -0% | 4.7 / 4.6 | 0.36 / 0.36 | 0.33 / 0.33 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 2 | 348 | 0.79 to 0.96 | +12% / +3% | 5.0 / 4.8 | 0.36 / 0.27 | 0.43 / 0.50 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 3 | 348 | 0.78 to 0.85 | +21% / +0% | 5.5 / 5.0 | 0.27 / 0.18 | 0.67 / 0.75 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 4 | 348 | 0.75 to 0.84 | +23% / +1% | 5.7 / 5.2 | 0.18 / 0.18 | 0.85 / 0.67 |
-| Ghaggar Khanauri | ecmwf_ifs025 | 5 | 348 | 0.75 to 0.82 | +26% / -0% | 6.1 / 5.4 | 0.00 / 0.00 | 1.00 / 1.00 |
-| Ghaggar Khanauri | gfs_seamless | 1 | 348 | 0.97 to 1.25 | -10% / +4% | 4.8 / 5.3 | 0.18 / 0.18 | 0.67 / 0.82 |
-| Ghaggar Khanauri | gfs_seamless | 2 | 348 | 0.88 to 1.01 | +5% / -1% | 5.4 / 5.3 | 0.18 / 0.18 | 0.75 / 0.67 |
-| Ghaggar Khanauri | gfs_seamless | 3 | 348 | 0.69 to 0.86 | +28% / -0% | 6.9 / 6.0 | 0.18 / 0.18 | 0.86 / 0.80 |
-| Ghaggar Khanauri | gfs_seamless | 4 | 348 | 0.67 to 0.81 | +34% / -0% | 7.4 / 6.2 | 0.09 / 0.09 | 0.94 / 0.86 |
-| Ghaggar Khanauri | gfs_seamless | 5 | 348 | 1.21 to 1.86 | -33% / +2% | 5.0 / 6.2 | 0.09 / 0.09 | 0.67 / 0.89 |
-| Harike local | ecmwf_aifs025_single | 1 | 226 | 0.81 to 1.07 | +2% / -9% | 3.3 / 3.4 | 0.50 / 0.38 | 0.33 / 0.40 |
-| Harike local | ecmwf_aifs025_single | 2 | 226 | 0.76 to 0.92 | +15% / -7% | 3.7 / 3.4 | 0.50 / 0.50 | 0.00 / 0.00 |
-| Harike local | ecmwf_aifs025_single | 3 | 226 | 0.70 to 0.99 | +13% / -10% | 4.2 / 4.3 | 0.38 / 0.38 | 0.25 / 0.25 |
-| Harike local | ecmwf_aifs025_single | 4 | 226 | 0.63 to 1.09 | +10% / -10% | 4.9 / 5.0 | 0.12 / 0.00 | 0.50 / 1.00 |
-| Harike local | ecmwf_aifs025_single | 5 | 226 | 0.60 to 1.04 | +15% / -10% | 5.5 / 5.3 | 0.00 / 0.00 | 1.00 / 1.00 |
-| Pong | ecmwf_aifs025_single | 1 | 226 | 0.97 to 1.10 | -5% / -4% | 4.5 / 4.6 | 0.27 / 0.27 | 0.50 / 0.43 |
-| Pong | ecmwf_aifs025_single | 2 | 226 | 0.95 to 0.97 | +3% / -1% | 4.7 / 4.6 | 0.47 / 0.40 | 0.30 / 0.33 |
-| Pong | ecmwf_aifs025_single | 3 | 226 | 0.92 to 1.03 | +1% / -4% | 5.2 / 5.2 | 0.27 / 0.07 | 0.43 / 0.75 |
-| Pong | ecmwf_aifs025_single | 4 | 226 | 0.90 to 1.08 | -2% / -5% | 5.6 / 5.7 | 0.00 / 0.00 | 1.00 / 1.00 |
-| Pong | ecmwf_aifs025_single | 5 | 226 | 0.90 to 1.02 | +2% / -4% | 6.1 / 6.0 | 0.07 / 0.00 | 0.80 / 1.00 |
-| Pong | ecmwf_ifs025 | 1 | 348 | 1.15 to 1.37 | -21% / -2% | 4.8 / 5.2 | 0.24 / 0.24 | 0.56 / 0.64 |
-| Pong | ecmwf_ifs025 | 2 | 348 | 1.01 to 1.22 | -10% / -2% | 5.2 / 5.5 | 0.29 / 0.29 | 0.58 / 0.62 |
-| Pong | ecmwf_ifs025 | 3 | 348 | 0.99 to 1.25 | -11% / -2% | 5.7 / 6.1 | 0.12 / 0.12 | 0.78 / 0.78 |
-| Pong | ecmwf_ifs025 | 4 | 348 | 0.99 to 1.22 | -11% / -2% | 5.4 / 5.7 | 0.18 / 0.18 | 0.57 / 0.75 |
-| Pong | ecmwf_ifs025 | 5 | 348 | 0.93 to 1.21 | -8% / -2% | 5.7 / 6.2 | 0.18 / 0.18 | 0.70 / 0.77 |
-| Pong | gfs_seamless | 1 | 348 | 1.12 to 1.29 | -19% / -2% | 5.6 / 6.0 | 0.12 / 0.12 | 0.75 / 0.78 |
-| Pong | gfs_seamless | 2 | 348 | 1.01 to 1.35 | -19% / -1% | 5.8 / 6.4 | 0.06 / 0.06 | 0.80 / 0.86 |
-| Pong | gfs_seamless | 3 | 348 | 0.87 to 1.25 | -8% / -0% | 6.2 / 6.8 | 0.12 / 0.06 | 0.75 / 0.86 |
-| Pong | gfs_seamless | 4 | 348 | 0.77 to 1.09 | +4% / -1% | 6.6 / 6.9 | 0.06 / 0.06 | 0.92 / 0.92 |
-| Pong | gfs_seamless | 5 | 348 | 1.38 to 2.00 | -46% / -6% | 6.7 / 8.0 | 0.00 / 0.00 | 1.00 / 1.00 |
-| Ranjit Sagar | ecmwf_aifs025_single | 1 | 226 | 0.98 to 1.08 | -1% / +3% | 4.3 / 4.5 | 0.31 / 0.31 | 0.56 / 0.56 |
-| Ranjit Sagar | ecmwf_aifs025_single | 2 | 226 | 0.88 to 1.09 | +5% / +8% | 4.9 / 5.1 | 0.46 / 0.46 | 0.40 / 0.40 |
-| Ranjit Sagar | ecmwf_aifs025_single | 3 | 226 | 0.95 to 1.11 | -0% / +5% | 5.4 / 5.6 | 0.23 / 0.23 | 0.50 / 0.50 |
-| Ranjit Sagar | ecmwf_aifs025_single | 4 | 226 | 1.02 to 1.09 | -4% / +2% | 5.6 / 5.7 | 0.15 / 0.15 | 0.50 / 0.50 |
-| Ranjit Sagar | ecmwf_aifs025_single | 5 | 226 | 1.00 to 1.07 | -2% / +2% | 6.0 / 6.1 | 0.00 / 0.00 | 1.00 / 1.00 |
-| Ranjit Sagar | ecmwf_ifs025 | 1 | 348 | 1.28 to 1.37 | -25% / -1% | 4.5 / 4.6 | 0.25 / 0.31 | 0.20 / 0.44 |
-| Ranjit Sagar | ecmwf_ifs025 | 2 | 348 | 1.11 to 1.20 | -14% / -1% | 5.0 / 5.2 | 0.19 / 0.31 | 0.62 / 0.67 |
-| Ranjit Sagar | ecmwf_ifs025 | 3 | 348 | 1.16 to 1.23 | -17% / -1% | 5.1 / 5.3 | 0.25 / 0.25 | 0.50 / 0.56 |
-| Ranjit Sagar | ecmwf_ifs025 | 4 | 348 | 1.11 to 1.23 | -16% / -1% | 4.8 / 5.0 | 0.12 / 0.25 | 0.60 / 0.64 |
-| Ranjit Sagar | ecmwf_ifs025 | 5 | 348 | 1.05 to 1.19 | -12% / -1% | 5.2 / 5.4 | 0.12 / 0.12 | 0.75 / 0.78 |
-| Ranjit Sagar | gfs_seamless | 1 | 348 | 1.07 to 1.20 | -13% / -1% | 4.9 / 5.1 | 0.19 / 0.19 | 0.50 / 0.50 |
-| Ranjit Sagar | gfs_seamless | 2 | 348 | 1.02 to 1.31 | -17% / -1% | 5.4 / 5.8 | 0.06 / 0.12 | 0.67 / 0.67 |
-| Ranjit Sagar | gfs_seamless | 3 | 348 | 0.91 to 1.33 | -11% / +1% | 5.6 / 6.2 | 0.06 / 0.06 | 0.67 / 0.80 |
-| Ranjit Sagar | gfs_seamless | 4 | 348 | 0.81 to 1.15 | +2% / +1% | 6.4 / 6.5 | 0.12 / 0.06 | 0.80 / 0.88 |
-| Ranjit Sagar | gfs_seamless | 5 | 348 | 1.34 to 2.00 | -43% / -1% | 5.6 / 7.0 | 0.06 / 0.12 | 0.67 / 0.87 |
-| Sutlej local | ecmwf_aifs025_single | 1 | 226 | 0.80 to 1.40 | -16% / -15% | 4.4 / 5.3 | 0.25 / 0.17 | 0.50 / 0.50 |
-| Sutlej local | ecmwf_aifs025_single | 2 | 226 | 0.73 to 1.18 | -3% / -14% | 4.6 / 5.1 | 0.33 / 0.33 | 0.20 / 0.20 |
-| Sutlej local | ecmwf_aifs025_single | 3 | 226 | 0.66 to 1.25 | -3% / -15% | 5.5 / 6.2 | 0.17 / 0.17 | 0.60 / 0.60 |
-| Sutlej local | ecmwf_aifs025_single | 4 | 226 | 0.61 to 1.33 | -4% / -13% | 6.3 / 7.1 | 0.08 / 0.00 | 0.75 / 1.00 |
-| Sutlej local | ecmwf_aifs025_single | 5 | 226 | 0.59 to 1.25 | +1% / -14% | 6.9 / 7.3 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Beas local | ecmwf_aifs025_single | 1 | 229 | 0.99 to 1.17 | -5% / +5% | 4.9 / 5.1 | 0.60 / 0.60 | 0.33 / 0.40 |
+| Beas local | ecmwf_aifs025_single | 2 | 229 | 0.86 to 1.15 | +5% / +10% | 5.1 / 5.5 | 0.60 / 0.60 | 0.25 / 0.33 |
+| Beas local | ecmwf_aifs025_single | 3 | 229 | 0.94 to 1.12 | -0% / +5% | 5.3 / 5.4 | 0.40 / 0.50 | 0.43 / 0.44 |
+| Beas local | ecmwf_aifs025_single | 4 | 229 | 1.05 to 1.05 | -4% / +0% | 5.7 / 5.8 | 0.20 / 0.20 | 0.60 / 0.60 |
+| Beas local | ecmwf_aifs025_single | 5 | 229 | 1.00 to 1.01 | -1% / -0% | 6.3 / 6.3 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Bhakra | ecmwf_aifs025_single | 1 | 229 | 1.15 to 1.39 | -20% / +4% | 2.5 / 2.8 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_aifs025_single | 2 | 229 | 1.03 to 1.32 | -13% / +5% | 2.6 / 3.0 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_aifs025_single | 3 | 229 | 1.07 to 1.28 | -14% / +3% | 2.7 / 2.9 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_aifs025_single | 4 | 229 | 1.11 to 1.25 | -15% / +2% | 2.8 / 2.9 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_aifs025_single | 5 | 229 | 1.07 to 1.21 | -11% / +2% | 3.1 / 3.2 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_ifs025 | 1 | 351 | 1.25 to 1.44 | -26% / +1% | 2.6 / 2.8 | n/a / n/a | n/a / 1.00 |
+| Bhakra | ecmwf_ifs025 | 2 | 351 | 1.20 to 1.33 | -22% / +1% | 2.5 / 2.7 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_ifs025 | 3 | 351 | 1.22 to 1.30 | -21% / +0% | 2.6 / 2.8 | n/a / n/a | n/a / 1.00 |
+| Bhakra | ecmwf_ifs025 | 4 | 351 | 1.19 to 1.32 | -21% / +0% | 2.8 / 3.0 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | ecmwf_ifs025 | 5 | 351 | 1.18 to 1.29 | -19% / -0% | 2.7 / 3.0 | n/a / n/a | n/a / 1.00 |
+| Bhakra | gfs_seamless | 1 | 351 | 1.10 to 1.26 | -17% / +1% | 2.8 / 3.0 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | gfs_seamless | 2 | 351 | 1.11 to 1.28 | -15% / +0% | 3.1 / 3.3 | n/a / n/a | n/a / 1.00 |
+| Bhakra | gfs_seamless | 3 | 351 | 1.02 to 1.25 | -10% / +1% | 3.2 / 3.4 | n/a / n/a | n/a / 1.00 |
+| Bhakra | gfs_seamless | 4 | 351 | 0.94 to 1.11 | -1% / +0% | 3.1 / 3.2 | n/a / n/a | 1.00 / 1.00 |
+| Bhakra | gfs_seamless | 5 | 351 | 1.68 to 2.00 | -48% / -3% | 3.2 / 3.5 | n/a / n/a | n/a / 1.00 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 1 | 229 | 0.99 to 1.00 | +0% / -0% | 6.0 / 5.9 | 0.33 / 0.33 | 0.57 / 0.57 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 2 | 229 | 0.85 to 0.87 | +16% / -1% | 6.5 / 6.1 | 0.33 / 0.22 | 0.50 / 0.50 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 3 | 229 | 0.76 to 0.89 | +20% / -3% | 7.0 / 6.5 | 0.33 / 0.22 | 0.57 / 0.60 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 4 | 229 | 0.71 to 0.91 | +21% / -4% | 7.5 / 6.9 | 0.22 / 0.00 | 0.71 / 1.00 |
+| Ghaggar Bhankarpur | ecmwf_aifs025_single | 5 | 229 | 0.68 to 0.87 | +26% / -4% | 8.0 / 7.2 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 1 | 351 | 1.04 to 1.07 | -5% / +0% | 6.0 / 6.2 | 0.33 / 0.33 | 0.33 / 0.33 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 2 | 351 | 0.92 to 1.07 | +2% / +3% | 6.0 / 6.1 | 0.33 / 0.33 | 0.33 / 0.33 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 3 | 351 | 0.91 to 0.96 | +8% / +1% | 6.4 / 6.2 | 0.33 / 0.33 | 0.56 / 0.56 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 4 | 351 | 0.85 to 0.91 | +15% / +1% | 6.8 / 6.4 | 0.17 / 0.17 | 0.82 / 0.75 |
+| Ghaggar Bhankarpur | ecmwf_ifs025 | 5 | 351 | 0.86 to 0.88 | +15% / +0% | 7.2 / 6.7 | 0.17 / 0.00 | 0.82 / 1.00 |
+| Ghaggar Bhankarpur | gfs_seamless | 1 | 351 | 1.10 to 1.29 | -14% / +4% | 6.0 / 6.5 | 0.08 / 0.25 | 0.86 / 0.80 |
+| Ghaggar Bhankarpur | gfs_seamless | 2 | 351 | 0.93 to 1.12 | +1% / +1% | 6.6 / 6.6 | 0.17 / 0.17 | 0.75 / 0.75 |
+| Ghaggar Bhankarpur | gfs_seamless | 3 | 351 | 0.73 to 0.93 | +24% / +1% | 8.1 / 7.3 | 0.17 / 0.17 | 0.87 / 0.85 |
+| Ghaggar Bhankarpur | gfs_seamless | 4 | 351 | 0.72 to 0.93 | +24% / +1% | 8.3 / 7.4 | 0.08 / 0.08 | 0.95 / 0.88 |
+| Ghaggar Bhankarpur | gfs_seamless | 5 | 351 | 1.30 to 1.86 | -36% / +2% | 6.1 / 7.4 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 1 | 229 | 0.94 to 1.00 | +4% / +2% | 5.3 / 5.2 | 0.29 / 0.29 | 0.71 / 0.71 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 2 | 229 | 0.82 to 0.86 | +19% / +1% | 5.7 / 5.2 | 0.29 / 0.29 | 0.71 / 0.50 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 3 | 229 | 0.77 to 0.84 | +23% / -2% | 6.1 / 5.6 | 0.29 / 0.29 | 0.71 / 0.50 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 4 | 229 | 0.72 to 0.86 | +25% / -3% | 6.6 / 6.0 | 0.29 / 0.00 | 0.71 / 1.00 |
+| Ghaggar Khanauri | ecmwf_aifs025_single | 5 | 229 | 0.69 to 0.83 | +30% / -3% | 7.1 / 6.3 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 1 | 351 | 1.00 to 1.10 | -2% / +2% | 5.5 / 5.7 | 0.25 / 0.25 | 0.50 / 0.50 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 2 | 351 | 0.88 to 1.09 | +4% / +5% | 5.3 / 5.4 | 0.33 / 0.33 | 0.43 / 0.43 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 3 | 351 | 0.85 to 0.96 | +13% / +2% | 5.9 / 5.6 | 0.25 / 0.25 | 0.67 / 0.67 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 4 | 351 | 0.84 to 0.96 | +15% / +3% | 6.1 / 5.8 | 0.17 / 0.17 | 0.85 / 0.82 |
+| Ghaggar Khanauri | ecmwf_ifs025 | 5 | 351 | 0.82 to 0.91 | +18% / +2% | 6.5 / 6.1 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Ghaggar Khanauri | gfs_seamless | 1 | 351 | 1.08 to 1.41 | -16% / +7% | 5.4 / 6.2 | 0.08 / 0.17 | 0.83 / 0.87 |
+| Ghaggar Khanauri | gfs_seamless | 2 | 351 | 0.96 to 1.12 | -2% / +1% | 5.8 / 6.0 | 0.17 / 0.17 | 0.75 / 0.71 |
+| Ghaggar Khanauri | gfs_seamless | 3 | 351 | 0.79 to 0.95 | +20% / +2% | 7.2 / 6.6 | 0.17 / 0.17 | 0.86 / 0.83 |
+| Ghaggar Khanauri | gfs_seamless | 4 | 351 | 0.76 to 0.90 | +25% / +2% | 7.6 / 6.7 | 0.08 / 0.08 | 0.94 / 0.88 |
+| Ghaggar Khanauri | gfs_seamless | 5 | 351 | 1.37 to 1.86 | -37% / +1% | 5.5 / 6.6 | 0.08 / 0.08 | 0.67 / 0.91 |
+| Harike local | ecmwf_aifs025_single | 1 | 229 | 0.84 to 1.07 | +1% / -7% | 3.8 / 3.9 | 0.50 / 0.38 | 0.33 / 0.40 |
+| Harike local | ecmwf_aifs025_single | 2 | 229 | 0.80 to 0.92 | +13% / -5% | 4.2 / 3.9 | 0.50 / 0.50 | 0.00 / 0.00 |
+| Harike local | ecmwf_aifs025_single | 3 | 229 | 0.73 to 0.99 | +12% / -9% | 4.7 / 4.7 | 0.38 / 0.38 | 0.25 / 0.25 |
+| Harike local | ecmwf_aifs025_single | 4 | 229 | 0.65 to 1.09 | +9% / -9% | 5.3 / 5.4 | 0.12 / 0.00 | 0.50 / 1.00 |
+| Harike local | ecmwf_aifs025_single | 5 | 229 | 0.63 to 1.04 | +14% / -9% | 6.0 / 5.7 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Pong | ecmwf_aifs025_single | 1 | 229 | 1.10 to 1.40 | -17% / +8% | 5.8 / 6.3 | 0.24 / 0.41 | 0.50 / 0.50 |
+| Pong | ecmwf_aifs025_single | 2 | 229 | 0.97 to 1.38 | -9% / +13% | 5.9 / 7.1 | 0.41 / 0.47 | 0.30 / 0.60 |
+| Pong | ecmwf_aifs025_single | 3 | 229 | 1.03 to 1.34 | -12% / +9% | 6.4 / 7.0 | 0.24 / 0.29 | 0.43 / 0.50 |
+| Pong | ecmwf_aifs025_single | 4 | 229 | 1.08 to 1.30 | -14% / +5% | 6.6 / 7.0 | 0.00 / 0.18 | 1.00 / 0.57 |
+| Pong | ecmwf_aifs025_single | 5 | 229 | 1.02 to 1.30 | -10% / +8% | 7.1 / 7.7 | 0.06 / 0.12 | 0.80 / 0.75 |
+| Pong | ecmwf_ifs025 | 1 | 351 | 1.37 to 1.46 | -29% / -0% | 5.7 / 6.0 | 0.21 / 0.26 | 0.56 / 0.62 |
+| Pong | ecmwf_ifs025 | 2 | 351 | 1.20 to 1.25 | -18% / -0% | 5.9 / 6.1 | 0.26 / 0.37 | 0.58 / 0.56 |
+| Pong | ecmwf_ifs025 | 3 | 351 | 1.18 to 1.27 | -19% / -1% | 6.3 / 6.6 | 0.11 / 0.11 | 0.78 / 0.80 |
+| Pong | ecmwf_ifs025 | 4 | 351 | 1.18 to 1.30 | -19% / -1% | 6.0 / 6.4 | 0.16 / 0.21 | 0.57 / 0.71 |
+| Pong | ecmwf_ifs025 | 5 | 351 | 1.10 to 1.27 | -17% / -1% | 6.2 / 6.5 | 0.16 / 0.21 | 0.70 / 0.73 |
+| Pong | gfs_seamless | 1 | 351 | 1.29 to 1.44 | -26% / +0% | 6.4 / 6.8 | 0.11 / 0.11 | 0.75 / 0.83 |
+| Pong | gfs_seamless | 2 | 351 | 1.21 to 1.54 | -26% / +0% | 6.4 / 6.9 | 0.05 / 0.05 | 0.80 / 0.93 |
+| Pong | gfs_seamless | 3 | 351 | 1.04 to 1.43 | -16% / +2% | 6.7 / 7.4 | 0.11 / 0.11 | 0.75 / 0.83 |
+| Pong | gfs_seamless | 4 | 351 | 0.92 to 1.24 | -5% / +1% | 7.0 / 7.5 | 0.05 / 0.16 | 0.92 / 0.84 |
+| Pong | gfs_seamless | 5 | 351 | 1.64 to 2.00 | -50% / -7% | 7.1 / 7.7 | 0.00 / 0.05 | 1.00 / 0.94 |
+| Ranjit Sagar | ecmwf_aifs025_single | 1 | 229 | 0.98 to 1.29 | -8% / +8% | 5.8 / 6.3 | 0.22 / 0.28 | 0.56 / 0.50 |
+| Ranjit Sagar | ecmwf_aifs025_single | 2 | 229 | 0.88 to 1.30 | -2% / +14% | 6.2 / 7.2 | 0.39 / 0.33 | 0.30 / 0.50 |
+| Ranjit Sagar | ecmwf_aifs025_single | 3 | 229 | 0.95 to 1.32 | -7% / +10% | 6.7 / 7.3 | 0.17 / 0.17 | 0.50 / 0.67 |
+| Ranjit Sagar | ecmwf_aifs025_single | 4 | 229 | 1.02 to 1.29 | -11% / +6% | 6.9 / 7.3 | 0.11 / 0.17 | 0.50 / 0.57 |
+| Ranjit Sagar | ecmwf_aifs025_single | 5 | 229 | 1.00 to 1.28 | -9% / +7% | 7.4 / 8.0 | 0.00 / 0.00 | 1.00 / 1.00 |
+| Ranjit Sagar | ecmwf_ifs025 | 1 | 351 | 1.36 to 1.47 | -29% / -0% | 5.3 / 5.5 | 0.19 / 0.29 | 0.20 / 0.50 |
+| Ranjit Sagar | ecmwf_ifs025 | 2 | 351 | 1.20 to 1.28 | -19% / -0% | 5.9 / 6.2 | 0.14 / 0.38 | 0.62 / 0.53 |
+| Ranjit Sagar | ecmwf_ifs025 | 3 | 351 | 1.23 to 1.31 | -21% / -0% | 5.9 / 6.2 | 0.24 / 0.24 | 0.38 / 0.44 |
+| Ranjit Sagar | ecmwf_ifs025 | 4 | 351 | 1.22 to 1.33 | -21% / -1% | 5.5 / 5.8 | 0.10 / 0.29 | 0.60 / 0.57 |
+| Ranjit Sagar | ecmwf_ifs025 | 5 | 351 | 1.16 to 1.28 | -17% / -1% | 5.9 / 6.3 | 0.10 / 0.14 | 0.75 / 0.75 |
+| Ranjit Sagar | gfs_seamless | 1 | 351 | 1.16 to 1.29 | -18% / -0% | 5.8 / 6.1 | 0.14 / 0.19 | 0.50 / 0.50 |
+| Ranjit Sagar | gfs_seamless | 2 | 351 | 1.13 to 1.41 | -21% / -1% | 6.1 / 6.5 | 0.05 / 0.14 | 0.67 / 0.57 |
+| Ranjit Sagar | gfs_seamless | 3 | 351 | 1.00 to 1.42 | -16% / +1% | 6.1 / 6.8 | 0.05 / 0.05 | 0.67 / 0.83 |
+| Ranjit Sagar | gfs_seamless | 4 | 351 | 0.89 to 1.23 | -3% / +1% | 7.0 / 7.3 | 0.10 / 0.05 | 0.80 / 0.90 |
+| Ranjit Sagar | gfs_seamless | 5 | 351 | 1.48 to 2.00 | -46% / -2% | 6.3 / 7.2 | 0.10 / 0.24 | 0.33 / 0.69 |
+| Sutlej local | ecmwf_aifs025_single | 1 | 229 | 1.18 to 1.40 | -25% / -5% | 5.4 / 5.8 | 0.21 / 0.36 | 0.50 / 0.44 |
+| Sutlej local | ecmwf_aifs025_single | 2 | 229 | 1.09 to 1.18 | -13% / -3% | 5.7 / 5.8 | 0.29 / 0.43 | 0.20 / 0.25 |
+| Sutlej local | ecmwf_aifs025_single | 3 | 229 | 0.98 to 1.25 | -13% / -6% | 6.4 / 6.7 | 0.14 / 0.14 | 0.60 / 0.60 |
+| Sutlej local | ecmwf_aifs025_single | 4 | 229 | 0.90 to 1.33 | -14% / -7% | 7.1 / 7.5 | 0.07 / 0.00 | 0.75 / 1.00 |
+| Sutlej local | ecmwf_aifs025_single | 5 | 229 | 0.88 to 1.25 | -9% / -7% | 7.7 / 8.0 | 0.00 / 0.00 | 1.00 / 1.00 |
 
-Held-out days, dam catchments, leads 1 to 5: MAE lower after correction in 4 of 45 rows, heavy-day hit rate higher in 5, false-alarm ratio higher in 19. The product applies a correction only when MAE and hit rate both improve on the held-out seasons for a dam catchment; the rule is in `design.md`.
+Held-out days, dam catchments, leads 1 to 5: MAE lower after correction in 0 of 45 rows, heavy-day hit rate higher in 20, false-alarm ratio higher in 17. The product applies a correction only when MAE and hit rate both improve on the held-out seasons for a dam catchment; the rule is in `design.md`.
 
 ### The machine-learned model against the primary deterministic model
 
-`ecmwf_aifs025_single` (ECMWF AIFS, the machine-learned forecast) and `ecmwf_ifs025` scored on exactly the same rows: the dam catchments, leads 1, 2, 3, every target day both have in the archive (2,034 rows). The rule, written before the pull: the challenger replaces the incumbent as the product's primary deterministic model only if its heavy-day hit rate is higher and its false-alarm ratio is not higher on those rows. The spill probability comes from the IFS ensemble either way; the primary deterministic model drives the local term and the deterministic fallback.
+`ecmwf_aifs025_single` (ECMWF AIFS, the machine-learned forecast) and `ecmwf_ifs025` scored on exactly the same rows: the dam catchments, leads 1, 2, 3, every target day both have in the archive (2,061 rows). The rule, written before the pull: the challenger replaces the incumbent as the product's primary deterministic model only if its heavy-day hit rate is higher and its false-alarm ratio is not higher on those rows. The spill probability comes from the IFS ensemble either way; the primary deterministic model drives the local term and the deterministic fallback.
 
 | model | obs mean (mm) | bias | r | MAE (mm) | heavy days | hit rate | false-alarm ratio |
 |---|---|---|---|---|---|---|---|
-| ecmwf_ifs025 | 7.6 | -16% | 0.65 | 4.1 | 84 | 0.24 | 0.53 |
-| ecmwf_aifs025_single | 7.6 | +1% | 0.60 | 3.9 | 84 | 0.33 | 0.49 |
+| ecmwf_ifs025 | 8.5 | -25% | 0.58 | 5.1 | 105 | 0.20 | 0.51 |
+| ecmwf_aifs025_single | 8.5 | -11% | 0.54 | 5.0 | 105 | 0.28 | 0.47 |
 
 Hit rate higher: yes; false-alarm ratio not higher: yes. Verdict: the primary deterministic model switches to ecmwf_aifs025_single. The product's primary is `ecmwf_aifs025_single`.
+
+### The in-season observed rain: IMD real-time grid and ERA5 against the final grid
+
+The runoff model is calibrated on the final IMD grid, which arrives after the season. In season the product has to carry the previous days' rain from something else: until now the best-match model's past days (ERA5 physics), and the record on disk was ERA5. IMD Pune serves a preliminary real-time analysis on the same lattice. Both are scored here against the final grid over the 2025 season on the dam catchments, on the days each has (heavy day: 30 mm or more). The rule, written before the pull: the real-time grid replaces the model's past days as the product's observed record only if its MAE is lower than ERA5's at every dam and its heavy-day hit rate is not lower at any.
+
+| catchment | record | days | final mean (mm) | bias | r | MAE (mm) | heavy days | hit rate | false-alarm ratio |
+|---|---|---|---|---|---|---|---|---|---|
+| Bhakra | imd_rt | 121 | 5.5 | +9% | 0.98 | 0.6 | 0 | n/a | n/a |
+| Bhakra | era5 | 122 | 5.5 | -22% | 0.72 | 2.7 | 0 | n/a | 1.00 |
+| Pong | imd_rt | 121 | 12.1 | +6% | 1.00 | 0.9 | 14 | 0.93 | 0.07 |
+| Pong | era5 | 122 | 12.1 | -27% | 0.60 | 7.1 | 14 | 0.29 | 0.50 |
+| Ranjit Sagar | imd_rt | 121 | 10.2 | +11% | 0.99 | 1.5 | 11 | 1.00 | 0.21 |
+| Ranjit Sagar | era5 | 122 | 10.1 | -12% | 0.76 | 5.7 | 11 | 0.36 | 0.43 |
+
+MAE lower at every dam: yes; hit rate not lower at any: yes. Verdict: the product's observed record switches to the IMD real-time grid, the model's past days standing in for any day the service does not have. The product's observed record is `imd_rt`.
 
 ## Live 2026: one-day inflow prediction against the BBMB bulletins
 
@@ -577,8 +592,8 @@ Persistence (tomorrow's inflow equals today's) is the baseline any one-day predi
 
 | dam | days | mean observed (cusecs) | mean predicted (cusecs) | bias | Pearson r | MAE (cusecs) | persistence bias | persistence r | persistence MAE |
 |---|---|---|---|---|---|---|---|---|---|
-| Bhakra | 30 | 41,926 | 41,551 | -1% | +0.46 | 4,185 | +0% | +0.56 | 4,148 |
-| Pong | 30 | 35,571 | 35,601 | +0% | +0.42 | 11,232 | +3% | +0.37 | 12,135 |
+| Bhakra | 30 | 41,926 | 41,459 | -1% | +0.57 | 4,006 | +0% | +0.56 | 4,148 |
+| Pong | 30 | 35,571 | 35,608 | +0% | +0.86 | 5,904 | +3% | +0.37 | 12,135 |
 
 ### By horizon, with observed and with forecast rain
 
@@ -586,56 +601,56 @@ From each bulletin day, the inflow one to five days ahead: predicted with the ob
 
 | dam | horizon (days) | rain | days | bias | Pearson r | MAE (cusecs) |
 |---|---|---|---|---|---|---|
-| Bhakra | 1 | observed rain | 30 | -1% | +0.46 | 4,185 |
+| Bhakra | 1 | observed rain | 30 | -1% | +0.57 | 4,006 |
 | Bhakra | 1 | persistence | 30 | +0% | +0.56 | 4,148 |
-| Bhakra | 1 | ecmwf_ifs025 | 30 | -1% | +0.49 | 4,187 |
-| Bhakra | 1 | gfs_seamless | 30 | +0% | +0.48 | 5,049 |
-| Bhakra | 1 | ecmwf_aifs025_single | 30 | +1% | +0.45 | 4,804 |
-| Bhakra | 2 | observed rain | 29 | -2% | +0.21 | 6,107 |
+| Bhakra | 1 | ecmwf_ifs025 | 30 | -9% | +0.43 | 4,633 |
+| Bhakra | 1 | gfs_seamless | 30 | -7% | +0.44 | 4,956 |
+| Bhakra | 1 | ecmwf_aifs025_single | 30 | -6% | +0.38 | 4,603 |
+| Bhakra | 2 | observed rain | 29 | -2% | +0.38 | 5,703 |
 | Bhakra | 2 | persistence | 29 | +0% | +0.32 | 5,796 |
-| Bhakra | 2 | ecmwf_ifs025 | 29 | +0% | +0.27 | 6,121 |
-| Bhakra | 2 | gfs_seamless | 29 | +1% | +0.24 | 7,049 |
-| Bhakra | 2 | ecmwf_aifs025_single | 29 | +3% | +0.20 | 7,065 |
-| Bhakra | 3 | observed rain | 28 | -3% | +0.18 | 6,894 |
+| Bhakra | 2 | ecmwf_ifs025 | 29 | -12% | +0.21 | 6,205 |
+| Bhakra | 2 | gfs_seamless | 29 | -11% | +0.20 | 6,754 |
+| Bhakra | 2 | ecmwf_aifs025_single | 29 | -8% | +0.14 | 5,891 |
+| Bhakra | 3 | observed rain | 28 | -3% | +0.35 | 6,278 |
 | Bhakra | 3 | persistence | 28 | +0% | +0.19 | 6,762 |
-| Bhakra | 3 | ecmwf_ifs025 | 28 | +1% | +0.33 | 6,313 |
-| Bhakra | 3 | gfs_seamless | 28 | +1% | +0.25 | 7,414 |
-| Bhakra | 3 | ecmwf_aifs025_single | 28 | +4% | +0.17 | 7,695 |
-| Bhakra | 4 | observed rain | 27 | -6% | +0.19 | 6,829 |
+| Bhakra | 3 | ecmwf_ifs025 | 28 | -12% | +0.27 | 6,405 |
+| Bhakra | 3 | gfs_seamless | 28 | -12% | +0.18 | 8,008 |
+| Bhakra | 3 | ecmwf_aifs025_single | 28 | -9% | +0.06 | 7,103 |
+| Bhakra | 4 | observed rain | 27 | -5% | +0.30 | 6,021 |
 | Bhakra | 4 | persistence | 27 | +0% | +0.10 | 7,551 |
-| Bhakra | 4 | ecmwf_ifs025 | 27 | +0% | +0.31 | 5,974 |
-| Bhakra | 4 | gfs_seamless | 27 | +2% | +0.33 | 6,728 |
-| Bhakra | 4 | ecmwf_aifs025_single | 27 | +3% | +0.14 | 6,886 |
-| Bhakra | 5 | observed rain | 26 | -8% | +0.08 | 7,488 |
+| Bhakra | 4 | ecmwf_ifs025 | 27 | -15% | +0.10 | 7,876 |
+| Bhakra | 4 | gfs_seamless | 27 | -13% | +0.18 | 8,388 |
+| Bhakra | 4 | ecmwf_aifs025_single | 27 | -12% | -0.10 | 8,037 |
+| Bhakra | 5 | observed rain | 26 | -6% | +0.37 | 5,792 |
 | Bhakra | 5 | persistence | 26 | +1% | -0.05 | 7,691 |
-| Bhakra | 5 | ecmwf_ifs025 | 26 | +0% | +0.29 | 6,748 |
-| Bhakra | 5 | gfs_seamless | 26 | +2% | +0.34 | 7,301 |
-| Bhakra | 5 | ecmwf_aifs025_single | 26 | +3% | +0.01 | 7,646 |
-| Pong | 1 | observed rain | 30 | +0% | +0.42 | 11,232 |
+| Bhakra | 5 | ecmwf_ifs025 | 26 | -14% | +0.21 | 7,734 |
+| Bhakra | 5 | gfs_seamless | 26 | -12% | +0.30 | 8,120 |
+| Bhakra | 5 | ecmwf_aifs025_single | 26 | -11% | -0.09 | 8,199 |
+| Pong | 1 | observed rain | 30 | +0% | +0.86 | 5,904 |
 | Pong | 1 | persistence | 30 | +3% | +0.37 | 12,135 |
-| Pong | 1 | ecmwf_ifs025 | 30 | -0% | +0.42 | 11,031 |
-| Pong | 1 | gfs_seamless | 30 | -1% | +0.40 | 11,662 |
-| Pong | 1 | ecmwf_aifs025_single | 30 | +2% | +0.39 | 11,449 |
-| Pong | 2 | observed rain | 29 | +0% | +0.06 | 14,649 |
+| Pong | 1 | ecmwf_ifs025 | 30 | -12% | +0.79 | 7,835 |
+| Pong | 1 | gfs_seamless | 30 | -13% | +0.77 | 8,229 |
+| Pong | 1 | ecmwf_aifs025_single | 30 | -10% | +0.77 | 7,455 |
+| Pong | 2 | observed rain | 29 | -0% | +0.81 | 7,773 |
 | Pong | 2 | persistence | 29 | +4% | -0.20 | 17,175 |
-| Pong | 2 | ecmwf_ifs025 | 29 | +4% | +0.01 | 15,541 |
-| Pong | 2 | gfs_seamless | 29 | +1% | +0.00 | 16,189 |
-| Pong | 2 | ecmwf_aifs025_single | 29 | +5% | -0.04 | 15,559 |
-| Pong | 3 | observed rain | 28 | -1% | +0.36 | 12,085 |
+| Pong | 2 | ecmwf_ifs025 | 29 | -28% | +0.33 | 14,072 |
+| Pong | 2 | gfs_seamless | 29 | -32% | +0.32 | 14,930 |
+| Pong | 2 | ecmwf_aifs025_single | 29 | -27% | +0.28 | 13,276 |
+| Pong | 3 | observed rain | 28 | -0% | +0.79 | 8,770 |
 | Pong | 3 | persistence | 28 | +4% | +0.03 | 16,235 |
-| Pong | 3 | ecmwf_ifs025 | 28 | +10% | +0.39 | 14,082 |
-| Pong | 3 | gfs_seamless | 28 | +5% | +0.28 | 15,032 |
-| Pong | 3 | ecmwf_aifs025_single | 28 | +5% | +0.26 | 13,353 |
-| Pong | 4 | observed rain | 27 | -1% | +0.53 | 10,358 |
+| Pong | 3 | ecmwf_ifs025 | 28 | -26% | +0.43 | 13,923 |
+| Pong | 3 | gfs_seamless | 28 | -32% | +0.34 | 14,793 |
+| Pong | 3 | ecmwf_aifs025_single | 28 | -32% | +0.30 | 13,577 |
+| Pong | 4 | observed rain | 27 | -0% | +0.77 | 8,438 |
 | Pong | 4 | persistence | 27 | +7% | +0.31 | 14,265 |
-| Pong | 4 | ecmwf_ifs025 | 27 | +10% | +0.56 | 9,676 |
-| Pong | 4 | gfs_seamless | 27 | +12% | +0.53 | 12,058 |
-| Pong | 4 | ecmwf_aifs025_single | 27 | +6% | +0.44 | 10,421 |
-| Pong | 5 | observed rain | 26 | -3% | +0.12 | 13,870 |
+| Pong | 4 | ecmwf_ifs025 | 27 | -32% | +0.37 | 13,994 |
+| Pong | 4 | gfs_seamless | 27 | -30% | +0.40 | 14,960 |
+| Pong | 4 | ecmwf_aifs025_single | 27 | -36% | +0.13 | 14,937 |
+| Pong | 5 | observed rain | 26 | -1% | +0.80 | 7,828 |
 | Pong | 5 | persistence | 26 | +9% | +0.03 | 16,071 |
-| Pong | 5 | ecmwf_ifs025 | 26 | +12% | +0.17 | 14,245 |
-| Pong | 5 | gfs_seamless | 26 | +18% | +0.33 | 14,171 |
-| Pong | 5 | ecmwf_aifs025_single | 26 | +7% | +0.04 | 14,444 |
+| Pong | 5 | ecmwf_ifs025 | 26 | -32% | +0.38 | 14,045 |
+| Pong | 5 | gfs_seamless | 26 | -26% | +0.51 | 13,907 |
+| Pong | 5 | ecmwf_aifs025_single | 26 | -37% | +0.24 | 14,946 |
 
 ## Prospective record, 2026 season
 

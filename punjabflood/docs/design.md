@@ -15,8 +15,15 @@ grid stops at the Indian border, so the Tibetan Sutlej above Bhakra (about half 
 catchment) is outside it and enters the model through the base flow. Coverage weights are
 carried per grid point and the runoff coefficient is calibrated with the same weighted
 polygons, so the area bias is absorbed into the coefficient rather than into the volume.
-ERA5 through Open-Meteo covers the current season only, where the IMD archive has not yet
-been published.
+The final IMD grid arrives after the season, so the current season needs another observed
+record. Two are kept: IMD Pune's real-time analysis, a preliminary daily grid on the same
+lattice served keyless for recent days (source `imd_rt`), and ERA5 through Open-Meteo
+(source `era5`); the rain table holds one row per catchment and day with the best source
+present, final over real-time over ERA5. Live, the product carries the previous six days'
+rain per catchment from the IMD real-time grid where the service has the day and from the
+best-match model's past day otherwise, and records the source of every day; the rule that
+put the real-time grid in front of the model's past days is in the verification section
+below (item 4) and the switch is `forecast.OBSERVED_RECORD`.
 
 **Catchment to reservoir.** Inflow is a base component plus a quick response to the last
 four days of catchment rain. The quick response is calibrated on what the public record
@@ -158,7 +165,13 @@ percentile of the forecast three-day total against the 1988 to 2025 season recor
    supplies false-alarm and calibration evidence only.
 4. Rain input check. ERA5 catchment rain against the IMD grid over the 2023 and 2025 event
    windows, because the forecast models share ERA5's physics and resolution; a reanalysis
-   that misses the mountain rain of an event says the forecasts will too.
+   that misses the mountain rain of an event says the forecasts will too. The in-season
+   half of the same question: the IMD real-time grid and ERA5 each against the final grid
+   over the latest season that has all three, on the dam catchments (bias, r, MAE,
+   heavy-day hit rate and false-alarm ratio, the QPF skill scores). The rule, written
+   before the pull: the real-time grid replaces the model's past days as the product's
+   observed record only if its MAE is lower than ERA5's at every dam and its heavy-day hit
+   rate is not lower at any. The report prints both records and the verdict.
 5. QPF bias correction, out of sample. One multiplicative factor per catchment, model and
    lead (observed over forecast season rain), fitted on every season but one and applied to
    the held-out one, scored against the raw forecast on the held-out days. The rule for the

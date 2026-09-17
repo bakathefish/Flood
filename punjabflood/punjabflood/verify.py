@@ -1050,3 +1050,54 @@ def qpf_model_comparison(
     out["false_alarm_not_higher"] = bool(far_ok)
     out["switch"] = bool(hit_better and far_ok)
     return out
+def realtime_vs_final(
+    final: pd.DataFrame,
+    realtime: pd.DataFrame,
+    era5: pd.DataFrame,
+    catchments=tuple(C.DAMS),
+    heavy_mm: float = 30.0,
+) -> dict:
+    """The two in-season observed-rain records against the final IMD grid on the days each
+    has: per dam catchment, the IMD real-time grid (``imd_rt``) and ERA5, scored with
+    ``_qpf_scores`` (bias, r, MAE, heavy-day hit rate and false-alarm ratio). The rule for
+    the product's observed record, written before the pull: the real-time grid replaces the
+    best-match past days only if its MAE is lower than ERA5's at every dam and its heavy-day
+    hit rate is not lower at any; a dam with no real-time days fails it."""
+
+    def series(df: pd.DataFrame, cat: str) -> pd.Series:
+        g = df[df["catchment"] == cat].copy()
+        g["date"] = pd.to_datetime(g["date"])
+        return g.set_index("date")["rain_mm"].astype(float).sort_index()
+
+    rows, missing = [], []
+    mae_lower, hit_ok = [], []
+    for cat in catchments:
+        f = series(final, cat)
+        scores = {}
+        for name, df in (("imd_rt", realtime), ("era5", era5)):
+            s = series(df, cat)
+            both = f.index.intersection(s.index)
+            if len(both) == 0:
+                continue
+            sc = _qpf_scores(s.loc[both].to_numpy(), f.loc[both].to_numpy(), heavy_mm)
+            scores[name] = sc
+            rows.append({"catchment": cat, "record": name, "n_days": int(len(both)), **sc})
+        if "imd_rt" not in scores or "era5" not in scores:
+            missing.append(cat)
+            continue
+        rt, e = scores["imd_rt"], scores["era5"]
+        mae_lower.append(rt["mae_mm"] < e["mae_mm"])
+        hr, he = rt["hit_rate"], e["hit_rate"]
+        # no heavy day in the season: the condition is vacuous; ERA5 without a hit rate
+        # cannot beat a real-time record that has one
+        hit_ok.append((hr != hr and he != he) or (hr == hr and (he != he or hr >= he)))
+    ok_mae = bool(mae_lower) and all(mae_lower) and not missing
+    ok_hit = bool(hit_ok) and all(hit_ok) and not missing
+    return {
+        "rows": rows,
+        "dams_missing": missing,
+        "mae_lower_everywhere": ok_mae,
+        "hit_rate_not_lower": ok_hit,
+        "switch": ok_mae and ok_hit,
+        "heavy_mm": heavy_mm,
+    }

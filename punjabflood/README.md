@@ -12,7 +12,8 @@ turns that mechanism into a daily hazard watch:
    dam's own level-storage relation fitted on the CWC record, with the record's stale and
    mistyped rows reconciled against that relation.
 2. **Rain.** IMD 0.25 degree gridded daily rainfall (1961 to 2025) as the observed record,
-   ERA5 through Open-Meteo for the current season, deterministic and 51-member ensemble
+   IMD's real-time grid for the current season (ERA5 through Open-Meteo where the service
+   lacks a day), deterministic and 51-member ensemble
    quantitative precipitation forecasts (GFS, ECMWF IFS, ICON), all area-weighted over the
    real HydroBASINS catchments, all through keyless APIs.
 3. **Inflow.** A runoff coefficient that rises with how wet the catchment already is, with
@@ -33,8 +34,9 @@ turns that mechanism into a daily hazard watch:
    holds for 2023 and 2025 (BBMB's archived sheets, the Public Action Committee's period
    means, the season peaks stated to the Rajya Sabha, 26 dated press readings), the as-issued
    rain forecasts of 2024 to 2026 (as rain skill, and as a day-by-day hindcast of what the
-   product would have said before the 2025 event, at each dam), the live 2026 bulletins,
-   and the season's prospective record. Results, with their caveats, are in
+   product would have said before the 2025 event, at each dam), the in-season rain records
+   against the final IMD grid, the live 2026 bulletins, and the season's prospective
+   record. Results, with their caveats, are in
    `docs/verification.md`, rendered from `outputs/verification/` and never typed by hand.
 
 Not an official warning. The Punjab WRD, CWC, BBMB and IMD issue those. This is a hazard
@@ -67,7 +69,8 @@ python -m pytest                       # unit tests, offline
 punjabflood pull-cwc                   # hours; resumable; the feed throttles hard
 punjabflood build-catchments           # needs data/raw/hydrobasins/hybas_as_lev08_v1c.*
 punjabflood build-rain                 # IMD gridded archive in data/raw/imd (imdlib layout)
-punjabflood pull-rain-recent           # ERA5 for the current season, all catchments
+punjabflood pull-rain-recent           # current season: IMD real-time grid where served, ERA5 for the rest
+punjabflood pull-era5-season --year 2025   # ERA5 over the dam catchments for one season (the real-time grid's reference)
 punjabflood pull-soil-moisture         # ERA5-Land soil moisture 2015-2025, dam catchments, into the rain table
 punjabflood pull-qpf-archive           # as-issued QPF leads 1..7, 2024 to date (merges by model and season)
 punjabflood digitise-guidebook         # needs the WRD guidebook PDF in data/raw/wrd/

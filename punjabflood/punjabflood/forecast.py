@@ -230,6 +230,7 @@ def build_product(
             "headroom_bcm": max(C.DAMS[dam].live_capacity_bcm.value - st["storage_bcm"], 0.0),
             "absorption_cusecs": absorb,
             "base_inflow_cusecs": base,
+            "recent_rain_mm": [float(x) for x in recent],
             "deterministic": {},
             "ensemble": {},
         }
@@ -383,6 +384,14 @@ def render_markdown(product: dict) -> str:
             f"inflow {st.get('inflow_cusecs')} cusecs, outflow {st.get('outflow_cusecs')} cusecs "
             f"({st.get('basis')})."
         )
+        srcs = (product.get("recent_rain_source") or {}).get(dam)
+        if srcs:
+            n_imd = sum(1 for s in srcs if s == "imd_rt")
+            lines.append(
+                f"Observed rain of the previous {len(srcs)} days: {n_imd} from the IMD "
+                f"real-time grid, {len(srcs) - n_imd} from the {RECENT_MODEL} model's past days "
+                f"({', '.join(f'{v:.1f}' for v in e.get('recent_rain_mm', []))} mm)."
+            )
         if e.get("soil_moisture"):
             s = e["soil_moisture"]
             lines.append(
@@ -544,6 +553,87 @@ def latest_soil_moisture(
     return out
 
 
+RECENT_MODEL = "best_match"  # the past days of Open-Meteo's best-match model, the fallback
+# The product's observed record for the days before the issue date: the incumbent is the
+# best-match model's past days; "imd_rt" takes the IMD real-time grid where the service has
+# the day. Switched only by the rule in verify.realtime_vs_final (report section "The
+# in-season observed rain"); until then the incumbent stands.
+OBSERVED_RECORD = "imd_rt"
+
+
+def recent_rain(
+    client: OpenMeteo,
+    catchments: dict[str, Catchment],
+    issue_date: str,
+    rt_dir: Path | None = None,
+    fetch=None,
+    days: int = RECENT_DAYS,
+    record: str | None = None,
+) -> tuple[dict[str, list[float]], dict[str, list[str]]]:
+    """The observed rain of the ``days`` days before the issue date for every catchment, and
+    the source of each day. Catchments with IMD coverage weights (the calibrated index) take
+    each day from the IMD real-time grid when it is on disk or can be fetched (``fetch``
+    defaults to ``imdrain.fetch_realtime``; pass ``fetch=False`` to use only what is on
+    disk), and the best-match model's past day otherwise; the others take the model.
+    ``record`` (default ``OBSERVED_RECORD``) set to the model's name takes the model for
+    every day, the real-time grid untouched."""
+    from punjabflood import imdrain
+
+    record = OBSERVED_RECORD if record is None else record
+
+    issue = pd.Timestamp(issue_date)
+    want = [issue - pd.Timedelta(days=k) for k in range(days, 0, -1)]
+    rt_dir = imdrain.realtime_dir() if rt_dir is None else Path(rt_dir)
+    with_imd = {n: c for n, c in catchments.items() if IMD_WEIGHT_COL in c.points}
+    grid = pd.DataFrame()
+    if with_imd and record == imdrain.RT_SOURCE:
+        if fetch is None:
+            fetch = imdrain.fetch_realtime
+        if fetch is not False:
+            try:
+                fetch(want, rt_dir)
+            except Exception:  # noqa: BLE001 - the service failing is a fallback, not an error
+                log.warning("IMD real-time fetch failed; the model's past days stand in")
+        grid = imdrain.catchment_daily_realtime(want, with_imd, rt_dir)
+        if len(grid):
+            grid["date"] = pd.to_datetime(grid["date"])
+    recent, sources = {}, {}
+    for name, cat in catchments.items():
+        calibrated_index = name in DAM_CATCHMENT.values() or name in C.LOCAL_CATCHMENTS
+        wc = (
+            IMD_WEIGHT_COL
+            if calibrated_index and IMD_WEIGHT_COL in cat.points
+            else rain.WEIGHT_COL
+        )
+        past = rain.forecast_catchment(
+            client,
+            cat,
+            models=(RECENT_MODEL,),
+            days=1,
+            issue_date=issue_date,
+            past_days=days,
+            weight_col=wc,
+        )
+        past = past.sort_values("target_date")
+        model_days = past.set_index(pd.to_datetime(past["target_date"]))["rain_mm"]
+        imd_days = (
+            grid[grid["catchment"] == name].set_index("date")["rain_mm"]
+            if len(grid)
+            else pd.Series(dtype=float)
+        )
+        vals, srcs = [], []
+        for d in want:
+            if d in imd_days.index and imd_days[d] == imd_days[d]:
+                vals.append(float(imd_days[d]))
+                srcs.append(imdrain.RT_SOURCE)
+            elif d in model_days.index and model_days[d] == model_days[d]:
+                vals.append(float(model_days[d]))
+                srcs.append(RECENT_MODEL)
+        recent[name] = vals
+        sources[name] = srcs
+    return recent, sources
+
+
 def run(
     client: OpenMeteo,
     catchments: dict[str, Catchment],
@@ -554,6 +644,7 @@ def run(
     bulletin: dict | None = None,
     out_dir: Path = Path("outputs/forecast"),
     climatology: dict[str, np.ndarray] | None = None,
+    rt_dir: Path | None = None,
 ) -> dict:
     """One live cycle: bulletin, deterministic and ensemble QPF for every catchment, recent
     rain from the best-match model's past days, then the product on disk. Dam catchments use
@@ -563,7 +654,8 @@ def run(
     issue_date = issue_date or datetime.now(UTC).date().isoformat()
     rec = bulletin or fetch_bulletin()
     states = dam_state_from_bulletin(rec, ratings)
-    det_frames, ens_frames, recent = [], [], {}
+    det_frames, ens_frames = [], []
+    recent, recent_sources = recent_rain(client, catchments, issue_date, rt_dir=rt_dir)
     for name, cat in catchments.items():
         calibrated_index = name in DAM_CATCHMENT.values() or name in C.LOCAL_CATCHMENTS
         wc = IMD_WEIGHT_COL if calibrated_index else rain.WEIGHT_COL
@@ -583,18 +675,6 @@ def run(
                     client, cat, days=max(HORIZONS) + 1, issue_date=issue_date, weight_col=wc
                 )
             )
-        past = rain.forecast_catchment(
-            client,
-            cat,
-            models=("best_match",),
-            days=1,
-            issue_date=issue_date,
-            past_days=RECENT_DAYS,
-            weight_col=wc,
-        )
-        past = past.sort_values("target_date")
-        past = past[past["target_date"] < pd.Timestamp(issue_date)]
-        recent[name] = [float(x) for x in past["rain_mm"].to_numpy()]
     qpf_det = pd.concat(det_frames, ignore_index=True)
     qpf_det = qpf_det[qpf_det["target_date"] > pd.Timestamp(issue_date)]
     qpf_ens = (
@@ -623,5 +703,6 @@ def run(
         soil_moisture=soil or None,
     )
     product["bulletin"] = {k: v for k, v in rec.items() if k != "raw_text"}
+    product["recent_rain_source"] = recent_sources
     write_outputs(product, out_dir)
     return product

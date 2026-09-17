@@ -35,6 +35,8 @@ OUT = Path("outputs")
 CWC_CSV = RAW / "cwc" / "cwc_daily.csv"
 RAIN_CSV = RAW / "rain" / "catchment_daily.csv"  # IMD history plus ERA5 for the current year
 QPF_CSV = RAW / "rain" / "qpf_leads_catchment_daily.csv"
+ERA5_SEASON_CSV = RAW / "rain" / "era5_dams_{year}_season.csv"  # ERA5 over the dam
+# catchments for one season, the reference the real-time grid is judged against
 PARAMS_JSON = REF / "inflow_params.json"
 GHAGGAR_CLIM_JSON = REF / "ghaggar_season_3day_totals.json"  # committed; lets a runner without
 # the raw rain archive place the Ghaggar forecast in the record's percentiles
@@ -94,7 +96,7 @@ def build_rain(start_year: int = 1961, end_year: int = 2025, only: str = ""):
     RAIN_CSV.parent.mkdir(parents=True, exist_ok=True)
     if RAIN_CSV.exists():
         old = pd.read_csv(RAIN_CSV)
-        keep = ~((old["source"] == "imd") & old["catchment"].isin(names))
+        keep = ~(old["source"].isin(["imd", imdrain.RT_SOURCE]) & old["catchment"].isin(names))
         df = pd.concat([df, old[keep]], ignore_index=True)
     # one date format on disk: a partial rebuild mixes fresh Timestamps with the file's
     # strings, and a mixed column would print some rows with a time of day
@@ -117,32 +119,103 @@ def write_ghaggar_climatology(rain_daily: pd.DataFrame) -> None:
 
 
 @app.command("pull-rain-recent")
-def pull_rain_recent(start: str | None = None, end: str | None = None):
-    """ERA5 rain over the IMD-covered points for the days the IMD archive does not yet have
-    (this year), appended to the same file with source 'era5'."""
+def pull_rain_recent(
+    start: str | None = None, end: str | None = None, source: str = "imd", fetch: bool = True
+):
+    """Observed rain for the days the IMD archive does not yet have (this year), into the same
+    file: with ``--source imd`` (the default) the IMD real-time grid where it has the day
+    (source ``imd_rt``; ``--no-fetch`` uses only the files on disk) and ERA5 for the rest;
+    with ``--source era5`` ERA5 only. Real-time rows replace ERA5 rows for the same day, and
+    ``build-rain`` replaces both when the final year arrives."""
     _log()
+    if source not in ("imd", "era5"):
+        raise typer.BadParameter("source must be 'imd' or 'era5'")
     cats = catchments_mod.load_geojson()
     today = pd.Timestamp.utcnow().normalize()
     start = start or f"{today.year}-01-01"
     end = end or (today - pd.Timedelta(days=2)).date().isoformat()
+    days = pd.date_range(start, end)
+    frames = []
+    if source == "imd":
+        rt_dir = imdrain.realtime_dir()
+        with_imd = {n: c for n, c in cats.items() if imdrain.IMD_WEIGHT_COL in c.points}
+        present = (
+            imdrain.fetch_realtime(days, rt_dir)
+            if fetch
+            else [d for d in days if imdrain.realtime_path(d, rt_dir).exists()]
+        )
+        rt = imdrain.catchment_daily_realtime(present, with_imd, rt_dir)
+        typer.echo(f"IMD real-time: {len(present)} of {len(days)} days on hand")
+        if len(rt):
+            frames.append(rt)
     client = OpenMeteo()
-    frames = [
+    frames += [
         rain.era5_catchment_daily(
             client, c, start, end, years_per_chunk=1, weight_col=imdrain.IMD_WEIGHT_COL
         )
         for c in cats.values()
     ]
-    new = pd.concat(frames, ignore_index=True)
-    if RAIN_CSV.exists():
-        old = pd.read_csv(RAIN_CSV)
-        old["date"] = pd.to_datetime(old["date"], format="ISO8601")
-        new["date"] = pd.to_datetime(new["date"], format="ISO8601")
-        keep = ~(
-            (old["source"] == "era5") & old["date"].between(new["date"].min(), new["date"].max())
-        )
-        new = pd.concat([old[keep], new], ignore_index=True)
-    new.sort_values(["catchment", "date"]).to_csv(RAIN_CSV, index=False)
+    new = merge_recent_rain(pd.read_csv(RAIN_CSV) if RAIN_CSV.exists() else None, frames)
+    new.to_csv(RAIN_CSV, index=False)
     typer.echo(f"wrote {RAIN_CSV} ({client.calls} calls, {client.cache_hits} cache hits)")
+
+
+def merge_recent_rain(old: pd.DataFrame | None, frames: list[pd.DataFrame]) -> pd.DataFrame:
+    """One row per catchment and day, the best source kept: final ``imd`` over ``imd_rt``
+    over ``era5``. ``frames`` are the fresh pulls; ``old`` the file on disk (its rows of the
+    same days and catchments lose to a fresh row of a better or equal source)."""
+    rank = {"imd": 0, imdrain.RT_SOURCE: 1, "era5": 2}
+    fresh = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+    parts = [fresh]
+    if old is not None and len(old):
+        parts.append(old.assign(_old=1))
+    df = pd.concat(parts, ignore_index=True)
+    if df.empty:
+        return df
+    df["date"] = pd.to_datetime(df["date"], format="ISO8601")
+    df["_rank"] = df["source"].map(rank).fillna(9)
+    df["_old"] = df.get("_old", pd.Series(0, index=df.index)).fillna(0)
+    # the soil-moisture columns ride with the day, whichever rain row wins
+    sm = [c for c in rain.SM_COLS if c in df.columns]
+    if sm:
+        carried = df.dropna(subset=sm, how="all").drop_duplicates(["catchment", "date"])
+        carried = carried.set_index(["catchment", "date"])[sm]
+    df = df.sort_values(["catchment", "date", "_rank", "_old"]).drop_duplicates(
+        ["catchment", "date"], keep="first"
+    )
+    if sm:
+        key = pd.MultiIndex.from_frame(df[["catchment", "date"]])
+        for c in sm:
+            df[c] = df[c].to_numpy() if c in df else float("nan")
+            df[c] = pd.Series(df[c].to_numpy(), index=key).fillna(carried[c]).to_numpy()
+    df["date"] = df["date"].dt.strftime("%Y-%m-%d")
+    return df.drop(columns=["_rank", "_old"]).sort_values(["catchment", "date"]).reset_index(
+        drop=True
+    )
+
+
+@app.command("pull-era5-season")
+def pull_era5_season(year: int = 2025):
+    """ERA5 catchment rain over the dam catchments for one June to September season, the
+    reference the IMD real-time grid is judged against in ``verify``."""
+    _log()
+    cats = catchments_mod.load_geojson()
+    client = OpenMeteo()
+    frames = [
+        rain.era5_catchment_daily(
+            client,
+            cats[d],
+            f"{year}-06-01",
+            f"{year}-09-30",
+            years_per_chunk=1,
+            weight_col=imdrain.IMD_WEIGHT_COL,
+        )
+        for d in DAM_NAMES
+        if d in cats
+    ]
+    path = Path(str(ERA5_SEASON_CSV).format(year=year))
+    pd.concat(frames, ignore_index=True).to_csv(path, index=False)
+    typer.echo(f"wrote {path} ({client.calls} calls, {client.cache_hits} cache hits)")
 
 
 @app.command("pull-qpf-archive")
@@ -604,6 +677,31 @@ def run_verify(horizon_days: int = 5):
             qpf_leads, rain_daily, fc.INCUMBENT_DETERMINISTIC, "ecmwf_aifs025_single"
         )
         results["qpf_model_comparison"]["primary_in_product"] = fc.PRIMARY_DETERMINISTIC
+
+    # the in-season observed-rain records against the final IMD grid (the rule for the
+    # product's observed record is in the function); the season is the latest one with a
+    # final grid, a real-time file and an ERA5 season file
+    for year in sorted({int(y) for y in pd.to_datetime(rain_daily["date"]).dt.year}, reverse=True):
+        era5_path = Path(str(ERA5_SEASON_CSV).format(year=year))
+        rt_dir = imdrain.realtime_dir()
+        season = pd.date_range(f"{year}-06-01", f"{year}-09-30")
+        final = rain_daily[
+            (rain_daily["source"] == "imd") & pd.to_datetime(rain_daily["date"]).isin(season)
+        ]
+        if not era5_path.exists() or final.empty:
+            continue
+        with_imd = {n: c for n, c in cats.items() if n in DAM_NAMES}
+        rt = imdrain.catchment_daily_realtime(season, with_imd, rt_dir)
+        if rt.empty:
+            continue
+        cmp = verify.realtime_vs_final(final, rt, pd.read_csv(era5_path))
+        cmp["season"] = year
+        from punjabflood import forecast as fc
+
+        cmp["record_in_product"] = fc.OBSERVED_RECORD
+        results["realtime_rain"] = cmp
+        pd.DataFrame(cmp["rows"]).to_csv(out / "realtime_rain.csv", index=False)
+        break
 
     verify.write_json(results, out / "results.json")
     typer.echo(

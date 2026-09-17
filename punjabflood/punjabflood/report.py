@@ -700,6 +700,51 @@ def render_verification(
             "",
         ]
 
+    rr = results.get("realtime_rain")
+    if rr and rr.get("rows"):
+        lines += [
+            "### The in-season observed rain: IMD real-time grid and ERA5 against the final grid",
+            "",
+            f"The runoff model is calibrated on the final IMD grid, which arrives after the "
+            f"season. In season the product has to carry the previous days' rain from something "
+            f"else: until now the best-match model's past days (ERA5 physics), and the record on "
+            f"disk was ERA5. IMD Pune serves a preliminary real-time analysis on the same "
+            f"lattice. Both are scored here against the final grid over the {rr['season']} "
+            f"season on the dam catchments, on the days each has (heavy day: "
+            f"{rr['heavy_mm']:.0f} mm or more). The rule, written before the pull: the real-time "
+            "grid replaces the model's past days as the product's observed record only if its "
+            "MAE is lower than ERA5's at every dam and its heavy-day hit rate is not lower at any.",
+            "",
+            "| catchment | record | days | final mean (mm) | bias | r | MAE (mm) | heavy days | hit rate | false-alarm ratio |",
+            "|---|---|---|---|---|---|---|---|---|---|",
+        ]
+        for s in rr["rows"]:
+            lines.append(
+                f"| {s['catchment']} | {s['record']} | {int(s['n_days'])} | {s['obs_mean_mm']:.1f} | "
+                f"{s['bias_pct']:+.0f}% | {_num(s.get('pearson_r'), '.2f')} | {s['mae_mm']:.1f} | "
+                f"{int(s['heavy_days_obs'])} | {_rate(s.get('hit_rate'))} | "
+                f"{_rate(s.get('false_alarm_ratio'))} |"
+            )
+        verdict = (
+            "the product's observed record switches to the IMD real-time grid, the model's "
+            "past days standing in for any day the service does not have"
+            if rr.get("switch")
+            else "the product keeps the model's past days"
+        )
+        lines += [
+            "",
+            f"MAE lower at every dam: {'yes' if rr.get('mae_lower_everywhere') else 'no'}; "
+            f"hit rate not lower at any: {'yes' if rr.get('hit_rate_not_lower') else 'no'}"
+            + (f"; dams without real-time days: {', '.join(rr['dams_missing'])}" if rr.get("dams_missing") else "")
+            + f". Verdict: {verdict}."
+            + (
+                f" The product's observed record is `{rr['record_in_product']}`."
+                if rr.get("record_in_product")
+                else ""
+            ),
+            "",
+        ]
+
     lines += [
         "## Live 2026: one-day inflow prediction against the BBMB bulletins",
         "",

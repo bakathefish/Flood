@@ -693,3 +693,43 @@ def test_qpf_model_comparison_pools_common_days_and_applies_the_switch_rule():
     # nothing in common: no verdict
     none = verify.qpf_model_comparison(archive, obs, ifs, "no_such_model", catchments=("Pong",))
     assert none["n_common_days"] == 0 and none["switch"] is False
+
+
+def test_realtime_vs_final_scores_both_records_and_applies_the_switch_rule():
+    days = pd.date_range("2025-06-01", periods=40)
+    final = np.r_[np.full(30, 5.0), np.full(10, 40.0)]  # ten heavy days at the end
+    frames = []
+    for cat in ("Pong", "Bhakra"):
+        frames.append(pd.DataFrame({"date": days, "catchment": cat, "rain_mm": final, "source": "imd"}))
+    final_df = pd.concat(frames, ignore_index=True)
+    # real-time: close to final, catches every heavy day; ERA5: half of everything
+    rt = final_df.copy()
+    rt["rain_mm"] = rt["rain_mm"] * 0.9
+    rt["source"] = "imd_rt"
+    era5 = final_df.copy()
+    era5["rain_mm"] = era5["rain_mm"] * 0.5
+    era5["source"] = "era5"
+    cmp = verify.realtime_vs_final(final_df, rt, era5, catchments=("Pong", "Bhakra"))
+    rows = cmp["rows"]
+    assert {(r["catchment"], r["record"]) for r in rows} == {
+        ("Pong", "imd_rt"),
+        ("Pong", "era5"),
+        ("Bhakra", "imd_rt"),
+        ("Bhakra", "era5"),
+    }
+    pong_rt = next(r for r in rows if r["catchment"] == "Pong" and r["record"] == "imd_rt")
+    pong_era5 = next(r for r in rows if r["catchment"] == "Pong" and r["record"] == "era5")
+    assert pong_rt["n_days"] == 40 and pong_rt["hit_rate"] == 1.0 and pong_era5["hit_rate"] == 0.0
+    assert pong_rt["mae_mm"] < pong_era5["mae_mm"]
+    assert cmp["mae_lower_everywhere"] and cmp["hit_rate_not_lower"] and cmp["switch"]
+    # the rule fails when one dam's real-time misses heavy days that ERA5 catches, even
+    # with the lower MAE (real-time 29 mm against 40: hit rate 0; ERA5 there at 30: hits)
+    bad = rt.copy()
+    bad.loc[(bad["catchment"] == "Bhakra") & (bad["rain_mm"] > 30), "rain_mm"] = 29.0
+    era5b = era5.copy()
+    era5b.loc[(era5b["catchment"] == "Bhakra") & (final_df["rain_mm"] > 30), "rain_mm"] = 30.0
+    cmp2 = verify.realtime_vs_final(final_df, bad, era5b, catchments=("Pong", "Bhakra"))
+    assert cmp2["mae_lower_everywhere"] and not cmp2["hit_rate_not_lower"] and not cmp2["switch"]
+    # a dam with no real-time rows cannot pass
+    cmp3 = verify.realtime_vs_final(final_df, rt[rt["catchment"] == "Pong"], era5, catchments=("Pong", "Bhakra"))
+    assert not cmp3["switch"] and cmp3["dams_missing"] == ["Bhakra"]
