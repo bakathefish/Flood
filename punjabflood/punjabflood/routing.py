@@ -160,26 +160,59 @@ def route_daily(daily_release: pd.Series, hours: float, how: str = "max") -> pd.
     return daily
 
 
-def arrivals(releases: dict[str, pd.Series], how: str = "max") -> pd.DataFrame:
+def _local_by_station(local: dict[str, pd.Series] | None) -> dict[str, list[pd.Series]]:
+    """Local inflow series grouped by the control point that receives them."""
+    out: dict[str, list[pd.Series]] = {}
+    for name, series in (local or {}).items():
+        lc = C.LOCAL_CATCHMENTS.get(name)
+        if lc is None:
+            raise KeyError(f"unknown local catchment {name!r}")
+        s = pd.Series(np.asarray(series, dtype=float), index=pd.to_datetime(series.index))
+        for st in lc.stations:
+            out.setdefault(st, []).append(s)
+    return out
+
+
+def _add(parts: list[pd.Series]) -> pd.Series:
+    return pd.concat(parts, axis=1).fillna(0.0).sum(axis=1).sort_index()
+
+
+def arrivals(
+    releases: dict[str, pd.Series],
+    local: dict[str, pd.Series] | None = None,
+    how: str = "max",
+) -> pd.DataFrame:
     """``releases``: dam or index point -> daily series of river release (cusecs).
+    ``local``: local catchment (``constants.LOCAL_CATCHMENTS``) -> daily runoff series
+    (cusecs), added on the day at every control point that catchment feeds; no travel time
+    and no attenuation, the same assumption as the dam reaches.
     Returns one row per (station, date) with the summed arrivals (Harike sums Sutlej and
-    Beas; Hussainiwala is Harike shifted 12 h)."""
+    Beas plus its local inflow; Hussainiwala is Harike shifted 12 h)."""
+    local_parts = _local_by_station(local)
     rows = []
     harike_parts = []
+    seen: set[str] = set()
     for st in STATIONS:
-        if st.source_dam not in releases:
-            continue
-        s = route_daily(releases[st.source_dam], st.hours, how)
+        parts = []
+        if st.source_dam in releases:
+            parts.append(route_daily(releases[st.source_dam], st.hours, how))
         if st.name == "Harike Head Works":
-            harike_parts.append(s)
+            harike_parts += parts
             continue
+        if st.name not in seen:
+            parts += local_parts.get(st.name, [])
+        seen.add(st.name)
+        if not parts:
+            continue
+        s = _add(parts)
         rows.append(
             pd.DataFrame(
                 {"station": st.name, "date": s.index, "cusecs": s.to_numpy(), "river": st.river}
             )
         )
+    harike_parts += local_parts.get("Harike Head Works", [])
     if harike_parts:
-        h = pd.concat(harike_parts, axis=1).fillna(0.0).sum(axis=1)
+        h = _add(harike_parts)
         rows.append(
             pd.DataFrame(
                 {

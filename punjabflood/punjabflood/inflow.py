@@ -462,6 +462,44 @@ def predict_daily_bcm(
     return np.asarray(out)
 
 
+def transferred_params(p: InflowParams, name: str, area_km2: float) -> InflowParams:
+    """A dam's calibrated response carried to another catchment: the same coefficient,
+    wetness dependence and lag weights over the other catchment's area."""
+    from dataclasses import replace
+
+    return replace(p, dam=name, area_km2=float(area_km2))
+
+
+def local_inflow_cusecs(p: InflowParams, area_km2: float, rain_mm: pd.Series) -> pd.Series:
+    """Runoff of an intermediate catchment (between a dam and a control point) from its own
+    daily rain, in cusecs per day, with ``p`` transferred to its area: the quick response
+    only, no base component, so a lower bound on what the tributaries add. ``rain_mm`` is
+    indexed by date; the antecedent index and the lags read the days before each one."""
+    t = transferred_params(p, p.dam, area_km2)
+    s = pd.Series(np.asarray(rain_mm, dtype=float), index=rain_mm.index).sort_index()
+    hist = s.to_numpy()
+    n_hist = history_days(t)
+    out = np.zeros(len(hist))
+    for i in range(len(hist)):
+        lo = max(i - n_hist + 1, 0)
+        out[i] = C.bcm_to_cusec_days(quick_response_bcm(t, hist[lo : i + 1]))
+    return pd.Series(out, index=s.index)
+
+
+def local_inflow_forecast_cusecs(
+    p: InflowParams, area_km2: float, rain_mm_recent, rain_mm_forecast
+) -> np.ndarray:
+    """The same term on the forecast days: the recent observed days feed the lags and the
+    antecedent index of the first forecast days. One value per forecast day."""
+    recent = np.asarray(list(rain_mm_recent), dtype=float)
+    fut = np.asarray(list(rain_mm_forecast), dtype=float)
+    if len(fut) == 0:
+        return np.zeros(0)
+    both = np.concatenate([recent, fut])
+    s = local_inflow_cusecs(p, area_km2, pd.Series(both, index=pd.RangeIndex(len(both))))
+    return s.to_numpy()[len(recent) :]
+
+
 def base_from_observed(
     p: InflowParams, observed_inflow_cusecs: float, rain_mm_recent, sm_anom=0.0
 ) -> float:
