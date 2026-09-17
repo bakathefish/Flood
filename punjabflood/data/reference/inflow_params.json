@@ -18,7 +18,12 @@
     "rho_raw": 1.8560354837840056,
     "c_wet": 0.24991984946245677,
     "api_days": 5,
-    "resid_acf1": 0.10292746419233867
+    "resid_acf1": 0.10292746419233867,
+    "c_excess": 0.0,
+    "w_excess": [],
+    "excess_threshold_mm": NaN,
+    "wetness": "api",
+    "sm_clim": []
   },
   "Pong": {
     "dam": "Pong",
@@ -39,7 +44,12 @@
     "rho_raw": 1.0507593057921685,
     "c_wet": 0.32815516998502064,
     "api_days": 5,
-    "resid_acf1": 0.2812921360994265
+    "resid_acf1": 0.2812921360994265,
+    "c_excess": 0.0,
+    "w_excess": [],
+    "excess_threshold_mm": NaN,
+    "wetness": "api",
+    "sm_clim": []
   },
   "Ranjit Sagar": {
     "dam": "Ranjit Sagar",
@@ -60,6 +70,11 @@
     "rho_raw": 2.2193782976411764,
     "c_wet": 0.26331892708888766,
     "api_days": 5,
-    "resid_acf1": 0.08209431651915901
+    "resid_acf1": 0.08209431651915901,
+    "c_excess": 0.0,
+    "w_excess": [],
+    "excess_threshold_mm": NaN,
+    "wetness": "api",
+    "sm_clim": []
   }
 }

@@ -129,6 +129,25 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
             "note": "too few days",
         },
     ]
+    results["qpf_model_comparison"] = {
+        "incumbent_model": "ecmwf_ifs025",
+        "challenger_model": "ecmwf_aifs025_single",
+        "catchments": ["Bhakra", "Pong", "Ranjit Sagar"],
+        "leads": [1, 2, 3],
+        "n_common_days": 2034,
+        "incumbent": {
+            "obs_mean_mm": 7.6, "fc_mean_mm": 6.4, "bias_pct": -15.7, "pearson_r": 0.65,
+            "mae_mm": 4.1, "heavy_days_obs": 84, "hit_rate": 0.238, "false_alarm_ratio": 0.535,
+        },
+        "challenger": {
+            "obs_mean_mm": 7.6, "fc_mean_mm": 7.7, "bias_pct": 0.5, "pearson_r": 0.60,
+            "mae_mm": 3.9, "heavy_days_obs": 84, "hit_rate": 0.333, "false_alarm_ratio": 0.491,
+        },
+        "hit_rate_higher": True,
+        "false_alarm_not_higher": True,
+        "switch": True,
+        "primary_in_product": "ecmwf_aifs025_single",
+    }
     results["inflow_variants"] = {
         "loso": [
             {
@@ -349,7 +368,7 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     assert "| Pong | 3 | persistence | 18 | +1% | +0.40 | 9,000 |" in md
     assert "| Bhakra | 5 | gfs_seamless | 2 | too few days | | |" in md
     # the response variant: one row per dam and variant, the flood-scale summaries, the verdict
-    assert "### A sharper response to heavy rain" in md
+    assert "### Response variants, tested out of sample" in md
     assert (
         "| Pong | baseline | 8 | 700 | 0.0296 | 28 | 0.0900 | +0.0123 | 0.203 | 0.328 | "
         "0.35 0.48 0.09 0.08 | 0.000 | none |" in md
@@ -359,6 +378,15 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
         "0.40 0.45 0.10 0.05 | 0.412 | 0.60 0.40 0.00 0.00 |" in md
     )
     assert "| baseline | 5 | 0.22 | 0.57 | 0.58 |" in md
+    # the machine-learned model against the incumbent on the common rows, and the verdict
+    assert "### The machine-learned model against the primary deterministic model" in md
+    assert "(2,034 rows)" in md
+    assert "| ecmwf_ifs025 | 7.6 | -16% | 0.65 | 4.1 | 84 | 0.24 | 0.54 |" in md
+    assert "| ecmwf_aifs025_single | 7.6 | +0% | 0.60 | 3.9 | 84 | 0.33 | 0.49 |" in md
+    assert (
+        "Verdict: the primary deterministic model switches to ecmwf_aifs025_single. "
+        "The product's primary is `ecmwf_aifs025_single`." in md
+    )
     assert (
         "Verdict on 'excess above 30 mm', not adopted. Conditions: the held-out error does not "
         "rise at any dam (fails); the season peaks rise (passes); the period means hold (fails)."

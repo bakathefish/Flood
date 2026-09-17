@@ -41,7 +41,7 @@ INK2 = "#52514e"
 MUTED = "#898781"
 GRID = "#e1e0d9"
 AXIS = "#c3c2b7"
-S1, S2, S3 = "#2a78d6", "#eb6834", "#1baf7a"  # blue, orange, aqua
+S1, S2, S3, S4 = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"  # blue, orange, aqua, yellow
 BASELINE = "#b5b3ab"  # de-emphasis tone for the persistence reference, not a series slot
 
 plt.rcParams.update(
@@ -321,6 +321,7 @@ def horizon_mae():
         ("observed rain", "rain response, observed rain", S1),
         ("ecmwf_ifs025", "rain response, ECMWF as issued", S2),
         ("gfs_seamless", "rain response, GFS as issued", S3),
+        ("ecmwf_aifs025_single", "rain response, ECMWF AIFS as issued", S4),
     ]
     dams = ["Bhakra", "Pong"]
     fig, axes = plt.subplots(1, len(dams), figsize=(7.2, 3.4), sharex=True)
@@ -360,7 +361,7 @@ def horizon_mae():
         )
     axes[0].set_ylabel("mean absolute error, one-day inflow (cusecs)")
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=2, bbox_to_anchor=(0.5, -0.08))
+    fig.legend(handles, labels, loc="lower center", ncol=2, bbox_to_anchor=(0.5, -0.12))
     fig.suptitle(
         "Live 2026 test: inflow error by lead, rain response against persistence",
         x=0.01,

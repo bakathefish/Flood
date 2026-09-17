@@ -8434,7 +8434,9 @@
         "c_wet": 0.24991984946245677,
         "w": "0.54 0.27 0.10 0.09",
         "c_excess": 0.0,
-        "w_excess": ""
+        "w_excess": "",
+        "wetness": "api",
+        "gamma": 0.0
       },
       {
         "dam": "Bhakra",
@@ -8450,7 +8452,9 @@
         "c_wet": 0.20732740755545315,
         "w": "0.55 0.21 0.12 0.12",
         "c_excess": 0.3033218593002517,
-        "w_excess": "0.00 1.00 0.00 0.00"
+        "w_excess": "0.00 1.00 0.00 0.00",
+        "wetness": "api",
+        "gamma": 0.0
       },
       {
         "dam": "Pong",
@@ -8466,7 +8470,9 @@
         "c_wet": 0.32815516998502064,
         "w": "0.35 0.48 0.09 0.08",
         "c_excess": 0.0,
-        "w_excess": ""
+        "w_excess": "",
+        "wetness": "api",
+        "gamma": 0.0
       },
       {
         "dam": "Pong",
@@ -8482,7 +8488,9 @@
         "c_wet": 0.3322928346153121,
         "w": "0.40 0.39 0.11 0.10",
         "c_excess": 0.523263961684464,
-        "w_excess": "0.20 0.65 0.09 0.06"
+        "w_excess": "0.20 0.65 0.09 0.06",
+        "wetness": "api",
+        "gamma": 0.0
       },
       {
         "dam": "Ranjit Sagar",
@@ -8498,7 +8506,9 @@
         "c_wet": 0.26331892708888766,
         "w": "0.62 0.24 0.08 0.05",
         "c_excess": 0.0,
-        "w_excess": ""
+        "w_excess": "",
+        "wetness": "api",
+        "gamma": 0.0
       },
       {
         "dam": "Ranjit Sagar",
@@ -8514,7 +8524,9 @@
         "c_wet": 0.16597692458717728,
         "w": "0.47 0.27 0.15 0.11",
         "c_excess": 0.4686172859406195,
-        "w_excess": "0.46 0.48 0.00 0.07"
+        "w_excess": "0.46 0.48 0.00 0.07",
+        "wetness": "api",
+        "gamma": 0.0
       }
     ],
     "flood_scale": {
@@ -8542,9 +8554,43 @@
       "season_peaks_higher": false,
       "period_means_hold": false,
       "adopt": false
-    }
+    },
+    "verdicts": [
+      {
+        "variant": "excess above 30 mm",
+        "dams": [
+          "Bhakra",
+          "Pong",
+          "Ranjit Sagar"
+        ],
+        "loso_error_not_higher": false,
+        "season_peaks_higher": false,
+        "period_means_hold": false,
+        "adopt": false
+      }
+    ]
   },
   "as_issued_events": [
+    {
+      "year": 2024,
+      "dam": null,
+      "model": "ecmwf_aifs025_single",
+      "issue_days": 0,
+      "flagged_days": 0,
+      "hit_days": 0,
+      "false_flag_days": 0,
+      "missed_days": 0,
+      "first_flag_issue_date": null,
+      "first_hit_issue_date": null,
+      "first_hit_spill_day": null,
+      "pp_first_flag_date": null,
+      "pp_first_spill_date": null,
+      "lead_days_to_pp_spill": null,
+      "observed_peak_date": "2024-08-12",
+      "lead_days_to_observed_peak": null,
+      "max_forecast_peak_release_cusecs": NaN,
+      "pp_peak_day1_release_cusecs": 0.0
+    },
     {
       "year": 2024,
       "dam": "Pong",
@@ -8584,6 +8630,26 @@
       "lead_days_to_observed_peak": null,
       "max_forecast_peak_release_cusecs": 0.0,
       "pp_peak_day1_release_cusecs": 0.0
+    },
+    {
+      "year": 2025,
+      "dam": "Pong",
+      "model": "ecmwf_aifs025_single",
+      "issue_days": 41,
+      "flagged_days": 23,
+      "hit_days": 23,
+      "false_flag_days": 0,
+      "missed_days": 6,
+      "first_flag_issue_date": "2025-08-17",
+      "first_hit_issue_date": "2025-08-17",
+      "first_hit_spill_day": 3,
+      "pp_first_flag_date": "2025-08-14",
+      "pp_first_spill_date": "2025-08-27",
+      "lead_days_to_pp_spill": 10,
+      "observed_peak_date": "2025-08-31",
+      "lead_days_to_observed_peak": 14,
+      "max_forecast_peak_release_cusecs": 133606.91299871323,
+      "pp_peak_day1_release_cusecs": 139401.30030390903
     },
     {
       "year": 2025,
@@ -8628,8 +8694,28 @@
     {
       "year": 2026,
       "dam": "Pong",
+      "model": "ecmwf_aifs025_single",
+      "issue_days": 42,
+      "flagged_days": 0,
+      "hit_days": 0,
+      "false_flag_days": 0,
+      "missed_days": 0,
+      "first_flag_issue_date": null,
+      "first_hit_issue_date": null,
+      "first_hit_spill_day": null,
+      "pp_first_flag_date": null,
+      "pp_first_spill_date": null,
+      "lead_days_to_pp_spill": null,
+      "observed_peak_date": null,
+      "lead_days_to_observed_peak": null,
+      "max_forecast_peak_release_cusecs": 0.0,
+      "pp_peak_day1_release_cusecs": 0.0
+    },
+    {
+      "year": 2026,
+      "dam": "Pong",
       "model": "ecmwf_ifs025",
-      "issue_days": 30,
+      "issue_days": 42,
       "flagged_days": 0,
       "hit_days": 0,
       "false_flag_days": 0,
@@ -8649,7 +8735,7 @@
       "year": 2026,
       "dam": "Pong",
       "model": "gfs_seamless",
-      "issue_days": 30,
+      "issue_days": 42,
       "flagged_days": 0,
       "hit_days": 0,
       "false_flag_days": 0,
@@ -8663,6 +8749,26 @@
       "observed_peak_date": null,
       "lead_days_to_observed_peak": null,
       "max_forecast_peak_release_cusecs": 0.0,
+      "pp_peak_day1_release_cusecs": 0.0
+    },
+    {
+      "year": 2024,
+      "dam": null,
+      "model": "ecmwf_aifs025_single",
+      "issue_days": 0,
+      "flagged_days": 0,
+      "hit_days": 0,
+      "false_flag_days": 0,
+      "missed_days": 0,
+      "first_flag_issue_date": null,
+      "first_hit_issue_date": null,
+      "first_hit_spill_day": null,
+      "pp_first_flag_date": null,
+      "pp_first_spill_date": null,
+      "lead_days_to_pp_spill": null,
+      "observed_peak_date": null,
+      "lead_days_to_observed_peak": null,
+      "max_forecast_peak_release_cusecs": NaN,
       "pp_peak_day1_release_cusecs": 0.0
     },
     {
@@ -8703,6 +8809,26 @@
       "observed_peak_date": null,
       "lead_days_to_observed_peak": null,
       "max_forecast_peak_release_cusecs": 0.0,
+      "pp_peak_day1_release_cusecs": 0.0
+    },
+    {
+      "year": 2025,
+      "dam": "Bhakra",
+      "model": "ecmwf_aifs025_single",
+      "issue_days": 46,
+      "flagged_days": 3,
+      "hit_days": 3,
+      "false_flag_days": 0,
+      "missed_days": 1,
+      "first_flag_issue_date": "2025-08-30",
+      "first_hit_issue_date": "2025-08-30",
+      "first_hit_spill_day": 4,
+      "pp_first_flag_date": "2025-08-29",
+      "pp_first_spill_date": null,
+      "lead_days_to_pp_spill": null,
+      "observed_peak_date": null,
+      "lead_days_to_observed_peak": null,
+      "max_forecast_peak_release_cusecs": 67584.68509311498,
       "pp_peak_day1_release_cusecs": 0.0
     },
     {
@@ -8748,8 +8874,28 @@
     {
       "year": 2026,
       "dam": "Bhakra",
+      "model": "ecmwf_aifs025_single",
+      "issue_days": 42,
+      "flagged_days": 0,
+      "hit_days": 0,
+      "false_flag_days": 0,
+      "missed_days": 0,
+      "first_flag_issue_date": null,
+      "first_hit_issue_date": null,
+      "first_hit_spill_day": null,
+      "pp_first_flag_date": null,
+      "pp_first_spill_date": null,
+      "lead_days_to_pp_spill": null,
+      "observed_peak_date": null,
+      "lead_days_to_observed_peak": null,
+      "max_forecast_peak_release_cusecs": 0.0,
+      "pp_peak_day1_release_cusecs": 0.0
+    },
+    {
+      "year": 2026,
+      "dam": "Bhakra",
       "model": "ecmwf_ifs025",
-      "issue_days": 30,
+      "issue_days": 42,
       "flagged_days": 0,
       "hit_days": 0,
       "false_flag_days": 0,
@@ -8769,7 +8915,7 @@
       "year": 2026,
       "dam": "Bhakra",
       "model": "gfs_seamless",
-      "issue_days": 30,
+      "issue_days": 42,
       "flagged_days": 0,
       "hit_days": 0,
       "false_flag_days": 0,
@@ -8783,6 +8929,26 @@
       "observed_peak_date": null,
       "lead_days_to_observed_peak": null,
       "max_forecast_peak_release_cusecs": 0.0,
+      "pp_peak_day1_release_cusecs": 0.0
+    },
+    {
+      "year": 2024,
+      "dam": null,
+      "model": "ecmwf_aifs025_single",
+      "issue_days": 0,
+      "flagged_days": 0,
+      "hit_days": 0,
+      "false_flag_days": 0,
+      "missed_days": 0,
+      "first_flag_issue_date": null,
+      "first_hit_issue_date": null,
+      "first_hit_spill_day": null,
+      "pp_first_flag_date": null,
+      "pp_first_spill_date": null,
+      "lead_days_to_pp_spill": null,
+      "observed_peak_date": null,
+      "lead_days_to_observed_peak": null,
+      "max_forecast_peak_release_cusecs": NaN,
       "pp_peak_day1_release_cusecs": 0.0
     },
     {
@@ -8824,6 +8990,26 @@
       "lead_days_to_observed_peak": null,
       "max_forecast_peak_release_cusecs": 0.0,
       "pp_peak_day1_release_cusecs": 0.0
+    },
+    {
+      "year": 2025,
+      "dam": "Ranjit Sagar",
+      "model": "ecmwf_aifs025_single",
+      "issue_days": 42,
+      "flagged_days": 13,
+      "hit_days": 12,
+      "false_flag_days": 1,
+      "missed_days": 3,
+      "first_flag_issue_date": "2025-08-26",
+      "first_hit_issue_date": "2025-08-26",
+      "first_hit_spill_day": 3,
+      "pp_first_flag_date": "2025-08-23",
+      "pp_first_spill_date": "2025-08-28",
+      "lead_days_to_pp_spill": 2,
+      "observed_peak_date": null,
+      "lead_days_to_observed_peak": null,
+      "max_forecast_peak_release_cusecs": 63711.46536331107,
+      "pp_peak_day1_release_cusecs": 71845.10262618227
     },
     {
       "year": 2025,
@@ -8893,23 +9079,34 @@
       "dam": "Bhakra",
       "horizon_days": 1,
       "rain": "ecmwf_ifs025",
-      "n": 27,
-      "bias_pct": -1.1979325661878566,
-      "pearson_r": 0.481965495068627,
-      "mae_cusecs": 4471.85101228392,
-      "mean_obs_cusecs": 42161.62962962963,
-      "mean_pred_cusecs": 41656.561737860786
+      "n": 30,
+      "bias_pct": -0.8675408077177041,
+      "pearson_r": 0.48663493654589646,
+      "mae_cusecs": 4187.024950160587,
+      "mean_obs_cusecs": 41925.86666666667,
+      "mean_pred_cusecs": 41562.14266434402
     },
     {
       "dam": "Bhakra",
       "horizon_days": 1,
       "rain": "gfs_seamless",
-      "n": 27,
-      "bias_pct": -0.2798722830030644,
-      "pearson_r": 0.48224853526016254,
-      "mae_cusecs": 5279.871013751085,
-      "mean_obs_cusecs": 42161.62962962963,
-      "mean_pred_cusecs": 42043.63091423389
+      "n": 30,
+      "bias_pct": 0.4542068336883496,
+      "pearson_r": 0.48013049442173567,
+      "mae_cusecs": 5048.512907715211,
+      "mean_obs_cusecs": 41925.86666666667,
+      "mean_pred_cusecs": 42116.296818149734
+    },
+    {
+      "dam": "Bhakra",
+      "horizon_days": 1,
+      "rain": "ecmwf_aifs025_single",
+      "n": 30,
+      "bias_pct": 1.365170977558767,
+      "pearson_r": 0.4480467226539511,
+      "mae_cusecs": 4803.7880659936745,
+      "mean_obs_cusecs": 41925.86666666667,
+      "mean_pred_cusecs": 42498.22643048999
     },
     {
       "dam": "Bhakra",
@@ -8937,23 +9134,34 @@
       "dam": "Bhakra",
       "horizon_days": 2,
       "rain": "ecmwf_ifs025",
-      "n": 26,
-      "bias_pct": -0.3705657814247257,
-      "pearson_r": 0.26065786417742326,
-      "mae_cusecs": 6502.6841412102085,
-      "mean_obs_cusecs": 42239.5,
-      "mean_pred_cusecs": 42082.9748667551
+      "n": 29,
+      "bias_pct": 0.2680590919114723,
+      "pearson_r": 0.2676053486621274,
+      "mae_cusecs": 6120.618287402144,
+      "mean_obs_cusecs": 41987.55172413793,
+      "mean_pred_cusecs": 42100.10317400551
     },
     {
       "dam": "Bhakra",
       "horizon_days": 2,
       "rain": "gfs_seamless",
-      "n": 26,
-      "bias_pct": -1.1464434155887895,
-      "pearson_r": 0.25516243236630753,
-      "mae_cusecs": 7096.230509213532,
-      "mean_obs_cusecs": 42239.5,
-      "mean_pred_cusecs": 41755.24803347237
+      "n": 29,
+      "bias_pct": 0.6028064593738979,
+      "pearson_r": 0.2411578014394272,
+      "mae_cusecs": 7049.39830734917,
+      "mean_obs_cusecs": 41987.55172413793,
+      "mean_pred_cusecs": 42240.65539806399
+    },
+    {
+      "dam": "Bhakra",
+      "horizon_days": 2,
+      "rain": "ecmwf_aifs025_single",
+      "n": 29,
+      "bias_pct": 3.189458058279291,
+      "pearson_r": 0.2030275486920795,
+      "mae_cusecs": 7064.983180646739,
+      "mean_obs_cusecs": 41987.55172413793,
+      "mean_pred_cusecs": 43326.72707607763
     },
     {
       "dam": "Bhakra",
@@ -8981,23 +9189,34 @@
       "dam": "Bhakra",
       "horizon_days": 3,
       "rain": "ecmwf_ifs025",
-      "n": 25,
-      "bias_pct": -0.9296587897045732,
-      "pearson_r": 0.3639176001422956,
-      "mae_cusecs": 6276.65963751025,
-      "mean_obs_cusecs": 42216.36,
-      "mean_pred_cusecs": 41823.891898566675
+      "n": 28,
+      "bias_pct": 0.8546040740317725,
+      "pearson_r": 0.3345817702369239,
+      "mae_cusecs": 6313.152200077515,
+      "mean_obs_cusecs": 41957.892857142855,
+      "mean_pred_cusecs": 42316.466718877884
     },
     {
       "dam": "Bhakra",
       "horizon_days": 3,
       "rain": "gfs_seamless",
-      "n": 25,
-      "bias_pct": -1.1281693228756506,
-      "pearson_r": 0.2787049033592297,
-      "mae_cusecs": 7231.180203061681,
-      "mean_obs_cusecs": 42216.36,
-      "mean_pred_cusecs": 41740.08797724525
+      "n": 28,
+      "bias_pct": 1.2685488509708636,
+      "pearson_r": 0.25009089486195557,
+      "mae_cusecs": 7413.91014078125,
+      "mean_obs_cusecs": 41957.892857142855,
+      "mean_pred_cusecs": 42490.14922487373
+    },
+    {
+      "dam": "Bhakra",
+      "horizon_days": 3,
+      "rain": "ecmwf_aifs025_single",
+      "n": 28,
+      "bias_pct": 3.6523225480819694,
+      "pearson_r": 0.1699494413289545,
+      "mae_cusecs": 7695.4855443507395,
+      "mean_obs_cusecs": 41957.892857142855,
+      "mean_pred_cusecs": 43490.33043866436
     },
     {
       "dam": "Bhakra",
@@ -9025,23 +9244,34 @@
       "dam": "Bhakra",
       "horizon_days": 4,
       "rain": "ecmwf_ifs025",
-      "n": 24,
-      "bias_pct": -0.8275334994956701,
-      "pearson_r": 0.35328624134447806,
-      "mae_cusecs": 5763.820619540348,
-      "mean_obs_cusecs": 42225.25,
-      "mean_pred_cusecs": 41875.821911004205
+      "n": 27,
+      "bias_pct": 0.03527306361018638,
+      "pearson_r": 0.313871411870339,
+      "mae_cusecs": 5974.455151608195,
+      "mean_obs_cusecs": 41956.22222222222,
+      "mean_pred_cusecs": 41971.021467175095
     },
     {
       "dam": "Bhakra",
       "horizon_days": 4,
       "rain": "gfs_seamless",
-      "n": 24,
-      "bias_pct": 1.3825596159120683,
-      "pearson_r": 0.358333653973877,
-      "mae_cusecs": 6455.108534493691,
-      "mean_obs_cusecs": 42225.25,
-      "mean_pred_cusecs": 42809.03925421791
+      "n": 27,
+      "bias_pct": 2.0301892225888665,
+      "pearson_r": 0.3274229268128294,
+      "mae_cusecs": 6728.1714409478,
+      "mean_obs_cusecs": 41956.22222222222,
+      "mean_pred_cusecs": 42808.01292398321
+    },
+    {
+      "dam": "Bhakra",
+      "horizon_days": 4,
+      "rain": "ecmwf_aifs025_single",
+      "n": 27,
+      "bias_pct": 2.6754398149106517,
+      "pearson_r": 0.13628242660429052,
+      "mae_cusecs": 6885.50710153849,
+      "mean_obs_cusecs": 41956.22222222222,
+      "mean_pred_cusecs": 43078.73569638794
     },
     {
       "dam": "Bhakra",
@@ -9069,23 +9299,34 @@
       "dam": "Bhakra",
       "horizon_days": 5,
       "rain": "ecmwf_ifs025",
-      "n": 23,
-      "bias_pct": 0.19570981341147514,
-      "pearson_r": 0.3242044856144891,
-      "mae_cusecs": 6693.172077935613,
-      "mean_obs_cusecs": 41898.739130434784,
-      "mean_pred_cusecs": 41980.73907460872
+      "n": 26,
+      "bias_pct": 0.09676819829010072,
+      "pearson_r": 0.2924638565485229,
+      "mae_cusecs": 6748.384003810884,
+      "mean_obs_cusecs": 41657.03846153846,
+      "mean_pred_cusecs": 41697.349227118706
     },
     {
       "dam": "Bhakra",
       "horizon_days": 5,
       "rain": "gfs_seamless",
-      "n": 23,
-      "bias_pct": 3.3620870259896583,
-      "pearson_r": 0.3676381674021861,
-      "mae_cusecs": 7063.445896232307,
-      "mean_obs_cusecs": 41898.739130434784,
-      "mean_pred_cusecs": 43307.411202792384
+      "n": 26,
+      "bias_pct": 2.3536352421679916,
+      "pearson_r": 0.34178635355138726,
+      "mae_cusecs": 7301.209282424,
+      "mean_obs_cusecs": 41657.03846153846,
+      "mean_pred_cusecs": 42637.493199612705
+    },
+    {
+      "dam": "Bhakra",
+      "horizon_days": 5,
+      "rain": "ecmwf_aifs025_single",
+      "n": 26,
+      "bias_pct": 2.993088922109558,
+      "pearson_r": 0.014632603702061568,
+      "mae_cusecs": 7645.792863028152,
+      "mean_obs_cusecs": 41657.03846153846,
+      "mean_pred_cusecs": 42903.87066500969
     },
     {
       "dam": "Pong",
@@ -9113,23 +9354,34 @@
       "dam": "Pong",
       "horizon_days": 1,
       "rain": "ecmwf_ifs025",
-      "n": 27,
-      "bias_pct": 0.14440787835590355,
-      "pearson_r": 0.3174709907601265,
-      "mae_cusecs": 12124.153007334105,
-      "mean_obs_cusecs": 37203.74074074074,
-      "mean_pred_cusecs": 37257.46587341347
+      "n": 30,
+      "bias_pct": -0.1820982181631223,
+      "pearson_r": 0.42401985062899383,
+      "mae_cusecs": 11030.600867931576,
+      "mean_obs_cusecs": 35570.666666666664,
+      "mean_pred_cusecs": 35505.89311647792
     },
     {
       "dam": "Pong",
       "horizon_days": 1,
       "rain": "gfs_seamless",
-      "n": 27,
-      "bias_pct": -0.1833175215100853,
-      "pearson_r": 0.2951734985919042,
-      "mae_cusecs": 12727.943063798068,
-      "mean_obs_cusecs": 37203.74074074074,
-      "mean_pred_cusecs": 37135.53976530577
+      "n": 30,
+      "bias_pct": -0.7296311139826438,
+      "pearson_r": 0.3999757672827331,
+      "mae_cusecs": 11662.033445476467,
+      "mean_obs_cusecs": 35570.666666666664,
+      "mean_pred_cusecs": 35311.13201521561
+    },
+    {
+      "dam": "Pong",
+      "horizon_days": 1,
+      "rain": "ecmwf_aifs025_single",
+      "n": 30,
+      "bias_pct": 1.8837636075834343,
+      "pearson_r": 0.3926909430969351,
+      "mae_cusecs": 11449.255712572864,
+      "mean_obs_cusecs": 35570.666666666664,
+      "mean_pred_cusecs": 36240.73394030814
     },
     {
       "dam": "Pong",
@@ -9157,23 +9409,34 @@
       "dam": "Pong",
       "horizon_days": 2,
       "rain": "ecmwf_ifs025",
-      "n": 26,
-      "bias_pct": 1.1965440999416959,
-      "pearson_r": -0.0790983954704569,
-      "mae_cusecs": 15960.20312346692,
-      "mean_obs_cusecs": 37316.846153846156,
-      "mean_pred_cusecs": 37763.35867478432
+      "n": 29,
+      "bias_pct": 3.7536190075672473,
+      "pearson_r": 0.014097495208592848,
+      "mae_cusecs": 15541.172124858356,
+      "mean_obs_cusecs": 35615.75862068965,
+      "mean_pred_cusecs": 36952.63850596513
     },
     {
       "dam": "Pong",
       "horizon_days": 2,
       "rain": "gfs_seamless",
-      "n": 26,
-      "bias_pct": -1.5689912598089149,
-      "pearson_r": -0.08635544490204784,
-      "mae_cusecs": 16773.892807105396,
-      "mean_obs_cusecs": 37316.846153846156,
-      "mean_pred_cusecs": 36731.34809925597
+      "n": 29,
+      "bias_pct": 0.6430361259890663,
+      "pearson_r": 0.0037294712421891466,
+      "mae_cusecs": 16189.458705323457,
+      "mean_obs_cusecs": 35615.75862068965,
+      "mean_pred_cusecs": 35844.78081516575
+    },
+    {
+      "dam": "Pong",
+      "horizon_days": 2,
+      "rain": "ecmwf_aifs025_single",
+      "n": 29,
+      "bias_pct": 5.110320407647349,
+      "pearson_r": -0.03984570252015934,
+      "mae_cusecs": 15558.707746064692,
+      "mean_obs_cusecs": 35615.75862068965,
+      "mean_pred_cusecs": 37435.838001821176
     },
     {
       "dam": "Pong",
@@ -9201,23 +9464,34 @@
       "dam": "Pong",
       "horizon_days": 3,
       "rain": "ecmwf_ifs025",
-      "n": 25,
-      "bias_pct": 6.047643262518092,
-      "pearson_r": 0.4094621802623385,
-      "mae_cusecs": 13488.730337448143,
-      "mean_obs_cusecs": 37819.56,
-      "mean_pred_cusecs": 40106.752072253985
+      "n": 28,
+      "bias_pct": 10.167644574605943,
+      "pearson_r": 0.3885435525676567,
+      "mae_cusecs": 14081.691242194982,
+      "mean_obs_cusecs": 36003.857142857145,
+      "mean_pred_cusecs": 39664.60137029173
     },
     {
       "dam": "Pong",
       "horizon_days": 3,
       "rain": "gfs_seamless",
-      "n": 25,
-      "bias_pct": 0.9628088967057186,
-      "pearson_r": 0.29796800858827854,
-      "mae_cusecs": 14547.18449144612,
-      "mean_obs_cusecs": 37819.56,
-      "mean_pred_cusecs": 38183.690088374955
+      "n": 28,
+      "bias_pct": 5.30601971274609,
+      "pearson_r": 0.27797860677373687,
+      "mae_cusecs": 15032.101937956566,
+      "mean_obs_cusecs": 36003.857142857145,
+      "mean_pred_cusecs": 37914.228900206086
+    },
+    {
+      "dam": "Pong",
+      "horizon_days": 3,
+      "rain": "ecmwf_aifs025_single",
+      "n": 28,
+      "bias_pct": 5.420011525522762,
+      "pearson_r": 0.26485151234321785,
+      "mae_cusecs": 13353.236494187553,
+      "mean_obs_cusecs": 36003.857142857145,
+      "mean_pred_cusecs": 37955.27034963275
     },
     {
       "dam": "Pong",
@@ -9245,23 +9519,34 @@
       "dam": "Pong",
       "horizon_days": 4,
       "rain": "ecmwf_ifs025",
-      "n": 24,
-      "bias_pct": 4.011991585375467,
-      "pearson_r": 0.6274705550179964,
-      "mae_cusecs": 8313.466713635864,
-      "mean_obs_cusecs": 37625.666666666664,
-      "mean_pred_cusecs": 39135.20524727475
+      "n": 27,
+      "bias_pct": 10.144791704717534,
+      "pearson_r": 0.5598128771743677,
+      "mae_cusecs": 9676.145724833917,
+      "mean_obs_cusecs": 35764.25925925926,
+      "mean_pred_cusecs": 39392.46886584627
     },
     {
       "dam": "Pong",
       "horizon_days": 4,
       "rain": "gfs_seamless",
-      "n": 24,
-      "bias_pct": 5.73069943404073,
-      "pearson_r": 0.5857312842448283,
-      "mae_cusecs": 10978.453433652132,
-      "mean_obs_cusecs": 37625.666666666664,
-      "mean_pred_cusecs": 39781.88053338738
+      "n": 27,
+      "bias_pct": 11.789645202335072,
+      "pearson_r": 0.53123256444674,
+      "mae_cusecs": 12058.4700020712,
+      "mean_obs_cusecs": 35764.25925925926,
+      "mean_pred_cusecs": 39980.7385351692
+    },
+    {
+      "dam": "Pong",
+      "horizon_days": 4,
+      "rain": "ecmwf_aifs025_single",
+      "n": 27,
+      "bias_pct": 6.429954477286566,
+      "pearson_r": 0.4424163515838621,
+      "mae_cusecs": 10420.634248041313,
+      "mean_obs_cusecs": 35764.25925925926,
+      "mean_pred_cusecs": 38063.88484876838
     },
     {
       "dam": "Pong",
@@ -9289,25 +9574,75 @@
       "dam": "Pong",
       "horizon_days": 5,
       "rain": "ecmwf_ifs025",
-      "n": 23,
-      "bias_pct": 7.619814639418021,
-      "pearson_r": 0.13492823887396363,
-      "mae_cusecs": 14190.107852442557,
-      "mean_obs_cusecs": 36645.434782608696,
-      "mean_pred_cusecs": 39437.7489868523
+      "n": 26,
+      "bias_pct": 11.952967503850529,
+      "pearson_r": 0.1654502098112446,
+      "mae_cusecs": 14245.348907216963,
+      "mean_obs_cusecs": 34825.53846153846,
+      "mean_pred_cusecs": 38988.22375688712
     },
     {
       "dam": "Pong",
       "horizon_days": 5,
       "rain": "gfs_seamless",
-      "n": 23,
-      "bias_pct": 13.624284538716402,
-      "pearson_r": 0.31670608893644325,
-      "mae_cusecs": 14062.096663135706,
-      "mean_obs_cusecs": 36645.434782608696,
-      "mean_pred_cusecs": 41638.113087841055
+      "n": 26,
+      "bias_pct": 17.65529767292689,
+      "pearson_r": 0.3343226953608103,
+      "mae_cusecs": 14171.499490498758,
+      "mean_obs_cusecs": 34825.53846153846,
+      "mean_pred_cusecs": 40974.09094312272
+    },
+    {
+      "dam": "Pong",
+      "horizon_days": 5,
+      "rain": "ecmwf_aifs025_single",
+      "n": 26,
+      "bias_pct": 6.765982999987913,
+      "pearson_r": 0.042403348521733525,
+      "mae_cusecs": 14444.299962061457,
+      "mean_obs_cusecs": 34825.53846153846,
+      "mean_pred_cusecs": 37181.828473500405
     }
   ],
-  "qpf_skill_rows": 80,
-  "qpf_bias_rows": 80
+  "qpf_skill_rows": 192,
+  "qpf_bias_rows": 144,
+  "qpf_model_comparison": {
+    "incumbent_model": "ecmwf_ifs025",
+    "challenger_model": "ecmwf_aifs025_single",
+    "catchments": [
+      "Bhakra",
+      "Pong",
+      "Ranjit Sagar"
+    ],
+    "leads": [
+      1,
+      2,
+      3
+    ],
+    "n_common_days": 2034,
+    "incumbent": {
+      "obs_mean_mm": 7.624581115181738,
+      "fc_mean_mm": 6.426371372855481,
+      "bias_pct": -15.715089448526335,
+      "pearson_r": 0.6451687835066746,
+      "mae_mm": 4.140862730493334,
+      "heavy_days_obs": 84,
+      "hit_rate": 0.23809523809523808,
+      "false_alarm_ratio": 0.5348837209302325
+    },
+    "challenger": {
+      "obs_mean_mm": 7.624581115181738,
+      "fc_mean_mm": 7.6653212953804974,
+      "bias_pct": 0.5343267988537675,
+      "pearson_r": 0.5995525582671265,
+      "mae_mm": 3.910064003013018,
+      "heavy_days_obs": 84,
+      "hit_rate": 0.3333333333333333,
+      "false_alarm_ratio": 0.4909090909090909
+    },
+    "switch": true,
+    "hit_rate_higher": true,
+    "false_alarm_not_higher": true,
+    "primary_in_product": "ecmwf_aifs025_single"
+  }
 }

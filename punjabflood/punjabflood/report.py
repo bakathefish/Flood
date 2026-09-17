@@ -238,8 +238,8 @@ def render_verification(
             "season (base flow and outflow both move slowly) rather than recessing, so the "
             "base is carried as nearly constant over the horizon.",
             "",
-            "| dam | area used (km2) | runoff coefficient c (dry) | c_wet per 100 mm antecedent | lag weights w0..w3 | recession (raw ratio) | gamma | R2 | RMSE (BCM/day) | days |",
-            "|---|---|---|---|---|---|---|---|---|---|",
+            "| dam | area used (km2) | runoff coefficient c (dry) | c_wet per 100 mm antecedent | lag weights w0..w3 | recession (raw ratio) | gamma | R2 | RMSE (BCM/day) | days | wetness carrier |",
+            "|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for dam, p in params.items():
             w = ", ".join(f"{x:.2f}" for x in p["w"])
@@ -248,11 +248,14 @@ def render_verification(
             lines.append(
                 f"| {dam} | {p['area_km2']:,.0f} | {p['c']:.3f} | {p.get('c_wet', 0.0):.3f} | {w} | "
                 f"{p['rho']:.3f} ({raw_s}) | {p['gamma']:.2f} | {p['r2']:.3f} | {p['rmse_bcm']:.4f} | "
-                f"{p['n_days']} |"
+                f"{p['n_days']} | {p.get('wetness', 'api')} |"
             )
         lines.append(
             "The coefficient in force on a day is c plus c_wet times the previous five days' "
-            "catchment rain over 100 mm, capped at 0.95."
+            "catchment rain over 100 mm, capped at 0.95, times one plus gamma times the "
+            "ERA5-Land 0-7 cm soil-moisture anomaly (fractional, against a 31-day day-of-year "
+            "climatology) where the wetness carrier includes soil moisture (`api+sm` or `sm`; "
+            "gamma is zero under `api`)."
         )
         lines.append("")
 
@@ -443,26 +446,31 @@ def render_verification(
     iv = results.get("inflow_variants")
     if iv and iv.get("loso"):
         lines += [
-            "### A sharper response to heavy rain, tested out of sample",
+            "### Response variants, tested out of sample",
             "",
-            "Rain above the heavy-day threshold in a catchment day gets its own coefficient and "
-            "lag weights (the threshold-excess variant), fitted jointly with the ordinary "
-            "response on the same storage record. The rule before it can replace the response "
-            "the product uses: the leave-one-season-out error (each season scored by a fit on "
-            "the others) may not rise at any dam, the season-peak ratios of the flood-scale "
-            "table must rise, and the period means may not move further from the reported "
-            "means than the baseline's worst one does. Heavy-day bias is observed minus "
-            "predicted storage change, positive when heavy days are under-predicted.",
+            "Each variant is fitted on the same storage record beside the response in use and "
+            "scored leave-one-season-out (each season by a fit on the others). Rain above the "
+            "heavy-day threshold in a catchment day gets its own coefficient and lag weights "
+            "(the threshold-excess variant). The soil-moisture variants change the carrier of "
+            "catchment wetness: `api+sm` keeps the five-day rain index and adds the ERA5-Land "
+            "0-7 cm soil-moisture anomaly through gamma; `sm` drops the rain index and keeps "
+            "the anomaly alone (each fold's climatology leaves the held-out season out). The "
+            "rule before any variant can replace the response the product uses: the held-out "
+            "error may not rise at any dam, the season-peak ratios of the flood-scale table "
+            "must rise, and the period means may not move further from the reported means "
+            "than the baseline's worst one does. Heavy-day bias is observed minus predicted "
+            "storage change, positive when heavy days are under-predicted.",
             "",
-            "| dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess |",
-            "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+            "| dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess | wetness | gamma |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for r in iv["loso"]:
             lines.append(
                 f"| {r['dam']} | {r['variant']} | {int(r['n_seasons'])} | {int(r['n_days'])} | "
                 f"{_num(r.get('rmse_bcm'), '.4f')} | {int(r['n_heavy_days'])} | "
                 f"{_num(r.get('heavy_rmse_bcm'), '.4f')} | {_num(r.get('heavy_bias_bcm'), '+.4f')} | "
-                f"{r['c']:.3f} | {r['c_wet']:.3f} | {r['w']} | {r['c_excess']:.3f} | {r['w_excess'] or 'none'} |"
+                f"{r['c']:.3f} | {r['c_wet']:.3f} | {r['w']} | {r['c_excess']:.3f} | {r['w_excess'] or 'none'} | "
+                f"{r.get('wetness', 'api')} | {_num(r.get('gamma', 0.0), '.2f')} |"
             )
         lines += [
             "",
@@ -476,8 +484,8 @@ def render_verification(
                 f"{_num(s.get('season_peak_ratio_min'), '.2f')} | "
                 f"{_num(s.get('season_peak_ratio_max'), '.2f')} |"
             )
-        vd = iv.get("verdict")
-        if vd:
+        verdicts = iv.get("verdicts") or ([iv["verdict"]] if iv.get("verdict") else [])
+        for vd in verdicts:
             conds = [
                 ("the held-out error does not rise at any dam", vd["loso_error_not_higher"]),
                 ("the season peaks rise", vd["season_peaks_higher"]),
@@ -636,6 +644,48 @@ def render_verification(
                 "the rule is in `design.md`.",
                 "",
             ]
+
+    mc = results.get("qpf_model_comparison")
+    if mc and mc.get("n_common_days"):
+        inc, ch = mc["incumbent"], mc["challenger"]
+        rule = (
+            "the challenger replaces the incumbent as the product's primary deterministic "
+            "model only if its heavy-day hit rate is higher and its false-alarm ratio is not "
+            "higher on those rows"
+        )
+        lines += [
+            "### The machine-learned model against the primary deterministic model",
+            "",
+            f"`{mc['challenger_model']}` (ECMWF AIFS, the machine-learned forecast) and "
+            f"`{mc['incumbent_model']}` scored on exactly the same rows: the dam catchments, "
+            f"leads {', '.join(str(x) for x in mc['leads'])}, every target day both have in the "
+            f"archive ({mc['n_common_days']:,} rows). The rule, written before the pull: {rule}. "
+            "The spill probability comes from the IFS ensemble either way; the primary "
+            "deterministic model drives the local term and the deterministic fallback.",
+            "",
+            "| model | obs mean (mm) | bias | r | MAE (mm) | heavy days | hit rate | false-alarm ratio |",
+            "|---|---|---|---|---|---|---|---|",
+        ]
+        for name, s in ((mc["incumbent_model"], inc), (mc["challenger_model"], ch)):
+            lines.append(
+                f"| {name} | {s['obs_mean_mm']:.1f} | {s['bias_pct']:+.0f}% | "
+                f"{_num(s.get('pearson_r'), '.2f')} | {s['mae_mm']:.1f} | "
+                f"{int(s['heavy_days_obs'])} | {_rate(s.get('hit_rate'))} | "
+                f"{_rate(s.get('false_alarm_ratio'))} |"
+            )
+        lines += [
+            "",
+            f"Hit rate higher: {'yes' if mc.get('hit_rate_higher') else 'no'}; false-alarm "
+            f"ratio not higher: {'yes' if mc.get('false_alarm_not_higher') else 'no'}. "
+            f"Verdict: the primary deterministic model "
+            f"{'switches to ' + mc['challenger_model'] if mc.get('switch') else 'stays ' + mc['incumbent_model']}."
+            + (
+                f" The product's primary is `{mc['primary_in_product']}`."
+                if mc.get("primary_in_product")
+                else ""
+            ),
+            "",
+        ]
 
     lines += [
         "## Live 2026: one-day inflow prediction against the BBMB bulletins",
