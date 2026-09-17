@@ -42,7 +42,7 @@ DAM_NAMES = ("Bhakra", "Pong", "Ranjit Sagar")
 # the flood-scale inflow figures the public record holds (sources inside each file and in
 # docs/data-sources.md); the model is checked against them in `verify`
 PAC_PERIODS_CSV = REF / "bbmb" / "pac_period_means_2025.csv"
-INFLOW_POINTS_CSV = REF / "bbmb" / "inflow_points_2025.csv"
+INFLOW_POINTS_CSV = REF / "bbmb" / "inflow_points.csv"
 SEASON_PEAKS_CSV = REF / "bbmb" / "season_peak_inflows_2025.csv"
 # the inflow-response variant the verification fits and scores beside the response in use
 EXCESS_VARIANT = f"excess above {inflow.EXCESS_THRESHOLD_MM:.0f} mm"

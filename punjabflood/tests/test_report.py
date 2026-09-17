@@ -357,6 +357,9 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
         "| Pong | largest day of 2025 | 120 | 349,522 | 175,210 | 0.50 | Rajya Sabha reply |" in md
     )
     assert "| Pong | record day, 2023-08-14 | 0 | 734,000 | n/a | n/a | Pong EAP |" in md
+    # the dated figures summarised by year; the uncovered record day does not count
+    assert "Dated figures by year" in md
+    assert "2025: 1 dated figures" in md and "median 0.92" in md and "2023:" not in md.split("Dated figures by year")[1].split(")")[0]
     assert (
         "the model's mean is 0.82 of the reported mean; its largest day of the season is 0.50 "
         "of the stated peak." in md

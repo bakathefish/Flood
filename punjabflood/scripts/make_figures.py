@@ -248,6 +248,11 @@ def flood_scale_ratios():
         return f"{r.dam}, {when}"
 
     df["label"] = df.apply(label, axis=1)
+    # two reports of the same day: name the outlet so the rows can be told apart
+    dup = df.duplicated("label", keep=False)
+    df.loc[dup, "label"] = df.loc[dup].apply(
+        lambda r: f"{r.label} ({str(r.source).split(',')[0]})", axis=1
+    )
     groups = {
         0: "Period mean inflow (BBMB data released by the Public Action Committee)",
         1: "Single dated readings (press, BBMB sheets)",

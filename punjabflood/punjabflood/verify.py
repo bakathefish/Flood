@@ -522,13 +522,18 @@ def flood_scale_inflow_check(
 def flood_scale_summary(fs: pd.DataFrame, min_period_days: int = 10) -> dict:
     """What the adoption rule for a response variant reads off a flood-scale table: how many
     period means the run covers on at least ``min_period_days`` days, the worst deviation of
-    those ratios from one, and the smallest and largest season-peak ratio."""
+    those ratios from one, the smallest and largest season-peak ratio, and (for the record,
+    not for the rule) how many dated single-day figures the run covers and the median of
+    the model's ratio to them."""
     pm = fs[(fs["kind"] == "period mean") & (fs["n_days"] >= min_period_days)].dropna(
         subset=["ratio"]
     )
     pk = fs[fs["kind"] == "season peak"].dropna(subset=["ratio"])
+    dd = fs[fs["kind"].isin(["day", "record day"])].dropna(subset=["ratio"])
     return {
         "n_period_means": int(len(pm)),
+        "n_dated_days": int(len(dd)),
+        "dated_day_ratio_median": float(dd["ratio"].median()) if len(dd) else float("nan"),
         "period_mean_worst_deviation": float((pm["ratio"] - 1.0).abs().max())
         if len(pm)
         else float("nan"),

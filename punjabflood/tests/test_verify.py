@@ -449,6 +449,24 @@ def test_flood_scale_summary_and_variant_verdict():
     assert b["n_period_means"] == 2
     assert b["period_mean_worst_deviation"] == pytest.approx(137000 / 121600 - 1)
     assert b["season_peak_ratio_min"] == pytest.approx(108000 / 190603)
+    assert b["n_dated_days"] == 0 and b["dated_day_ratio_median"] != b["dated_day_ratio_median"]
+    with_days = pd.concat(
+        [
+            base_fs,
+            pd.DataFrame(
+                [
+                    ["Pong", "day", "2025-08-31", "2025-08-31", 160276.0, 121294.0, 0.757, 1, "s"],
+                    ["Bhakra", "day", "2023-08-23", "2023-08-23", 128406.0, 60147.0, 0.468, 1, "s"],
+                    ["Pong", "record day", "2023-08-14", "2023-08-14", 734000.0, np.nan, np.nan, 0, "s"],
+                ],
+                columns=cols,
+            ),
+        ],
+        ignore_index=True,
+    )
+    d = verify.flood_scale_summary(with_days)
+    assert d["n_dated_days"] == 2 and d["dated_day_ratio_median"] == pytest.approx((0.757 + 0.468) / 2)
+    assert d["n_period_means"] == b["n_period_means"]
     better = base_fs.copy()
     better.loc[better["kind"] == "season peak", "ratio"] += 0.1
     v = verify.flood_scale_summary(better)

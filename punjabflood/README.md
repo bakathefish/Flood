@@ -31,7 +31,7 @@ turns that mechanism into a daily hazard watch:
 6. **Verification.** 38 years of annual peaks with the department's High/Medium/Low class,
    the dated 2023 and 2025 Dhilwan peaks, every flood-scale inflow figure the public record
    holds for 2023 and 2025 (BBMB's archived sheets, the Public Action Committee's period
-   means, the season peaks stated to the Rajya Sabha, dated press figures), the as-issued
+   means, the season peaks stated to the Rajya Sabha, 26 dated press readings), the as-issued
    rain forecasts of 2024 to 2026 (as rain skill, and as a day-by-day hindcast of what the
    product would have said before the 2025 event, at each dam), the live 2026 bulletins,
    and the season's prospective record. Results, with their caveats, are in

@@ -410,7 +410,7 @@ def render_verification(
             "stand-in) on the same day or days: a period mean against the model's mean over the "
             "same days, a season peak against the model's largest day of the same June to "
             "September. A period mean is a daily quantity like the model's; the season peaks, "
-            "the evening press figure and the sheets' figures are readings at a time of day, so "
+            "the dated press figures and the sheets' figures are readings at a time of day, so "
             "against a daily volume those ratios are lower bounds on the model's share of the "
             "day's mean. The full citations are in `data-sources.md` and the reference tables.",
             "",
@@ -430,6 +430,19 @@ def render_verification(
                 f"| {r['dam']} | {what} | {int(r['n_days'])} | {r['truth_cusecs']:,.0f} | {model} | "
                 f"{ratio} | {r['source']} |"
             )
+        days = fs[fs["kind"].isin(["day", "record day"])].dropna(subset=["ratio"])
+        if len(days):
+            parts = []
+            for year, g in days.groupby(days["start"].str[:4]):
+                parts.append(
+                    f"{year}: {len(g)} dated figures, the model at {_ratio_range(g['ratio'])} of "
+                    f"the reading, median {g['ratio'].median():.2f}"
+                )
+            lines += [
+                "",
+                "Dated figures by year (readings at a time of day against the model's daily "
+                "volume; " + "; ".join(parts) + ").",
+            ]
         pm = fs[(fs["kind"] == "period mean") & (fs["n_days"] >= 10)].dropna(subset=["ratio"])
         pk = fs[fs["kind"] == "season peak"].dropna(subset=["ratio"])
         if len(pm) and len(pk):

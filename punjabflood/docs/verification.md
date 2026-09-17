@@ -132,7 +132,7 @@ Storage basis of the Pong path in August of each event year (days):
 
 ### Flood-scale inflow: the model against the figures the record holds
 
-The runoff coefficient is fitted on ordinary filling days (the storage-change relation), so what the model does at flood scale has to be checked against whatever flood-scale inflow the public record holds: BBMB's daily sheets where the Internet Archive kept them, dated press figures credited to the dam offices, the period means of BBMB inflow that the Public Action Committee compiled for August to early September 2025, the season's largest inflows as stated to the Rajya Sabha, and the record inflow in the Pong emergency action plan. Each is set against the model's one-day inflow under observed rain (the perfect-prognosis run with its base-flow stand-in) on the same day or days: a period mean against the model's mean over the same days, a season peak against the model's largest day of the same June to September. A period mean is a daily quantity like the model's; the season peaks, the evening press figure and the sheets' figures are readings at a time of day, so against a daily volume those ratios are lower bounds on the model's share of the day's mean. The full citations are in `data-sources.md` and the reference tables.
+The runoff coefficient is fitted on ordinary filling days (the storage-change relation), so what the model does at flood scale has to be checked against whatever flood-scale inflow the public record holds: BBMB's daily sheets where the Internet Archive kept them, dated press figures credited to the dam offices, the period means of BBMB inflow that the Public Action Committee compiled for August to early September 2025, the season's largest inflows as stated to the Rajya Sabha, and the record inflow in the Pong emergency action plan. Each is set against the model's one-day inflow under observed rain (the perfect-prognosis run with its base-flow stand-in) on the same day or days: a period mean against the model's mean over the same days, a season peak against the model's largest day of the same June to September. A period mean is a daily quantity like the model's; the season peaks, the dated press figures and the sheets' figures are readings at a time of day, so against a daily volume those ratios are lower bounds on the model's share of the day's mean. The full citations are in `data-sources.md` and the reference tables.
 
 | dam | figure | model days | reported (cusecs) | model (cusecs) | model / reported | source |
 |---|---|---|---|---|---|---|
@@ -142,8 +142,32 @@ The runoff coefficient is fitted on ordinary filling days (the storage-change re
 | Pong | mean, 2025-08-25 to 2025-09-04 | 11 | 121,600 | 137,283 | 1.13 | PAC data via The Wire, 8 Sep 2025 |
 | Ranjit Sagar | mean, 2025-08-01 to 2025-08-24 | 20 | 38,700 | 30,075 | 0.78 | PAC data via The Wire, 8 Sep 2025 |
 | Ranjit Sagar | mean, 2025-08-25 to 2025-09-04 | 11 | 71,960 | 69,098 | 0.96 | PAC data via The Wire, 8 Sep 2025 |
+| Bhakra | day, 2023-08-14 | 1 | 193,324 | 91,025 | 0.47 | BBMB via Himachal Tonite, Aug 2023 |
+| Bhakra | day, 2023-08-15 | 1 | 85,899 | 86,995 | 1.01 | The Tribune, 15 Aug 2023 |
+| Bhakra | day, 2023-08-22 | 1 | 105,000 | 39,112 | 0.37 | The Tribune, 23 Aug 2023 (Tuesday) |
+| Bhakra | day, 2023-08-22 | 1 | 72,835 | 39,112 | 0.54 | The Tribune, 24 Aug 2023 (yesterday) |
+| Pong | day, 2023-08-22 | 1 | 58,702 | 46,948 | 0.80 | The Tribune, 24 Aug 2023 (yesterday) |
+| Bhakra | day, 2023-08-23 | 1 | 128,000 | 60,147 | 0.47 | The Tribune, 23 Aug 2023 (Wednesday) |
+| Bhakra | day, 2023-08-23 | 1 | 128,406 | 60,147 | 0.47 | The Tribune, 24 Aug 2023 |
+| Pong | day, 2023-08-23 | 1 | 158,000 | 68,465 | 0.43 | The Tribune, 23 Aug 2023 (Wednesday) |
+| Pong | day, 2023-08-23 | 1 | 138,674 | 68,465 | 0.49 | The Tribune, 24 Aug 2023 |
+| Bhakra | day, 2023-08-25 | 1 | 52,810 | 57,026 | 1.08 | Rozana Spokesman, 25 Aug 2023 |
+| Pong | day, 2025-08-02 | 0 | 87,586 | n/a | n/a | The Tribune, 2 Aug 2025 |
+| Bhakra | day, 2025-08-06 | 1 | 59,200 | 82,043 | 1.39 | Babushahi, 6 Aug 2025 |
+| Pong | day, 2025-08-06 | 0 | 93,650 | n/a | n/a | Babushahi, 6 Aug 2025 |
+| Pong | day, 2025-08-17 | 1 | 109,789 | 116,417 | 1.06 | The Tribune, 17 Aug 2025 |
+| Bhakra | day, 2025-08-19 | 1 | 65,617 | 50,860 | 0.78 | Babushahi, 19 Aug 2025 |
+| Pong | day, 2025-08-25 | 1 | 146,174 | 104,157 | 0.71 | Diary Times, 25 Aug 2025 |
 | Pong | day, 2025-08-26 | 1 | 233,000 | 175,210 | 0.75 | PTI via The Week, 26 Aug 2025 (about) |
+| Bhakra | day, 2025-08-27 | 1 | 58,997 | 62,325 | 1.06 | The Tribune, 28 Aug 2026 (same date last year) |
+| Pong | day, 2025-08-27 | 1 | 228,091 | 203,537 | 0.89 | The Tribune, 28 Aug 2026 (same date last year) |
+| Ranjit Sagar | day, 2025-08-27 | 1 | 163,037 | 109,546 | 0.67 | The Tribune, 28 Aug 2026 (same date last year) |
+| Pong | day, 2025-08-31 | 1 | 160,276 | 121,294 | 0.76 | The Tribune, 31 Aug 2025 |
+| Pong | day, 2025-09-04 | 1 | 107,301 | 147,004 | 1.37 | The Tribune, 4 Sep 2025 (actual inflow) |
 | Bhakra | day, 2025-09-05 | 1 | 76,318 | 67,120 | 0.88 | SDO Nangal via Babushahi, 5 Sep 2025 |
+| Pong | day, 2025-09-05 | 1 | 105,950 | 113,008 | 1.07 | The Tribune, 6 Sep 2025 (yesterday) |
+| Bhakra | day, 2025-09-06 | 1 | 62,481 | 56,139 | 0.90 | The Tribune, 6 Sep 2025 |
+| Pong | day, 2025-09-06 | 1 | 98,418 | 75,537 | 0.77 | The Tribune, 6 Sep 2025 |
 | Bhakra | day, 2025-09-15 | 1 | 54,667 | 44,853 | 0.82 | BBMB daily sheet, Internet Archive |
 | Bhakra | day, 2025-09-24 | 1 | 35,666 | 35,817 | 1.00 | BBMB daily sheet, Internet Archive |
 | Pong | day, 2025-09-15 | 1 | 76,498 | 83,124 | 1.09 | BBMB daily sheet, Internet Archive |
@@ -151,6 +175,8 @@ The runoff coefficient is fitted on ordinary filling days (the storage-change re
 | Pong | record day, 2023-08-14 | 1 | 734,000 | 233,281 | 0.32 | BBMB Pong EAP, largest inflow recorded |
 | Pong | largest day of 2025 | 112 | 349,522 | 203,537 | 0.58 | Rajya Sabha reply via PTI, 2 Dec 2025 |
 | Bhakra | largest day of 2025 | 121 | 190,603 | 108,620 | 0.57 | Rajya Sabha reply via PTI, 2 Dec 2025 |
+
+Dated figures by year (readings at a time of day against the model's daily volume; 2023: 11 dated figures, the model at 0.32 to 1.08 of the reading, median 0.47; 2025: 18 dated figures, the model at 0.67 to 2.32 of the reading, median 0.90).
 
 Where the run covers at least 10 of a period's days, the model's mean is 0.78 to 1.13 of the reported mean; its largest day of the season is 0.57 to 0.58 of the stated peak. The flood's volume is close to right and its peak day is not: the model spreads the volume over more days than the river does, which is consistent with lag weights fitted on ordinary days.
 
@@ -162,16 +188,16 @@ Each variant is fitted on the same storage record beside the response in use and
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Bhakra | baseline | 11 | 1009 | 0.0439 | 2 | 0.1013 | -0.0908 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api | 0.00 |
 | Bhakra | excess above 30 mm | 11 | 1009 | 0.0668 | 2 | 0.0923 | -0.0773 | 0.194 | 0.207 | 0.55 0.21 0.12 0.12 | 0.303 | 0.00 1.00 0.00 0.00 | api | 0.00 |
-| Bhakra | api+sm | 11 | 1009 | 0.0440 | 2 | 0.0951 | -0.0853 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api+sm | -0.16 |
-| Bhakra | sm | 11 | 1009 | 0.0436 | 2 | 0.0688 | -0.0524 | 0.278 | 0.000 | 0.27 0.36 0.18 0.19 | 0.000 | none | sm | 0.13 |
+| Bhakra | api+sm | 11 | 1009 | 0.0440 | 2 | 0.0961 | -0.0866 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api+sm | -0.14 |
+| Bhakra | sm | 11 | 1009 | 0.0436 | 2 | 0.0691 | -0.0530 | 0.278 | 0.000 | 0.27 0.36 0.18 0.19 | 0.000 | none | sm | 0.15 |
 | Pong | baseline | 8 | 733 | 0.0302 | 28 | 0.0782 | -0.0158 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api | 0.00 |
 | Pong | excess above 30 mm | 8 | 733 | 0.0304 | 28 | 0.0773 | -0.0129 | 0.200 | 0.332 | 0.40 0.39 0.11 0.10 | 0.523 | 0.20 0.65 0.09 0.06 | api | 0.00 |
-| Pong | api+sm | 8 | 733 | 0.0300 | 28 | 0.0774 | -0.0053 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api+sm | -0.38 |
-| Pong | sm | 8 | 733 | 0.0335 | 28 | 0.0866 | +0.0111 | 0.509 | 0.000 | 0.21 0.52 0.15 0.13 | 0.000 | none | sm | -0.28 |
+| Pong | api+sm | 8 | 733 | 0.0300 | 28 | 0.0772 | -0.0059 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api+sm | -0.36 |
+| Pong | sm | 8 | 733 | 0.0334 | 28 | 0.0860 | +0.0101 | 0.509 | 0.000 | 0.21 0.52 0.15 0.13 | 0.000 | none | sm | -0.25 |
 | Ranjit Sagar | baseline | 11 | 1184 | 0.0229 | 29 | 0.0442 | -0.0113 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api | 0.00 |
 | Ranjit Sagar | excess above 30 mm | 11 | 1184 | 0.0229 | 29 | 0.0469 | -0.0074 | 0.156 | 0.166 | 0.47 0.27 0.15 0.11 | 0.469 | 0.46 0.48 0.00 0.07 | api | 0.00 |
-| Ranjit Sagar | api+sm | 11 | 1184 | 0.0230 | 29 | 0.0385 | -0.0167 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api+sm | 0.26 |
-| Ranjit Sagar | sm | 11 | 1184 | 0.0230 | 29 | 0.0470 | -0.0100 | 0.341 | 0.000 | 0.34 0.45 0.11 0.10 | 0.000 | none | sm | 1.31 |
+| Ranjit Sagar | api+sm | 11 | 1184 | 0.0230 | 29 | 0.0384 | -0.0168 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api+sm | 0.26 |
+| Ranjit Sagar | sm | 11 | 1184 | 0.0230 | 29 | 0.0471 | -0.0101 | 0.341 | 0.000 | 0.34 0.45 0.11 0.10 | 0.000 | none | sm | 1.30 |
 
 | variant | period means covered | worst deviation of a period mean from 1 | season-peak ratio, smallest | season-peak ratio, largest |
 |---|---|---|---|---|

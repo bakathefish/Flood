@@ -131,6 +131,20 @@ numbers that motivate them are in `verification.md`, never repeated here.
    August 2023 or August 2025. With any daily inflow series for an event, the coefficient can
    be fitted on inflow rather than on storage change, and the release-during-event bias
    disappears. Effort: data hunt plus one calibration mode.
+   *Hunt of 2026-09-17:* a sweep of the English and Hindi press (The Tribune, Hindustan
+   Times, Indian Express, Times of India, Babushahi, Diary Times, Rozana Spokesman, Himachal
+   Tonite, SANDRP, Down To Earth, The Wire) for 10 to 25 August 2023 and 15 August to
+   10 September 2025 found no day-wise table for either event and confirmed that BBMB's
+   `res_data.pdf` has two Internet Archive captures in all. It did yield 24 more dated
+   readings credited to BBMB or the dam offices (level, inflow, outflow at a stated time of
+   day) on 5 days of the 2023 event and 11 days of the 2025 event, each re-read from its
+   source page; they are in `data/reference/bbmb/inflow_points.csv` and the flood-scale
+   check of `verification.md` now prints the model against each of them with a per-year
+   summary. They are moment readings, not daily means, so they bound the model from below;
+   the calibration mode on inflow still waits for a daily series, which only the 2026
+   capture provides so far. The day-wise BBMB data the Public Action Committee released on
+   8 September 2025 remains the one known table; asking the committee for it is an owner
+   action.
 2. **Peak-day concentration.** The flood-scale check says the model's volumes over the 2025
    flood periods are close to the means BBMB reported while its largest days fall well short
    of the stated season peaks, and in both 2023 and 2025 the routed Dhilwan peak fell below
