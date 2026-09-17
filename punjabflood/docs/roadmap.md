@@ -85,6 +85,20 @@ numbers that motivate them are in `verification.md`, never repeated here.
   tributaries. The coefficient is fitted on nothing local (`design.md`, known limits); daily
   gauge readings at the control points during a flood would let it be fitted on the river.
 
+- **The machine-learned rain forecast as a source.** ECMWF's AIFS (the single, deterministic
+  run; Open-Meteo serves no AIFS ensemble) joins IFS and GFS everywhere a rain forecast is
+  read: the daily product, the as-issued hindcast, the live test by horizon and the QPF skill
+  tables. Its as-issued archive begins in March 2025, so it is scored against IFS on exactly
+  the dam-catchment rows both have at the product's short leads, under a rule written before
+  the pull: it becomes the product's primary deterministic model only if its heavy-day hit
+  rate is higher and its false-alarm ratio is not higher on those rows. It passed both, with
+  a lower mean error and next to no mean bias where IFS under-forecasts (`verification.md`),
+  so the primary deterministic model, which drives the local term and the deterministic
+  fallback, is now AIFS; the spill probability keeps the IFS ensemble. In the 2025 hindcast
+  its first flag at Pong came two days after IFS's; on the live 2026 days it beats
+  persistence at Pong at every lead. Item 4 below stays open for what it asked for, a
+  correction conditional on the forecast amount, which needs more archive than exists.
+
 ## Next, in order
 
 1. **Flood-scale inflow truth.** The one thing that would settle the runoff response at the

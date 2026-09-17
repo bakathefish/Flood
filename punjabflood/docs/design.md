@@ -33,7 +33,17 @@ and it is fitted jointly with the lag weights by non-negative least squares, lea
 days the cap would bind. A threshold-excess response (rain above the heavy-day threshold
 with its own coefficient and lag weights) was fitted on the same record and scored
 leave-one-season-out beside this one; it did not lower the held-out error and is not used
-(`verification.md`; the rule is in `roadmap.md`). The base component today is the observed BBMB inflow minus the
+(`verification.md`; the rule is in `roadmap.md`). The rain index is a proxy for the
+ground's wetness; the direct quantity, ERA5-Land soil moisture (0 to 7 cm, daily catchment
+mean over the same IMD-covered points, 2015 onward from the keyless Open-Meteo archive), is
+carried as a fractional anomaly against a 31-day day-of-year climatology and multiplies the
+coefficient by `1 + gamma * anomaly`, gamma fitted in a second stage on the residual of the
+rain fit. Three wetness carriers are fitted and scored out of sample beside each other
+(`api`, the index alone; `api+sm`, both; `sm`, the anomaly alone, each fold's climatology
+leaving the held-out season out) under the rule the threshold-excess test used; the product
+uses the carrier in the parameter file, and the report says which one and why. In the daily
+product the anomaly is the latest ERA5-Land day on record, up to about six days before the
+issue date, labelled with its date; the issue day's anomaly holds over the horizon. The base component today is the observed BBMB inflow minus the
 quick response the recent rain explains, decaying at a fitted daily recession. The recession is estimated from the residuals as the lag-2 to lag-1
 autocovariance ratio, which is unbiased under white measurement noise; where the residual
 drifts through the season instead of recessing the ratio exceeds one and the estimate sits
@@ -203,9 +213,15 @@ The full list, ordered by expected effect, is `roadmap.md`.
 - The storage record is sparse exactly in the event weeks; the model carry is a bridge, not
   a measurement. BBMB keeps no bulletin archive, so 2026 is the first season with daily
   measured state in this project.
-- Soil-moisture modulation of the coefficient is implemented but inactive (gamma 0):
-  the ERA5-Land soil-moisture pull was not made because the IMD archive replaced ERA5 as
-  the observed rain record. It is one archive pull away.
+- Soil moisture is a reanalysis (ERA5-Land), not a measurement, and its climatology is its
+  own; the anomaly in the product is up to about six days old (the archive's lag) and is
+  held constant over the horizon. The local catchments carry a transferred response with no
+  anomaly of their own.
+- The rain forecast sources are the ones Open-Meteo serves keyless: IFS, GFS, ICON, the
+  best-match blend and, from March 2025 in the as-issued archive, ECMWF's machine-learned
+  AIFS (single, no ensemble). AIFS is scored beside IFS on exactly the days both have; the
+  product's primary deterministic model changes only under the rule in `verify.py`, and the
+  spill probability keeps the IFS ensemble because AIFS has none there.
 - The ratings clamp at the highest level each dam has printed; above that the flood cushion
   above full reservoir level is not resolved, and headroom is simply zero.
 - The local inflow term is not fitted on anything local: the intermediate catchments carry a

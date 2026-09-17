@@ -68,7 +68,8 @@ punjabflood pull-cwc                   # hours; resumable; the feed throttles ha
 punjabflood build-catchments           # needs data/raw/hydrobasins/hybas_as_lev08_v1c.*
 punjabflood build-rain                 # IMD gridded archive in data/raw/imd (imdlib layout)
 punjabflood pull-rain-recent           # ERA5 for the current season, all catchments
-punjabflood pull-qpf-archive           # as-issued QPF leads 1..7, 2024 to date
+punjabflood pull-soil-moisture         # ERA5-Land soil moisture 2015-2025, dam catchments, into the rain table
+punjabflood pull-qpf-archive           # as-issued QPF leads 1..7, 2024 to date (merges by model and season)
 punjabflood digitise-guidebook         # needs the WRD guidebook PDF in data/raw/wrd/
 punjabflood calibrate
 punjabflood verify
