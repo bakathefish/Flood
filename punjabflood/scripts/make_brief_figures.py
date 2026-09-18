@@ -85,6 +85,7 @@ def live_2026():
     fig.suptitle(
         "Live 2026: the rain response against the forecast it must beat",
         fontsize=10,
+        y=1.04,
         x=0.01,
         ha="left",
         color=INK,
@@ -128,11 +129,12 @@ def realtime_rain():
         if metric == "bias_pct":
             ax.axhline(0, color=AXIS, lw=0.8)
     axes[0].set_ylim(0, 1.15)
-    axes[0].legend(frameon=False, fontsize=7.5, loc="lower left")
+    axes[0].legend(frameon=False, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2)
     n = int(rows["n_days"].max())
     fig.suptitle(
         f"In-season observed rain, 2025 monsoon ({n} days): what the model now sees",
         fontsize=10,
+        y=1.04,
         x=0.01,
         ha="left",
         color=INK,
@@ -178,6 +180,7 @@ def qpf_models():
     fig.suptitle(
         f"ECMWF IFS against ECMWF AIFS, leads 1 to 3, {q['n_common_days']:,} common catchment days, {q['incumbent']['heavy_days_obs']} heavy days",
         fontsize=10,
+        y=1.04,
         x=0.01,
         ha="left",
         color=INK,
@@ -294,6 +297,7 @@ def gauge_ratios():
     fig.suptitle(
         "The routed release on the days the press quoted the gauges (dot: quoted; cross: routed)",
         fontsize=10,
+        y=1.04,
         x=0.01,
         ha="left",
         color=INK,
@@ -336,6 +340,7 @@ def readings_db():
     fig.suptitle(
         f"The press and bulletin readings database, {len(p)} dated rows from four sweeps",
         fontsize=10,
+        y=1.04,
         x=0.01,
         ha="left",
         color=INK,
