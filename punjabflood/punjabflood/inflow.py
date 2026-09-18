@@ -155,7 +155,7 @@ def sm_climatology(sm: pd.Series, window: int = SM_CLIM_WINDOW_DAYS) -> np.ndarr
     the smoothed value of its neighbours)."""
     s = sm.dropna()
     by_doy = s.groupby(s.index.dayofyear).mean().reindex(range(1, 367))
-    v = by_doy.to_numpy(dtype=float)
+    v = by_doy.to_numpy(dtype=float, copy=True)  # pandas 3 hands back a read-only view
     if np.isnan(v[365]):  # no leap day in the record
         v[365] = np.nanmean(v[[364, 0]])
     half = window // 2

@@ -486,3 +486,12 @@ def test_inflow_fit_in_storage_convention_scores_the_storage_record_out_of_sampl
     bad = inflow.InflowParams("Pong", 12560.0, c=0.2, w=(0.25,) * 4, rho=0.9, intercept_bcm_per_day=0.02)
     assert inflow.storage_change_score(bad, state, rain, "Pong", 12560.0)["rmse_bcm"] > s_true["rmse_bcm"] * 1.5
 
+
+
+def test_sm_climatology_fills_the_leap_day_when_the_record_has_none():
+    # pandas 3 returns a read-only view from to_numpy; the leap-day fill must write to a copy
+    idx = pd.date_range("2001-01-01", "2003-12-31", freq="D")
+    sm = pd.Series(np.linspace(0.2, 0.3, len(idx)), index=idx)
+    clim = inflow.sm_climatology(sm)
+    assert clim.shape == (366,)
+    assert np.isfinite(clim).all()
