@@ -1,34 +1,39 @@
 {
- "generated_utc": "2026-09-18T10:35:48Z",
+ "generated_utc": "2026-09-18T15:51:23Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-09-17",
- "latest_pass_utc": "2026-09-17T12:56:11.547440Z",
- "new_scenes": 4,
+ "latest_pass": "2026-09-18",
+ "latest_pass_utc": "2026-09-18T00:59:55.820332Z",
+ "new_scenes": 3,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.593,
- "total_flooded_km2": 0.1,
+ "coverage_fraction": 0.867,
+ "total_flooded_km2": 0.6,
  "passes": [
   {
-   "date": "2026-09-17",
-   "scenes": 4,
-   "total_flooded_km2": 0.1,
+   "date": "2026-09-18",
+   "scenes": 3,
+   "total_flooded_km2": 0.6,
    "flagged": 0,
-   "coverage_fraction": 0.593
+   "coverage_fraction": 0.867
   }
  ],
  "districts": [
   {
-   "district": "Sangrur",
-   "flooded_km2": 0.1,
-   "flooded_fraction": 0.0
+   "district": "Amritsar",
+   "flooded_km2": 0.3,
+   "flooded_fraction": 0.0001
   },
   {
-   "district": "Amritsar",
-   "flooded_km2": 0.0,
+   "district": "Kapurthala",
+   "flooded_km2": 0.2,
+   "flooded_fraction": 0.0001
+  },
+  {
+   "district": "Gurdaspur",
+   "flooded_km2": 0.1,
    "flooded_fraction": 0.0
   },
   {
@@ -57,22 +62,12 @@
    "flooded_fraction": 0.0
   },
   {
-   "district": "Gurdaspur",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
-  },
-  {
    "district": "Hoshiarpur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
   {
    "district": "Jalandhar",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
-  },
-  {
-   "district": "Kapurthala",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
@@ -113,6 +108,11 @@
   },
   {
    "district": "Sahibzada Ajit Singh Nagar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Sangrur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
