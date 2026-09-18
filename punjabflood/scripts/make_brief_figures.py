@@ -15,6 +15,9 @@ a legend whenever there are two series).
 4. ``brief_rule_curve``: the Bhakra filling schedule against the dated gate openings.
 5. ``brief_gauge_ratios``: routed Pong release over the press readings of the gauges.
 6. ``brief_readings_db``: the press readings database by year and dam.
+7. ``brief_weather_watch``: the weather watch of the latest product: what fell over each dam
+   catchment, the ensemble's next days, and the level.
+8. ``brief_qpf_blend``: the deterministic models combined against the primary one.
 """
 
 from __future__ import annotations
@@ -129,7 +132,9 @@ def realtime_rain():
         if metric == "bias_pct":
             ax.axhline(0, color=AXIS, lw=0.8)
     axes[0].set_ylim(0, 1.15)
-    axes[0].legend(frameon=False, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2)
+    axes[0].legend(
+        frameon=False, fontsize=7.5, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2
+    )
     n = int(rows["n_days"].max())
     fig.suptitle(
         f"In-season observed rain, 2025 monsoon ({n} days): what the model now sees",
@@ -348,6 +353,112 @@ def readings_db():
     _save(fig, "brief_readings_db")
 
 
+def weather_watch():
+    fdir = OUT.parent / "forecast"
+    latest = sorted(fdir.glob("20??-??-??.json"))[-1]
+    prod = json.load(open(latest, encoding="utf-8"))
+    watch = prod.get("weather") or {}
+    dams = [d for d in ("Bhakra", "Pong", "Ranjit Sagar") if d in watch]
+    fig, axes = plt.subplots(1, len(dams), figsize=(7.2, 2.9), sharey=True)
+    for ax, dam in zip(axes, dams):
+        _style(ax)
+        e = watch[dam]
+        obs_days = pd.to_datetime(e["observed"]["days"])
+        ax.bar(
+            obs_days,
+            e["observed"]["rain_mm"],
+            color=S1,
+            width=0.7,
+            label="observed (IMD real-time)",
+        )
+        fc_days = pd.to_datetime(e["forecast"]["dates"])
+        ens = e.get("ensemble")
+        if ens:
+            ax.fill_between(
+                fc_days, 0, ens["daily_q90_mm"], color=S2, alpha=0.18, lw=0, label="ensemble to q90"
+            )
+            ax.plot(
+                fc_days,
+                ens["daily_q50_mm"],
+                color=S2,
+                lw=2,
+                marker="o",
+                ms=4,
+                label="ensemble median",
+            )
+        prim = e["forecast"]["by_model_mm"].get(e["primary_model"])
+        if prim:
+            ax.plot(fc_days, prim, color=S3, lw=1.6, ls="--", label="AIFS")
+        snow = (e.get("temperature") or {}).get("snow_share_3day")
+        pct = e["level_basis"]["three_day_percentile"]
+        sub = f"{dam}: {e['level']}\n" + (f"next 3 days p{pct:.0f}" if pct is not None else "")
+        if snow is not None:
+            sub += f", snow share {snow:.2f}"
+        ax.set_title(sub, fontsize=8.5, loc="left")
+        ax.axvline(
+            pd.Timestamp(prod["issue_date"]) + pd.Timedelta(hours=12), color=MUTED, lw=0.8, ls=":"
+        )
+        ax.xaxis.set_major_locator(matplotlib.dates.DayLocator(interval=3))
+        ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%d %b"))
+        ax.tick_params(axis="x", labelsize=7)
+    axes[0].set_ylabel("catchment rain (mm/day)", fontsize=8)
+    axes[0].legend(frameon=False, fontsize=7, loc="upper left")
+    fig.suptitle(
+        f"Weather watch issued {prod['issue_date']}: what fell, what the ensemble says, and the level",
+        fontsize=10,
+        y=1.04,
+        x=0.01,
+        ha="left",
+        color=INK,
+    )
+    _save(fig, "brief_weather_watch")
+
+
+def qpf_blend():
+    bt = RESULTS.get("qpf_blend_test")
+    if not bt or not bt.get("n_common_days"):
+        return
+    sc = bt["scores"]
+    names = [bt["incumbent_model"]] + [m for m in bt["models"] if m != bt["incumbent_model"]]
+    names += ["equal_mean", "inverse_mae_weighted_loso", "max_of_models"]
+    labels = {
+        "ecmwf_aifs025_single": "AIFS (primary)",
+        "ecmwf_ifs025": "IFS",
+        "gfs_seamless": "GFS",
+        "equal_mean": "equal mean",
+        "inverse_mae_weighted_loso": "inverse-MAE mean",
+        "max_of_models": "max of models",
+    }
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.6))
+    for ax, (key, lab) in zip(
+        axes, (("hit_rate", "heavy-day hit rate"), ("mae_mm", "MAE (mm/day)"))
+    ):
+        _style(ax)
+        vals = [sc[n][key] for n in names]
+        cols = [
+            S1 if n == bt["incumbent_model"] else (S4 if n in bt["models"] else S2) for n in names
+        ]
+        ax.barh([labels[n] for n in names], vals, color=cols, height=0.6)
+        for i, v in enumerate(vals):
+            ax.text(v, i, f" {v:.2f}", va="center", fontsize=7.5, color=INK2)
+        ax.set_title(lab, fontsize=9, loc="left")
+        ax.set_xlim(0, max(vals) * 1.25)
+        ax.invert_yaxis()
+        ax.tick_params(axis="y", labelsize=7.5)
+    fig.subplots_adjust(wspace=0.75)
+    far = ", ".join(f"{labels[n]} {sc[n]['false_alarm_ratio']:.2f}" for n in names)
+    fig.suptitle(
+        f"Combining the models on {bt['n_common_days']:,} common rows: none passes the rule\n"
+        f"false-alarm ratio: {far}",
+        fontsize=9,
+        y=1.06,
+        x=0.01,
+        ha="left",
+        color=INK,
+    )
+    _save(fig, "brief_qpf_blend")
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     live_2026()
@@ -356,3 +467,5 @@ if __name__ == "__main__":
     rule_curve()
     gauge_ratios()
     readings_db()
+    weather_watch()
+    qpf_blend()

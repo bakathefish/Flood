@@ -186,6 +186,15 @@ numbers that motivate them are in `verification.md`, never repeated here.
   scored on the storage record, where its held-out error is higher than the baseline's
   and it is not adopted (report, response variants).
 
+## Tested and refused in the 2026-09-19 sprint
+
+- **Combining the deterministic rain models.** The equal-weight mean, an inverse-MAE
+  weighted mean (weights fitted leave-one-season-out) and the maximum of AIFS, IFS and GFS
+  were scored against AIFS on the common rows over the dam catchments at leads 1 to 3
+  (`verify.qpf_blend_test`). The means lower the MAE and raise the correlation but catch
+  fewer of the heavy days; the maximum catches more at a higher false-alarm ratio. None
+  passes the switching rule; AIFS stays. The numbers are in `verification.md`.
+
 ## Next, in order
 
 1. **Flood-scale inflow truth.** The one thing that would settle the runoff response at the

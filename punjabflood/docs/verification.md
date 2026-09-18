@@ -794,6 +794,21 @@ Held-out days, dam catchments, leads 1 to 5: MAE lower after correction in 0 of 
 
 Hit rate higher: yes; false-alarm ratio not higher: yes. Verdict: the primary deterministic model switches to ecmwf_aifs025_single. The product's primary is `ecmwf_aifs025_single`.
 
+### The deterministic models combined against the primary one
+
+Three ways of combining `ecmwf_aifs025_single`, `ecmwf_ifs025`, `gfs_seamless` scored on the 2,061 (catchment, day, lead) rows all of them have over the dam catchments at leads 1, 2, 3: the equal-weight mean, an inverse-MAE weighted mean with the weights fitted on every season but the one scored, and the largest of the three (the hazard-minded blend). Same rule as the model switch: a blend replaces the primary only if its heavy-day hit rate is higher and its false-alarm ratio is not higher on the same rows.
+
+| rain source | bias | r | MAE (mm) | heavy days | hit rate | false-alarm ratio | passes the rule |
+|---|---|---|---|---|---|---|---|
+| ecmwf_aifs025_single | -11% | 0.54 | 4.96 | 105 | 0.28 | 0.47 |  |
+| ecmwf_ifs025 | -25% | 0.58 | 5.14 | 105 | 0.20 | 0.51 |  |
+| gfs_seamless | -28% | 0.50 | 5.54 | 105 | 0.07 | 0.67 |  |
+| equal_mean | -21% | 0.64 | 4.78 | 105 | 0.18 | 0.46 | no |
+| inverse_mae_weighted_loso | -21% | 0.64 | 4.77 | 105 | 0.19 | 0.43 | no |
+| max_of_models | +9% | 0.55 | 5.41 | 105 | 0.35 | 0.55 | no |
+
+Weights fitted on every season: ecmwf_aifs025_single 0.35, ecmwf_ifs025 0.34, gfs_seamless 0.31. Verdict: no blend passes; the primary stays `ecmwf_aifs025_single`. The means lower the MAE and raise the correlation but miss more of the heavy days (the models disagree on their timing, so averaging smears them); the maximum catches more heavy days at a higher false-alarm ratio.
+
 ### The in-season observed rain: IMD real-time grid and ERA5 against the final grid
 
 The runoff model is calibrated on the final IMD grid, which arrives after the season. In season the product has to carry the previous days' rain from something else: until now the best-match model's past days (ERA5 physics), and the record on disk was ERA5. IMD Pune serves a preliminary real-time analysis on the same lattice. Both are scored here against the final grid over the 2025 season on the dam catchments, on the days each has (heavy day: 30 mm or more). The rule, written before the pull: the real-time grid replaces the model's past days as the product's observed record only if its MAE is lower than ERA5's at every dam and its heavy-day hit rate is not lower at any.
@@ -892,6 +907,6 @@ From each bulletin day, the inflow one to five days ahead: predicted with the ob
 
 Issued daily from the committed inputs and the live BBMB bulletin; a record is never rewritten (`outputs/forecast/`). P(spillway forced) is at the five-day horizon.
 
-13 issue dates from 2026-09-05 to 2026-09-17. Bhakra: P(spillway forced) above zero on 0 of 13 days. Pong: P(spillway forced) above zero on 0 of 13 days. Days with any control point at or above the WRD low band: 0.
+14 issue dates from 2026-09-05 to 2026-09-18. Bhakra: P(spillway forced) above zero on 0 of 14 days. Pong: P(spillway forced) above zero on 0 of 14 days. Days with any control point at or above the WRD low band: 0.
 
 No day so far has put a forced spill or a classed arrival on the record.

@@ -21,6 +21,7 @@ import requests
 
 from punjabflood import constants as C
 from punjabflood import hei, inflow, rain, reservoirs, routing
+from punjabflood import weather as wx
 from punjabflood.catchments import Catchment
 from punjabflood.imdrain import IMD_WEIGHT_COL, covered_area_km2
 from punjabflood.openmeteo import OpenMeteo
@@ -186,6 +187,8 @@ def build_product(
     soil_moisture: dict[str, dict] | None = None,
     flood_scale_log_sd: float | None = None,
     ratings: dict | None = None,
+    recent_sources: dict[str, list[str]] | None = None,
+    weather_daily: pd.DataFrame | None = None,
 ) -> dict:
     """Assemble the hazard product from already-pulled inputs (pure; tested with fakes).
     ``ratings``: the level-to-storage curves; with them a dam that has a sourced filling
@@ -472,6 +475,17 @@ def build_product(
                 m: float((clim < v).mean() * 100) for m, v in three_day.items()
             }
         product["ghaggar"][cat] = entry
+    product["weather"] = wx.weather_watch(
+        issue_date,
+        qpf_det,
+        qpf_ens,
+        recent_rain,
+        recent_sources,
+        ghaggar_climatology,
+        PRIMARY_DETERMINISTIC,
+        weather_daily=weather_daily,
+        horizon_days=max(horizons),
+    )
     return product
 
 
@@ -578,6 +592,40 @@ def render_markdown(product: dict) -> str:
                 f"{li['model']}): peak {peak:,.0f} cusecs, added at {', '.join(li['stations'])}"
             )
         lines.append("")
+    if product.get("weather"):
+        lines.append("## Weather watch")
+        lines.append(
+            "Rain over each catchment: what fell (IMD real-time grid where served), what the "
+            "models say for the next days, and where the next three days sit in the 1961-2025 "
+            "monsoon record of three-day totals. Levels: alert at the 90th percentile or half "
+            "the ensemble members with a 30 mm day; watch at the 75th, a quarter of the "
+            "members, or any model with a 30 mm day."
+        )
+        lines.append(
+            "| catchment | level | last days observed (mm) | next 3 days, primary model "
+            "(mm, percentile) | ensemble 3-day q10 / q50 / q90 (mm) | P(30 mm day) | "
+            "models with a 30 mm day | snow share |"
+        )
+        lines.append("|---|---|---|---|---|---|---|---|")
+        for row in wx.summary_rows(product["weather"]):
+            pct = row["primary_3day_percentile"]
+            ens = (
+                f"{row['ens_3day_q10_mm']:.0f} / {row['ens_3day_q50_mm']:.0f} / "
+                f"{row['ens_3day_q90_mm']:.0f}"
+                if row["ens_3day_q50_mm"] is not None
+                else "n/a"
+            )
+            ph = row["p_heavy_day"]
+            snow = row["snow_share_3day"]
+            lines.append(
+                f"| {row['catchment']} | {row['level']} | {row['observed_total_mm']:.0f} | "
+                f"{row['primary_3day_mm']:.0f}"
+                + (f" (p{pct:.0f})" if pct is not None else "")
+                + f" | {ens} | {'n/a' if ph is None else f'{ph:.2f}'} | "
+                f"{row['models_with_heavy_day']:.2f} | "
+                f"{'n/a' if snow is None else f'{snow:.2f}'} |"
+            )
+        lines.append("")
     if product["ghaggar"]:
         lines.append("## Ghaggar rain index (no gauge model; catchment QPF only)")
         for cat, g in product["ghaggar"].items():
@@ -619,16 +667,10 @@ def write_outputs(product: dict, out_dir: Path = Path("outputs/forecast")) -> tu
 
 
 def ghaggar_climatology(rain_daily: pd.DataFrame) -> dict[str, np.ndarray]:
-    """Season (Jun-Sep) 3-day rain totals per Ghaggar catchment from the observed record."""
-    out = {}
-    for cat in GHAGGAR_CATCHMENTS:
-        g = rain_daily[rain_daily["catchment"] == cat].copy()
-        if g.empty:
-            continue
-        g["date"] = pd.to_datetime(g["date"])
-        s = g.set_index("date")["rain_mm"].sort_index().rolling(3).sum()
-        out[cat] = s[s.index.month.isin([6, 7, 8, 9])].dropna().to_numpy()
-    return out
+    """Season (Jun-Sep) 3-day rain totals per catchment from the observed record: every
+    catchment the record holds, so the weather watch and the Ghaggar index share one
+    distribution (the name is kept from the first release)."""
+    return wx.season_3day_climatology(rain_daily)
 
 
 def save_climatology(clim: dict[str, np.ndarray], path: Path, years: str = "") -> None:
@@ -812,7 +854,7 @@ def run(
     issue_date = issue_date or datetime.now(UTC).date().isoformat()
     rec = bulletin or fetch_bulletin()
     states = dam_state_from_bulletin(rec, ratings)
-    det_frames, ens_frames = [], []
+    det_frames, ens_frames, wx_frames = [], [], []
     recent, recent_sources = recent_rain(client, catchments, issue_date, rt_dir=rt_dir)
     for name, cat in catchments.items():
         calibrated_index = name in DAM_CATCHMENT.values() or name in C.LOCAL_CATCHMENTS
@@ -833,6 +875,20 @@ def run(
                     client, cat, days=max(HORIZONS) + 1, issue_date=issue_date, weight_col=wc
                 )
             )
+            try:
+                wx_frames.append(
+                    rain.weather_catchment(
+                        client,
+                        cat,
+                        model=PRIMARY_DETERMINISTIC,
+                        days=max(HORIZONS) + 1,
+                        issue_date=issue_date,
+                        weight_col=wc,
+                    )
+                )
+            except Exception:  # noqa: BLE001 - temperature is a watch extra, never a blocker
+                log.warning("weather pull failed for %s; the watch runs on rain alone", name)
+    weather_daily = pd.concat(wx_frames, ignore_index=True) if wx_frames else None
     qpf_det = pd.concat(det_frames, ignore_index=True)
     qpf_det = qpf_det[qpf_det["target_date"] > pd.Timestamp(issue_date)]
     qpf_ens = (
@@ -861,6 +917,8 @@ def run(
         soil_moisture=soil or None,
         flood_scale_log_sd=flood_scale_log_sd,
         ratings=ratings,
+        recent_sources=recent_sources,
+        weather_daily=weather_daily,
     )
     product["bulletin"] = {k: v for k, v in rec.items() if k != "raw_text"}
     product["recent_rain_source"] = recent_sources

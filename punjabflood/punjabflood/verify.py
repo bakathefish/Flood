@@ -1234,3 +1234,103 @@ def realtime_vs_final(
         "switch": ok_mae and ok_hit,
         "heavy_mm": heavy_mm,
     }
+
+
+BLEND_MODELS = ("ecmwf_aifs025_single", "ecmwf_ifs025", "gfs_seamless")
+
+
+def qpf_blend_test(
+    qpf_leads: pd.DataFrame,
+    rain_daily: pd.DataFrame,
+    incumbent: str = "ecmwf_aifs025_single",
+    models=BLEND_MODELS,
+    catchments=tuple(C.DAMS),
+    leads=(1, 2, 3),
+    heavy_mm: float = 30.0,
+) -> dict:
+    """Do the deterministic models combined beat the product's primary one?
+
+    On the (catchment, target day, lead) rows every model in ``models`` has, over the dam
+    catchments at the product's short leads, four challengers are scored beside the
+    incumbent with ``_qpf_scores``: the equal-weight mean, an inverse-MAE weighted mean
+    whose weights are fitted on every season but the one scored (leave-one-season-out, so
+    the score is out of sample), the largest of the models (the hazard-minded blend), and
+    the incumbent itself. Each challenger is judged by the rule of ``qpf_model_comparison``
+    (heavy-day hit rate higher, false-alarm ratio not higher); ``adopt`` names the one the
+    product should take, or None when none passes."""
+    df = _qpf_merge(qpf_leads, rain_daily)
+    df = df[df["catchment"].isin(list(catchments)) & df["lead_days"].isin(list(leads))]
+    key = ["catchment", "target_date", "lead_days"]
+    wide = None
+    for m in models:
+        g = df[df["model"] == m][key + ["rain_mm"] + (["obs_mm"] if wide is None else [])]
+        g = g.rename(columns={"rain_mm": m})
+        wide = g if wide is None else wide.merge(g, on=key)
+    out = {
+        "incumbent_model": incumbent,
+        "models": list(models),
+        "catchments": list(catchments),
+        "leads": list(leads),
+        "n_common_days": 0 if wide is None else int(len(wide)),
+        "scores": {},
+        "weights_all_seasons": {},
+        "adopt": None,
+    }
+    if wide is None or len(wide) < 20:
+        return out
+    o = wide["obs_mm"].to_numpy()
+    f = {m: wide[m].to_numpy() for m in models}
+    season = wide["target_date"].dt.year.to_numpy()
+    blends = {
+        "equal_mean": np.mean([f[m] for m in models], axis=0),
+        "max_of_models": np.max([f[m] for m in models], axis=0),
+    }
+    # inverse-MAE weights, leave one season out
+    weighted = np.full(len(o), np.nan)
+    for y in np.unique(season):
+        train = season != y
+        if train.sum() < 60:
+            continue
+        inv = np.array([1.0 / max(np.abs(f[m][train] - o[train]).mean(), 1e-6) for m in models])
+        w = inv / inv.sum()
+        weighted[~train] = sum(w[i] * f[m][~train] for i, m in enumerate(models))
+    inv_all = np.array([1.0 / max(np.abs(f[m] - o).mean(), 1e-6) for m in models])
+    out["weights_all_seasons"] = {
+        m: float(v) for m, v in zip(models, inv_all / inv_all.sum(), strict=True)
+    }
+    ok = ~np.isnan(weighted)
+    inc = _qpf_scores(f[incumbent], o, heavy_mm)
+    out["scores"][incumbent] = inc
+    for m in models:
+        if m != incumbent:
+            out["scores"][m] = _qpf_scores(f[m], o, heavy_mm)
+    for name, b in blends.items():
+        out["scores"][name] = _qpf_scores(b, o, heavy_mm)
+    if ok.sum() >= 20:
+        out["scores"]["inverse_mae_weighted_loso"] = {
+            **_qpf_scores(weighted[ok], o[ok], heavy_mm),
+            "incumbent_on_same_rows": _qpf_scores(f[incumbent][ok], o[ok], heavy_mm),
+        }
+    passing = []
+    for name in ("equal_mean", "inverse_mae_weighted_loso", "max_of_models"):
+        s = out["scores"].get(name)
+        if not s:
+            continue
+        ref = s.get("incumbent_on_same_rows", inc)
+        hit_better = (
+            s["hit_rate"] == s["hit_rate"]
+            and ref["hit_rate"] == ref["hit_rate"]
+            and s["hit_rate"] > ref["hit_rate"]
+        )
+        far_ok = (
+            s["false_alarm_ratio"] != s["false_alarm_ratio"]
+            or ref["false_alarm_ratio"] != ref["false_alarm_ratio"]
+            or s["false_alarm_ratio"] <= ref["false_alarm_ratio"]
+        )
+        s["hit_rate_higher"] = bool(hit_better)
+        s["false_alarm_not_higher"] = bool(far_ok)
+        s["passes_rule"] = bool(hit_better and far_ok)
+        if s["passes_rule"]:
+            passing.append((s["mae_mm"], name))
+    out["adopt"] = min(passing)[1] if passing else None
+    return out

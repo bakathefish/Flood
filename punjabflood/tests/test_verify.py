@@ -851,3 +851,45 @@ def test_routed_vs_gauge_readings_pairs_by_station_and_day():
     assert np.isnan(d.loc["2023-08-19", "routed_cusecs"]) and np.isnan(d.loc["2023-08-19", "ratio"])
     assert t[t["station"] == "Harike Head Works"]["ratio"].iloc[0] == pytest.approx(140_000 / 284_987)
 
+
+
+def test_qpf_blend_test_scores_the_blends_on_common_rows_and_applies_the_rule():
+    days = pd.date_range("2025-07-01", "2025-08-31")
+    obs = np.zeros(len(days))
+    obs[::7] = 50.0  # nine heavy days
+    obs_df = pd.DataFrame({"date": days, "catchment": "Pong", "rain_mm": obs})
+    rows = []
+    for k in (1, 2, 3):
+        # AIFS hits every heavy day at 40; IFS and GFS miss them all at 5, and are dry
+        # otherwise: the mean of the three is 16.7 on a heavy day, below the threshold
+        for m, val in (("ecmwf_aifs025_single", 40.0), ("ecmwf_ifs025", 5.0), ("gfs_seamless", 5.0)):
+            f = np.where(obs >= 30, val, 0.0)
+            rows.append(
+                pd.DataFrame(
+                    {"target_date": days, "lead_days": k, "model": m, "rain_mm": f, "catchment": "Pong"}
+                )
+            )
+    # a second season so the leave-one-season-out weights exist
+    second = [r.assign(target_date=r["target_date"] + pd.DateOffset(years=1)) for r in rows]
+    obs2 = obs_df.assign(date=obs_df["date"] + pd.DateOffset(years=1))
+    q = pd.concat(rows + second, ignore_index=True)
+    res = verify.qpf_blend_test(q, pd.concat([obs_df, obs2]), incumbent="ecmwf_aifs025_single")
+    assert res["n_common_days"] == 2 * 3 * len(days)
+    s = res["scores"]
+    assert s["ecmwf_aifs025_single"]["hit_rate"] == 1.0
+    assert s["equal_mean"]["hit_rate"] == 0.0 and s["equal_mean"]["passes_rule"] is False
+    assert s["max_of_models"]["hit_rate"] == 1.0 and s["max_of_models"]["passes_rule"] is False
+    assert "inverse_mae_weighted_loso" in s
+    assert s["inverse_mae_weighted_loso"]["passes_rule"] is False
+    assert res["adopt"] is None
+    assert abs(sum(res["weights_all_seasons"].values()) - 1.0) < 1e-9
+
+
+def test_qpf_blend_test_with_no_common_rows_is_empty():
+    days = pd.date_range("2025-07-01", "2025-07-31")
+    q = pd.DataFrame(
+        {"target_date": days, "lead_days": 1, "model": "ecmwf_aifs025_single", "rain_mm": 1.0, "catchment": "Pong"}
+    )
+    obs = pd.DataFrame({"date": days, "catchment": "Pong", "rain_mm": 0.0})
+    res = verify.qpf_blend_test(q, obs)
+    assert res["n_common_days"] == 0 and res["adopt"] is None and res["scores"] == {}

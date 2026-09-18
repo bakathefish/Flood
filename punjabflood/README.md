@@ -14,8 +14,12 @@ turns that mechanism into a daily hazard watch:
 2. **Rain.** IMD 0.25 degree gridded daily rainfall (1961 to 2025) as the observed record,
    IMD's real-time grid for the current season (ERA5 through Open-Meteo where the service
    lacks a day), deterministic and 51-member ensemble
-   quantitative precipitation forecasts (GFS, ECMWF IFS, ICON), all area-weighted over the
-   real HydroBASINS catchments, all through keyless APIs.
+   quantitative precipitation forecasts (GFS, ECMWF IFS, ECMWF AIFS, ICON), all area-weighted
+   over the real HydroBASINS catchments, all through keyless APIs. A weather watch sits on
+   top: per catchment, what fell, what every model and the ensemble say for the next days,
+   where the next three days sit in the 1961-2025 record of monsoon three-day totals, the
+   share of the primary model's precipitation falling as snow over the high catchments, and
+   a level (quiet, watch, alert) from rules written before any season was scored.
 3. **Inflow.** A runoff coefficient that rises with how wet the catchment already is, with
    lag weights, fitted on day-to-day changes of measured storage during filling season.
 4. **Headroom-exhaustion index.** Forecast inflow volume minus headroom minus what the

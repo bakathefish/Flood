@@ -399,3 +399,39 @@ def test_product_prints_the_rule_curve_scenario_for_bhakra_only_with_a_rating():
     assert "rule_curve" not in prod3["dams"]["Pong"]
     assert "filling schedule" not in forecast.render_markdown(prod3)
 
+
+
+def test_product_carries_the_weather_watch_and_prints_it():
+    states, det, ens, params = _inputs()
+    wd = pd.DataFrame(
+        {
+            "target_date": pd.date_range("2026-09-05", periods=6),
+            "precipitation_mm": 80.0,
+            "snowfall_cm": 0.0,
+            "t2m_max_c": 20.0,
+            "t2m_mean_c": 15.0,
+            "model": "ecmwf_aifs025_single",
+            "catchment": "Pong",
+        }
+    )
+    prod = forecast.build_product(
+        "2026-09-04",
+        states,
+        det,
+        ens,
+        {"Pong": [1.0, 2.0, 3.0]},
+        params,
+        ghaggar_climatology={"Pong": np.arange(0, 400, 1.0), "Ghaggar Khanauri": np.arange(0, 200, 1.0)},
+        recent_sources={"Pong": ["imd_rt", "imd_rt", "best_match"]},
+        weather_daily=wd,
+    )
+    w = prod["weather"]
+    assert set(w) == {"Pong", "Ghaggar Khanauri"}
+    assert w["Pong"]["level"] == "alert"  # 80 mm a day: every member has a heavy day
+    assert w["Pong"]["observed"]["sources"] == ["imd_rt", "imd_rt", "best_match"]
+    assert w["Pong"]["forecast"]["three_day_percentile"]["gfs_seamless"] == 60.0
+    assert w["Pong"]["temperature"]["snow_share_3day"] == 0.0
+    assert w["Ghaggar Khanauri"]["forecast"]["three_day_percentile"]["best_match"] == 45.0
+    md = forecast.render_markdown(prod)
+    assert "## Weather watch" in md and "| Pong | alert |" in md
+    json.dumps(prod, default=str)

@@ -12557,6 +12557,112 @@
     "false_alarm_not_higher": true,
     "primary_in_product": "ecmwf_aifs025_single"
   },
+  "qpf_blend_test": {
+    "incumbent_model": "ecmwf_aifs025_single",
+    "models": [
+      "ecmwf_aifs025_single",
+      "ecmwf_ifs025",
+      "gfs_seamless"
+    ],
+    "catchments": [
+      "Bhakra",
+      "Pong",
+      "Ranjit Sagar"
+    ],
+    "leads": [
+      1,
+      2,
+      3
+    ],
+    "n_common_days": 2061,
+    "scores": {
+      "ecmwf_aifs025_single": {
+        "obs_mean_mm": 8.502932333505722,
+        "fc_mean_mm": 7.600305958781887,
+        "bias_pct": -10.615471690478405,
+        "pearson_r": 0.5400863737677405,
+        "mae_mm": 4.957404815808955,
+        "heavy_days_obs": 105,
+        "hit_rate": 0.2761904761904762,
+        "false_alarm_ratio": 0.4727272727272727
+      },
+      "ecmwf_ifs025": {
+        "obs_mean_mm": 8.502932333505722,
+        "fc_mean_mm": 6.3654580223092685,
+        "bias_pct": -25.13808445556784,
+        "pearson_r": 0.5836981013041291,
+        "mae_mm": 5.142361180874595,
+        "heavy_days_obs": 105,
+        "hit_rate": 0.2,
+        "false_alarm_ratio": 0.5116279069767442
+      },
+      "gfs_seamless": {
+        "obs_mean_mm": 8.502932333505722,
+        "fc_mean_mm": 6.146023538709775,
+        "bias_pct": -27.718776327415558,
+        "pearson_r": 0.49955670446256784,
+        "mae_mm": 5.53632616979315,
+        "heavy_days_obs": 105,
+        "hit_rate": 0.06666666666666667,
+        "false_alarm_ratio": 0.6666666666666666
+      },
+      "equal_mean": {
+        "obs_mean_mm": 8.502932333505722,
+        "fc_mean_mm": 6.703929173266976,
+        "bias_pct": -21.157444157820606,
+        "pearson_r": 0.6393405392931564,
+        "mae_mm": 4.778618342273592,
+        "heavy_days_obs": 105,
+        "hit_rate": 0.18095238095238095,
+        "false_alarm_ratio": 0.45714285714285713,
+        "hit_rate_higher": false,
+        "false_alarm_not_higher": true,
+        "passes_rule": false
+      },
+      "max_of_models": {
+        "obs_mean_mm": 8.502932333505722,
+        "fc_mean_mm": 9.271638940865538,
+        "bias_pct": 9.04048835400859,
+        "pearson_r": 0.5490302373009923,
+        "mae_mm": 5.414594515981617,
+        "heavy_days_obs": 105,
+        "hit_rate": 0.3523809523809524,
+        "false_alarm_ratio": 0.5487804878048781,
+        "hit_rate_higher": true,
+        "false_alarm_not_higher": false,
+        "passes_rule": false
+      },
+      "inverse_mae_weighted_loso": {
+        "obs_mean_mm": 8.502932333505722,
+        "fc_mean_mm": 6.734297319826809,
+        "bias_pct": -20.800295054796848,
+        "pearson_r": 0.6384340098859586,
+        "mae_mm": 4.7731487048332255,
+        "heavy_days_obs": 105,
+        "hit_rate": 0.19047619047619047,
+        "false_alarm_ratio": 0.42857142857142855,
+        "incumbent_on_same_rows": {
+          "obs_mean_mm": 8.502932333505722,
+          "fc_mean_mm": 7.600305958781887,
+          "bias_pct": -10.615471690478405,
+          "pearson_r": 0.5400863737677405,
+          "mae_mm": 4.957404815808955,
+          "heavy_days_obs": 105,
+          "hit_rate": 0.2761904761904762,
+          "false_alarm_ratio": 0.4727272727272727
+        },
+        "hit_rate_higher": false,
+        "false_alarm_not_higher": true,
+        "passes_rule": false
+      }
+    },
+    "weights_all_seasons": {
+      "ecmwf_aifs025_single": 0.34971576720091363,
+      "ecmwf_ifs025": 0.3371374680825655,
+      "gfs_seamless": 0.31314676471652086
+    },
+    "adopt": null
+  },
   "realtime_rain": {
     "rows": [
       {

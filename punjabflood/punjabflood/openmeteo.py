@@ -55,6 +55,9 @@ class OpenMeteoError(RuntimeError):
     pass
 
 
+WEATHER_DAILY = ("precipitation_sum", "snowfall_sum", "temperature_2m_max", "temperature_2m_mean")
+
+
 def canonical(params: dict) -> str:
     """Order-independent, list-tolerant string form of the query, used for the cache key."""
     norm = {}
@@ -213,6 +216,31 @@ class OpenMeteo:
         if past_days:
             params["past_days"] = int(past_days)
         return self.get("forecast", params)
+
+    def forecast_daily_weather(
+        self,
+        lat: float,
+        lon: float,
+        model: str = "ecmwf_aifs025_single",
+        days: int = 6,
+        issue_date: str | None = None,
+        daily: Iterable[str] = WEATHER_DAILY,
+    ) -> dict:
+        """One model's daily precipitation, snowfall and 2 m temperature (the weather
+        watch's temperature and snow share). Cached per issue date like ``forecast_daily``."""
+        issue_date = issue_date or self.clock().date().isoformat()
+        return self.get(
+            "forecast",
+            {
+                "latitude": lat,
+                "longitude": lon,
+                "daily": list(daily),
+                "models": model,
+                "forecast_days": days,
+                "timezone": "UTC",
+                "_issue_date": issue_date,
+            },
+        )
 
     def ensemble_daily(
         self,

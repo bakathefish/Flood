@@ -787,6 +787,54 @@ def render_verification(
             "",
         ]
 
+    bt = results.get("qpf_blend_test")
+    if bt and bt.get("n_common_days"):
+        sc = bt["scores"]
+        inc = sc.get(bt["incumbent_model"], {})
+        lines += [
+            "### The deterministic models combined against the primary one",
+            "",
+            f"Three ways of combining `{'`, `'.join(bt['models'])}` scored on the "
+            f"{bt['n_common_days']:,} (catchment, day, lead) rows all of them have over the dam "
+            f"catchments at leads {', '.join(str(x) for x in bt['leads'])}: the equal-weight "
+            "mean, an inverse-MAE weighted mean with the weights fitted on every season but the "
+            "one scored, and the largest of the three (the hazard-minded blend). Same rule as "
+            "the model switch: a blend replaces the primary only if its heavy-day hit rate is "
+            "higher and its false-alarm ratio is not higher on the same rows.",
+            "",
+            "| rain source | bias | r | MAE (mm) | heavy days | hit rate | false-alarm ratio "
+            "| passes the rule |",
+            "|---|---|---|---|---|---|---|---|",
+        ]
+        order = [bt["incumbent_model"]] + [m for m in bt["models"] if m != bt["incumbent_model"]]
+        order += ["equal_mean", "inverse_mae_weighted_loso", "max_of_models"]
+        for name in order:
+            s_ = sc.get(name)
+            if not s_:
+                continue
+            verdict = "" if "passes_rule" not in s_ else ("yes" if s_["passes_rule"] else "no")
+            lines.append(
+                f"| {name} | {s_['bias_pct']:+.0f}% | {_num(s_.get('pearson_r'), '.2f')} | "
+                f"{s_['mae_mm']:.2f} | {int(s_['heavy_days_obs'])} | {_rate(s_.get('hit_rate'))} | "
+                f"{_rate(s_.get('false_alarm_ratio'))} | {verdict} |"
+            )
+        w = bt.get("weights_all_seasons") or {}
+        lines += [
+            "",
+            "Weights fitted on every season: "
+            + ", ".join(f"{m} {v:.2f}" for m, v in w.items())
+            + ". "
+            + (
+                f"Verdict: the product takes `{bt['adopt']}`."
+                if bt.get("adopt")
+                else f"Verdict: no blend passes; the primary stays `{bt['incumbent_model']}`. "
+                "The means lower the MAE and raise the correlation but miss more of the heavy "
+                "days (the models disagree on their timing, so averaging smears them); the "
+                "maximum catches more heavy days at a higher false-alarm ratio."
+            ),
+            "",
+        ]
+
     rr = results.get("realtime_rain")
     if rr and rr.get("rows"):
         lines += [

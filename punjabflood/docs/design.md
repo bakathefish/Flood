@@ -152,6 +152,17 @@ test adds it from the IMD record and reports the Dhilwan peaks with and without 
 publishes the catchment QPF above Bhankarpur and Khanauri, the recent rain, and the
 percentile of the forecast three-day total against the 1988 to 2025 season record.
 
+**Weather watch.** Before the index asks whether the spillway must open, the product
+places the weather itself: for every catchment, the observed days (IMD real-time grid
+where served), the next days from every deterministic model and the IFS ensemble, the
+percentile of the next three days against the monsoon three-day totals of the 1961-2025
+IMD record over the same catchment, and, for the dam catchments, the primary model's
+2 m temperature and the share of its precipitation falling as snow (Open-Meteo's snowfall
+at 7 mm of water per cm). The level is a fixed rule (`weather.py`): alert at the 90th
+percentile of the ensemble median or half the members with a 30 mm day; watch at the
+75th, a quarter of the members, or any model with a 30 mm day; quiet otherwise. It is a
+reading aid over the same inputs, never an input to the inflow model.
+
 ## Verification, tiered by the density of the record
 
 1. Annual peak class, 38 years. The WRD table of annual maximum discharge at Harike,

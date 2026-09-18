@@ -881,6 +881,11 @@ def run_verify(horizon_days: int = 5):
             qpf_leads, rain_daily, fc.INCUMBENT_DETERMINISTIC, "ecmwf_aifs025_single"
         )
         results["qpf_model_comparison"]["primary_in_product"] = fc.PRIMARY_DETERMINISTIC
+        # the deterministic models combined against the primary, same rule; the product
+        # takes a blend only when the rule passes
+        results["qpf_blend_test"] = verify.qpf_blend_test(
+            qpf_leads, rain_daily, incumbent=fc.PRIMARY_DETERMINISTIC
+        )
 
     # the in-season observed-rain records against the final IMD grid (the rule for the
     # product's observed record is in the function); the season is the latest one with a

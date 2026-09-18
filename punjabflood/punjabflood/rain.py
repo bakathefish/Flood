@@ -192,6 +192,48 @@ def ensemble_catchment(
     return res
 
 
+WEATHER_COLS = {
+    "precipitation_sum": "precipitation_mm",
+    "snowfall_sum": "snowfall_cm",
+    "temperature_2m_max": "t2m_max_c",
+    "temperature_2m_mean": "t2m_mean_c",
+}
+
+
+def weather_catchment(
+    client: OpenMeteo,
+    catchment: Catchment,
+    model: str = "ecmwf_aifs025_single",
+    days: int = 6,
+    issue_date: str | None = None,
+    weight_col: str = WEIGHT_COL,
+) -> pd.DataFrame:
+    """One model's daily precipitation (mm), snowfall (cm) and 2 m temperature (max and
+    mean, C) as catchment means: columns ``target_date, model, catchment`` plus the
+    ``WEATHER_COLS`` values."""
+    per_var: dict[str, dict[str, pd.Series]] = {k: {} for k in WEATHER_COLS}
+    weights = {}
+    for pid, lat, lon, w in points_with_weights(catchment, weight_col):
+        weights[pid] = w
+        j = client.forecast_daily_weather(lat, lon, model=model, days=days, issue_date=issue_date)
+        d = j.get("daily", {})
+        idx = pd.to_datetime(d.get("time", []))
+        for k in WEATHER_COLS:
+            per_var[k][pid] = pd.Series(d.get(k, [None] * len(idx)), index=idx, dtype=float)
+    wser = pd.Series(weights)
+    cols = {}
+    for k, name in WEATHER_COLS.items():
+        cols[name] = (
+            weighted_mean(pd.DataFrame(per_var[k]), wser) if per_var[k] else pd.Series(dtype=float)
+        )
+    res = pd.DataFrame(cols)
+    res.index.name = "target_date"
+    res = res.reset_index()
+    res["model"] = model
+    res["catchment"] = catchment.name
+    return res
+
+
 def ensemble_quantiles(ens: pd.DataFrame, qs=(0.1, 0.5, 0.9)) -> pd.DataFrame:
     g = ens.groupby("target_date")["rain_mm"]
     out = pd.DataFrame({f"q{int(q * 100):02d}": g.quantile(q) for q in qs})
