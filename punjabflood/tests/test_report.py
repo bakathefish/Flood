@@ -149,6 +149,36 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     results["flood_scale_error"] = {
         "n_periods": 6, "log_bias": -0.02, "log_sd": 0.13, "n_dated_days": 29, "dated_log_sd": 0.44,
     }
+    results["rule_curve"] = {
+        "dam": "Bhakra",
+        "vintage": "2019 chart (CBIP RTDSS presentation, page 44)",
+        "points": [
+            {"month": 7, "day": 31, "level_ft": 1650.0},
+            {"month": 8, "day": 15, "level_ft": 1670.0},
+            {"month": 8, "day": 31, "level_ft": 1680.0},
+        ],
+        "guideline_2025_08_19_ft": 1662.0,
+    }
+    results["rule_curve_timing"] = [
+        {
+            "year": 2023, "opening_date": "2023-08-13", "opening_level_ft": 1672.0,
+            "schedule_level_ft": 1670.0, "frl_ft": 1680.0, "n_days_frl": 40, "n_days_rule": 40,
+            "first_forced_frl": "2023-08-16", "lag_frl_days": 3,
+            "first_forced_rule": "2023-08-12", "lag_rule_days": -1,
+        },
+        {
+            "year": 2025, "opening_date": "2025-08-19", "opening_level_ft": 1665.06,
+            "schedule_level_ft": 1672.5, "frl_ft": 1680.0, "n_days_frl": 30, "n_days_rule": 30,
+            "first_forced_frl": None, "lag_frl_days": None,
+            "first_forced_rule": "2025-08-28", "lag_rule_days": 9,
+        },
+    ]
+    results["gauge_readings_check"] = [
+        {"station": "Dhilwan", "date": "2023-08-17", "observed_cusecs": 234000.0,
+         "routed_cusecs": 120000.0, "ratio": 120000.0 / 234000.0, "as_of_time": ""},
+        {"station": "Dhilwan", "date": "2023-08-19", "observed_cusecs": 200000.0,
+         "routed_cusecs": float("nan"), "ratio": float("nan"), "as_of_time": ""},
+    ]
     results["flood_cushion"] = {
         "dam": "Pong", "top_level_ft": 1400.0, "capacity_bcm": 7.29, "live_capacity_bcm": 6.157,
     }
@@ -412,6 +442,14 @@ def test_render_verification_from_synthetic_outputs(tmp_path):
     assert "Dated figures by year" in md
     assert "spread of the model's log ratio to the 6 period means" in md and "0.13" in md
     assert "### The response fitted on measured inflow, 2026 bulletins" in md
+    assert "### The operator's schedule at Bhakra" in md
+    assert "1,650 ft up to 31 July; 1,670 ft up to 15 August; 1,680 ft up to 31 August" in md
+    assert "guideline of 1,662 ft for 19 August 2025" in md
+    assert "| 2023 | 2023-08-13 | 1,672.00 | 1,670.0 | 2023-08-16 | +3 | 2023-08-12 | -1 |" in md
+    assert "| 2025 | 2025-08-19 | 1,665.06 | 1,672.5 | none in the season | n/a | 2025-08-28 | +9 |" in md
+    assert "### The routed release on the days the press quoted the gauges" in md
+    assert "| Dhilwan | 2023-08-17 | 234,000 | 120,000 | 0.51 |" in md
+    assert "| Dhilwan | 2023-08-19 | 200,000 | n/a | n/a |" in md
     assert "| Pong | 39 | storage change, 2015 to 2025 | 0.203 | 0.328 | 0.35, 0.48, 0.09, 0.08 | 25,000 | 0.610 | -12% | 0.81 | 4,100 | 1.40 |" in md
     assert "| Pong | 30 | storage change, base fitted on 2026 | 0.203 | 0.328 | 0.35, 0.48, 0.09, 0.08 | 21,000 | | +0% | 0.81 | 3,900 | |" in md
     assert "| Pong | 30 | measured inflow, 2026 (in sample) | 0.284 | 0.300 | 0.40, 0.40, 0.10, 0.10 | 24,000 | 0.770 | +0% | 0.88 | 3,200 | |" in md

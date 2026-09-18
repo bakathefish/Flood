@@ -107,6 +107,48 @@ The forced release of a full Pong reservoir under the observed rain (one-day-ahe
 
 The rows marked flood cushion let Pong rise to 1400 ft (7.290 BCM live, the design pair in the emergency action plan) before the spillway must open, against 6.157 BCM at the reduced FRL in the other rows; the storage above FRL is rated on the straight line between the two published points. The dam did rise into the cushion in both events, so the two settings bracket what BBMB did: the FRL bound fires early and high, the cushion bound late and low.
 
+### The operator's schedule at Bhakra
+
+The forced release above is the spillway's bound. BBMB opens the gates earlier, under a filling schedule; the one in hand for Bhakra (2019 chart (CBIP RTDSS presentation, page 44)) reads 1,650 ft up to 31 July; 1,670 ft up to 15 August; 1,680 ft up to 31 August, a level holding up to its date and a straight line from the last point below FRL to the date FRL may be reached. The press quotes a guideline of 1,662 ft for 19 August 2025, below that line, so the schedule has been lowered since and this scenario is the 2019 rule. For each dated gate opening, the first day of the season on which each bound forces a release (the schedule bound counting a release above a tenth of the turbine passage), and its lag from the opening; the storage between measurements is the model's carry.
+
+| year | gates opened | level then (ft) | schedule level that day (ft) | first forced, FRL bound | lag (days) | first forced, schedule bound | lag (days) |
+|---|---|---|---|---|---|---|---|
+| 2015 | 2015-08-10 | 1,661.10 | 1,670.0 | none in the season | n/a | 2015-08-17 | +7 |
+| 2023 | 2023-08-13 | 1,672.00 | 1,670.0 | none in the season | n/a | 2023-07-25 | -19 |
+| 2025 | 2025-08-19 | 1,665.06 | 1,672.5 | none in the season | n/a | 2025-09-01 | +13 |
+
+### The routed release on the days the press quoted the gauges
+
+The dated press readings of the river gauges (moment readings, ambiguous rows left out) against the routed Pong release (spill plus passage, no local term) on the same day, as a ratio; a check of the hydrograph's level on dated days, not a fit.
+
+| station | date | quoted (cusecs) | routed (cusecs) | ratio |
+|---|---|---|---|---|
+| Dhilwan | 2023-08-17 | 234,000 | 181,686 | 0.78 |
+| Dhilwan | 2023-08-18 | 220,000 | 181,686 | 0.83 |
+| Dhilwan | 2023-08-20 | 155,500 | 52,268 | 0.34 |
+| Dhilwan | 2023-08-21 | 139,000 | 38,388 | 0.28 |
+| Dhilwan | 2023-08-23 | 136,000 | 0 | 0.00 |
+| Dhilwan | 2025-08-24 | 130,000 | 0 | 0.00 |
+| Dhilwan | 2025-08-25 | 140,000 | 0 | 0.00 |
+| Ferozepur Head Works | 2023-08-18 | 258,910 | 103,483 | 0.40 |
+| Ferozepur Head Works | 2023-08-20 | 225,000 | 181,686 | 0.81 |
+| Ferozepur Head Works | 2023-08-21 | 156,000 | 92,820 | 0.59 |
+| Ferozepur Head Works | 2023-08-23 | 133,224 | 38,388 | 0.29 |
+| Ferozepur Head Works | 2025-08-21 | 82,725 | 0 | 0.00 |
+| Ferozepur Head Works | 2025-09-03 | 324,000 | 114,036 | 0.35 |
+| Ferozepur Head Works | 2025-09-03 | 302,508 | 114,036 | 0.38 |
+| Ferozepur Head Works | 2025-09-03 | 301,918 | 114,036 | 0.38 |
+| Harike Head Works | 2023-08-17 | 235,000 | 0 | 0.00 |
+| Harike Head Works | 2023-08-17 | 215,000 | 0 | 0.00 |
+| Harike Head Works | 2023-08-18 | 284,987 | 103,483 | 0.36 |
+| Harike Head Works | 2023-08-20 | 169,000 | 92,820 | 0.55 |
+| Harike Head Works | 2023-08-21 | 160,000 | 52,268 | 0.33 |
+| Harike Head Works | 2023-08-23 | 142,766 | 0 | 0.00 |
+| Harike Head Works | 2025-08-21 | 94,929 | 0 | 0.00 |
+| Harike Head Works | 2025-09-03 | 330,000 | 109,794 | 0.33 |
+| Harike Head Works | 2025-09-03 | 335,030 | 109,794 | 0.33 |
+| Harike Head Works | 2025-09-03 | 318,159 | 109,794 | 0.35 |
+
 | year | release routed | predicted peak date | predicted peak (cusecs) | observed peak date | observed peak (cusecs) | lag (days) | magnitude ratio |
 |---|---|---|---|---|---|---|---|
 | 2023 | spill + passage | 2023-08-17 | 181,686 | 2023-08-17 | 237,500 | +0 | 0.76 |
@@ -146,32 +188,202 @@ The runoff coefficient is fitted on ordinary filling days (the storage-change re
 | Pong | mean, 2025-08-25 to 2025-09-04 | 11 | 121,600 | 137,283 | 1.13 | PAC data via The Wire, 8 Sep 2025 |
 | Ranjit Sagar | mean, 2025-08-01 to 2025-08-24 | 20 | 38,700 | 30,075 | 0.78 | PAC data via The Wire, 8 Sep 2025 |
 | Ranjit Sagar | mean, 2025-08-25 to 2025-09-04 | 11 | 71,960 | 69,098 | 0.96 | PAC data via The Wire, 8 Sep 2025 |
+| Bhakra | day, 2015-05-27 | 0 | 27,137 | n/a | n/a | dry spell leads to drop in water level in 3 dams |
+| Pong | day, 2015-05-27 | 0 | 5,278 | n/a | n/a | dry spell leads to drop in water level in 3 dams |
+| Bhakra | day, 2016-03-31 | 0 | 6,750 | n/a | n/a | bhakra water level plummets |
+| Bhakra | day, 2016-05-27 | 0 | 18,560 | n/a | n/a | dry spell leads to drop in water level in 3 dams |
+| Pong | day, 2016-05-27 | 0 | 2,965 | n/a | n/a | dry spell leads to drop in water level in 3 dams |
+| Ranjit Sagar | day, 2016-05-27 | 0 | 8,888 | n/a | n/a | dry spell leads to drop in water level in 3 dams |
+| Bhakra | day, 2016-07-02 | 1 | 35,627 | 61,038 | 1.71 | bhakra pong dams filling up quickly |
+| Bhakra | day, 2017-03-31 | 0 | 8,800 | n/a | n/a | bhakra water level plummets |
+| Bhakra | day, 2017-07-02 | 1 | 34,802 | 52,855 | 1.52 | bhakra pong dams filling up quickly |
+| Bhakra | day, 2020-05-13 | 0 | 19,548 | n/a | n/a | water storage down to 10 bhakra can meet only 30 demand for irrigation |
+| Pong | day, 2020-05-13 | 0 | 5,266 | n/a | n/a | water storage down to 10 bhakra can meet only 30 demand for irrigation |
+| Pong | day, 2020-09-01 | 1 | 74,960 | 59,435 | 0.79 | Water level in Pong Dam rises over 5 feet above danger mark as rains l |
+| Bhakra | day, 2021-05-13 | 0 | 15,661 | n/a | n/a | water storage down to 10 bhakra can meet only 30 demand for irrigation |
+| Pong | day, 2021-05-13 | 0 | 3,565 | n/a | n/a | water storage down to 10 bhakra can meet only 30 demand for irrigation |
+| Bhakra | day, 2021-08-19 | 1 | 90,000 | 37,521 | 0.42 | Bhakra water level flood update |
+| Pong | day, 2022-08-11 | 1 | 86,897 | 76,788 | 0.88 | Himachal: भारी बारिश से पौंग बांध का जलस्तर 1351.20 फीट तक पहुंचा, पंड |
+| Pong | day, 2022-08-22 | 1 | 50,592 | 89,472 | 1.77 | Water Level Rise: खतरे के निशान के नजदीक पहुंचा पौंग बांध का जलस्तर, झ |
+| Ranjit Sagar | day, 2023-07-06 | 1 | 18,000 | 26,024 | 1.45 | Jalandhar News: एक दिन की बारिश से रणजीत सागर डैम में 36 सेंटीमीटर बढ़ |
+| Ranjit Sagar | day, 2023-07-18 | 1 | 25,660 | 37,517 | 1.46 | rain a boon for pspcl generates 144 lakh units daily at ranjit sagar d |
 | Bhakra | day, 2023-08-14 | 1 | 193,324 | 91,025 | 0.47 | BBMB via Himachal Tonite, Aug 2023 |
+| Bhakra | day, 2023-08-14 | 1 | 109,834 | 91,025 | 0.83 | हिमाचल में भारी बारिश का असर: भाखड़ा बांध का जलस्तर 1675 फीट पहुंचा, ख |
+| Pong | day, 2023-08-14 | 1 | 700,000 | 233,281 | 0.33 | Punjab: पौंग डैम में सात लाख क्यूसेक पानी पहुंचा, पंजाब के पांच जिलों  |
+| Pong | day, 2023-08-14 | 1 | 381,330 | 233,281 | 0.61 | Kangra News: पौंग बांध का पानी खतरे के निशान से सात फीट ऊपर, निचले क्ष |
+| Pong | day, 2023-08-14 | 1 | 513,000 | 233,281 | 0.45 | Pong Dam Kangra: खतरे के निशान से ऊपर पौंग बांध का जलस्तर, आज शाम 4 बज |
 | Bhakra | day, 2023-08-15 | 1 | 85,899 | 86,995 | 1.01 | The Tribune, 15 Aug 2023 |
-| Bhakra | day, 2023-08-22 | 1 | 105,000 | 39,112 | 0.37 | The Tribune, 23 Aug 2023 (Tuesday) |
+| Pong | day, 2023-08-15 | 1 | 142,000 | 374,723 | 2.64 | Several villages in Punjab's Hoshiarpur, Rupnagar inundated after wate |
 | Bhakra | day, 2023-08-22 | 1 | 72,835 | 39,112 | 0.54 | The Tribune, 24 Aug 2023 (yesterday) |
 | Pong | day, 2023-08-22 | 1 | 58,702 | 46,948 | 0.80 | The Tribune, 24 Aug 2023 (yesterday) |
-| Bhakra | day, 2023-08-23 | 1 | 128,000 | 60,147 | 0.47 | The Tribune, 23 Aug 2023 (Wednesday) |
 | Bhakra | day, 2023-08-23 | 1 | 128,406 | 60,147 | 0.47 | The Tribune, 24 Aug 2023 |
-| Pong | day, 2023-08-23 | 1 | 158,000 | 68,465 | 0.43 | The Tribune, 23 Aug 2023 (Wednesday) |
 | Pong | day, 2023-08-23 | 1 | 138,674 | 68,465 | 0.49 | The Tribune, 24 Aug 2023 |
 | Bhakra | day, 2023-08-25 | 1 | 52,810 | 57,026 | 1.08 | Rozana Spokesman, 25 Aug 2023 |
+| Bhakra | day, 2023-08-25 | 1 | 52,810 | 57,026 | 1.08 | Mounting Rainfall Elevates Flood Concerns: Bhakra Dam Water Level Reac |
+| Bhakra | day, 2024-06-21 | 1 | 34,525 | 38,790 | 1.12 | Heavy rainfall in HP but water level low in Bhakra, Pong dams |
+| Pong | day, 2024-06-21 | 1 | 5,389 | 44,524 | 8.26 | Heavy rainfall in HP but water level low in Bhakra, Pong dams |
+| Bhakra | day, 2024-06-30 | 1 | 34,162 | 43,799 | 1.28 | ਭਾਖੜਾ ਡੈਮ 'ਚ ਪਾਣੀ ਦਾ ਪੱਧਰ 1585.83 ਫੁੱਟ 'ਤੇ ਪੁੱਜਾ |
+| Bhakra | day, 2024-08-02 | 1 | 56,073 | 51,931 | 0.93 | 1610.41 ਫੁੱਟ ਤੇ ਪਹੁੰਚਿਆਂ ਭਾਖੜਾ ਡੈਮ 'ਚ ਪਾਣੀ ਦਾ ਪੱਧਰ, ਬੀਤੇ ਵਰ੍ਹੇ ਦੇ ਮੁਕਾ |
+| Pong | day, 2024-08-12 | 1 | 59,830 | 100,436 | 1.68 | Kangra News: 1,346 फीट तक पहुंचा पौंग का जलस्तर, खतरे के निशान के महज  |
+| Bhakra | day, 2024-11-20 | 0 | 6,000 | n/a | n/a | water level low in dams bbmb cautions member states |
+| Bhakra | day, 2025-01-03 | 0 | 4,700 | n/a | n/a | water level low in dams bbmb sounds warning |
+| Pong | day, 2025-01-03 | 0 | 2,600 | n/a | n/a | water level low in dams bbmb sounds warning |
+| Bhakra | day, 2025-06-09 | 1 | 21,792 | 35,687 | 1.64 | Dam level up, BBMB tells Punjab, Haryana to draw more water |
+| Bhakra | day, 2025-06-12 | 1 | 28,015 | 39,772 | 1.42 | Una News: भाखड़ा डैम का जलस्तर पहुंचा 1,576 फीट के पार |
+| Bhakra | day, 2025-06-21 | 1 | 32,699 | 40,651 | 1.24 | Heavy rainfall in HP but water level low in Bhakra, Pong dams |
+| Pong | day, 2025-06-21 | 1 | 16,602 | 51,988 | 3.13 | Heavy rainfall in HP but water level low in Bhakra, Pong dams |
+| Bhakra | day, 2025-06-29 | 1 | 46,103 | 70,538 | 1.53 | Una News: बीते वर्ष के मुकाबले भाखड़ा बांध के जलस्तर में आई 16 फीट की  |
+| Bhakra | day, 2025-07-05 | 1 | 44,295 | 47,785 | 1.08 | Bhakra Dam Water level increased, level reached 1584.21 feet |
+| Pong | day, 2025-07-20 | 1 | 22,345 | 43,202 | 1.93 | पौंग बांध में पिछले नौ दिन में चार फीट तक बढ़ा जलस्तर |
+| Bhakra | day, 2025-07-21 | 1 | 43,671 | 59,579 | 1.36 | Una News: भाखड़ा बांध का जलस्तर 1600 फीट के ऊपर पहुंचा |
+| Bhakra | day, 2025-07-22 | 1 | 77,741 | 62,048 | 0.80 | Bhakra Dam Water Level: ਭਾਖੜਾ, ਪੌਂਗ ਅਤੇ ਪੰਡੋਹ ਡੈਮਾਂ ਵਿੱਚ ਪਾਣੀ ਦੀ ਆਮਦ ਘ |
+| Bhakra | day, 2025-07-28 | 1 | 45,857 | 42,449 | 0.93 | Una News: भाखड़ा बांध का जलस्तर बढ़ा, खतरे के निशान के करीब |
+| Bhakra | day, 2025-08-01 | 1 | 190,000 | 54,782 | 0.29 | Centre rejects Punjab's claim that lapses at Bhakra, Pong dams exacerb |
+| Pong | day, 2025-08-01 | 1 | 350,000 | 99,437 | 0.28 | Centre rejects Punjab's claim that lapses at Bhakra, Pong dams exacerb |
 | Pong | day, 2025-08-02 | 0 | 87,586 | n/a | n/a | The Tribune, 2 Aug 2025 |
+| Pong | day, 2025-08-02 | 0 | 87,586 | n/a | n/a | Water level in Pong dam rises sharply due to heavy rainfall; BBMB warn |
+| Pong | day, 2025-08-03 | 0 | 87,586 | n/a | n/a | पोंग बांध में जलस्तर खतरे के निशान के करीब, BBMB 18,995 क्यूसेक पानी छ |
+| Pong | day, 2025-08-03 | 0 | 87,586 | n/a | n/a | Himachal: Water level near danger mark at Pong dam |
+| Pong | day, 2025-08-03 | 0 | 87,586 | n/a | n/a | water level in pong dam nears danger mark bbmb to release 18995 cusecs |
+| Pong | day, 2025-08-05 | 0 | 74,370 | n/a | n/a | Kangra News: पौंग बांध का जलस्तर खतरे के निशान से 21 फीट दूर |
 | Bhakra | day, 2025-08-06 | 1 | 59,200 | 82,043 | 1.39 | Babushahi, 6 Aug 2025 |
+| Bhakra | day, 2025-08-06 | 1 | 59,200 | 82,043 | 1.39 | Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy  |
 | Pong | day, 2025-08-06 | 0 | 93,650 | n/a | n/a | Babushahi, 6 Aug 2025 |
+| Pong | day, 2025-08-06 | 0 | 93,650 | n/a | n/a | Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy  |
+| Ranjit Sagar | day, 2025-08-06 | 0 | 24,000 | n/a | n/a | Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy  |
+| Bhakra | day, 2025-08-07 | 1 | 70,352 | 69,513 | 0.99 | Una News: भाखड़ा बांध का जलस्तर पहुंचा 1638 फीट के पार |
+| Pong | day, 2025-08-07 | 1 | 190,000 | 121,176 | 0.64 | Punjab: 23,000 cusecs of water released from Pong dam |
+| Pong | day, 2025-08-09 | 1 | 52,518 | 61,410 | 1.17 | पंजाब में आज भारी बारिश का अलर्ट: पौंग बांध से फिर छोड़ा जाएगा पानी, ज |
+| Bhakra | day, 2025-08-16 | 1 | 89,361 | 65,752 | 0.74 | Una News: भाखड़ा बांध का जलस्तर पहुंचा 1658 फीट के पार |
 | Pong | day, 2025-08-17 | 1 | 109,789 | 116,417 | 1.06 | The Tribune, 17 Aug 2025 |
+| Pong | day, 2025-08-17 | 1 | 109,789 | 116,417 | 1.06 | Water level in Pong Dam touches 1,379.98 feet, BBMB orders release of  |
 | Bhakra | day, 2025-08-19 | 1 | 65,617 | 50,860 | 0.78 | Babushahi, 19 Aug 2025 |
+| Bhakra | day, 2025-08-19 | 1 | 65,617 | 50,860 | 0.78 | Breaking: All four floodgates of Bhakra dam opened |
+| Bhakra | day, 2025-08-19 | 1 | 70,500 | 50,860 | 0.72 | BBMB Releases Water From Pong & Bhakra Dams, Flood Alert Issued in Sev |
+| Pong | day, 2025-08-19 | 1 | 84,000 | 101,775 | 1.21 | BBMB Releases Water From Pong & Bhakra Dams, Flood Alert Issued in Sev |
+| Bhakra | day, 2025-08-25 | 1 | 48,000 | 64,420 | 1.34 | Amid heavy rainfall in Himachal: BBMB keeps close watch, says Bhakra w |
 | Pong | day, 2025-08-25 | 1 | 146,174 | 104,157 | 0.71 | Diary Times, 25 Aug 2025 |
-| Pong | day, 2025-08-26 | 1 | 233,000 | 175,210 | 0.75 | PTI via The Week, 26 Aug 2025 (about) |
+| Pong | day, 2025-08-25 | 1 | 151,000 | 104,157 | 0.69 | Kangra News: पौंग बांध का जलस्तर बढ़ा, घराट जलमग्न |
+| Pong | day, 2025-08-26 | 1 | 233,000 | 175,210 | 0.75 | Water level in Pong dam reaches 1,390 feet |
 | Bhakra | day, 2025-08-27 | 1 | 58,997 | 62,325 | 1.06 | The Tribune, 28 Aug 2026 (same date last year) |
+| Bhakra | day, 2025-08-27 | 1 | 58,997 | 62,325 | 1.06 | Bilaspur News: भाखड़ा बांध में पिछले साल से 37 फीट कम पानी |
+| Bhakra | day, 2025-08-27 | 1 | 59,364 | 62,325 | 1.05 | Punjab's power demand stays above 16,000 MW, but why is Bhakra inflow  |
 | Pong | day, 2025-08-27 | 1 | 228,091 | 203,537 | 0.89 | The Tribune, 28 Aug 2026 (same date last year) |
 | Ranjit Sagar | day, 2025-08-27 | 1 | 163,037 | 109,546 | 0.67 | The Tribune, 28 Aug 2026 (same date last year) |
+| Ranjit Sagar | day, 2025-08-27 | 1 | 7,073 | 109,546 | 15.49 | Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i |
+| Bhakra | day, 2025-08-28 | 1 | 53,856 | 57,537 | 1.07 | Water level drops in Punjab's Ranjit Sagar Dam |
+| Bhakra | day, 2025-08-28 | 1 | 54,213 | 57,537 | 1.06 | water levels recede in punjab dams bringing relief to flood affected a |
+| Pong | day, 2025-08-28 | 1 | 110,000 | 126,933 | 1.15 | Water level drops in Punjab's Ranjit Sagar Dam |
+| Pong | day, 2025-08-28 | 1 | 79,780 | 126,933 | 1.59 | pong dam water level remains above danger mark high discharge continue |
+| Pong | day, 2025-08-28 | 1 | 144,741 | 126,933 | 0.88 | water levels recede in punjab dams bringing relief to flood affected a |
+| Bhakra | day, 2025-08-29 | 1 | 49,137 | 72,173 | 1.47 | Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas |
+| Bhakra | day, 2025-08-29 | 1 | 49,137 | 72,173 | 1.47 | water levels recede in punjab dams bringing relief to flood affected a |
+| Pong | day, 2025-08-29 | 1 | 61,371 | 116,119 | 1.89 | Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas |
+| Pong | day, 2025-08-29 | 1 | 61,371 | 116,119 | 1.89 | water levels recede in punjab dams bringing relief to flood affected a |
+| Ranjit Sagar | day, 2025-08-29 | 1 | 54,623 | 52,900 | 0.97 | Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas |
 | Pong | day, 2025-08-31 | 1 | 160,276 | 121,294 | 0.76 | The Tribune, 31 Aug 2025 |
+| Pong | day, 2025-08-31 | 1 | 160,276 | 121,294 | 0.76 | pong dam level remains above danger mark 84952 cusecs water discharged |
+| Bhakra | day, 2025-09-01 | 1 | 107,565 | 103,902 | 0.97 | Una News: खतरे के निशान से मात्र तीन फीट की दूरी पर भाखड़ा डैम का जलस् |
+| Bhakra | day, 2025-09-01 | 1 | 107,000 | 103,902 | 0.97 | Amid Heavy Rain, Bhakra Dam Level Rises 3 ft In 24 Hours, Authorities  |
+| Bhakra | day, 2025-09-02 | 1 | 107,000 | 108,620 | 1.02 | Bhakra Dam level rises 3 ft in 24 hours, triggers flood alarm downstre |
+| Pong | day, 2025-09-02 | 1 | 96,777 | 134,700 | 1.39 | Bhakra Dam level rises 3 ft in 24 hours, triggers flood alarm downstre |
+| Pong | day, 2025-09-02 | 1 | 96,777 | 134,700 | 1.39 | Amid Heavy Rain, Bhakra Dam Level Rises 3 ft In 24 Hours, Authorities  |
+| Bhakra | day, 2025-09-03 | 1 | 110,000 | 102,327 | 0.93 | Una News: भाखड़ा बांध का जलस्तर 1678 फीट पार, दो फीट रह गया खतरे का नि |
+| Bhakra | day, 2025-09-03 | 1 | 86,822 | 102,327 | 1.18 | record rain red alert in punjab himachal j&k chandigarh's sukhna gates |
+| Pong | day, 2025-09-03 | 1 | 155,261 | 151,829 | 0.98 | heavy rainfall swells pong dam water level above danger mark for 4th d |
+| Bhakra | day, 2025-09-04 | 1 | 95,435 | 93,307 | 0.98 | BBMB Reservoir Data (data-reservoir.htm archived capture) |
+| Bhakra | day, 2025-09-04 | 1 | 95,435 | 93,307 | 0.98 | bhakra to release more water into punjab as pong dam hits full capacit |
 | Pong | day, 2025-09-04 | 1 | 107,301 | 147,004 | 1.37 | The Tribune, 4 Sep 2025 (actual inflow) |
+| Pong | day, 2025-09-04 | 1 | 132,595 | 147,004 | 1.11 | BBMB Reservoir Data (data-reservoir.htm archived capture) |
+| Pong | day, 2025-09-04 | 1 | 132,595 | 147,004 | 1.11 | bhakra to release more water into punjab as pong dam hits full capacit |
 | Bhakra | day, 2025-09-05 | 1 | 76,318 | 67,120 | 0.88 | SDO Nangal via Babushahi, 5 Sep 2025 |
+| Bhakra | day, 2025-09-05 | 1 | 76,318 | 67,120 | 0.88 | Bhakra reservoir water level data (SDO Nangal Dam office) |
 | Pong | day, 2025-09-05 | 1 | 105,950 | 113,008 | 1.07 | The Tribune, 6 Sep 2025 (yesterday) |
+| Pong | day, 2025-09-05 | 1 | 99,673 | 113,008 | 1.13 | Kangra News: पौंग बांध का जलस्तर 1394.80 फीट पर स्थिर, खतरे से 4.80 फी |
+| Pong | day, 2025-09-05 | 1 | 105,950 | 113,008 | 1.07 | Punjab floods: Bhakra water level drops; Pong dam continues high outfl |
 | Bhakra | day, 2025-09-06 | 1 | 62,481 | 56,139 | 0.90 | The Tribune, 6 Sep 2025 |
+| Bhakra | day, 2025-09-06 | 1 | 51,332 | 56,139 | 1.09 | Punjab: Pong releases 99,889 cusecs as water level exceeds limit |
+| Bhakra | day, 2025-09-06 | 1 | 62,481 | 56,139 | 0.90 | Water level in Bhakra, Pong & Ranjit Sagar dams recedes |
+| Bhakra | day, 2025-09-06 | 1 | 62,481 | 56,139 | 0.90 | Punjab floods: Bhakra water level drops; Pong dam continues high outfl |
 | Pong | day, 2025-09-06 | 1 | 98,418 | 75,537 | 0.77 | The Tribune, 6 Sep 2025 |
+| Pong | day, 2025-09-06 | 1 | 47,162 | 75,537 | 1.60 | Punjab: Pong releases 99,889 cusecs as water level exceeds limit |
+| Pong | day, 2025-09-06 | 1 | 47,162 | 75,537 | 1.60 | Punjab: Water level in Pong dam dips by 2 feet but outflow still high |
+| Pong | day, 2025-09-06 | 1 | 98,418 | 75,537 | 0.77 | Punjab floods: Bhakra water level drops; Pong dam continues high outfl |
+| Ranjit Sagar | day, 2025-09-06 | 1 | 24,947 | 22,582 | 0.91 | Punjab: Pong releases 99,889 cusecs as water level exceeds limit |
+| Bhakra | day, 2025-09-07 | 1 | 66,900 | 47,647 | 0.71 | Punjab: Water level in Pong dam dips by 2 feet but outflow still high |
+| Pong | day, 2025-09-07 | 1 | 36,968 | 58,398 | 1.58 | Punjab: Water level in Pong dam dips by 2 feet but outflow still high |
+| Bhakra | day, 2025-09-08 | 1 | 55,338 | 43,704 | 0.79 | Water level in Bhakra, Pong & Ranjit Sagar dams recedes |
+| Pong | day, 2025-09-08 | 1 | 46,500 | 54,954 | 1.18 | Punjab: Water level in Pong dam dips by 2 feet but outflow still high |
+| Pong | day, 2025-09-08 | 1 | 35,439 | 54,954 | 1.55 | Water level in Bhakra, Pong & Ranjit Sagar dams recedes |
+| Ranjit Sagar | day, 2025-09-08 | 1 | 30,500 | 19,141 | 0.63 | Punjab: Water level in Pong dam dips by 2 feet but outflow still high |
+| Ranjit Sagar | day, 2025-09-08 | 1 | 19,782 | 19,141 | 0.97 | Water level in Bhakra, Pong & Ranjit Sagar dams recedes |
+| Bhakra | day, 2025-09-14 | 1 | 46,708 | 46,129 | 0.99 | पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख |
+| Pong | day, 2025-09-14 | 1 | 34,737 | 70,784 | 2.04 | पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख |
+| Bhakra | day, 2025-09-15 | 1 | 54,667 | 44,853 | 0.82 | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Bhakra | day, 2025-09-15 | 1 | 40,999 | 44,853 | 1.09 | water level at pong dam rises amid surplus rain in parts of himachal p |
+| Pong | day, 2025-09-15 | 1 | 76,498 | 83,124 | 1.09 | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Pong | day, 2025-09-15 | 1 | 80,000 | 83,124 | 1.04 | पौंग डैम का जलस्तर घटा, निचले इलाकों के लिए राहत, जल्द पटरी पर लौटेगी  |
+| Pong | day, 2025-09-15 | 1 | 64,964 | 83,124 | 1.28 | water level at pong dam rises amid surplus rain in parts of himachal p |
+| Pong | day, 2025-09-16 | 1 | 160,369 | 74,345 | 0.46 | Kangra News: पौंग बांध का जलस्तर खतरे के निशान से पांच फीट ऊपर |
+| Pong | day, 2025-09-20 | 1 | 38,773 | 49,898 | 1.29 | Pong Dam water level sees decline |
+| Pong | day, 2025-09-21 | 1 | 31,540 | 45,578 | 1.45 | Pong Dam water level sees decline |
+| Bhakra | day, 2025-09-24 | 1 | 35,666 | 35,817 | 1.00 | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Pong | day, 2025-09-24 | 1 | 17,291 | 40,090 | 2.32 | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Pong | day, 2025-10-05 | 0 | 10,084 | n/a | n/a | 50000 cusecs of water released from pong dam |
+| Bhakra | day, 2025-11-20 | 0 | 7,811 | n/a | n/a | Himachal: पंजाब में नहरों की मरम्मत से और बढ़ेगा भाखड़ा डैम में पानी |
+| Bhakra | day, 2026-05-14 | 0 | 13,102 | n/a | n/a | BBMB Reservoir Data rdata.html (archived capture) |
+| Pong | day, 2026-05-14 | 0 | 2,705 | n/a | n/a | BBMB Reservoir Data rdata.html (archived capture) |
+| Bhakra | day, 2026-06-04 | 0 | 10,641 | n/a | n/a | BBMB Reservoir Data rdata.html (archived capture) |
+| Pong | day, 2026-06-04 | 0 | 2,088 | n/a | n/a | BBMB Reservoir Data rdata.html (archived capture) |
+| Bhakra | day, 2026-06-09 | 0 | 13,748 | n/a | n/a | Dam level up, BBMB tells Punjab, Haryana to draw more water |
+| Bhakra | day, 2026-06-10 | 0 | 13,748 | n/a | n/a | Draw more water from dams, BBMB tells partner states ahead of monsoon |
+| Pong | day, 2026-06-10 | 0 | 1,986 | n/a | n/a | Draw more water from dams, BBMB tells partner states ahead of monsoon |
+| Bhakra | day, 2026-06-11 | 0 | 16,527 | n/a | n/a | Una News: भाखड़ा डैम का जलस्तर पहुंचा 1,576 फीट के पार |
+| Bhakra | day, 2026-06-11 | 0 | 16,527 | n/a | n/a | Bhakra inflows down 50% as low snowfall, delayed snowmelt hit Sutlej c |
+| Pong | day, 2026-06-11 | 0 | 2,129 | n/a | n/a | Bhakra inflows down 50% as low snowfall, delayed snowmelt hit Sutlej c |
+| Ranjit Sagar | day, 2026-06-11 | 0 | 4,854 | n/a | n/a | Bhakra inflows down 50% as low snowfall, delayed snowmelt hit Sutlej c |
+| Bhakra | day, 2026-06-13 | 0 | 19,074 | n/a | n/a | Bhakra Dam Water Level: ਭਾਖੜਾ ਡੈਮ ਵਿੱਚ ਪਾਣੀ ਦਾ ਪੱਧਰ 1576.22 ਫੁੱਟ ਤੱਕ ਪ |
+| Bhakra | day, 2026-06-14 | 0 | 22,581 | n/a | n/a | ਭਾਖੜਾ ਡੈਮ ਅਪਡੇਟ: ਮੰਗ ਵਧਣ ਕਾਰਨ 3 ਦਿਨਾਂ 'ਚ 0.81 ਫੁੱਟ ਘਟਿਆ ਪਾਣੀ ਦਾ ਪੱਧਰ |
+| Bhakra | day, 2026-06-24 | 0 | 18,715 | n/a | n/a | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Pong | day, 2026-06-24 | 0 | 3,527 | n/a | n/a | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Bhakra | day, 2026-06-28 | 1 | 22,137 | 37,581 | 1.70 | Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r |
+| Pong | day, 2026-06-28 | 1 | 5,723 | 42,118 | 7.36 | Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r |
+| Ranjit Sagar | day, 2026-06-28 | 0 | 2,006 | n/a | n/a | Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r |
+| Bhakra | day, 2026-06-29 | 1 | 22,734 | 42,916 | 1.89 | Una News: बीते वर्ष के मुकाबले भाखड़ा बांध के जलस्तर में आई 16 फीट की  |
+| Bhakra | day, 2026-07-15 | 1 | 40,426 | 40,752 | 1.01 | 22 फीट बढ़ा भाखड़ा का जलस्तर: पिछले साल से फिर भी नीचे... |
+| Ranjit Sagar | day, 2026-07-21 | 0 | 43,898 | n/a | n/a | Water levels at Bhakra, Pong and Pandoh dams substantially lower due t |
+| Bhakra | day, 2026-07-22 | 0 | 36,866 | n/a | n/a | Water levels at Bhakra, Pong and Pandoh dams substantially lower due t |
+| Bhakra | day, 2026-07-22 | 0 | 36,866 | n/a | n/a | Bhakra Dam Water Level: ਭਾਖੜਾ, ਪੌਂਗ ਅਤੇ ਪੰਡੋਹ ਡੈਮਾਂ ਵਿੱਚ ਪਾਣੀ ਦੀ ਆਮਦ ਘ |
+| Pong | day, 2026-07-22 | 0 | 22,546 | n/a | n/a | Water levels at Bhakra, Pong and Pandoh dams substantially lower due t |
+| Ranjit Sagar | day, 2026-07-24 | 0 | 96,674 | n/a | n/a | ਰਣਜੀਤ ਸਾਗਰ ਡੈਮ 'ਚ ਵਧਿਆ ਪਾਣੀ ਦਾ ਪੱਧਰ, ਡੈਮ ਪ੍ਰਬੰਧਕਾਂ ਨੇ ਭੇਜਿਆ ਚੇਤਾਵਨੀ ਸੰ |
+| Bhakra | day, 2026-07-26 | 0 | 40,363 | n/a | n/a | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Pong | day, 2026-07-26 | 0 | 37,172 | n/a | n/a | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Pong | day, 2026-07-29 | 1 | 61,210 | 107,558 | 1.76 | Kangra News: पौंग बांध का जलस्तर 11 दिन में 12 फीट बढ़ा |
+| Bhakra | day, 2026-08-08 | 1 | 41,501 | 58,842 | 1.42 | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Pong | day, 2026-08-08 | 1 | 48,054 | 94,699 | 1.97 | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Bhakra | day, 2026-08-09 | 1 | 40,137 | 54,533 | 1.36 | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Pong | day, 2026-08-09 | 1 | 34,263 | 70,121 | 2.05 | BBMB Reservoir Data res_data.pdf (archived capture) |
+| Bhakra | day, 2026-08-10 | 1 | 41,000 | 57,125 | 1.39 | Himachal rain takes Bhakra Dam level to 1,612 feet, still far from 1,6 |
+| Pong | day, 2026-08-10 | 1 | 48,000 | 61,781 | 1.29 | Himachal rain takes Bhakra Dam level to 1,612 feet, still far from 1,6 |
+| Ranjit Sagar | day, 2026-08-12 | 0 | 11,645 | n/a | n/a | Jalandhar News: रंजीत सागर बांध का जलस्तर 513.01 मीटर पहुंचा |
+| Bhakra | day, 2026-08-21 | 1 | 48,309 | 46,096 | 0.95 | Punjab, Haryana brace for rain on August 22; dam levels below normal a |
+| Pong | day, 2026-08-21 | 1 | 39,639 | 62,136 | 1.57 | Punjab, Haryana brace for rain on August 22; dam levels below normal a |
+| Bhakra | day, 2026-08-26 | 1 | 42,000 | 42,434 | 1.01 | Punjab: Tighten taps, BBMB cautions partner states as weak monsoon str |
+| Bhakra | day, 2026-08-27 | 1 | 30,452 | 41,231 | 1.35 | Bilaspur News: भाखड़ा बांध में पिछले साल से 37 फीट कम पानी |
+| Bhakra | day, 2026-08-27 | 1 | 30,452 | 41,231 | 1.35 | Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i |
+| Bhakra | day, 2026-08-27 | 1 | 30,452 | 41,231 | 1.35 | Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon |
+| Bhakra | day, 2026-08-27 | 1 | 6,163 | 41,231 | 6.69 | Punjab's power demand stays above 16,000 MW, but why is Bhakra inflow  |
+| Pong | day, 2026-08-27 | 1 | 22,202 | 51,504 | 2.32 | Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i |
+| Pong | day, 2026-08-27 | 1 | 22,202 | 51,504 | 2.32 | Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon |
+| Ranjit Sagar | day, 2026-08-27 | 0 | 7,073 | n/a | n/a | Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon |
+| Bhakra | day, 2026-09-04 | 1 | 42,701 | 51,184 | 1.20 | BBMB Reservoir Data res_data.pdf (direct capture) |
+| Pong | day, 2026-09-04 | 1 | 20,102 | 64,224 | 3.19 | BBMB Reservoir Data res_data.pdf (direct capture) |
+| Bhakra | day, 2026-09-05 | 1 | 41,628 | 56,443 | 1.36 | BBMB Reservoir Data res_data.pdf (direct capture) |
+| Pong | day, 2026-09-05 | 1 | 22,870 | 61,254 | 2.68 | BBMB Reservoir Data res_data.pdf (direct capture) |
+| Bhakra | day, 2026-09-14 | 0 | 30,199 | n/a | n/a | पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख |
+| Pong | day, 2026-09-14 | 0 | 10,751 | n/a | n/a | पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख |
+| Bhakra | day, 2026-09-17 | 0 | 28,368 | n/a | n/a | BBMB Reservoir Data res_data.pdf (direct capture) |
+| Pong | day, 2026-09-17 | 0 | 11,509 | n/a | n/a | BBMB Reservoir Data res_data.pdf (direct capture) |
 | Bhakra | day, 2025-09-15 | 1 | 54,667 | 44,853 | 0.82 | BBMB daily sheet, Internet Archive |
 | Bhakra | day, 2025-09-24 | 1 | 35,666 | 35,817 | 1.00 | BBMB daily sheet, Internet Archive |
 | Pong | day, 2025-09-15 | 1 | 76,498 | 83,124 | 1.09 | BBMB daily sheet, Internet Archive |
@@ -180,15 +392,15 @@ The runoff coefficient is fitted on ordinary filling days (the storage-change re
 | Pong | largest day of 2025 | 112 | 349,522 | 203,537 | 0.58 | Rajya Sabha reply via PTI, 2 Dec 2025 |
 | Bhakra | largest day of 2025 | 121 | 190,603 | 108,620 | 0.57 | Rajya Sabha reply via PTI, 2 Dec 2025 |
 
-Dated figures by year (readings at a time of day against the model's daily volume; 2023: 11 dated figures, the model at 0.32 to 1.08 of the reading, median 0.47; 2025: 18 dated figures, the model at 0.67 to 2.32 of the reading, median 0.90).
+Dated figures by year (readings at a time of day against the model's daily volume; 2016: 1 dated figures, the model at 1.71 of the reading, median 1.71; 2017: 1 dated figures, the model at 1.52 of the reading, median 1.52; 2020: 1 dated figures, the model at 0.79 of the reading, median 0.79; 2021: 1 dated figures, the model at 0.42 of the reading, median 0.42; 2022: 2 dated figures, the model at 0.88 to 1.77 of the reading, median 1.33; 2023: 16 dated figures, the model at 0.32 to 2.64 of the reading, median 0.71; 2024: 5 dated figures, the model at 0.93 to 8.26 of the reading, median 1.28; 2025: 96 dated figures, the model at 0.28 to 15.49 of the reading, median 1.06; 2026: 24 dated figures, the model at 0.95 to 7.36 of the reading, median 1.49).
 
-The spread of the model's log ratio to the 6 period means (sample standard deviation) is 0.14, with a mean log ratio of -0.00; the dated readings (29) spread 0.44, wider because they are moments, not daily means. The product samples the period-mean spread as a multiplicative volume error on every inflow path for its third spill probability (an outer estimate), and does not apply the bias.
+The spread of the model's log ratio to the 6 period means (sample standard deviation) is 0.14, with a mean log ratio of -0.00; the dated readings (147) spread 0.56, wider because they are moments, not daily means. The product samples the period-mean spread as a multiplicative volume error on every inflow path for its third spill probability (an outer estimate), and does not apply the bias.
 
 Where the run covers at least 10 of a period's days, the model's mean is 0.78 to 1.13 of the reported mean; its largest day of the season is 0.57 to 0.58 of the stated peak. The flood's volume is close to right and its peak day is not: the model spreads the volume over more days than the river does, which is consistent with lag weights fitted on ordinary days.
 
 ### Response variants, tested out of sample
 
-Each variant is fitted on the same storage record beside the response in use and scored leave-one-season-out (each season by a fit on the others). Rain above the heavy-day threshold in a catchment day gets its own coefficient and lag weights (the threshold-excess variant). The soil-moisture variants change the carrier of catchment wetness: `api+sm` keeps the five-day rain index and adds the ERA5-Land 0-7 cm soil-moisture anomaly through gamma; `sm` drops the rain index and keeps the anomaly alone (each fold's climatology leaves the held-out season out). The rule before any variant can replace the response the product uses: the held-out error may not rise at any dam, the season-peak ratios of the flood-scale table must rise, and the period means may not move further from the reported means than the baseline's worst one does. Heavy-day bias is observed minus predicted storage change, positive when heavy days are under-predicted.
+Each variant is fitted on the same storage record beside the response in use and scored leave-one-season-out (each season by a fit on the others). Rain above the heavy-day threshold in a catchment day gets its own coefficient and lag weights (the threshold-excess variant). The soil-moisture variants change the carrier of catchment wetness: `api+sm` keeps the five-day rain index and adds the ERA5-Land 0-7 cm soil-moisture anomaly through gamma; `sm` drops the rain index and keeps the anomaly alone (each fold's climatology leaves the held-out season out). The press inflow fit is the same response fitted on every dated press reading of inflow the sweeps found (moment readings, all seasons before the current one), expressed in the storage-change convention and scored on the storage record, where every season is out of sample for it (`seasons` counts them). The rule before any variant can replace the response the product uses: the held-out error may not rise at any dam, the season-peak ratios of the flood-scale table must rise, and the period means may not move further from the reported means than the baseline's worst one does. Heavy-day bias is observed minus predicted storage change, positive when heavy days are under-predicted.
 
 | dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess | wetness | gamma |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -204,6 +416,8 @@ Each variant is fitted on the same storage record beside the response in use and
 | Ranjit Sagar | excess above 30 mm | 11 | 1184 | 0.0229 | 29 | 0.0469 | -0.0074 | 0.156 | 0.166 | 0.47 0.27 0.15 0.11 | 0.469 | 0.46 0.48 0.00 0.07 | api | 0.00 |
 | Ranjit Sagar | api+sm | 11 | 1184 | 0.0230 | 29 | 0.0384 | -0.0168 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api+sm | 0.26 |
 | Ranjit Sagar | sm | 11 | 1184 | 0.0230 | 29 | 0.0471 | -0.0101 | 0.341 | 0.000 | 0.34 0.45 0.11 0.10 | 0.000 | none | sm | 1.30 |
+| Bhakra | press inflow fit | 11 | 1009 | 0.0460 | 2 | 0.1520 | -0.1497 | 0.433 | 0.000 | 0.47 0.21 0.11 0.21 | 0.000 | none | api | 0.00 |
+| Pong | press inflow fit | 8 | 733 | 0.0714 | 28 | 0.1157 | -0.0589 | 0.710 | 0.278 | 0.35 0.15 0.22 0.28 | 0.000 | none | api | 0.00 |
 
 | variant | period means covered | worst deviation of a period mean from 1 | season-peak ratio, smallest | season-peak ratio, largest |
 |---|---|---|---|---|
@@ -211,12 +425,15 @@ Each variant is fitted on the same storage record beside the response in use and
 | excess above 30 mm | 6 | 0.26 | 0.55 | 0.58 |
 | api+sm | 6 | 0.22 | 0.54 | 0.57 |
 | sm | 6 | 0.26 | 0.46 | 0.50 |
+| press inflow fit | 4 | 0.22 | 0.58 | 0.62 |
 
 Verdict on 'excess above 30 mm', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (fails); the period means hold (fails).
 
 Verdict on 'api+sm', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (fails); the period means hold (passes).
 
 Verdict on 'sm', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (fails); the period means hold (fails).
+
+Verdict on 'press inflow fit', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (passes); the period means hold (passes).
 
 ## As-issued hindcast: what the product would have said, each dam, 2024 to 2026
 

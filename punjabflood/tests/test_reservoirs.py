@@ -227,3 +227,18 @@ def test_rating_with_cushion_runs_a_line_from_frl_to_the_published_top():
     df = pd.DataFrame({"dam": "Pong", "level_m": levels, "storage_bcm": storage})
     assert reservoirs.fit_ratings(df)["Pong"].level_range_m[1] == pytest.approx(top_m)
 
+
+def test_rule_curve_capacity_follows_the_schedule_through_the_rating():
+    frl = C.BHAKRA.frl_m.value
+    levels = np.linspace(frl - 40.0, frl, 200)
+    cap = C.BHAKRA.live_capacity_bcm.value
+    storage = cap - (frl - levels) * 0.1
+    r = reservoirs.Rating.fit("Bhakra", levels, storage)
+    dates = pd.to_datetime(["2025-07-20", "2025-08-10", "2025-08-23", "2025-09-05"])
+    caps = reservoirs.rule_curve_capacity_bcm(r, "Bhakra", dates)
+    lv = [C.rule_curve_level_ft("Bhakra", d) for d in dates]
+    assert lv == [1650.0, 1670.0, pytest.approx(1675.0), 1680.0]
+    assert caps[0] < caps[1] < caps[2] < caps[3] == pytest.approx(cap)
+    assert caps[1] == pytest.approx(float(r.storage(1670.0 * C.FOOT_M)))
+    assert reservoirs.rule_curve_capacity_bcm(r, "Pong", dates) is None
+

@@ -56,31 +56,54 @@ def absorption_cusecs(dam: str, canal_draw_cusecs: float | None = None) -> float
     return max(d.turbine_capacity_cusecs.value - (canal_draw_cusecs or 0.0), 0.0)
 
 
+def _caps(dam: str, capacity_bcm, H: int) -> np.ndarray:
+    """The ceiling per day of the horizon: a scalar repeated, or a per-day sequence (the
+    filling schedule) of length ``H``."""
+    if capacity_bcm is None:
+        return np.full(max(H, 1), C.DAMS[dam].live_capacity_bcm.value, dtype=float)
+    c = np.asarray(capacity_bcm, dtype=float)
+    if c.ndim == 0:
+        return np.full(max(H, 1), float(c))
+    if len(c) < H:
+        raise ValueError(f"{dam}: {len(c)} capacities for a {H}-day horizon")
+    return c[: max(H, 1)]
+
+
 def headroom_exhaustion(
     dam: str,
     storage_bcm: float,
     daily_inflow_bcm,
     absorption_cusecs_value: float,
-    capacity_bcm: float | None = None,
+    capacity_bcm=None,
+    clamp_start: bool = True,
 ) -> HEIResult:
-    cap = capacity_bcm if capacity_bcm is not None else C.DAMS[dam].live_capacity_bcm.value
+    """The water balance over the horizon against a ceiling: the live capacity at FRL, or
+    ``capacity_bcm`` (a scalar such as the top of the flood cushion, or one value per day
+    such as the filling schedule). With ``clamp_start`` a starting storage above the ceiling
+    is taken as the ceiling (the record cannot exceed FRL); without it the excess is owed on
+    day one (a reservoir above its schedule draws down). ``headroom_bcm`` is against the
+    first day's ceiling and is signed only when the start is not clamped; the index is
+    normalised by the last day's."""
     inflow = np.asarray(list(daily_inflow_bcm), dtype=float)
     H = len(inflow)
+    caps = _caps(dam, capacity_bcm, H)
+    cap = float(caps[-1])
     a = C.cusec_days_to_bcm(absorption_cusecs_value)
-    headroom = max(cap - storage_bcm, 0.0)
+    headroom = float(caps[0]) - storage_bcm if not clamp_start else max(cap - storage_bcm, 0.0)
     total = float(inflow.sum())
     hei = (total - headroom - a * H) / cap if H > 0 else float("nan")
 
-    s = min(storage_bcm, cap)
+    s = min(storage_bcm, float(caps[0])) if clamp_start else float(storage_bcm)
     release_by_day = []
     storage_by_day = []
     day_ex = None
     forced_total = 0.0
     for d, i_d in enumerate(inflow, start=1):
+        cap_d = float(caps[d - 1])
         s = s + i_d - a
-        if s > cap:
-            excess = s - cap
-            s = cap
+        if s > cap_d:
+            excess = s - cap_d
+            s = cap_d
             if day_ex is None:
                 day_ex = d
         else:
@@ -142,19 +165,21 @@ def error_paths(
     return sd_bcm * e
 
 
-def _balance_matrix(storage_bcm: float, cap: float, a: float, inflow: np.ndarray):
+def _balance_matrix(storage_bcm: float, cap, a: float, inflow: np.ndarray, clamp_start=True):
     """The water balance of ``headroom_exhaustion`` run on a matrix of inflow paths
-    (paths by days). Returns the exhaustion flag and the peak daily forced release (cusecs)
-    per path."""
-    n = inflow.shape[0]
-    s = np.full(n, min(storage_bcm, cap), dtype=float)
+    (paths by days); ``cap`` a scalar or one ceiling per day. Returns the exhaustion flag
+    and the peak daily forced release (cusecs) per path."""
+    n, H = inflow.shape
+    caps = np.asarray(cap, dtype=float)
+    caps = np.full(H, float(caps)) if caps.ndim == 0 else caps[:H]
+    s = np.full(n, min(storage_bcm, float(caps[0])) if clamp_start else float(storage_bcm))
     peak = np.zeros(n)
     exhausted = np.zeros(n, dtype=bool)
-    for d in range(inflow.shape[1]):
+    for d in range(H):
         s = s + inflow[:, d] - a
-        excess = np.maximum(s - cap, 0.0)
-        exhausted |= s > cap
-        s = np.clip(s, 0.0, cap)
+        excess = np.maximum(s - caps[d], 0.0)
+        exhausted |= s > caps[d]
+        s = np.clip(s, 0.0, caps[d])
         peak = np.maximum(peak, excess)
     return exhausted, C.bcm_to_cusec_days(peak)
 
@@ -168,8 +193,9 @@ def ensemble_summary_with_error(
     acf1: float,
     n_draws: int = 200,
     seed: int = 0,
-    capacity_bcm: float | None = None,
+    capacity_bcm=None,
     scale_log_sd: float | None = None,
+    clamp_start: bool = True,
 ) -> dict:
     """Probability of exhaustion and forced-release quantiles when the inflow model's own
     error is sampled on top of every QPF member.
@@ -190,19 +216,19 @@ def ensemble_summary_with_error(
     members = [m for m in members if len(m)]
     if not members or sd_bcm != sd_bcm or sd_bcm < 0:
         return {}
-    cap = capacity_bcm if capacity_bcm is not None else C.DAMS[dam].live_capacity_bcm.value
+    cap = _caps(dam, capacity_bcm, max(len(m) for m in members))
     a = C.cusec_days_to_bcm(absorption_cusecs_value)
     rng = np.random.default_rng(seed)
     with_scale = scale_log_sd is not None and scale_log_sd == scale_log_sd and scale_log_sd >= 0
     ex_all, peak_all, ex_fs, peak_fs = [], [], [], []
     for m in members:
         paths = np.maximum(m[None, :] + error_paths(len(m), n_draws, sd_bcm, acf1, rng), 0.0)
-        ex, peak = _balance_matrix(storage_bcm, cap, a, paths)
+        ex, peak = _balance_matrix(storage_bcm, cap, a, paths, clamp_start)
         ex_all.append(ex)
         peak_all.append(peak)
         if with_scale:
             factor = np.exp(rng.standard_normal(n_draws) * float(scale_log_sd))
-            ex2, peak2 = _balance_matrix(storage_bcm, cap, a, paths * factor[:, None])
+            ex2, peak2 = _balance_matrix(storage_bcm, cap, a, paths * factor[:, None], clamp_start)
             ex_fs.append(ex2)
             peak_fs.append(peak2)
     ex = np.concatenate(ex_all)

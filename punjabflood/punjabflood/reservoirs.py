@@ -262,6 +262,17 @@ class Rating:
         return float(self.levels_m[0]), float(self.levels_m[-1])
 
 
+def rule_curve_capacity_bcm(rating: Rating, dam: str, dates) -> np.ndarray | None:
+    """The live storage at the filling schedule's level on each of ``dates`` through the
+    dam's own rating (``constants.rule_curve_level_ft``), capped at the live capacity at FRL;
+    None where the dam has no schedule."""
+    if C.rule_curve(dam) is None:
+        return None
+    levels_ft = np.array([C.rule_curve_level_ft(dam, d) for d in pd.to_datetime(list(dates))])
+    cap = C.DAMS[dam].live_capacity_bcm.value
+    return np.minimum(np.asarray(rating.storage(levels_ft * C.FOOT_M), dtype=float), cap)
+
+
 def fit_ratings(cwc: pd.DataFrame) -> dict[str, Rating]:
     out = {}
     for dam, g in cwc.groupby("dam"):

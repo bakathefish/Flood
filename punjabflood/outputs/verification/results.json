@@ -8211,6 +8211,271 @@
       "magnitude_ratio": 0.6706642758924014
     }
   ],
+  "gauge_readings_check": [
+    {
+      "station": "Dhilwan",
+      "date": "2023-08-17",
+      "observed_cusecs": 234000.0,
+      "routed_cusecs": 181685.68876300362,
+      "ratio": 0.7764345673632633,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Dhilwan",
+      "date": "2023-08-18",
+      "observed_cusecs": 220000.0,
+      "routed_cusecs": 181685.68876300362,
+      "ratio": 0.8258440398318346,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Dhilwan",
+      "date": "2023-08-20",
+      "observed_cusecs": 155500.0,
+      "routed_cusecs": 52268.300241521916,
+      "ratio": 0.33613054817698984,
+      "as_of_time": "unspecified (\"yesterday\")"
+    },
+    {
+      "station": "Dhilwan",
+      "date": "2023-08-21",
+      "observed_cusecs": 139000.0,
+      "routed_cusecs": 38387.64727811252,
+      "ratio": 0.2761701243029678,
+      "as_of_time": "unspecified (\"today\")"
+    },
+    {
+      "station": "Dhilwan",
+      "date": "2023-08-23",
+      "observed_cusecs": 136000.0,
+      "routed_cusecs": 0.0,
+      "ratio": 0.0,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Dhilwan",
+      "date": "2025-08-24",
+      "observed_cusecs": 130000.0,
+      "routed_cusecs": 0.0,
+      "ratio": 0.0,
+      "as_of_time": "yesterday"
+    },
+    {
+      "station": "Dhilwan",
+      "date": "2025-08-25",
+      "observed_cusecs": 140000.0,
+      "routed_cusecs": 0.0,
+      "ratio": 0.0,
+      "as_of_time": "today"
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "date": "2023-08-18",
+      "observed_cusecs": 258910.0,
+      "routed_cusecs": 103482.83328132235,
+      "ratio": 0.39968650604967887,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "date": "2023-08-20",
+      "observed_cusecs": 225000.0,
+      "routed_cusecs": 181685.68876300362,
+      "ratio": 0.8074919500577938,
+      "as_of_time": "unspecified (\"yesterday\")"
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "date": "2023-08-21",
+      "observed_cusecs": 156000.0,
+      "routed_cusecs": 92819.77537081279,
+      "ratio": 0.5949985600693127,
+      "as_of_time": "unspecified (\"today\")"
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "date": "2023-08-23",
+      "observed_cusecs": 133224.0,
+      "routed_cusecs": 38387.64727811252,
+      "ratio": 0.2881436323643827,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "date": "2025-08-21",
+      "observed_cusecs": 82725.0,
+      "routed_cusecs": 0.0,
+      "ratio": 0.0,
+      "as_of_time": "Thursday"
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "date": "2025-09-03",
+      "observed_cusecs": 324000.0,
+      "routed_cusecs": 114035.94062493814,
+      "ratio": 0.3519627797065992,
+      "as_of_time": "during the day"
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "date": "2025-09-03",
+      "observed_cusecs": 302508.0,
+      "routed_cusecs": 114035.94062493814,
+      "ratio": 0.37696834670467605,
+      "as_of_time": "unspecified (upstream gauge)"
+    },
+    {
+      "station": "Ferozepur Head Works",
+      "date": "2025-09-03",
+      "observed_cusecs": 301918.0,
+      "routed_cusecs": 114035.94062493814,
+      "ratio": 0.3777050080648989,
+      "as_of_time": "unspecified (downstream gauge)"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2023-08-17",
+      "observed_cusecs": 235000.0,
+      "routed_cusecs": 0.0,
+      "ratio": 0.0,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2023-08-17",
+      "observed_cusecs": 215000.0,
+      "routed_cusecs": 0.0,
+      "ratio": 0.0,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2023-08-18",
+      "observed_cusecs": 284987.0,
+      "routed_cusecs": 103482.83328132235,
+      "ratio": 0.36311422374116137,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2023-08-20",
+      "observed_cusecs": 169000.0,
+      "routed_cusecs": 92819.77537081279,
+      "ratio": 0.549229440063981,
+      "as_of_time": "unspecified (\"yesterday\" per Aug-21 article)"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2023-08-21",
+      "observed_cusecs": 160000.0,
+      "routed_cusecs": 52268.300241521916,
+      "ratio": 0.326676876509512,
+      "as_of_time": "unspecified (\"today\")"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2023-08-23",
+      "observed_cusecs": 142766.0,
+      "routed_cusecs": 0.0,
+      "ratio": 0.0,
+      "as_of_time": "unspecified"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2025-08-21",
+      "observed_cusecs": 94929.0,
+      "routed_cusecs": 0.0,
+      "ratio": 0.0,
+      "as_of_time": "Thursday"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2025-09-03",
+      "observed_cusecs": 330000.0,
+      "routed_cusecs": 109794.22128070213,
+      "ratio": 0.33270976145667314,
+      "as_of_time": "during the day"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2025-09-03",
+      "observed_cusecs": 335030.0,
+      "routed_cusecs": 109794.22128070213,
+      "ratio": 0.32771459654568885,
+      "as_of_time": "unspecified (upstream gauge)"
+    },
+    {
+      "station": "Harike Head Works",
+      "date": "2025-09-03",
+      "observed_cusecs": 318159.0,
+      "routed_cusecs": 109794.22128070213,
+      "ratio": 0.3450923006443386,
+      "as_of_time": "unspecified (downstream gauge)"
+    }
+  ],
+  "rule_curve_timing": [
+    {
+      "year": 2015,
+      "opening_date": "2015-08-10",
+      "opening_level_ft": 1661.1,
+      "schedule_level_ft": 1670.0,
+      "frl_ft": 1680.0,
+      "n_days_frl": 122,
+      "first_forced_frl": null,
+      "lag_frl_days": null,
+      "n_days_rule": 122,
+      "first_forced_rule": "2015-08-17",
+      "lag_rule_days": 7
+    },
+    {
+      "year": 2023,
+      "opening_date": "2023-08-13",
+      "opening_level_ft": 1672.0,
+      "schedule_level_ft": 1670.0,
+      "frl_ft": 1680.0,
+      "n_days_frl": 122,
+      "first_forced_frl": null,
+      "lag_frl_days": null,
+      "n_days_rule": 122,
+      "first_forced_rule": "2023-07-25",
+      "lag_rule_days": -19
+    },
+    {
+      "year": 2025,
+      "opening_date": "2025-08-19",
+      "opening_level_ft": 1665.06,
+      "schedule_level_ft": 1672.5,
+      "frl_ft": 1680.0,
+      "n_days_frl": 122,
+      "first_forced_frl": null,
+      "lag_frl_days": null,
+      "n_days_rule": 122,
+      "first_forced_rule": "2025-09-01",
+      "lag_rule_days": 13
+    }
+  ],
+  "rule_curve": {
+    "dam": "Bhakra",
+    "vintage": "2019 chart (CBIP RTDSS presentation, page 44)",
+    "points": [
+      {
+        "month": 7,
+        "day": 31,
+        "level_ft": 1650.0
+      },
+      {
+        "month": 8,
+        "day": 15,
+        "level_ft": 1670.0
+      },
+      {
+        "month": 8,
+        "day": 31,
+        "level_ft": 1680.0
+      }
+    ],
+    "guideline_2025_08_19_ft": 1662.0
+  },
   "event_timing_local": [
     {
       "year": 2023,
@@ -8349,6 +8614,215 @@
     {
       "dam": "Bhakra",
       "kind": "day",
+      "start": "2015-05-27",
+      "end": "2015-05-27",
+      "truth_cusecs": 27137.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "dry spell leads to drop in water level in 3 dams"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2015-05-27",
+      "end": "2015-05-27",
+      "truth_cusecs": 5278.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "dry spell leads to drop in water level in 3 dams"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2016-03-31",
+      "end": "2016-03-31",
+      "truth_cusecs": 6750.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "bhakra water level plummets"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2016-05-27",
+      "end": "2016-05-27",
+      "truth_cusecs": 18560.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "dry spell leads to drop in water level in 3 dams"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2016-05-27",
+      "end": "2016-05-27",
+      "truth_cusecs": 2965.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "dry spell leads to drop in water level in 3 dams"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2016-05-27",
+      "end": "2016-05-27",
+      "truth_cusecs": 8888.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "dry spell leads to drop in water level in 3 dams"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2016-07-02",
+      "end": "2016-07-02",
+      "truth_cusecs": 35627.0,
+      "model_cusecs": 61037.685129487276,
+      "ratio": 1.71324234792397,
+      "n_days": 1,
+      "source": "bhakra pong dams filling up quickly"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2017-03-31",
+      "end": "2017-03-31",
+      "truth_cusecs": 8800.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "bhakra water level plummets"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2017-07-02",
+      "end": "2017-07-02",
+      "truth_cusecs": 34802.0,
+      "model_cusecs": 52855.420182327696,
+      "ratio": 1.518746628996256,
+      "n_days": 1,
+      "source": "bhakra pong dams filling up quickly"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2020-05-13",
+      "end": "2020-05-13",
+      "truth_cusecs": 19548.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "water storage down to 10 bhakra can meet only 30 demand for irrigation"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2020-05-13",
+      "end": "2020-05-13",
+      "truth_cusecs": 5266.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "water storage down to 10 bhakra can meet only 30 demand for irrigation"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2020-09-01",
+      "end": "2020-09-01",
+      "truth_cusecs": 74960.0,
+      "model_cusecs": 59434.62522574491,
+      "ratio": 0.7928845414320292,
+      "n_days": 1,
+      "source": "Water level in Pong Dam rises over 5 feet above danger mark as rains l"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2021-05-13",
+      "end": "2021-05-13",
+      "truth_cusecs": 15661.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "water storage down to 10 bhakra can meet only 30 demand for irrigation"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2021-05-13",
+      "end": "2021-05-13",
+      "truth_cusecs": 3565.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "water storage down to 10 bhakra can meet only 30 demand for irrigation"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2021-08-19",
+      "end": "2021-08-19",
+      "truth_cusecs": 90000.0,
+      "model_cusecs": 37520.9154996087,
+      "ratio": 0.41689906110676334,
+      "n_days": 1,
+      "source": "Bhakra water level flood update"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2022-08-11",
+      "end": "2022-08-11",
+      "truth_cusecs": 86897.0,
+      "model_cusecs": 76787.57588743044,
+      "ratio": 0.8836619893371513,
+      "n_days": 1,
+      "source": "Himachal: \u092d\u093e\u0930\u0940 \u092c\u093e\u0930\u093f\u0936 \u0938\u0947 \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 1351.20 \u092b\u0940\u091f \u0924\u0915 \u092a\u0939\u0941\u0902\u091a\u093e, \u092a\u0902\u0921"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2022-08-22",
+      "end": "2022-08-22",
+      "truth_cusecs": 50592.0,
+      "model_cusecs": 89471.56893199492,
+      "ratio": 1.7684924282889571,
+      "n_days": 1,
+      "source": "Water Level Rise: \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0915\u0947 \u0928\u091c\u0926\u0940\u0915 \u092a\u0939\u0941\u0902\u091a\u093e \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930, \u091d"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2023-07-06",
+      "end": "2023-07-06",
+      "truth_cusecs": 18000.0,
+      "model_cusecs": 26023.611996324602,
+      "ratio": 1.4457562220180333,
+      "n_days": 1,
+      "source": "Jalandhar News: \u090f\u0915 \u0926\u093f\u0928 \u0915\u0940 \u092c\u093e\u0930\u093f\u0936 \u0938\u0947 \u0930\u0923\u091c\u0940\u0924 \u0938\u093e\u0917\u0930 \u0921\u0948\u092e \u092e\u0947\u0902 36 \u0938\u0947\u0902\u091f\u0940\u092e\u0940\u091f\u0930 \u092c\u0922\u093c"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2023-07-18",
+      "end": "2023-07-18",
+      "truth_cusecs": 25660.0,
+      "model_cusecs": 37516.89296934063,
+      "ratio": 1.462076888906494,
+      "n_days": 1,
+      "source": "rain a boon for pspcl generates 144 lakh units daily at ranjit sagar d"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
       "start": "2023-08-14",
       "end": "2023-08-14",
       "truth_cusecs": 193324.0,
@@ -8356,6 +8830,50 @@
       "ratio": 0.4708426384801182,
       "n_days": 1,
       "source": "BBMB via Himachal Tonite, Aug 2023"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2023-08-14",
+      "end": "2023-08-14",
+      "truth_cusecs": 109834.0,
+      "model_cusecs": 91025.18224153038,
+      "ratio": 0.8287523193321774,
+      "n_days": 1,
+      "source": "\u0939\u093f\u092e\u093e\u091a\u0932 \u092e\u0947\u0902 \u092d\u093e\u0930\u0940 \u092c\u093e\u0930\u093f\u0936 \u0915\u093e \u0905\u0938\u0930: \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 1675 \u092b\u0940\u091f \u092a\u0939\u0941\u0902\u091a\u093e, \u0916"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2023-08-14",
+      "end": "2023-08-14",
+      "truth_cusecs": 700000.0,
+      "model_cusecs": 233281.27833468054,
+      "ratio": 0.3332589690495436,
+      "n_days": 1,
+      "source": "Punjab: \u092a\u094c\u0902\u0917 \u0921\u0948\u092e \u092e\u0947\u0902 \u0938\u093e\u0924 \u0932\u093e\u0916 \u0915\u094d\u092f\u0942\u0938\u0947\u0915 \u092a\u093e\u0928\u0940 \u092a\u0939\u0941\u0902\u091a\u093e, \u092a\u0902\u091c\u093e\u092c \u0915\u0947 \u092a\u093e\u0902\u091a \u091c\u093f\u0932\u094b\u0902 "
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2023-08-14",
+      "end": "2023-08-14",
+      "truth_cusecs": 381330.0,
+      "model_cusecs": 233281.27833468054,
+      "ratio": 0.6117569515503122,
+      "n_days": 1,
+      "source": "Kangra News: \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u092a\u093e\u0928\u0940 \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0938\u0947 \u0938\u093e\u0924 \u092b\u0940\u091f \u090a\u092a\u0930, \u0928\u093f\u091a\u0932\u0947 \u0915\u094d\u0937"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2023-08-14",
+      "end": "2023-08-14",
+      "truth_cusecs": 513000.0,
+      "model_cusecs": 233281.27833468054,
+      "ratio": 0.454739333985732,
+      "n_days": 1,
+      "source": "Pong Dam Kangra: \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0938\u0947 \u090a\u092a\u0930 \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930, \u0906\u091c \u0936\u093e\u092e 4 \u092c\u091c"
     },
     {
       "dam": "Bhakra",
@@ -8369,15 +8887,15 @@
       "source": "The Tribune, 15 Aug 2023"
     },
     {
-      "dam": "Bhakra",
+      "dam": "Pong",
       "kind": "day",
-      "start": "2023-08-22",
-      "end": "2023-08-22",
-      "truth_cusecs": 105000.0,
-      "model_cusecs": 39111.56877709903,
-      "ratio": 0.372491131210467,
+      "start": "2023-08-15",
+      "end": "2023-08-15",
+      "truth_cusecs": 142000.0,
+      "model_cusecs": 374722.5232870807,
+      "ratio": 2.6388910090639484,
       "n_days": 1,
-      "source": "The Tribune, 23 Aug 2023 (Tuesday)"
+      "source": "Several villages in Punjab's Hoshiarpur, Rupnagar inundated after wate"
     },
     {
       "dam": "Bhakra",
@@ -8406,33 +8924,11 @@
       "kind": "day",
       "start": "2023-08-23",
       "end": "2023-08-23",
-      "truth_cusecs": 128000.0,
-      "model_cusecs": 60147.31706735864,
-      "ratio": 0.4699009145887394,
-      "n_days": 1,
-      "source": "The Tribune, 23 Aug 2023 (Wednesday)"
-    },
-    {
-      "dam": "Bhakra",
-      "kind": "day",
-      "start": "2023-08-23",
-      "end": "2023-08-23",
       "truth_cusecs": 128406.0,
       "model_cusecs": 60147.31706735864,
       "ratio": 0.4684151602523141,
       "n_days": 1,
       "source": "The Tribune, 24 Aug 2023"
-    },
-    {
-      "dam": "Pong",
-      "kind": "day",
-      "start": "2023-08-23",
-      "end": "2023-08-23",
-      "truth_cusecs": 158000.0,
-      "model_cusecs": 68465.11847773571,
-      "ratio": 0.43332353466921336,
-      "n_days": 1,
-      "source": "The Tribune, 23 Aug 2023 (Wednesday)"
     },
     {
       "dam": "Pong",
@@ -8457,6 +8953,237 @@
       "source": "Rozana Spokesman, 25 Aug 2023"
     },
     {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2023-08-25",
+      "end": "2023-08-25",
+      "truth_cusecs": 52810.0,
+      "model_cusecs": 57025.92299279967,
+      "ratio": 1.0798319066994826,
+      "n_days": 1,
+      "source": "Mounting Rainfall Elevates Flood Concerns: Bhakra Dam Water Level Reac"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2024-06-21",
+      "end": "2024-06-21",
+      "truth_cusecs": 34525.0,
+      "model_cusecs": 38789.60588882932,
+      "ratio": 1.123522256012435,
+      "n_days": 1,
+      "source": "Heavy rainfall in HP but water level low in Bhakra, Pong dams"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2024-06-21",
+      "end": "2024-06-21",
+      "truth_cusecs": 5389.0,
+      "model_cusecs": 44523.723136570414,
+      "ratio": 8.26196384052151,
+      "n_days": 1,
+      "source": "Heavy rainfall in HP but water level low in Bhakra, Pong dams"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2024-06-30",
+      "end": "2024-06-30",
+      "truth_cusecs": 34162.0,
+      "model_cusecs": 43798.68299864414,
+      "ratio": 1.2820877875605683,
+      "n_days": 1,
+      "source": "\u0a2d\u0a3e\u0a16\u0a5c\u0a3e \u0a21\u0a48\u0a2e '\u0a1a \u0a2a\u0a3e\u0a23\u0a40 \u0a26\u0a3e \u0a2a\u0a71\u0a27\u0a30 1585.83 \u0a2b\u0a41\u0a71\u0a1f '\u0a24\u0a47 \u0a2a\u0a41\u0a71\u0a1c\u0a3e"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2024-08-02",
+      "end": "2024-08-02",
+      "truth_cusecs": 56073.0,
+      "model_cusecs": 51931.14617550696,
+      "ratio": 0.9261346133701953,
+      "n_days": 1,
+      "source": "1610.41 \u0a2b\u0a41\u0a71\u0a1f \u0a24\u0a47 \u0a2a\u0a39\u0a41\u0a70\u0a1a\u0a3f\u0a06\u0a02 \u0a2d\u0a3e\u0a16\u0a5c\u0a3e \u0a21\u0a48\u0a2e '\u0a1a \u0a2a\u0a3e\u0a23\u0a40 \u0a26\u0a3e \u0a2a\u0a71\u0a27\u0a30, \u0a2c\u0a40\u0a24\u0a47 \u0a35\u0a30\u0a4d\u0a39\u0a47 \u0a26\u0a47 \u0a2e\u0a41\u0a15\u0a3e"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2024-08-12",
+      "end": "2024-08-12",
+      "truth_cusecs": 59830.0,
+      "model_cusecs": 100436.06945556184,
+      "ratio": 1.678690781473539,
+      "n_days": 1,
+      "source": "Kangra News: 1,346 \u092b\u0940\u091f \u0924\u0915 \u092a\u0939\u0941\u0902\u091a\u093e \u092a\u094c\u0902\u0917 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930, \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0915\u0947 \u092e\u0939\u091c "
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2024-11-20",
+      "end": "2024-11-20",
+      "truth_cusecs": 6000.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "water level low in dams bbmb cautions member states"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-01-03",
+      "end": "2025-01-03",
+      "truth_cusecs": 4700.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "water level low in dams bbmb sounds warning"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-01-03",
+      "end": "2025-01-03",
+      "truth_cusecs": 2600.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "water level low in dams bbmb sounds warning"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-06-09",
+      "end": "2025-06-09",
+      "truth_cusecs": 21792.0,
+      "model_cusecs": 35687.2032811806,
+      "ratio": 1.6376286380864813,
+      "n_days": 1,
+      "source": "Dam level up, BBMB tells Punjab, Haryana to draw more water"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-06-12",
+      "end": "2025-06-12",
+      "truth_cusecs": 28015.0,
+      "model_cusecs": 39771.88628670389,
+      "ratio": 1.4196639759665854,
+      "n_days": 1,
+      "source": "Una News: \u092d\u093e\u0916\u0921\u093c\u093e \u0921\u0948\u092e \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u092a\u0939\u0941\u0902\u091a\u093e 1,576 \u092b\u0940\u091f \u0915\u0947 \u092a\u093e\u0930"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-06-21",
+      "end": "2025-06-21",
+      "truth_cusecs": 32699.0,
+      "model_cusecs": 40651.365290598784,
+      "ratio": 1.2431990363802803,
+      "n_days": 1,
+      "source": "Heavy rainfall in HP but water level low in Bhakra, Pong dams"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-06-21",
+      "end": "2025-06-21",
+      "truth_cusecs": 16602.0,
+      "model_cusecs": 51987.66646414411,
+      "ratio": 3.131409858098067,
+      "n_days": 1,
+      "source": "Heavy rainfall in HP but water level low in Bhakra, Pong dams"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-06-29",
+      "end": "2025-06-29",
+      "truth_cusecs": 46103.0,
+      "model_cusecs": 70537.51335231373,
+      "ratio": 1.5299983374685755,
+      "n_days": 1,
+      "source": "Una News: \u092c\u0940\u0924\u0947 \u0935\u0930\u094d\u0937 \u0915\u0947 \u092e\u0941\u0915\u093e\u092c\u0932\u0947 \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u0915\u0947 \u091c\u0932\u0938\u094d\u0924\u0930 \u092e\u0947\u0902 \u0906\u0908 16 \u092b\u0940\u091f \u0915\u0940 "
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-07-05",
+      "end": "2025-07-05",
+      "truth_cusecs": 44295.0,
+      "model_cusecs": 47784.55246606001,
+      "ratio": 1.0787798276568465,
+      "n_days": 1,
+      "source": "Bhakra Dam Water level increased, level reached 1584.21 feet"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-07-20",
+      "end": "2025-07-20",
+      "truth_cusecs": 22345.0,
+      "model_cusecs": 43202.43583278458,
+      "ratio": 1.933427425946949,
+      "n_days": 1,
+      "source": "\u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u092e\u0947\u0902 \u092a\u093f\u091b\u0932\u0947 \u0928\u094c \u0926\u093f\u0928 \u092e\u0947\u0902 \u091a\u093e\u0930 \u092b\u0940\u091f \u0924\u0915 \u092c\u0922\u093c\u093e \u091c\u0932\u0938\u094d\u0924\u0930"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-07-21",
+      "end": "2025-07-21",
+      "truth_cusecs": 43671.0,
+      "model_cusecs": 59578.9896366966,
+      "ratio": 1.3642689573560622,
+      "n_days": 1,
+      "source": "Una News: \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 1600 \u092b\u0940\u091f \u0915\u0947 \u090a\u092a\u0930 \u092a\u0939\u0941\u0902\u091a\u093e"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-07-22",
+      "end": "2025-07-22",
+      "truth_cusecs": 77741.0,
+      "model_cusecs": 62047.607367549244,
+      "ratio": 0.7981323544532389,
+      "n_days": 1,
+      "source": "Bhakra Dam Water Level: \u0a2d\u0a3e\u0a16\u0a5c\u0a3e, \u0a2a\u0a4c\u0a02\u0a17 \u0a05\u0a24\u0a47 \u0a2a\u0a70\u0a21\u0a4b\u0a39 \u0a21\u0a48\u0a2e\u0a3e\u0a02 \u0a35\u0a3f\u0a71\u0a1a \u0a2a\u0a3e\u0a23\u0a40 \u0a26\u0a40 \u0a06\u0a2e\u0a26 \u0a18"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-07-28",
+      "end": "2025-07-28",
+      "truth_cusecs": 45857.0,
+      "model_cusecs": 42449.18110589101,
+      "ratio": 0.9256859608323922,
+      "n_days": 1,
+      "source": "Una News: \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u092c\u0922\u093c\u093e, \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0915\u0947 \u0915\u0930\u0940\u092c"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-01",
+      "end": "2025-08-01",
+      "truth_cusecs": 190000.0,
+      "model_cusecs": 54781.662895581176,
+      "ratio": 0.2883245415556904,
+      "n_days": 1,
+      "source": "Centre rejects Punjab's claim that lapses at Bhakra, Pong dams exacerb"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-01",
+      "end": "2025-08-01",
+      "truth_cusecs": 350000.0,
+      "model_cusecs": 99436.71940083327,
+      "ratio": 0.2841049125738094,
+      "n_days": 1,
+      "source": "Centre rejects Punjab's claim that lapses at Bhakra, Pong dams exacerb"
+    },
+    {
       "dam": "Pong",
       "kind": "day",
       "start": "2025-08-02",
@@ -8468,6 +9195,61 @@
       "source": "The Tribune, 2 Aug 2025"
     },
     {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-02",
+      "end": "2025-08-02",
+      "truth_cusecs": 87586.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Water level in Pong dam rises sharply due to heavy rainfall; BBMB warn"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-03",
+      "end": "2025-08-03",
+      "truth_cusecs": 87586.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "\u092a\u094b\u0902\u0917 \u092c\u093e\u0902\u0927 \u092e\u0947\u0902 \u091c\u0932\u0938\u094d\u0924\u0930 \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0915\u0947 \u0915\u0930\u0940\u092c, BBMB 18,995 \u0915\u094d\u092f\u0942\u0938\u0947\u0915 \u092a\u093e\u0928\u0940 \u091b"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-03",
+      "end": "2025-08-03",
+      "truth_cusecs": 87586.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Himachal: Water level near danger mark at Pong dam"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-03",
+      "end": "2025-08-03",
+      "truth_cusecs": 87586.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "water level in pong dam nears danger mark bbmb to release 18995 cusecs"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-05",
+      "end": "2025-08-05",
+      "truth_cusecs": 74370.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Kangra News: \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0938\u0947 21 \u092b\u0940\u091f \u0926\u0942\u0930"
+    },
+    {
       "dam": "Bhakra",
       "kind": "day",
       "start": "2025-08-06",
@@ -8477,6 +9259,17 @@
       "ratio": 1.3858559825671144,
       "n_days": 1,
       "source": "Babushahi, 6 Aug 2025"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-06",
+      "end": "2025-08-06",
+      "truth_cusecs": 59200.0,
+      "model_cusecs": 82042.67416797318,
+      "ratio": 1.3858559825671144,
+      "n_days": 1,
+      "source": "Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy "
     },
     {
       "dam": "Pong",
@@ -8492,6 +9285,72 @@
     {
       "dam": "Pong",
       "kind": "day",
+      "start": "2025-08-06",
+      "end": "2025-08-06",
+      "truth_cusecs": 93650.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy "
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2025-08-06",
+      "end": "2025-08-06",
+      "truth_cusecs": 24000.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy "
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-07",
+      "end": "2025-08-07",
+      "truth_cusecs": 70352.0,
+      "model_cusecs": 69513.04346038855,
+      "ratio": 0.9880748729302443,
+      "n_days": 1,
+      "source": "Una News: \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u092a\u0939\u0941\u0902\u091a\u093e 1638 \u092b\u0940\u091f \u0915\u0947 \u092a\u093e\u0930"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-07",
+      "end": "2025-08-07",
+      "truth_cusecs": 190000.0,
+      "model_cusecs": 121176.06168257145,
+      "ratio": 0.6377687456977444,
+      "n_days": 1,
+      "source": "Punjab: 23,000 cusecs of water released from Pong dam"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-09",
+      "end": "2025-08-09",
+      "truth_cusecs": 52518.0,
+      "model_cusecs": 61410.26414556038,
+      "ratio": 1.1693184078898735,
+      "n_days": 1,
+      "source": "\u092a\u0902\u091c\u093e\u092c \u092e\u0947\u0902 \u0906\u091c \u092d\u093e\u0930\u0940 \u092c\u093e\u0930\u093f\u0936 \u0915\u093e \u0905\u0932\u0930\u094d\u091f: \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0938\u0947 \u092b\u093f\u0930 \u091b\u094b\u0921\u093c\u093e \u091c\u093e\u090f\u0917\u093e \u092a\u093e\u0928\u0940, \u091c"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-16",
+      "end": "2025-08-16",
+      "truth_cusecs": 89361.0,
+      "model_cusecs": 65751.54718002923,
+      "ratio": 0.7357969044664813,
+      "n_days": 1,
+      "source": "Una News: \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u092a\u0939\u0941\u0902\u091a\u093e 1658 \u092b\u0940\u091f \u0915\u0947 \u092a\u093e\u0930"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
       "start": "2025-08-17",
       "end": "2025-08-17",
       "truth_cusecs": 109789.0,
@@ -8499,6 +9358,17 @@
       "ratio": 1.060367942089516,
       "n_days": 1,
       "source": "The Tribune, 17 Aug 2025"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-17",
+      "end": "2025-08-17",
+      "truth_cusecs": 109789.0,
+      "model_cusecs": 116416.73599406586,
+      "ratio": 1.060367942089516,
+      "n_days": 1,
+      "source": "Water level in Pong Dam touches 1,379.98 feet, BBMB orders release of "
     },
     {
       "dam": "Bhakra",
@@ -8510,6 +9380,50 @@
       "ratio": 0.7751092660242196,
       "n_days": 1,
       "source": "Babushahi, 19 Aug 2025"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-19",
+      "end": "2025-08-19",
+      "truth_cusecs": 65617.0,
+      "model_cusecs": 50860.344708711214,
+      "ratio": 0.7751092660242196,
+      "n_days": 1,
+      "source": "Breaking: All four floodgates of Bhakra dam opened"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-19",
+      "end": "2025-08-19",
+      "truth_cusecs": 70500.0,
+      "model_cusecs": 50860.344708711214,
+      "ratio": 0.7214233292015775,
+      "n_days": 1,
+      "source": "BBMB Releases Water From Pong & Bhakra Dams, Flood Alert Issued in Sev"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-19",
+      "end": "2025-08-19",
+      "truth_cusecs": 84000.0,
+      "model_cusecs": 101774.94077406966,
+      "ratio": 1.2116064377865436,
+      "n_days": 1,
+      "source": "BBMB Releases Water From Pong & Bhakra Dams, Flood Alert Issued in Sev"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-25",
+      "end": "2025-08-25",
+      "truth_cusecs": 48000.0,
+      "model_cusecs": 64419.948887883605,
+      "ratio": 1.342082268497575,
+      "n_days": 1,
+      "source": "Amid heavy rainfall in Himachal: BBMB keeps close watch, says Bhakra w"
     },
     {
       "dam": "Pong",
@@ -8525,13 +9439,24 @@
     {
       "dam": "Pong",
       "kind": "day",
+      "start": "2025-08-25",
+      "end": "2025-08-25",
+      "truth_cusecs": 151000.0,
+      "model_cusecs": 104157.23941374957,
+      "ratio": 0.6897830424751628,
+      "n_days": 1,
+      "source": "Kangra News: \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u092c\u0922\u093c\u093e, \u0918\u0930\u093e\u091f \u091c\u0932\u092e\u0917\u094d\u0928"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
       "start": "2025-08-26",
       "end": "2025-08-26",
       "truth_cusecs": 233000.0,
       "model_cusecs": 175209.70325120323,
       "ratio": 0.7519729753270525,
       "n_days": 1,
-      "source": "PTI via The Week, 26 Aug 2025 (about)"
+      "source": "Water level in Pong dam reaches 1,390 feet"
     },
     {
       "dam": "Bhakra",
@@ -8543,6 +9468,28 @@
       "ratio": 1.05640845909115,
       "n_days": 1,
       "source": "The Tribune, 28 Aug 2026 (same date last year)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-27",
+      "end": "2025-08-27",
+      "truth_cusecs": 58997.0,
+      "model_cusecs": 62324.92986100058,
+      "ratio": 1.05640845909115,
+      "n_days": 1,
+      "source": "Bilaspur News: \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u092e\u0947\u0902 \u092a\u093f\u091b\u0932\u0947 \u0938\u093e\u0932 \u0938\u0947 37 \u092b\u0940\u091f \u0915\u092e \u092a\u093e\u0928\u0940"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-27",
+      "end": "2025-08-27",
+      "truth_cusecs": 59364.0,
+      "model_cusecs": 62324.92986100058,
+      "ratio": 1.0498775328650458,
+      "n_days": 1,
+      "source": "Punjab's power demand stays above 16,000 MW, but why is Bhakra inflow "
     },
     {
       "dam": "Pong",
@@ -8567,6 +9514,127 @@
       "source": "The Tribune, 28 Aug 2026 (same date last year)"
     },
     {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2025-08-27",
+      "end": "2025-08-27",
+      "truth_cusecs": 7073.0,
+      "model_cusecs": 109545.50435969727,
+      "ratio": 15.487841702205184,
+      "n_days": 1,
+      "source": "Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-28",
+      "end": "2025-08-28",
+      "truth_cusecs": 53856.0,
+      "model_cusecs": 57537.38781062122,
+      "ratio": 1.0683561313618022,
+      "n_days": 1,
+      "source": "Water level drops in Punjab's Ranjit Sagar Dam"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-28",
+      "end": "2025-08-28",
+      "truth_cusecs": 54213.0,
+      "model_cusecs": 57537.38781062122,
+      "ratio": 1.0613208605061741,
+      "n_days": 1,
+      "source": "water levels recede in punjab dams bringing relief to flood affected a"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-28",
+      "end": "2025-08-28",
+      "truth_cusecs": 110000.0,
+      "model_cusecs": 126932.69229166715,
+      "ratio": 1.1539335662878831,
+      "n_days": 1,
+      "source": "Water level drops in Punjab's Ranjit Sagar Dam"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-28",
+      "end": "2025-08-28",
+      "truth_cusecs": 79780.0,
+      "model_cusecs": 126932.69229166715,
+      "ratio": 1.5910339971379688,
+      "n_days": 1,
+      "source": "pong dam water level remains above danger mark high discharge continue"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-28",
+      "end": "2025-08-28",
+      "truth_cusecs": 144741.0,
+      "model_cusecs": 126932.69229166715,
+      "ratio": 0.8769643175856678,
+      "n_days": 1,
+      "source": "water levels recede in punjab dams bringing relief to flood affected a"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-29",
+      "end": "2025-08-29",
+      "truth_cusecs": 49137.0,
+      "model_cusecs": 72173.15064395606,
+      "ratio": 1.4688147555600883,
+      "n_days": 1,
+      "source": "Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-08-29",
+      "end": "2025-08-29",
+      "truth_cusecs": 49137.0,
+      "model_cusecs": 72173.15064395606,
+      "ratio": 1.4688147555600883,
+      "n_days": 1,
+      "source": "water levels recede in punjab dams bringing relief to flood affected a"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-29",
+      "end": "2025-08-29",
+      "truth_cusecs": 61371.0,
+      "model_cusecs": 116118.9063998768,
+      "ratio": 1.8920810545677405,
+      "n_days": 1,
+      "source": "Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-08-29",
+      "end": "2025-08-29",
+      "truth_cusecs": 61371.0,
+      "model_cusecs": 116118.9063998768,
+      "ratio": 1.8920810545677405,
+      "n_days": 1,
+      "source": "water levels recede in punjab dams bringing relief to flood affected a"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2025-08-29",
+      "end": "2025-08-29",
+      "truth_cusecs": 54623.0,
+      "model_cusecs": 52899.51001113673,
+      "ratio": 0.9684475406172625,
+      "n_days": 1,
+      "source": "Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas"
+    },
+    {
       "dam": "Pong",
       "kind": "day",
       "start": "2025-08-31",
@@ -8580,6 +9648,127 @@
     {
       "dam": "Pong",
       "kind": "day",
+      "start": "2025-08-31",
+      "end": "2025-08-31",
+      "truth_cusecs": 160276.0,
+      "model_cusecs": 121294.22128070219,
+      "ratio": 0.7567834315849047,
+      "n_days": 1,
+      "source": "pong dam level remains above danger mark 84952 cusecs water discharged"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-01",
+      "end": "2025-09-01",
+      "truth_cusecs": 107565.0,
+      "model_cusecs": 103902.06506724423,
+      "ratio": 0.9659467769929273,
+      "n_days": 1,
+      "source": "Una News: \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0938\u0947 \u092e\u093e\u0924\u094d\u0930 \u0924\u0940\u0928 \u092b\u0940\u091f \u0915\u0940 \u0926\u0942\u0930\u0940 \u092a\u0930 \u092d\u093e\u0916\u0921\u093c\u093e \u0921\u0948\u092e \u0915\u093e \u091c\u0932\u0938\u094d"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-01",
+      "end": "2025-09-01",
+      "truth_cusecs": 107000.0,
+      "model_cusecs": 103902.06506724423,
+      "ratio": 0.9710473370770488,
+      "n_days": 1,
+      "source": "Amid Heavy Rain, Bhakra Dam Level Rises 3 ft In 24 Hours, Authorities "
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-02",
+      "end": "2025-09-02",
+      "truth_cusecs": 107000.0,
+      "model_cusecs": 108619.67158454008,
+      "ratio": 1.0151371176125241,
+      "n_days": 1,
+      "source": "Bhakra Dam level rises 3 ft in 24 hours, triggers flood alarm downstre"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-02",
+      "end": "2025-09-02",
+      "truth_cusecs": 96777.0,
+      "model_cusecs": 134699.9284947273,
+      "ratio": 1.3918588972041632,
+      "n_days": 1,
+      "source": "Bhakra Dam level rises 3 ft in 24 hours, triggers flood alarm downstre"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-02",
+      "end": "2025-09-02",
+      "truth_cusecs": 96777.0,
+      "model_cusecs": 134699.9284947273,
+      "ratio": 1.3918588972041632,
+      "n_days": 1,
+      "source": "Amid Heavy Rain, Bhakra Dam Level Rises 3 ft In 24 Hours, Authorities "
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-03",
+      "end": "2025-09-03",
+      "truth_cusecs": 110000.0,
+      "model_cusecs": 102327.15265009609,
+      "ratio": 0.9302468422736008,
+      "n_days": 1,
+      "source": "Una News: \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 1678 \u092b\u0940\u091f \u092a\u093e\u0930, \u0926\u094b \u092b\u0940\u091f \u0930\u0939 \u0917\u092f\u093e \u0916\u0924\u0930\u0947 \u0915\u093e \u0928\u093f"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-03",
+      "end": "2025-09-03",
+      "truth_cusecs": 86822.0,
+      "model_cusecs": 102327.15265009609,
+      "ratio": 1.1785855272868178,
+      "n_days": 1,
+      "source": "record rain red alert in punjab himachal j&k chandigarh's sukhna gates"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-03",
+      "end": "2025-09-03",
+      "truth_cusecs": 155261.0,
+      "model_cusecs": 151828.66315042417,
+      "ratio": 0.9778931164324858,
+      "n_days": 1,
+      "source": "heavy rainfall swells pong dam water level above danger mark for 4th d"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-04",
+      "end": "2025-09-04",
+      "truth_cusecs": 95435.0,
+      "model_cusecs": 93306.83755831943,
+      "ratio": 0.9777003987878601,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data (data-reservoir.htm archived capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-04",
+      "end": "2025-09-04",
+      "truth_cusecs": 95435.0,
+      "model_cusecs": 93306.83755831943,
+      "ratio": 0.9777003987878601,
+      "n_days": 1,
+      "source": "bhakra to release more water into punjab as pong dam hits full capacit"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
       "start": "2025-09-04",
       "end": "2025-09-04",
       "truth_cusecs": 107301.0,
@@ -8587,6 +9776,28 @@
       "ratio": 1.3700174695782956,
       "n_days": 1,
       "source": "The Tribune, 4 Sep 2025 (actual inflow)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-04",
+      "end": "2025-09-04",
+      "truth_cusecs": 132595.0,
+      "model_cusecs": 147004.2445032207,
+      "ratio": 1.1086710999903517,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data (data-reservoir.htm archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-04",
+      "end": "2025-09-04",
+      "truth_cusecs": 132595.0,
+      "model_cusecs": 147004.2445032207,
+      "ratio": 1.1086710999903517,
+      "n_days": 1,
+      "source": "bhakra to release more water into punjab as pong dam hits full capacit"
     },
     {
       "dam": "Bhakra",
@@ -8600,6 +9811,17 @@
       "source": "SDO Nangal via Babushahi, 5 Sep 2025"
     },
     {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-05",
+      "end": "2025-09-05",
+      "truth_cusecs": 76318.0,
+      "model_cusecs": 67119.76968114947,
+      "ratio": 0.87947495585772,
+      "n_days": 1,
+      "source": "Bhakra reservoir water level data (SDO Nangal Dam office)"
+    },
+    {
       "dam": "Pong",
       "kind": "day",
       "start": "2025-09-05",
@@ -8609,6 +9831,28 @@
       "ratio": 1.0666206193976742,
       "n_days": 1,
       "source": "The Tribune, 6 Sep 2025 (yesterday)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-05",
+      "end": "2025-09-05",
+      "truth_cusecs": 99673.0,
+      "model_cusecs": 113008.45462518357,
+      "ratio": 1.1337920462430504,
+      "n_days": 1,
+      "source": "Kangra News: \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 1394.80 \u092b\u0940\u091f \u092a\u0930 \u0938\u094d\u0925\u093f\u0930, \u0916\u0924\u0930\u0947 \u0938\u0947 4.80 \u092b\u0940"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-05",
+      "end": "2025-09-05",
+      "truth_cusecs": 105950.0,
+      "model_cusecs": 113008.45462518357,
+      "ratio": 1.0666206193976742,
+      "n_days": 1,
+      "source": "Punjab floods: Bhakra water level drops; Pong dam continues high outfl"
     },
     {
       "dam": "Bhakra",
@@ -8622,6 +9866,39 @@
       "source": "The Tribune, 6 Sep 2025"
     },
     {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-06",
+      "end": "2025-09-06",
+      "truth_cusecs": 51332.0,
+      "model_cusecs": 56139.03293982175,
+      "ratio": 1.0936459311895455,
+      "n_days": 1,
+      "source": "Punjab: Pong releases 99,889 cusecs as water level exceeds limit"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-06",
+      "end": "2025-09-06",
+      "truth_cusecs": 62481.0,
+      "model_cusecs": 56139.03293982175,
+      "ratio": 0.898497670328928,
+      "n_days": 1,
+      "source": "Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-06",
+      "end": "2025-09-06",
+      "truth_cusecs": 62481.0,
+      "model_cusecs": 56139.03293982175,
+      "ratio": 0.898497670328928,
+      "n_days": 1,
+      "source": "Punjab floods: Bhakra water level drops; Pong dam continues high outfl"
+    },
+    {
       "dam": "Pong",
       "kind": "day",
       "start": "2025-09-06",
@@ -8631,6 +9908,864 @@
       "ratio": 0.7675169143335551,
       "n_days": 1,
       "source": "The Tribune, 6 Sep 2025"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-06",
+      "end": "2025-09-06",
+      "truth_cusecs": 47162.0,
+      "model_cusecs": 75537.47967487983,
+      "ratio": 1.60165980397099,
+      "n_days": 1,
+      "source": "Punjab: Pong releases 99,889 cusecs as water level exceeds limit"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-06",
+      "end": "2025-09-06",
+      "truth_cusecs": 47162.0,
+      "model_cusecs": 75537.47967487983,
+      "ratio": 1.60165980397099,
+      "n_days": 1,
+      "source": "Punjab: Water level in Pong dam dips by 2 feet but outflow still high"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-06",
+      "end": "2025-09-06",
+      "truth_cusecs": 98418.0,
+      "model_cusecs": 75537.47967487983,
+      "ratio": 0.7675169143335551,
+      "n_days": 1,
+      "source": "Punjab floods: Bhakra water level drops; Pong dam continues high outfl"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2025-09-06",
+      "end": "2025-09-06",
+      "truth_cusecs": 24947.0,
+      "model_cusecs": 22582.02442088607,
+      "ratio": 0.9052000008372177,
+      "n_days": 1,
+      "source": "Punjab: Pong releases 99,889 cusecs as water level exceeds limit"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-07",
+      "end": "2025-09-07",
+      "truth_cusecs": 66900.0,
+      "model_cusecs": 47646.75420653801,
+      "ratio": 0.7122085830573693,
+      "n_days": 1,
+      "source": "Punjab: Water level in Pong dam dips by 2 feet but outflow still high"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-07",
+      "end": "2025-09-07",
+      "truth_cusecs": 36968.0,
+      "model_cusecs": 58397.63139715122,
+      "ratio": 1.5796805723098686,
+      "n_days": 1,
+      "source": "Punjab: Water level in Pong dam dips by 2 feet but outflow still high"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-08",
+      "end": "2025-09-08",
+      "truth_cusecs": 55338.0,
+      "model_cusecs": 43703.67475221035,
+      "ratio": 0.7897588411617757,
+      "n_days": 1,
+      "source": "Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-08",
+      "end": "2025-09-08",
+      "truth_cusecs": 46500.0,
+      "model_cusecs": 54953.54475152494,
+      "ratio": 1.181796661323117,
+      "n_days": 1,
+      "source": "Punjab: Water level in Pong dam dips by 2 feet but outflow still high"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-08",
+      "end": "2025-09-08",
+      "truth_cusecs": 35439.0,
+      "model_cusecs": 54953.54475152494,
+      "ratio": 1.5506516761625593,
+      "n_days": 1,
+      "source": "Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2025-09-08",
+      "end": "2025-09-08",
+      "truth_cusecs": 30500.0,
+      "model_cusecs": 19140.620746148634,
+      "ratio": 0.6275613359392994,
+      "n_days": 1,
+      "source": "Punjab: Water level in Pong dam dips by 2 feet but outflow still high"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2025-09-08",
+      "end": "2025-09-08",
+      "truth_cusecs": 19782.0,
+      "model_cusecs": 19140.620746148634,
+      "ratio": 0.9675776335127203,
+      "n_days": 1,
+      "source": "Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-14",
+      "end": "2025-09-14",
+      "truth_cusecs": 46708.0,
+      "model_cusecs": 46128.51824710914,
+      "ratio": 0.9875935224610161,
+      "n_days": 1,
+      "source": "\u092a\u0902\u091c\u093e\u092c \u092e\u0947\u0902 \u092c\u0922\u093c\u0940 \u092c\u093f\u091c\u0932\u0940 \u0915\u0940 \u092e\u093e\u0902\u0917: 2173 \u092e\u0947\u0917\u093e\u0935\u093e\u091f \u0909\u0924\u094d\u092a\u093e\u0926\u0928 \u0920\u092a, \u092e\u093e\u0928\u0938\u0942\u0928 \u0915\u0940 \u092c\u0947\u0930\u0941\u0916"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-14",
+      "end": "2025-09-14",
+      "truth_cusecs": 34737.0,
+      "model_cusecs": 70783.79838298121,
+      "ratio": 2.0377061456942513,
+      "n_days": 1,
+      "source": "\u092a\u0902\u091c\u093e\u092c \u092e\u0947\u0902 \u092c\u0922\u093c\u0940 \u092c\u093f\u091c\u0932\u0940 \u0915\u0940 \u092e\u093e\u0902\u0917: 2173 \u092e\u0947\u0917\u093e\u0935\u093e\u091f \u0909\u0924\u094d\u092a\u093e\u0926\u0928 \u0920\u092a, \u092e\u093e\u0928\u0938\u0942\u0928 \u0915\u0940 \u092c\u0947\u0930\u0941\u0916"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-15",
+      "end": "2025-09-15",
+      "truth_cusecs": 54667.0,
+      "model_cusecs": 44853.21639075868,
+      "ratio": 0.8204806627537395,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-15",
+      "end": "2025-09-15",
+      "truth_cusecs": 40999.0,
+      "model_cusecs": 44853.21639075868,
+      "ratio": 1.0940075706909602,
+      "n_days": 1,
+      "source": "water level at pong dam rises amid surplus rain in parts of himachal p"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-15",
+      "end": "2025-09-15",
+      "truth_cusecs": 76498.0,
+      "model_cusecs": 83123.73162950129,
+      "ratio": 1.086613135369569,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-15",
+      "end": "2025-09-15",
+      "truth_cusecs": 80000.0,
+      "model_cusecs": 83123.73162950129,
+      "ratio": 1.0390466453687661,
+      "n_days": 1,
+      "source": "\u092a\u094c\u0902\u0917 \u0921\u0948\u092e \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u0918\u091f\u093e, \u0928\u093f\u091a\u0932\u0947 \u0907\u0932\u093e\u0915\u094b\u0902 \u0915\u0947 \u0932\u093f\u090f \u0930\u093e\u0939\u0924, \u091c\u0932\u094d\u0926 \u092a\u091f\u0930\u0940 \u092a\u0930 \u0932\u094c\u091f\u0947\u0917\u0940 "
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-15",
+      "end": "2025-09-15",
+      "truth_cusecs": 64964.0,
+      "model_cusecs": 83123.73162950129,
+      "ratio": 1.2795353061618941,
+      "n_days": 1,
+      "source": "water level at pong dam rises amid surplus rain in parts of himachal p"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-16",
+      "end": "2025-09-16",
+      "truth_cusecs": 160369.0,
+      "model_cusecs": 74344.50021407582,
+      "ratio": 0.46358398577078996,
+      "n_days": 1,
+      "source": "Kangra News: \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u0916\u0924\u0930\u0947 \u0915\u0947 \u0928\u093f\u0936\u093e\u0928 \u0938\u0947 \u092a\u093e\u0902\u091a \u092b\u0940\u091f \u090a\u092a\u0930"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-20",
+      "end": "2025-09-20",
+      "truth_cusecs": 38773.0,
+      "model_cusecs": 49898.22723509414,
+      "ratio": 1.2869323301032713,
+      "n_days": 1,
+      "source": "Pong Dam water level sees decline"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-21",
+      "end": "2025-09-21",
+      "truth_cusecs": 31540.0,
+      "model_cusecs": 45577.679211324714,
+      "ratio": 1.4450754347281138,
+      "n_days": 1,
+      "source": "Pong Dam water level sees decline"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-09-24",
+      "end": "2025-09-24",
+      "truth_cusecs": 35666.0,
+      "model_cusecs": 35817.32995465823,
+      "ratio": 1.0042429752329454,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-09-24",
+      "end": "2025-09-24",
+      "truth_cusecs": 17291.0,
+      "model_cusecs": 40090.15623207463,
+      "ratio": 2.318556256553966,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2025-10-05",
+      "end": "2025-10-05",
+      "truth_cusecs": 10084.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "50000 cusecs of water released from pong dam"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2025-11-20",
+      "end": "2025-11-20",
+      "truth_cusecs": 7811.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Himachal: \u092a\u0902\u091c\u093e\u092c \u092e\u0947\u0902 \u0928\u0939\u0930\u094b\u0902 \u0915\u0940 \u092e\u0930\u092e\u094d\u092e\u0924 \u0938\u0947 \u0914\u0930 \u092c\u0922\u093c\u0947\u0917\u093e \u092d\u093e\u0916\u0921\u093c\u093e \u0921\u0948\u092e \u092e\u0947\u0902 \u092a\u093e\u0928\u0940"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-05-14",
+      "end": "2026-05-14",
+      "truth_cusecs": 13102.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data rdata.html (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-05-14",
+      "end": "2026-05-14",
+      "truth_cusecs": 2705.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data rdata.html (archived capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-04",
+      "end": "2026-06-04",
+      "truth_cusecs": 10641.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data rdata.html (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-06-04",
+      "end": "2026-06-04",
+      "truth_cusecs": 2088.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data rdata.html (archived capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-09",
+      "end": "2026-06-09",
+      "truth_cusecs": 13748.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Dam level up, BBMB tells Punjab, Haryana to draw more water"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-10",
+      "end": "2026-06-10",
+      "truth_cusecs": 13748.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Draw more water from dams, BBMB tells partner states ahead of monsoon"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-06-10",
+      "end": "2026-06-10",
+      "truth_cusecs": 1986.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Draw more water from dams, BBMB tells partner states ahead of monsoon"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-11",
+      "end": "2026-06-11",
+      "truth_cusecs": 16527.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Una News: \u092d\u093e\u0916\u0921\u093c\u093e \u0921\u0948\u092e \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 \u092a\u0939\u0941\u0902\u091a\u093e 1,576 \u092b\u0940\u091f \u0915\u0947 \u092a\u093e\u0930"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-11",
+      "end": "2026-06-11",
+      "truth_cusecs": 16527.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Bhakra inflows down 50% as low snowfall, delayed snowmelt hit Sutlej c"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-06-11",
+      "end": "2026-06-11",
+      "truth_cusecs": 2129.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Bhakra inflows down 50% as low snowfall, delayed snowmelt hit Sutlej c"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2026-06-11",
+      "end": "2026-06-11",
+      "truth_cusecs": 4854.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Bhakra inflows down 50% as low snowfall, delayed snowmelt hit Sutlej c"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-13",
+      "end": "2026-06-13",
+      "truth_cusecs": 19074.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Bhakra Dam Water Level: \u0a2d\u0a3e\u0a16\u0a5c\u0a3e \u0a21\u0a48\u0a2e \u0a35\u0a3f\u0a71\u0a1a \u0a2a\u0a3e\u0a23\u0a40 \u0a26\u0a3e \u0a2a\u0a71\u0a27\u0a30 1576.22 \u0a2b\u0a41\u0a71\u0a1f \u0a24\u0a71\u0a15 \u0a2a"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-14",
+      "end": "2026-06-14",
+      "truth_cusecs": 22581.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "\u0a2d\u0a3e\u0a16\u0a5c\u0a3e \u0a21\u0a48\u0a2e \u0a05\u0a2a\u0a21\u0a47\u0a1f: \u0a2e\u0a70\u0a17 \u0a35\u0a27\u0a23 \u0a15\u0a3e\u0a30\u0a28 3 \u0a26\u0a3f\u0a28\u0a3e\u0a02 '\u0a1a 0.81 \u0a2b\u0a41\u0a71\u0a1f \u0a18\u0a1f\u0a3f\u0a06 \u0a2a\u0a3e\u0a23\u0a40 \u0a26\u0a3e \u0a2a\u0a71\u0a27\u0a30"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-24",
+      "end": "2026-06-24",
+      "truth_cusecs": 18715.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-06-24",
+      "end": "2026-06-24",
+      "truth_cusecs": 3527.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-28",
+      "end": "2026-06-28",
+      "truth_cusecs": 22137.0,
+      "model_cusecs": 37581.25070454426,
+      "ratio": 1.6976668340129313,
+      "n_days": 1,
+      "source": "Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-06-28",
+      "end": "2026-06-28",
+      "truth_cusecs": 5723.0,
+      "model_cusecs": 42117.89128628874,
+      "ratio": 7.359407878086447,
+      "n_days": 1,
+      "source": "Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2026-06-28",
+      "end": "2026-06-28",
+      "truth_cusecs": 2006.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-06-29",
+      "end": "2026-06-29",
+      "truth_cusecs": 22734.0,
+      "model_cusecs": 42916.067453822754,
+      "ratio": 1.8877481945026284,
+      "n_days": 1,
+      "source": "Una News: \u092c\u0940\u0924\u0947 \u0935\u0930\u094d\u0937 \u0915\u0947 \u092e\u0941\u0915\u093e\u092c\u0932\u0947 \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u0915\u0947 \u091c\u0932\u0938\u094d\u0924\u0930 \u092e\u0947\u0902 \u0906\u0908 16 \u092b\u0940\u091f \u0915\u0940 "
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-07-15",
+      "end": "2026-07-15",
+      "truth_cusecs": 40426.0,
+      "model_cusecs": 40752.3688324431,
+      "ratio": 1.0080732407965938,
+      "n_days": 1,
+      "source": "22 \u092b\u0940\u091f \u092c\u0922\u093c\u093e \u092d\u093e\u0916\u0921\u093c\u093e \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930: \u092a\u093f\u091b\u0932\u0947 \u0938\u093e\u0932 \u0938\u0947 \u092b\u093f\u0930 \u092d\u0940 \u0928\u0940\u091a\u0947..."
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2026-07-21",
+      "end": "2026-07-21",
+      "truth_cusecs": 43898.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Water levels at Bhakra, Pong and Pandoh dams substantially lower due t"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-07-22",
+      "end": "2026-07-22",
+      "truth_cusecs": 36866.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Water levels at Bhakra, Pong and Pandoh dams substantially lower due t"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-07-22",
+      "end": "2026-07-22",
+      "truth_cusecs": 36866.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Bhakra Dam Water Level: \u0a2d\u0a3e\u0a16\u0a5c\u0a3e, \u0a2a\u0a4c\u0a02\u0a17 \u0a05\u0a24\u0a47 \u0a2a\u0a70\u0a21\u0a4b\u0a39 \u0a21\u0a48\u0a2e\u0a3e\u0a02 \u0a35\u0a3f\u0a71\u0a1a \u0a2a\u0a3e\u0a23\u0a40 \u0a26\u0a40 \u0a06\u0a2e\u0a26 \u0a18"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-07-22",
+      "end": "2026-07-22",
+      "truth_cusecs": 22546.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Water levels at Bhakra, Pong and Pandoh dams substantially lower due t"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2026-07-24",
+      "end": "2026-07-24",
+      "truth_cusecs": 96674.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "\u0a30\u0a23\u0a1c\u0a40\u0a24 \u0a38\u0a3e\u0a17\u0a30 \u0a21\u0a48\u0a2e '\u0a1a \u0a35\u0a27\u0a3f\u0a06 \u0a2a\u0a3e\u0a23\u0a40 \u0a26\u0a3e \u0a2a\u0a71\u0a27\u0a30, \u0a21\u0a48\u0a2e \u0a2a\u0a4d\u0a30\u0a2c\u0a70\u0a27\u0a15\u0a3e\u0a02 \u0a28\u0a47 \u0a2d\u0a47\u0a1c\u0a3f\u0a06 \u0a1a\u0a47\u0a24\u0a3e\u0a35\u0a28\u0a40 \u0a38\u0a70"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-07-26",
+      "end": "2026-07-26",
+      "truth_cusecs": 40363.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-07-26",
+      "end": "2026-07-26",
+      "truth_cusecs": 37172.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-07-29",
+      "end": "2026-07-29",
+      "truth_cusecs": 61210.0,
+      "model_cusecs": 107557.74542645254,
+      "ratio": 1.757192377494732,
+      "n_days": 1,
+      "source": "Kangra News: \u092a\u094c\u0902\u0917 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 11 \u0926\u093f\u0928 \u092e\u0947\u0902 12 \u092b\u0940\u091f \u092c\u0922\u093c\u093e"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-08",
+      "end": "2026-08-08",
+      "truth_cusecs": 41501.0,
+      "model_cusecs": 58841.976292051746,
+      "ratio": 1.4178447818619249,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-08-08",
+      "end": "2026-08-08",
+      "truth_cusecs": 48054.0,
+      "model_cusecs": 94698.90837638473,
+      "ratio": 1.9706769129809116,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-09",
+      "end": "2026-08-09",
+      "truth_cusecs": 40137.0,
+      "model_cusecs": 54533.04096572807,
+      "ratio": 1.3586725705889346,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-08-09",
+      "end": "2026-08-09",
+      "truth_cusecs": 34263.0,
+      "model_cusecs": 70121.38017145613,
+      "ratio": 2.0465627695022657,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (archived capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-10",
+      "end": "2026-08-10",
+      "truth_cusecs": 41000.0,
+      "model_cusecs": 57124.8525145617,
+      "ratio": 1.3932890857210172,
+      "n_days": 1,
+      "source": "Himachal rain takes Bhakra Dam level to 1,612 feet, still far from 1,6"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-08-10",
+      "end": "2026-08-10",
+      "truth_cusecs": 48000.0,
+      "model_cusecs": 61781.294242797194,
+      "ratio": 1.2871102967249415,
+      "n_days": 1,
+      "source": "Himachal rain takes Bhakra Dam level to 1,612 feet, still far from 1,6"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2026-08-12",
+      "end": "2026-08-12",
+      "truth_cusecs": 11645.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Jalandhar News: \u0930\u0902\u091c\u0940\u0924 \u0938\u093e\u0917\u0930 \u092c\u093e\u0902\u0927 \u0915\u093e \u091c\u0932\u0938\u094d\u0924\u0930 513.01 \u092e\u0940\u091f\u0930 \u092a\u0939\u0941\u0902\u091a\u093e"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-21",
+      "end": "2026-08-21",
+      "truth_cusecs": 48309.0,
+      "model_cusecs": 46095.5587841811,
+      "ratio": 0.9541815973044587,
+      "n_days": 1,
+      "source": "Punjab, Haryana brace for rain on August 22; dam levels below normal a"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-08-21",
+      "end": "2026-08-21",
+      "truth_cusecs": 39639.0,
+      "model_cusecs": 62136.06677110037,
+      "ratio": 1.5675487971719864,
+      "n_days": 1,
+      "source": "Punjab, Haryana brace for rain on August 22; dam levels below normal a"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-26",
+      "end": "2026-08-26",
+      "truth_cusecs": 42000.0,
+      "model_cusecs": 42434.31541369859,
+      "ratio": 1.0103408431832999,
+      "n_days": 1,
+      "source": "Punjab: Tighten taps, BBMB cautions partner states as weak monsoon str"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-27",
+      "end": "2026-08-27",
+      "truth_cusecs": 30452.0,
+      "model_cusecs": 41230.85556057306,
+      "ratio": 1.3539621555422652,
+      "n_days": 1,
+      "source": "Bilaspur News: \u092d\u093e\u0916\u0921\u093c\u093e \u092c\u093e\u0902\u0927 \u092e\u0947\u0902 \u092a\u093f\u091b\u0932\u0947 \u0938\u093e\u0932 \u0938\u0947 37 \u092b\u0940\u091f \u0915\u092e \u092a\u093e\u0928\u0940"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-27",
+      "end": "2026-08-27",
+      "truth_cusecs": 30452.0,
+      "model_cusecs": 41230.85556057306,
+      "ratio": 1.3539621555422652,
+      "n_days": 1,
+      "source": "Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-27",
+      "end": "2026-08-27",
+      "truth_cusecs": 30452.0,
+      "model_cusecs": 41230.85556057306,
+      "ratio": 1.3539621555422652,
+      "n_days": 1,
+      "source": "Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-08-27",
+      "end": "2026-08-27",
+      "truth_cusecs": 6163.0,
+      "model_cusecs": 41230.85556057306,
+      "ratio": 6.690062560534327,
+      "n_days": 1,
+      "source": "Punjab's power demand stays above 16,000 MW, but why is Bhakra inflow "
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-08-27",
+      "end": "2026-08-27",
+      "truth_cusecs": 22202.0,
+      "model_cusecs": 51504.359533277406,
+      "ratio": 2.3198072035527164,
+      "n_days": 1,
+      "source": "Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-08-27",
+      "end": "2026-08-27",
+      "truth_cusecs": 22202.0,
+      "model_cusecs": 51504.359533277406,
+      "ratio": 2.3198072035527164,
+      "n_days": 1,
+      "source": "Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon"
+    },
+    {
+      "dam": "Ranjit Sagar",
+      "kind": "day",
+      "start": "2026-08-27",
+      "end": "2026-08-27",
+      "truth_cusecs": 7073.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-09-04",
+      "end": "2026-09-04",
+      "truth_cusecs": 42701.0,
+      "model_cusecs": 51184.26485669541,
+      "ratio": 1.1986666555044474,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (direct capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-09-04",
+      "end": "2026-09-04",
+      "truth_cusecs": 20102.0,
+      "model_cusecs": 64224.27994174548,
+      "ratio": 3.194919905568873,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (direct capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-09-05",
+      "end": "2026-09-05",
+      "truth_cusecs": 41628.0,
+      "model_cusecs": 56443.490526605696,
+      "ratio": 1.3559020497406962,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (direct capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-09-05",
+      "end": "2026-09-05",
+      "truth_cusecs": 22870.0,
+      "model_cusecs": 61254.096202213026,
+      "ratio": 2.678360131272979,
+      "n_days": 1,
+      "source": "BBMB Reservoir Data res_data.pdf (direct capture)"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-09-14",
+      "end": "2026-09-14",
+      "truth_cusecs": 30199.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "\u092a\u0902\u091c\u093e\u092c \u092e\u0947\u0902 \u092c\u0922\u093c\u0940 \u092c\u093f\u091c\u0932\u0940 \u0915\u0940 \u092e\u093e\u0902\u0917: 2173 \u092e\u0947\u0917\u093e\u0935\u093e\u091f \u0909\u0924\u094d\u092a\u093e\u0926\u0928 \u0920\u092a, \u092e\u093e\u0928\u0938\u0942\u0928 \u0915\u0940 \u092c\u0947\u0930\u0941\u0916"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-09-14",
+      "end": "2026-09-14",
+      "truth_cusecs": 10751.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "\u092a\u0902\u091c\u093e\u092c \u092e\u0947\u0902 \u092c\u0922\u093c\u0940 \u092c\u093f\u091c\u0932\u0940 \u0915\u0940 \u092e\u093e\u0902\u0917: 2173 \u092e\u0947\u0917\u093e\u0935\u093e\u091f \u0909\u0924\u094d\u092a\u093e\u0926\u0928 \u0920\u092a, \u092e\u093e\u0928\u0938\u0942\u0928 \u0915\u0940 \u092c\u0947\u0930\u0941\u0916"
+    },
+    {
+      "dam": "Bhakra",
+      "kind": "day",
+      "start": "2026-09-17",
+      "end": "2026-09-17",
+      "truth_cusecs": 28368.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data res_data.pdf (direct capture)"
+    },
+    {
+      "dam": "Pong",
+      "kind": "day",
+      "start": "2026-09-17",
+      "end": "2026-09-17",
+      "truth_cusecs": 11509.0,
+      "model_cusecs": NaN,
+      "ratio": NaN,
+      "n_days": 0,
+      "source": "BBMB Reservoir Data res_data.pdf (direct capture)"
     },
     {
       "dam": "Bhakra",
@@ -8714,9 +10849,97 @@
     "n_periods": 6,
     "log_bias": -0.0029717545905371388,
     "log_sd": 0.13951667092756717,
-    "n_dated_days": 29,
-    "dated_log_sd": 0.4380440658025653,
+    "n_dated_days": 147,
+    "dated_log_sd": 0.5587631029954789,
     "min_period_days": 10
+  },
+  "press_inflow_fit": {
+    "Bhakra": {
+      "n_readings": 48,
+      "params": {
+        "dam": "Bhakra",
+        "area_km2": 25762.476999999995,
+        "c": 0.4331727825003241,
+        "w": [
+          0.4696020840112322,
+          0.20977160562740338,
+          0.11317060262147291,
+          0.20745570773989147
+        ],
+        "rho": 0.9,
+        "intercept_bcm_per_day": 0.06275834534530682,
+        "gamma": 0.0,
+        "n_days": 48,
+        "r2": 0.4389992097221559,
+        "rmse_bcm": 0.06922486009703159,
+        "rho_raw": NaN,
+        "c_wet": 0.0,
+        "api_days": 5,
+        "resid_acf1": NaN,
+        "c_excess": 0.0,
+        "w_excess": [],
+        "excess_threshold_mm": NaN,
+        "wetness": "api",
+        "sm_clim": [],
+        "basis": "inflow"
+      },
+      "in_sample": {
+        "n_days": 48,
+        "bias_pct": 3.8592253132833506e-14,
+        "pearson_r": 0.6625701545664091,
+        "mae_cusecs": 18708.675908751888,
+        "mean_obs_cusecs": 56560.244791666664,
+        "mean_pred_cusecs": 56560.244791666686,
+        "base_cusecs": 25651.50520673142,
+        "coefficient_ratio": 1.0,
+        "wet_coefficient_ratio": NaN
+      }
+    },
+    "Pong": {
+      "n_readings": 45,
+      "params": {
+        "dam": "Pong",
+        "area_km2": 13637.446999999998,
+        "c": 0.7096240483024819,
+        "w": [
+          0.3538118769972825,
+          0.1474484910131082,
+          0.21713898740193882,
+          0.2816006445876705
+        ],
+        "rho": 0.9,
+        "intercept_bcm_per_day": 0.005411783900136152,
+        "gamma": 0.0,
+        "n_days": 45,
+        "r2": 0.5957031091788472,
+        "rmse_bcm": 0.15076755065557224,
+        "rho_raw": NaN,
+        "c_wet": 0.27816086959348285,
+        "api_days": 5,
+        "resid_acf1": NaN,
+        "c_excess": 0.0,
+        "w_excess": [],
+        "excess_threshold_mm": NaN,
+        "wetness": "api",
+        "sm_clim": [],
+        "basis": "inflow"
+      },
+      "in_sample": {
+        "n_days": 45,
+        "bias_pct": -2.8279141123940055,
+        "pearson_r": 0.7760143877310229,
+        "mae_cusecs": 41485.67225663889,
+        "mean_obs_cusecs": 95040.90740740742,
+        "mean_pred_cusecs": 92353.23217428602,
+        "base_cusecs": 2211.983157430855,
+        "coefficient_ratio": 0.6360401510878048,
+        "wet_coefficient_ratio": 3.681166367815619
+      }
+    },
+    "Ranjit Sagar": {
+      "note": "Ranjit Sagar: only 8 inflow days with a rain history",
+      "n_readings": 8
+    }
   },
   "inflow_variants": {
     "loso": [
@@ -8935,40 +11158,84 @@
         "w_excess": "",
         "wetness": "sm",
         "gamma": 1.298988503158571
+      },
+      {
+        "dam": "Bhakra",
+        "variant": "press inflow fit",
+        "n_seasons": 11,
+        "n_days": 1009,
+        "rmse_bcm": 0.045998228077371216,
+        "n_heavy_days": 2,
+        "heavy_rmse_bcm": 0.15200977222372283,
+        "heavy_bias_bcm": -0.14974755638960663,
+        "in_sample_rmse_bcm": 0.06922486009703159,
+        "c": 0.4331727825003241,
+        "c_wet": 0.0,
+        "w": "0.47 0.21 0.11 0.21",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "api",
+        "gamma": 0.0
+      },
+      {
+        "dam": "Pong",
+        "variant": "press inflow fit",
+        "n_seasons": 8,
+        "n_days": 733,
+        "rmse_bcm": 0.07137597362900956,
+        "n_heavy_days": 28,
+        "heavy_rmse_bcm": 0.11573218847532168,
+        "heavy_bias_bcm": -0.05891274172267668,
+        "in_sample_rmse_bcm": 0.15076755065557224,
+        "c": 0.7096240483024819,
+        "c_wet": 0.27816086959348285,
+        "w": "0.35 0.15 0.22 0.28",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "api",
+        "gamma": 0.0
       }
     ],
     "flood_scale": {
       "baseline": {
         "n_period_means": 6,
-        "n_dated_days": 29,
-        "dated_day_ratio_median": 0.7997651789750614,
+        "n_dated_days": 147,
+        "dated_day_ratio_median": 1.0798319066994826,
         "period_mean_worst_deviation": 0.22287181576552884,
         "season_peak_ratio_min": 0.5698738822817063,
         "season_peak_ratio_max": 0.5823307631193606
       },
       "excess above 30 mm": {
         "n_period_means": 6,
-        "n_dated_days": 29,
-        "dated_day_ratio_median": 0.8097205967530019,
+        "n_dated_days": 147,
+        "dated_day_ratio_median": 1.0801762028245967,
         "period_mean_worst_deviation": 0.2635423560682024,
         "season_peak_ratio_min": 0.5491850574655527,
         "season_peak_ratio_max": 0.5776685245303764
       },
       "api+sm": {
         "n_period_means": 6,
-        "n_dated_days": 29,
-        "dated_day_ratio_median": 0.8047620147683348,
+        "n_dated_days": 147,
+        "dated_day_ratio_median": 1.0701477414376142,
         "period_mean_worst_deviation": 0.21959679852181913,
         "season_peak_ratio_min": 0.5418760501184309,
         "season_peak_ratio_max": 0.565355227835989
       },
       "sm": {
         "n_period_means": 6,
-        "n_dated_days": 29,
-        "dated_day_ratio_median": 0.7052591027863848,
+        "n_dated_days": 147,
+        "dated_day_ratio_median": 1.0489142431610872,
         "period_mean_worst_deviation": 0.25598645246774976,
         "season_peak_ratio_min": 0.4602378505892313,
         "season_peak_ratio_max": 0.5029644150435935
+      },
+      "press inflow fit": {
+        "n_period_means": 4,
+        "n_dated_days": 139,
+        "dated_day_ratio_median": 1.0580576839352944,
+        "period_mean_worst_deviation": 0.2157746187834948,
+        "season_peak_ratio_min": 0.5763613408414898,
+        "season_peak_ratio_max": 0.6155210445261625
       }
     },
     "verdict": {
@@ -9018,6 +11285,17 @@
         "loso_error_not_higher": false,
         "season_peaks_higher": false,
         "period_means_hold": false,
+        "adopt": false
+      },
+      {
+        "variant": "press inflow fit",
+        "dams": [
+          "Bhakra",
+          "Pong"
+        ],
+        "loso_error_not_higher": false,
+        "season_peaks_higher": true,
+        "period_means_hold": true,
         "adopt": false
       }
     ]

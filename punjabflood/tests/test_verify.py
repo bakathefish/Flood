@@ -787,3 +787,67 @@ def test_flood_scale_error_from_the_period_means():
     e2 = verify.flood_scale_error(fs.iloc[:2])
     assert e2["n_periods"] == 2 and e2["log_sd"] != e2["log_sd"]
 
+
+def test_rule_curve_run_fires_before_the_frl_bound_and_the_timing_test_reads_the_opening():
+    from punjabflood import reservoirs
+
+    frl = C.BHAKRA.frl_m.value
+    cap = C.BHAKRA.live_capacity_bcm.value
+    levels = np.linspace(frl - 40.0, frl, 200)
+    rating = reservoirs.Rating.fit("Bhakra", levels, cap - (frl - levels) * 0.1)
+    # a reservoir sitting a little below FRL through August, rain that keeps it there
+    days = pd.date_range("2023-08-05", periods=20)
+    s_at = float(rating.storage((1672.0) * C.FOOT_M))
+    state = pd.DataFrame({"date": days, "dam": "Bhakra", "storage_bcm": s_at, "basis": "cwc"})
+    rain_days = pd.date_range(days[0] - pd.Timedelta(days=10), days[-1] + pd.Timedelta(days=6))
+    rain = pd.DataFrame({"date": rain_days, "catchment": "Bhakra", "rain_mm": 1.5})
+    p = inflow.InflowParams(
+        "Bhakra", 56000.0, c=0.5, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0
+    )
+    pp_frl = verify.perfect_prog_hei(state, rain, "Bhakra", "Bhakra", p, 3)
+    pp_rule = verify.perfect_prog_hei(state, rain, "Bhakra", "Bhakra", p, 3, rule_curve_rating=rating)
+    assert (pp_frl["forced_release_bcm"] == 0).all()
+    # 1,672 ft is above the schedule (1,670 up to 15 August): the drawdown is owed at once,
+    # and stops being owed once the line to FRL passes the reservoir in the third week
+    before = pd.to_datetime(pp_rule["date"]) <= "2023-08-15"
+    assert (pp_rule.loc[before, "release_day1_cusecs"] > 0).all()
+    assert (pp_rule.loc[~before, "release_day1_cusecs"] == 0).any()
+    assert pp_rule["inflow_day1_cusecs"].tolist() == pytest.approx(pp_frl["inflow_day1_cusecs"].tolist())
+    openings = pd.DataFrame({"dam": ["Bhakra"], "date": ["2023-08-13"], "level_ft": [1672.0]})
+    t = verify.rule_curve_timing_test(pp_frl, pp_rule, openings, "Bhakra")
+    r = t.iloc[0]
+    assert r["year"] == 2023 and r["schedule_level_ft"] == 1670.0 and r["frl_ft"] == 1680.0
+    assert r["first_forced_frl"] is None and r["lag_frl_days"] is None
+    # the first run is issued on 5 August, its release lands on the 6th: seven days early
+    assert r["first_forced_rule"] == "2023-08-06" and r["lag_rule_days"] == -7
+    # an opening with no run in its year gets no forced day either way
+    t2 = verify.rule_curve_timing_test(
+        pp_frl, pp_rule, pd.DataFrame({"dam": ["Bhakra"], "date": ["2015-08-10"], "level_ft": [1661.1]}), "Bhakra"
+    )
+    assert t2.iloc[0]["n_days_rule"] == 0 and t2.iloc[0]["first_forced_rule"] is None
+
+
+def test_routed_vs_gauge_readings_pairs_by_station_and_day():
+    arr = pd.DataFrame(
+        {
+            "station": ["Dhilwan", "Dhilwan", "Harike Head Works"],
+            "date": pd.to_datetime(["2023-08-17", "2023-08-18", "2023-08-18"]),
+            "cusecs": [120_000.0, 110_000.0, 140_000.0],
+        }
+    )
+    readings = pd.DataFrame(
+        {
+            "date": ["2023-08-17", "2023-08-18", "2023-08-18", "2023-08-19"],
+            "station": ["Dhilwan", "Dhilwan", "Harike Head Works", "Dhilwan"],
+            "discharge_cusecs": [234_000, 220_000, 284_987, 200_000],
+            "ambiguous": [False, True, False, False],
+            "as_of_time": ["", "evening", "", ""],
+        }
+    )
+    t = verify.routed_vs_gauge_readings(arr, readings, stations=("Dhilwan", "Harike Head Works"))
+    assert len(t) == 3  # the ambiguous row is left out
+    d = t[t["station"] == "Dhilwan"].set_index("date")
+    assert d.loc["2023-08-17", "ratio"] == pytest.approx(120_000 / 234_000)
+    assert np.isnan(d.loc["2023-08-19", "routed_cusecs"]) and np.isnan(d.loc["2023-08-19", "ratio"])
+    assert t[t["station"] == "Harike Head Works"]["ratio"].iloc[0] == pytest.approx(140_000 / 284_987)
+

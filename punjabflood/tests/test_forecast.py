@@ -359,3 +359,43 @@ def test_product_carries_the_flood_scale_probability_and_loads_its_parameter(tmp
     f.write_text(json.dumps({"log_sd": None, "n_periods": 2}), encoding="utf-8")
     assert forecast.load_flood_scale_error(f) is None
 
+
+def _bhakra_rating():
+    from punjabflood import reservoirs
+
+    frl = C.BHAKRA.frl_m.value
+    levels = np.linspace(frl - 40.0, frl, 200)
+    cap = C.BHAKRA.live_capacity_bcm.value
+    return reservoirs.Rating.fit("Bhakra", levels, cap - (frl - levels) * 0.1)
+
+
+def test_product_prints_the_rule_curve_scenario_for_bhakra_only_with_a_rating():
+    states, det, ens, params = _inputs(qpf_mm=5.0)
+    cap = C.BHAKRA.live_capacity_bcm.value
+    st = dict(states["Pong"])
+    st["storage_bcm"] = cap * 0.96  # above the schedule for 10 August (1,670 ft), below FRL
+    states2 = {"Bhakra": st}
+    det2 = det.assign(catchment="Bhakra")
+    ens2 = ens.assign(catchment="Bhakra")
+    ratings = {"Bhakra": _bhakra_rating()}
+    prod = forecast.build_product(
+        "2026-08-10", states2, det2, ens2, {}, {"Bhakra": params["Pong"]}, ratings=ratings
+    )
+    e = prod["dams"]["Bhakra"]
+    r = e["rule_curve"]
+    assert "2019" in r["vintage"] and len(r["points"]) == 3
+    assert r["level_ft_by_day"][0] == 1670.0 and len(r["level_ft_by_day"]) == len(r["capacity_bcm_by_day"])
+    assert r["headroom_day1_bcm"] < 0  # the reservoir is above its schedule
+    # the schedule bound fires on day one where the FRL bound does not
+    assert r["ensemble"]["1"]["p_exhaustion"] == 1.0
+    assert e["ensemble"]["1"]["p_exhaustion"] == 0.0
+    assert all("hei" in v for v in r["deterministic"].values())
+    md = forecast.render_markdown(prod)
+    assert "Against the filling schedule" in md and "1,670 ft tomorrow" in md
+    # without a rating, or for a dam without a schedule, no block and no line
+    prod2 = forecast.build_product("2026-08-10", states2, det2, ens2, {}, {"Bhakra": params["Pong"]})
+    assert "rule_curve" not in prod2["dams"]["Bhakra"]
+    prod3 = forecast.build_product("2026-08-10", states, det, ens, {}, params, ratings=ratings)
+    assert "rule_curve" not in prod3["dams"]["Pong"]
+    assert "filling schedule" not in forecast.render_markdown(prod3)
+

@@ -29,7 +29,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 
 from punjabflood import constants as C
-from punjabflood import hei, inflow, routing
+from punjabflood import hei, inflow, reservoirs, routing
 
 SEASON_MONTHS = (6, 7, 8, 9)
 
@@ -207,6 +207,7 @@ def perfect_prog_hei(
     horizon_days: int = 5,
     carry: str = "given",
     capacity_bcm: float | None = None,
+    rule_curve_rating=None,
 ) -> pd.DataFrame:
     """Daily headroom-exhaustion index using observed rain as a perfect forecast and the
     recorded storage as the state. Returns date, dam, hei, forced_release_bcm, the horizon
@@ -216,7 +217,10 @@ def perfect_prog_hei(
     gaps, basis ``interp``). ``carry='model'`` drops interpolated rows and bridges the gaps
     between measurements with ``carry_storage`` (basis ``model``). ``capacity_bcm`` runs
     the balance against another ceiling than the live capacity at FRL (the flood-cushion
-    scenario)."""
+    scenario). ``rule_curve_rating`` (a ``reservoirs.Rating``) runs it against the filling
+    schedule instead: the ceiling on each day of the horizon is the storage at that day's
+    permissible level, and a reservoir above the schedule owes the drawdown on day one; the
+    carry between measurements stays at FRL (the record's own bound)."""
     s, basis, rain, gaps, sm = _event_series(
         state, rain_daily, dam, catchment, params, carry, capacity_bcm
     )
@@ -231,6 +235,10 @@ def perfect_prog_hei(
         )
         if fut.isna().any() or past.isna().any():
             continue
+        cap_d, clamp = capacity_bcm, True
+        if rule_curve_rating is not None:
+            cap_d = reservoirs.rule_curve_capacity_bcm(rule_curve_rating, dam, fut.index)
+            clamp = False
         row = _hei_row(
             dam,
             d,
@@ -240,7 +248,8 @@ def perfect_prog_hei(
             params,
             absorb,
             _anom(sm, d),
-            capacity_bcm=capacity_bcm,
+            capacity_bcm=cap_d,
+            clamp_start=clamp,
         )
         row["storage_basis"] = basis.get(d, "")
         row["reanchor_gap_bcm"] = gaps.get(d, float("nan"))
@@ -287,7 +296,8 @@ def _hei_row(
     params: inflow.InflowParams,
     absorb: float,
     sm_anom: float = 0.0,
-    capacity_bcm: float | None = None,
+    capacity_bcm=None,
+    clamp_start: bool = True,
 ) -> dict:
     """One day's index from a storage, a rain path over the horizon (``fut``, mm per day),
     the recent observed rain (``past``) and the day's soil-moisture anomaly. The base flow
@@ -302,7 +312,9 @@ def _hei_row(
         rain_mm_recent=past,
         sm_anom=sm_anom,
     )
-    res = hei.headroom_exhaustion(dam, float(storage), daily, absorb, capacity_bcm=capacity_bcm)
+    res = hei.headroom_exhaustion(
+        dam, float(storage), daily, absorb, capacity_bcm=capacity_bcm, clamp_start=clamp_start
+    )
     return {
         "date": d,
         "dam": dam,
@@ -483,10 +495,10 @@ def flood_scale_inflow_check(
         g = pp.dropna(subset=["inflow_day1_cusecs"])
         s = pd.Series(
             g["inflow_day1_cusecs"].to_numpy(dtype=float),
-            index=pd.to_datetime(g["date"]) + pd.Timedelta(days=1),
+            index=pd.DatetimeIndex(pd.to_datetime(g["date"]) + pd.Timedelta(days=1)),
         ).sort_index()
         daily[dam] = s[~s.index.duplicated(keep="last")]
-    empty = pd.Series(dtype=float)
+    empty = pd.Series(dtype=float, index=pd.DatetimeIndex([]))
     rows = []
 
     def add(dam, kind, start, end, truth, sel: pd.Series, agg, source):
@@ -673,6 +685,75 @@ def peak_class_test(
         )
         out["loyo_probabilities"] = {int(k): float(v) for k, v in zip(df.index, probs, strict=True)}
     return out
+
+
+def rule_curve_timing_test(
+    pp_frl: pd.DataFrame, pp_rule: pd.DataFrame, openings: pd.DataFrame, dam: str
+) -> pd.DataFrame:
+    """For each dated gate opening of ``dam`` (``data/reference/bbmb/gate_openings.csv``):
+    the first day of that season on which the FRL bound and the schedule bound each force a
+    release (the run issued the day before puts it on the day), and the signed lag of each
+    from the opening. The schedule bound counts a day only when the release is more than a
+    tenth of the turbine passage, so the drawdown of a reservoir a hair above its line does
+    not fire it. A season with no forced day under a bound gets a note."""
+    from punjabflood import constants as C
+
+    small = 0.1 * hei.absorption_cusecs(dam)
+    rows = []
+    for _, o in openings[openings["dam"] == dam].iterrows():
+        d0 = pd.Timestamp(o["date"])
+        row = {
+            "year": int(d0.year),
+            "opening_date": d0.date().isoformat(),
+            "opening_level_ft": float(o["level_ft"]),
+            "schedule_level_ft": C.rule_curve_level_ft(dam, d0),
+            "frl_ft": float(C.DAMS[dam].frl_ft.value),
+        }
+        for label, pp, thr in (("frl", pp_frl, 0.0), ("rule", pp_rule, small)):
+            g = pp[(pp["dam"] == dam)].copy()
+            g["date"] = pd.to_datetime(g["date"])
+            g = g[g["date"].dt.year == d0.year]
+            row[f"n_days_{label}"] = int(len(g))
+            fire = g[g["release_day1_cusecs"] > thr].sort_values("date")
+            if fire.empty:
+                row[f"first_forced_{label}"] = None
+                row[f"lag_{label}_days"] = None
+                continue
+            first = fire["date"].iloc[0] + pd.Timedelta(days=1)
+            row[f"first_forced_{label}"] = first.date().isoformat()
+            row[f"lag_{label}_days"] = int((first - d0).days)
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def routed_vs_gauge_readings(
+    arrivals: pd.DataFrame, readings: pd.DataFrame, stations=("Dhilwan",)
+) -> pd.DataFrame:
+    """The routed release at each station on the days the press quoted the gauge
+    (``data/reference/wrd/gauge_readings_press.csv``, ambiguous rows left out): the reading,
+    the routed flow that day, and the ratio. Moment readings against a daily routed value;
+    a check of the level of the hydrograph on dated days, not a fit."""
+    r = readings[~readings["ambiguous"].astype(bool) & readings["station"].isin(stations)].copy()
+    r["date"] = pd.to_datetime(r["date"])
+    a = arrivals.copy()
+    a["date"] = pd.to_datetime(a["date"])
+    a = a.set_index(["station", "date"])["cusecs"]
+    rows = []
+    for _, x in r.sort_values(["station", "date"]).iterrows():
+        routed = a.get((x["station"], x["date"]), float("nan"))
+        rows.append(
+            {
+                "station": x["station"],
+                "date": x["date"].date().isoformat(),
+                "observed_cusecs": float(x["discharge_cusecs"]),
+                "routed_cusecs": float(routed),
+                "ratio": float(routed) / float(x["discharge_cusecs"])
+                if routed == routed and x["discharge_cusecs"] > 0
+                else float("nan"),
+                "as_of_time": str(x.get("as_of_time", "")),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def event_timing_test(

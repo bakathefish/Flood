@@ -20,7 +20,7 @@ import pandas as pd
 import requests
 
 from punjabflood import constants as C
-from punjabflood import hei, inflow, rain, routing
+from punjabflood import hei, inflow, rain, reservoirs, routing
 from punjabflood.catchments import Catchment
 from punjabflood.imdrain import IMD_WEIGHT_COL, covered_area_km2
 from punjabflood.openmeteo import OpenMeteo
@@ -185,8 +185,11 @@ def build_product(
     local_areas: dict[str, float] | None = None,
     soil_moisture: dict[str, dict] | None = None,
     flood_scale_log_sd: float | None = None,
+    ratings: dict | None = None,
 ) -> dict:
     """Assemble the hazard product from already-pulled inputs (pure; tested with fakes).
+    ``ratings``: the level-to-storage curves; with them a dam that has a sourced filling
+    schedule (``constants.rule_curve``) gets the schedule scenario beside the FRL bound.
     ``local_areas``: IMD-covered area (km2) per local catchment (``constants.LOCAL_CATCHMENTS``)
     whose QPF is in ``qpf_det``; with it the local inflow term is computed from the
     transferred response and added at the control points that catchment feeds.
@@ -335,6 +338,61 @@ def build_product(
                     else {},
                     "ensemble": ens_c,
                 }
+            rc_pts = C.rule_curve(dam)
+            if rc_pts is not None and ratings and dam in ratings:
+                # the same members against the operator's filling schedule: the level the
+                # board is not to exceed on each day of the horizon, through the dam's own
+                # rating; a reservoir already above the schedule owes the drawdown on day one
+                days = pd.date_range(pd.Timestamp(issue_date) + pd.Timedelta(days=1), periods=h_max)
+                caps_rc = reservoirs.rule_curve_capacity_bcm(ratings[dam], dam, days)
+                ens_rc = {}
+                for H in horizons:
+                    daily_h = [d[:H] for d in member_daily if len(d) >= H]
+                    res_rc = [
+                        hei.headroom_exhaustion(
+                            dam, st["storage_bcm"], d, absorb, capacity_bcm=caps_rc[:H], clamp_start=False
+                        )
+                        for d in daily_h
+                    ]
+                    summary_rc = hei.ensemble_summary(res_rc)
+                    summary_rc.update(
+                        hei.ensemble_summary_with_error(
+                            dam,
+                            st["storage_bcm"],
+                            daily_h,
+                            absorb,
+                            p.rmse_bcm,
+                            p.resid_acf1,
+                            capacity_bcm=caps_rc[:H],
+                            scale_log_sd=flood_scale_log_sd,
+                            clamp_start=False,
+                        )
+                    )
+                    ens_rc[str(H)] = summary_rc
+                det_model = (
+                    PRIMARY_DETERMINISTIC if PRIMARY_DETERMINISTIC in det_daily else next(iter(det_daily), None)
+                )
+                entry["rule_curve"] = {
+                    "vintage": C.RULE_CURVE_VINTAGE.get(dam, ""),
+                    "points": [{"month": m, "day": d_, "level_ft": lv} for m, d_, lv in rc_pts],
+                    "level_ft_by_day": [float(C.rule_curve_level_ft(dam, d)) for d in days],
+                    "capacity_bcm_by_day": [float(x) for x in caps_rc],
+                    "headroom_day1_bcm": float(caps_rc[0] - st["storage_bcm"]),
+                    "deterministic": {
+                        str(H): hei.headroom_exhaustion(
+                            dam,
+                            st["storage_bcm"],
+                            det_daily[det_model][:H],
+                            absorb,
+                            capacity_bcm=caps_rc[:H],
+                            clamp_start=False,
+                        ).to_dict()
+                        for H in horizons
+                    }
+                    if det_model
+                    else {},
+                    "ensemble": ens_rc,
+                }
             rel = np.array([r.release_by_day_cusecs for r in res_max])
             median_rel = np.median(rel, axis=0)
             entry["forced_release_median_cusecs_by_day"] = [float(x) for x in median_rel]
@@ -469,6 +527,17 @@ def render_markdown(product: dict) -> str:
             lines.append(
                 "No flood-cushion scenario: no published storage figure above FRL for this dam; "
                 "the FRL bound below is an early, upper bound."
+            )
+        if e.get("rule_curve"):
+            r = e["rule_curve"]
+            lines.append(
+                f"Against the filling schedule ({r['vintage']}; level not to exceed "
+                f"{r['level_ft_by_day'][0]:,.0f} ft tomorrow, "
+                f"{r['level_ft_by_day'][-1]:,.0f} ft on the last day of the horizon; "
+                f"headroom to it {r['headroom_day1_bcm']:+.3f} BCM), P(release forced) by horizon: "
+                + ", ".join(f"{H} d {s['p_exhaustion']:.2f}" for H, s in r["ensemble"].items())
+                + ". The schedule is the operator's rule, not the spillway's; the table below "
+                "and the routed arrivals are the FRL bound."
             )
         if e["ensemble"]:
             lines.append("")
@@ -791,6 +860,7 @@ def run(
         local_areas=local_areas or None,
         soil_moisture=soil or None,
         flood_scale_log_sd=flood_scale_log_sd,
+        ratings=ratings,
     )
     product["bulletin"] = {k: v for k, v in rec.items() if k != "raw_text"}
     product["recent_rain_source"] = recent_sources

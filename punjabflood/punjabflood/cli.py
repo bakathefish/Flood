@@ -47,6 +47,8 @@ DAM_NAMES = ("Bhakra", "Pong", "Ranjit Sagar")
 # docs/data-sources.md); the model is checked against them in `verify`
 PAC_PERIODS_CSV = REF / "bbmb" / "pac_period_means_2025.csv"
 INFLOW_POINTS_CSV = REF / "bbmb" / "inflow_points.csv"
+GATE_OPENINGS_CSV = REF / "bbmb" / "gate_openings.csv"  # dated floodgate openings (press)
+GAUGE_READINGS_CSV = REF / "wrd" / "gauge_readings_press.csv"  # dated press gauge readings
 PRESS_READINGS_CSV = REF / "bbmb" / "press_readings.csv"  # every dated press reading the
 # sweeps found (scripts/ingest_readings.py); supersedes inflow_points.csv where present
 PRESS_VARIANT = "press inflow fit"
@@ -417,7 +419,7 @@ def run_verify(horizon_days: int = 5):
     _log()
     out = OUT / "verification"
     out.mkdir(parents=True, exist_ok=True)
-    state_measured, _, bulletins = _state()
+    state_measured, ratings, bulletins = _state()
     state = reservoirs.fill_gaps(state_measured)
     rain_daily = pd.read_csv(RAIN_CSV)
     cats = catchments_mod.load_geojson()
@@ -508,6 +510,44 @@ def run_verify(horizon_days: int = 5):
             results["event_timing_spill_only"] = verify.event_timing_test(
                 spill_only, peaks_d
             ).to_dict(orient="records")
+            if GAUGE_READINGS_CSV.exists():
+                # the dated press readings of the river gauges against the routed release
+                gr = pd.read_csv(GAUGE_READINGS_CSV)
+                chk = verify.routed_vs_gauge_readings(
+                    arr, gr, stations=("Dhilwan", "Harike Head Works", "Ferozepur Head Works")
+                )
+                chk.to_csv(out / "routed_vs_gauge_readings.csv", index=False)
+                results["gauge_readings_check"] = chk.to_dict(orient="records")
+        if "Bhakra" in params and C.rule_curve("Bhakra") is not None and GATE_OPENINGS_CSV.exists():
+            # the operator's schedule: the day the schedule bound first forces a release in
+            # each event season against the dated gate opening, beside the FRL bound
+            pp_b = verify.perfect_prog_hei(
+                state_measured, rain_daily, "Bhakra", "Bhakra", params["Bhakra"], horizon_days, "model"
+            )
+            pp_b.to_csv(out / "perfect_prog_event_bhakra.csv", index=False)
+            pp_rc = verify.perfect_prog_hei(
+                state_measured,
+                rain_daily,
+                "Bhakra",
+                "Bhakra",
+                params["Bhakra"],
+                horizon_days,
+                "model",
+                rule_curve_rating=ratings["Bhakra"],
+            )
+            pp_rc.to_csv(out / "perfect_prog_event_bhakra_rule_curve.csv", index=False)
+            openings = pd.read_csv(GATE_OPENINGS_CSV)
+            rct = verify.rule_curve_timing_test(pp_b, pp_rc, openings, "Bhakra")
+            rct.to_csv(out / "rule_curve_timing.csv", index=False)
+            results["rule_curve_timing"] = rct.to_dict(orient="records")
+            results["rule_curve"] = {
+                "dam": "Bhakra",
+                "vintage": C.RULE_CURVE_VINTAGE["Bhakra"],
+                "points": [{"month": m, "day": d, "level_ft": lv} for m, d, lv in C.rule_curve("Bhakra")],
+                "guideline_2025_08_19_ft": float(
+                    C.BHAKRA.extra["rule_curve_guideline_ft_19_aug_2025"].value
+                ),
+            }
             # the land between Pong and Dhilwan (roadmap, done in the first round): its own
             # rain through a transferred response, added at Dhilwan on the day; Pong's
             # response as the primary transfer, Ranjit Sagar's (the lowest coefficient) as

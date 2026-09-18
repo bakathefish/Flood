@@ -153,6 +153,39 @@ numbers that motivate them are in `verification.md`, never repeated here.
   `data/reference/flood_scale_error.json` so the daily runner has it). The bias is reported,
   not applied. The prospective record carries the third column.
 
+- **The operator's schedule at Bhakra (roadmap item 3, first form).** The forced release
+  is the spillway's bound; BBMB opens the gates under a filling schedule. The 2026-09-18
+  sweep found the Bhakra schedule as three dated points (2019 chart on page 44 of the CBIP
+  decision-support presentation, and the thesis statement that FRL is not to be reached
+  before 31 August): 1,650 ft up to 31 July, 1,670 ft up to 15 August, 1,680 ft by
+  31 August. `constants.rule_curve_level_ft` gives the maximum permissible level on a date
+  (a level holds up to its date, a straight line from 15 to 31 August), the dam's rating
+  turns it into a per-day storage ceiling, and `hei.headroom_exhaustion` takes a per-day
+  ceiling with the start unclamped, so a reservoir already above the schedule owes its
+  drawdown on day one. The product prints a second Bhakra line: P(release forced) against
+  the schedule by horizon, with the day-one headroom to it. The timing test in the report
+  (`rule_curve_timing.csv`) sets the first forced day of each season under each bound
+  against the three dated gate openings the sweep found (10 August 2015 at 1,661.1 ft,
+  13 August 2023 at 1,672 ft, 19 August 2025 at 1,665.06 ft): the FRL bound fires in none
+  of those seasons, the 2019 schedule fires in all three but not on the day, and the 2025
+  guideline of 1,662 ft says the schedule has been lowered since. The scenario is labelled
+  with its vintage.
+- **The routed release on the days the press quoted the gauges.** The sweep found 27 dated
+  press readings of the Dhilwan, Harike and Ferozepur (Hussainiwala) gauges in 2023 and
+  2025 (`data/reference/wrd/gauge_readings_press.csv`); no station has a run of consecutive
+  days, so no attenuation fit, but `verify.routed_vs_gauge_readings` sets the routed Pong
+  release on each dated day against the reading as a ratio (report section). The ratios
+  are below one and fall to zero on the days after the spill stops, which is the local
+  catchment and the Sutlej arm the routed Pong release does not carry.
+- **The press readings database.** Four sweeps of the press and the CWC bulletins
+  (The Tribune, the English press, the Hindi and Punjabi press, the CWC weekly storage bulletins
+  2015 to 2026) under `data/raw/bbmb/readings_*.csv`, merged by `scripts/ingest_readings.py`
+  into `data/reference/bbmb/press_readings.csv` (829 dated rows, 200 with inflow, 761 with
+  level). Every dated inflow reading before the current season now enters the flood-scale
+  check (147 dated days), and the press-inflow response variant is fitted on them and
+  scored on the storage record, where its held-out error is higher than the baseline's
+  and it is not adopted (report, response variants).
+
 ## Next, in order
 
 1. **Flood-scale inflow truth.** The one thing that would settle the runoff response at the
@@ -197,19 +230,16 @@ numbers that motivate them are in `verification.md`, never repeated here.
    what the river did. What would settle it is the day-wise inflow record of item 1, on
    which a heavy-day response could be fitted directly, and a sub-daily reading of the peaks
    to say how much of the gap is the daily mean. Effort: blocked on item 1.
-3. **The operator.** The forced release is a bound on BBMB, not a prediction of BBMB. The
-   board runs a filling schedule (rule curve). Two points of the Bhakra schedule are now in
-   hand from the chart on page 44 of the CBIP decision-support presentation (2019 season,
-   read off the image, the lines sit on the gridlines): a maximum permissible level of
-   1,650 ft up to 31 July and 1,670 ft up to 15 August, against a full reservoir level of
-   1,680 ft; they are recorded in `constants.py` with the vintage. Press coverage of
-   19 August 2025 quotes a guideline of 1,662 ft for that date, below the 2019 line, so the
-   schedule has been revised since and the current one, with the date the reservoir may
-   reach FRL, is what a rule-curve scenario needs; nothing is in hand for Pong. With the
-   current schedule as dated (date, level) points, a second scenario follows: release forced
-   by the rule curve, which fires days before the FRL bound and would speak to the 2025
-   pre-emptive releases. Effort: locate the current schedule (BBMB Technical Committee
-   minutes or a right-to-information reply), then a small module.
+3. **The operator, the current schedule.** The 2019 rule is built (above). The press quotes
+   a guideline of 1,662 ft for 19 August 2025, below the 2019 line, and the timing test
+   shows it: the 2019 rule reproduces none of the three dated gate openings to the day
+   (the 2015 and 2025 openings came a week and thirteen days before it would have forced a
+   release, the 2023 one nineteen days after). The current schedule as dated points, with
+   the date the reservoir may reach FRL, is what would make the scenario a prediction of
+   BBMB rather than a scenario; nothing is in hand for Pong beyond the EAP's alert levels
+   (1,380 ft by 15 August, 1,390 by 20 August, 1,410 by 31 August), which are warnings,
+   not a filling schedule. Effort: locate the current schedule (BBMB Technical Committee
+   minutes or a right-to-information reply), then a constants change.
 4. **Rain input for the extremes.** ERA5 saw well under half of the IMD catchment rain over
    Pong in the August 2023 event (`data/reference/rain/era5_vs_imd_event_windows.csv`,
    rendered in `verification.md`). The forecast models share ERA5's physics and resolution,

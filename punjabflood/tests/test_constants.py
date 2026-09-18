@@ -90,6 +90,7 @@ def test_extra_constants_carry_sources_and_the_rule_curve_is_ordered():
     assert jul.value < aug.value < C.BHAKRA.frl_ft.value
     assert "page 44" in jul.source and "2019" in jul.note and "2019" in aug.note
     # nothing of the kind is claimed for Pong or Ranjit Sagar
+    assert C.BHAKRA.extra["rule_curve_frl_date_31_aug"].value == C.BHAKRA.frl_ft.value
     assert not any(k.startswith("rule_curve") for k in C.PONG.extra)
     assert not any(k.startswith("rule_curve") for k in C.RANJIT_SAGAR.extra)
 
@@ -103,4 +104,33 @@ def test_flood_cushion_is_published_for_pong_only():
     for dam in ("Bhakra", "Ranjit Sagar"):
         assert C.flood_cushion(dam) is None
         assert C.cushion_capacity_bcm(dam) == C.DAMS[dam].live_capacity_bcm.value
+
+
+def test_rule_curve_level_holds_to_its_date_then_rises_to_frl():
+    pts = C.rule_curve("Bhakra")
+    assert [(m, d) for m, d, _ in pts] == [(7, 31), (8, 15), (8, 31)]
+    assert [lv for _, _, lv in pts] == [1650.0, 1670.0, 1680.0]
+    frl = C.BHAKRA.frl_ft.value
+    assert pts[-1][2] == frl
+    # a point's level holds up to and on its date
+    assert C.rule_curve_level_ft("Bhakra", "2023-06-15") == 1650.0
+    assert C.rule_curve_level_ft("Bhakra", "2023-07-31") == 1650.0
+    assert C.rule_curve_level_ft("Bhakra", "2023-08-01") == 1670.0
+    assert C.rule_curve_level_ft("Bhakra", "2023-08-15") == 1670.0
+    # a straight line from 15 August to the date FRL may be reached
+    mid = C.rule_curve_level_ft("Bhakra", "2023-08-23")
+    assert 1670.0 < mid < 1680.0 and mid == pytest.approx(1670.0 + 10.0 * 8 / 16)
+    assert C.rule_curve_level_ft("Bhakra", "2023-08-31") == frl
+    assert C.rule_curve_level_ft("Bhakra", "2023-09-20") == frl
+    import datetime
+
+    assert C.rule_curve_level_ft("Bhakra", datetime.date(2025, 8, 19)) == pytest.approx(1672.5)
+    # the 2025 guideline sits below the 2019 line: evidence of a revision, recorded with it
+    g = C.BHAKRA.extra["rule_curve_guideline_ft_19_aug_2025"]
+    assert g.value == 1662.0 and "tribuneindia" in g.source
+    assert g.value < C.rule_curve_level_ft("Bhakra", "2025-08-19")
+    # nothing of the kind for the other dams
+    for dam in ("Pong", "Ranjit Sagar"):
+        assert C.rule_curve(dam) is None and C.rule_curve_level_ft(dam, "2025-08-19") is None
+    assert "2019" in C.RULE_CURVE_VINTAGE["Bhakra"]
 

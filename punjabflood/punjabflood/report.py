@@ -37,6 +37,9 @@ def _fmt(x, nd=2):
     return str(x)
 
 
+_MONTH = {7: "July", 8: "August", 9: "September", 6: "June", 10: "October"}
+
+
 def _num(x, spec: str) -> str:
     """A number in the given format spec, or ``n/a`` when missing."""
     if x is None or (isinstance(x, float) and x != x):
@@ -335,6 +338,54 @@ def render_verification(
             "cushion bound late and low.",
             "",
         ]
+    rc = results.get("rule_curve")
+    rct = results.get("rule_curve_timing") or []
+    if rc and rct:
+        pts = "; ".join(
+            f"{q['level_ft']:,.0f} ft up to {q['day']} {_MONTH[q['month']]}" for q in rc["points"]
+        )
+        lines += [
+            f"### The operator's schedule at {rc['dam']}",
+            "",
+            f"The forced release above is the spillway's bound. BBMB opens the gates earlier, under "
+            f"a filling schedule; the one in hand for {rc['dam']} ({rc['vintage']}) reads {pts}, "
+            "a level holding up to its date and a straight line from the last point below FRL to "
+            "the date FRL may be reached. The press quotes a guideline of "
+            f"{rc['guideline_2025_08_19_ft']:,.0f} ft for 19 August 2025, below that line, so the "
+            "schedule has been lowered since and this scenario is the 2019 rule. For each dated "
+            "gate opening, the first day of the season on which each bound forces a release (the "
+            "schedule bound counting a release above a tenth of the turbine passage), and its lag "
+            "from the opening; the storage between measurements is the model's carry.",
+            "",
+            "| year | gates opened | level then (ft) | schedule level that day (ft) | first forced, FRL bound | lag (days) | first forced, schedule bound | lag (days) |",
+            "|---|---|---|---|---|---|---|---|",
+        ]
+        for r in rct:
+            lines.append(
+                f"| {r['year']} | {r['opening_date']} | {r['opening_level_ft']:,.2f} | "
+                f"{_num(r.get('schedule_level_ft'), ',.1f')} | "
+                f"{r.get('first_forced_frl') or 'none in the season'} | {_num(r.get('lag_frl_days'), '+.0f')} | "
+                f"{r.get('first_forced_rule') or 'none in the season'} | {_num(r.get('lag_rule_days'), '+.0f')} |"
+            )
+        lines.append("")
+    gc = results.get("gauge_readings_check") or []
+    if gc:
+        lines += [
+            "### The routed release on the days the press quoted the gauges",
+            "",
+            "The dated press readings of the river gauges (moment readings, ambiguous rows left "
+            "out) against the routed Pong release (spill plus passage, no local term) on the same "
+            "day, as a ratio; a check of the hydrograph's level on dated days, not a fit.",
+            "",
+            "| station | date | quoted (cusecs) | routed (cusecs) | ratio |",
+            "|---|---|---|---|---|",
+        ]
+        for r in gc:
+            lines.append(
+                f"| {r['station']} | {r['date']} | {r['observed_cusecs']:,.0f} | "
+                f"{_num(r.get('routed_cusecs'), ',.0f')} | {_num(r.get('ratio'), '.2f')} |"
+            )
+        lines.append("")
     et = results.get("event_timing") or []
     et_cushion = results.get("event_timing_cushion") or []
     et_spill = results.get("event_timing_spill_only") or []

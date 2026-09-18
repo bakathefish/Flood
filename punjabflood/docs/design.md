@@ -244,6 +244,13 @@ of 30 mm or more.
 
 The full list, ordered by expected effect, is `roadmap.md`.
 
+- The forced release is a bound on the operator, not a prediction of it. For Bhakra the
+  product prints a second scenario against the 2019 filling schedule (the level not to be
+  exceeded on the date, through the rating, with a reservoir above the schedule owing its
+  drawdown at once); the timing test in `docs/verification.md` shows that schedule fires
+  in every season with a dated gate opening but not on the day, and the guideline the
+  press quotes for 19 August 2025 (1,662 ft) is below the 2019 line. The current
+  schedule would replace the constants; nothing exists for Pong beyond alert levels.
 - Peak-day inflow is still underestimated. The flood-scale check (event section of
   `docs/verification.md`) puts the model's volumes over the 2025 flood periods close to the
   means BBMB reported and its largest days well below the stated season peaks: the lag

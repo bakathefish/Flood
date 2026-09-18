@@ -23,7 +23,9 @@ turns that mechanism into a daily hazard watch:
    open: a full reservoir passes its inflow. The probability that it opens is printed three
    times: from the 51-member rain ensemble alone, with the inflow model's ordinary-day
    error sampled on top, and with its flood-scale volume error on top of that. For Pong a second scenario lets the reservoir rise into its published flood
-   cushion (to 1400 ft) before the spillway must open; the two bracket the operator.
+   cushion (to 1400 ft) before the spillway must open; the two bracket the operator. For
+   Bhakra a second scenario runs against the operator's 2019 filling schedule (the level
+   not to be exceeded on the date), which fires before the spillway's bound.
 5. **Routing.** The forced release travels with the Water Resources Department's Annexure Z
    times to Ropar, Phillaur, Harike, Dhilwan and Ferozepur, the runoff of the land between
    the dams and the head works (three HydroBASINS local catchments, a dam's calibrated
@@ -80,6 +82,7 @@ punjabflood verify
 punjabflood report                     # renders docs/verification.md
 punjabflood forecast                   # one live cycle: outputs/forecast/<date>.{json,md}
 python scripts/sync_bulletins.py       # new BBMB captures from the hourly task into data/reference
+python scripts/ingest_readings.py      # merge the press and bulletin sweeps into data/reference/bbmb/press_readings.csv
 python scripts/make_figures.py         # board figures from outputs/verification into outputs/figures
 ```
 

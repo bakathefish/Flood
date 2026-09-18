@@ -141,3 +141,33 @@ def test_flood_scale_volume_error_widens_the_probability():
     )
     assert zero["p_exhaustion_flood_scale"] == plain["p_exhaustion_model_error"]
 
+
+def test_per_day_ceiling_and_unclamped_start():
+    cap = C.BHAKRA.live_capacity_bcm.value
+    a = C.cusec_days_to_bcm(35_000)
+    daily = [a, a, a]  # inflow equal to the passage: storage would stand still
+    # a rising ceiling that starts below the storage: the excess is owed on day one
+    caps = [cap - 0.3, cap - 0.1, cap]
+    r = hei.headroom_exhaustion("Bhakra", cap - 0.2, daily, 35_000, capacity_bcm=caps, clamp_start=False)
+    assert r.day_of_exhaustion == 1
+    assert r.release_by_day_cusecs[0] == pytest.approx(C.bcm_to_cusec_days(0.1))
+    assert r.release_by_day_cusecs[1:] == pytest.approx([0.0, 0.0])
+    assert r.storage_by_day_bcm == pytest.approx([cap - 0.3, cap - 0.3, cap - 0.3])
+    assert r.headroom_bcm == pytest.approx(-0.1)  # signed: above the day-one ceiling
+    assert r.capacity_bcm == pytest.approx(cap)  # the last day's
+    # the same with the start clamped (the scalar bounds' convention): nothing is owed
+    r2 = hei.headroom_exhaustion("Bhakra", cap - 0.2, daily, 35_000, capacity_bcm=caps)
+    assert r2.day_of_exhaustion is None and r2.storage_by_day_bcm[0] == pytest.approx(cap - 0.3)
+    # a scalar ceiling behaves as before
+    r3 = hei.headroom_exhaustion("Bhakra", cap - 0.2, daily, 35_000, capacity_bcm=cap)
+    assert r3.day_of_exhaustion is None and r3.headroom_bcm == pytest.approx(0.2)
+    with pytest.raises(ValueError):
+        hei.headroom_exhaustion("Bhakra", cap - 0.2, daily, 35_000, capacity_bcm=caps[:2])
+    # the matrix balance agrees with the loop
+    ex, peak = hei._balance_matrix(cap - 0.2, np.array(caps), a, np.array([daily]), clamp_start=False)
+    assert bool(ex[0]) and peak[0] == pytest.approx(C.bcm_to_cusec_days(0.1))
+    s = hei.ensemble_summary_with_error(
+        "Bhakra", cap - 0.2, [daily, daily], 35_000, 0.0, 0.0, n_draws=5, capacity_bcm=caps, clamp_start=False
+    )
+    assert s["p_exhaustion_model_error"] == 1.0
+

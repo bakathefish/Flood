@@ -237,6 +237,26 @@ BHAKRA = Dam(
             "'MAXIMUM PERMISSIBLE RESERVOIR LEVEL UPTO 15AUGUST AS PER RULE CURVE'; 2019 season "
             "chart; line on the 1,670 ft gridline",
         ),
+        "rule_curve_frl_date_31_aug": Sourced(
+            1680.0,
+            "Asha Devi Singh, Operational Strategy for Bhakra Reservoir Under Changing Climate, "
+            "PhD thesis, Jamia Millia Islamia, March 2020, p. 112; "
+            "https://anurag14.github.io/archives/Asha%20Thesis.pdf",
+            "'The reservoir level El.1680ft should not fill before 31st August'; the same 1,650 "
+            "by 31 July and 1,670 by 15 August restated on the page; the 31 July figure is also "
+            "a BBMB decision quoted by a retired PSEB chief engineer (The Tribune letters, "
+            "24 July 2013)",
+        ),
+        # Evidence that the schedule has been lowered since the 2019 chart: the press quotes a
+        # guideline for one date of the 2025 season; no full revised schedule is in hand.
+        "rule_curve_guideline_ft_19_aug_2025": Sourced(
+            1662.0,
+            "The Tribune, What opening of Bhakra floodgates means for Punjab and Sutlej basin, "
+            "20 August 2025; https://www.tribuneindia.com/news/explainers/"
+            "what-opening-of-bhakra-floodgates-means-for-punjab-and-sutlej-basin/",
+            "'the water level at Bhakra Dam touched 1,665.06 feet, which is 3 feet above the "
+            "regulatory guideline of 1,662 feet set for this date' (19 August 2025)",
+        ),
     },
 )
 
@@ -354,6 +374,61 @@ RANJIT_SAGAR = Dam(
 )
 
 DAMS: dict[str, Dam] = {d.name: d for d in (BHAKRA, PONG, RANJIT_SAGAR)}
+
+
+# The filling schedule (rule curve) as dated points: (month, day, key in the dam's extra
+# constants). A point's level holds up to its date (the chart draws horizontal lines); from
+# the last point below FRL to the date FRL may be reached, a straight line stands in for a
+# schedule the sources do not draw; FRL after that date and before the first point the first
+# point's level (the level is not to exceed it "up to" that date).
+RULE_CURVE_POINTS: dict[str, tuple[tuple[int, int, str], ...]] = {
+    "Bhakra": (
+        (7, 31, "rule_curve_max_level_ft_31_jul"),
+        (8, 15, "rule_curve_max_level_ft_15_aug"),
+        (8, 31, "rule_curve_frl_date_31_aug"),
+    ),
+}
+RULE_CURVE_VINTAGE = {"Bhakra": "2019 chart (CBIP RTDSS presentation, page 44)"}
+
+
+def rule_curve(dam: str) -> list[tuple[int, int, float]] | None:
+    """The dated points of the dam's filling schedule as ``(month, day, level_ft)``, or None
+    where none is sourced (Pong and Ranjit Sagar)."""
+    pts = RULE_CURVE_POINTS.get(dam)
+    if not pts:
+        return None
+    return [(m, d, float(DAMS[dam].extra[k].value)) for m, d, k in pts]
+
+
+def rule_curve_level_ft(dam: str, date) -> float | None:
+    """The maximum permissible level on ``date`` under the schedule (feet), or None where the
+    dam has none. The level of a point holds up to and on its date; between the last point
+    below FRL and the FRL date the bound rises on a straight line; FRL from that date on."""
+    pts = rule_curve(dam)
+    if pts is None:
+        return None
+    import datetime as _dt
+
+    if isinstance(date, _dt.datetime):
+        d = date.date()  # a pandas Timestamp is a datetime
+    elif isinstance(date, _dt.date):
+        d = date
+    else:
+        d = _dt.date.fromisoformat(str(date)[:10])
+    doy = (d.month, d.day)
+    frl = float(DAMS[dam].frl_ft.value)
+    if doy <= (pts[0][0], pts[0][1]):
+        return pts[0][2]
+    for (m0, d0, l0), (m1, d1, l1) in zip(pts, pts[1:], strict=False):
+        if (m0, d0) < doy <= (m1, d1):
+            if l1 < frl:
+                return l1
+            # the stretch up to the FRL date: a straight line between the two points
+            a = _dt.date(d.year, m0, d0)
+            b = _dt.date(d.year, m1, d1)
+            f = (d - a).days / max((b - a).days, 1)
+            return l0 + f * (l1 - l0)
+    return frl
 
 
 def flood_cushion(dam: str) -> tuple[float, float] | None:
