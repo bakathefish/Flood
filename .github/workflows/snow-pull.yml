@@ -1,0 +1,41 @@
+name: punjabflood-snow-pull
+
+# Manual, sharded pull of the ERA5 snow and temperature archive for the Bhakra catchment
+# points (keyless Open-Meteo; its free tier is limited per IP per day, so shards run on
+# separate runners). Each shard uploads its cached responses as an artifact; the files are
+# copied into the local cache and the full script then runs from cache. Nothing is committed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: 'JSON list of comma-separated point index lists, e.g. ["112,113","114,115"]'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(inputs.shards) }}
+    defaults:
+      run:
+        working-directory: punjabflood
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - run: pip install -e .
+      - name: pull the shard's points
+        run: python scripts/pull_snow_points.py --points "${{ matrix.shard }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snow-cache-${{ strategy.job-index }}
+          path: punjabflood/data/cache/openmeteo/archive/*.json
+          if-no-files-found: error
