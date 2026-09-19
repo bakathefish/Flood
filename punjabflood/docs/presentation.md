@@ -9,11 +9,10 @@ figures come from `scripts/make_brief_figures.py` on the same files.
 ## The question
 
 Punjab's largest river floods are dam-release floods. In late August 2025 the Beas rose
-into Pong while the reservoir was already near its flood cushion, the gates opened on
-27 August, and the wave peaked at Dhilwan on 31 August. Anyone standing on the
-Dhilwan bridge that morning had four days' notice from the gate opening. The watch asks
-a different question: how many days before the gates open can the rain forecasts, run
-through a water balance of the reservoir, say they will have to?
+into Pong while the reservoir was already near its flood cushion, BBMB released through
+the floodgates, and the wave peaked at Dhilwan on 31 August. The watch asks how many
+days before the gates must open the rain forecasts, run through a water balance of the
+reservoir, can say so.
 
 ## What it reads
 
@@ -42,26 +41,36 @@ Resources Department's published travel times and classed Low, Medium or High ag
 the department's thresholds at Ropar, Phillaur, Harike, Dhilwan and Ferozepur.
 
 The weather watch sits beside it with a level per catchment (quiet, watch, alert) from
-rules written before any season was scored: the primary model's next three days placed
-in the 1961 to 2025 record of monsoon three-day totals, and the share of models with a
-30 mm day.
+rules written before any season was scored: the ensemble median of the next three days
+(the primary model when no ensemble is in hand) placed in the 1961 to 2025 record of
+monsoon three-day totals, and the share of members, or of models, with a 30 mm day.
+The archive hindcast below runs the deterministic branch, because no ensemble is
+archived, against the record up to the latest day on disk.
 
 ## How it did on the 2025 flood
 
-Run day by day over the forecasts that were issued at the time, the watch would have
-said this before the event:
+BBMB's gate log is not public, so the reference is the model's own run under the rain
+that fell: a flagged issue day is a hit when that run also forces the spillway within
+five days, and the lead is counted from the first hit to that run's first spill and to
+the dated Dhilwan peak. Run day by day over the forecasts that were issued at the time,
+the watch would have said this before the event:
 
-| dam | first flagged forced spill | gates opened | lead | Dhilwan peak | lead | flagged days | false |
+| dam | first flagged forced spill | reference spill (observed-rain run) | lead | Dhilwan peak | lead | flagged days | false |
 |---|---|---|---|---|---|---|---|
 | Pong (AIFS) | 17 Aug 2025 | 27 Aug 2025 | 10 days | 31 Aug 2025 | 14 days | 23 | 0 |
 | Pong (IFS) | 15 Aug 2025 | 27 Aug 2025 | 12 days | 31 Aug 2025 | 16 days | 25 | 0 |
-| Bhakra (AIFS and IFS) | 30 Aug 2025 | 19 Aug 2025 | after the fact | n/a | n/a | 3 | 0 |
+| Bhakra (AIFS and IFS) | 30 Aug 2025 | none in the window | n/a | n/a | n/a | 3 | 0 |
 
-At Bhakra BBMB opened the gates on 19 August at 1,665 ft, below the 1,672.5 ft its
-filling schedule allowed that day, so the watch, which forecasts the schedule's bound,
-first flagged on 30 August, eleven days late; its three flagged days were each followed
-by gate operation, none false. In 2024 and 2026, seasons with no forced spill, the
-watch flagged no day at either dam.
+The press readings on file put Pong's floodgates open from 19 August (66,000 cusecs
+released that day), earlier than the reference run spills, so the ten-day lead is
+against the model's spill date, not a logged gate opening. At Bhakra BBMB opened the
+gates on 19 August at 1,665 ft, below the 1,672.5 ft the 2019 filling schedule in the
+package allows for that day (the press quoted a lower 1,662 ft guideline for 2025), so
+the watch, which forecasts the spillway's bound, first flagged on 30 August, eleven
+days after the opening; the observed-rain run confirmed its three flagged days and
+under the 2019 schedule first forces a release on 1 September. In 2024 and 2026,
+seasons with no forced spill, no archived model flagged a day at either dam (the AIFS
+archive begins in 2025).
 The weather watch reached watch level over the Bhakra catchment on 9 August 2025, ten
 days before the 19 August gate opening, and alert on 10 August; over Pong and Ranjit
 Sagar it was raised at least fourteen days before the largest inflow day. Its false
@@ -94,8 +103,8 @@ Bhakra's base flow is snowmelt from outside the rain grid. The degree-day term e
 the inflow fit as a lagged variable with its own coefficient (0.067) and lag weights;
 it was adopted because the held-out error at Bhakra did not rise and the season peak
 rose, from 0.5699 to 0.5775 of the stated peak. Over the 2025 monsoon the melt response
-averaged 0.025 BCM over five days, about 2,000 cusecs a day, a seasonal modulation of
-the base flow rather than the flood signal.
+averaged 0.025 BCM over five days, about 2,000 cusecs a day, against bulletin inflows
+in the tens of thousands: a seasonal modulation of the base flow.
 
 ![Degree-day melt at Bhakra beside the held-out error of every inflow variant](../outputs/figures/brief_snowmelt.png)
 
@@ -115,7 +124,7 @@ the base flow rather than the flood signal.
 
 - Live: the river watch section of [bakathefish.github.io/Flood](https://bakathefish.github.io/Flood/#rivers),
   reading `outputs/forecast/latest.json`, which a daily GitHub Action rewrites; the dated
-  records beside it are never rewritten.
+  records beside it are never rewritten, and a same-day rerun gets its own file.
 - Code, tests and data: [`punjabflood/`](../) in the Sailaab repository, MIT.
 - The full record: [`verification.md`](verification.md), [`design.md`](design.md),
   [`data-sources.md`](data-sources.md), [`roadmap.md`](roadmap.md).

@@ -33,7 +33,7 @@ forecasts that chain each day and the live site prints the result in its
 
 Each morning it reads the BBMB bulletin (level, inflow, outflow at Bhakra and Pong), the
 rain that fell over the eight catchments from IMD's real-time grid, and the rain forecasts
-of four weather models with the 51-member ECMWF ensemble, all through keyless services. A
+of four named weather models (ECMWF AIFS, ECMWF IFS, GFS, ICON) with the 51-member ECMWF ensemble, all through keyless services. A
 runoff model calibrated on measured storage changes turns rain into inflow, with a
 degree-day snowmelt term at Bhakra for the half of its catchment above the rain grid. For
 each dam and each of the next five days it computes how much of the forecast inflow a full
@@ -44,16 +44,18 @@ its Low, Medium and High thresholds. A weather watch sits beside it: what fell, 
 models say, where the next three days sit in 65 years of monsoon three-day totals, and a
 level (quiet, watch, alert) from rules fixed before any season was scored.
 
-**How it did on the 2025 flood, using only the forecasts issued at the time.** Run day by
-day over the archived as-issued forecasts, the watch first flagged a forced Pong spill on
-17 August 2025, ten days before the gates opened on 27 August and fourteen days before the
-Dhilwan peak of 31 August; the 23 issue days it flagged were all followed by a spill, none
-false. The weather watch reached watch level over the Bhakra catchment on 9 August, ten
+**How it did on the 2025 flood, using only the forecasts issued at the time.** BBMB's gate
+log is not public, so the reference is the model's own run under the rain that fell. Run
+day by day over the archived as-issued forecasts, the watch first flagged a forced Pong
+spill on 17 August 2025, ten days before that reference run first spills (27 August) and
+fourteen days before the dated Dhilwan peak of 31 August; the observed-rain run confirmed
+all 23 issue days it flagged, none false by that test. The weather watch reached watch level over the Bhakra catchment on 9 August, ten
 days before the 19 August gate opening, and alert on the 10th. Over 1,029 scored issue
 days across 2024 to 2026 the false alarms are counted too: over the Bhakra catchment
 23 of the 119 issue days of 2024 and 20 of the 105 of 2026 sat at watch or above with no
-dam event that year. At Bhakra, where BBMB opened the gates on 19 August at a level
-below its filling schedule, the watch's first flag came eleven days after the opening.
+dam event that year. At Bhakra, where BBMB opened the gates on 19 August at 1,665 ft,
+below the level the 2019 filling schedule in the package allows for that day, the
+watch's first flag came eleven days after the opening.
 
 **How it is doing live.** Against the 2026 bulletins the one-day Pong inflow prediction
 has a mean absolute error of 5,904 cusecs with r = 0.86, where carrying today's figure
@@ -63,7 +65,7 @@ periods came to 0.78 to 1.13 of what BBMB reported, but its largest day was 0.58
 stated peak, because lag weights fitted on ordinary days spread a flood over more days
 than the river does.
 
-The whole record is rendered from the outputs, never typed:
+The package renders the whole record from its outputs; nobody types a number:
 [`punjabflood/docs/verification.md`](punjabflood/docs/verification.md). A ten-minute
 read with the figures: [`punjabflood/docs/presentation.md`](punjabflood/docs/presentation.md).
 A daily GitHub Action commits a dated prospective record to `punjabflood/outputs/forecast/`

@@ -96,7 +96,7 @@ punjabflood forecast                   # one live cycle: outputs/forecast/<date>
 python scripts/sync_bulletins.py       # new BBMB captures from the hourly task into data/reference
 python scripts/ingest_readings.py      # merge the press and bulletin sweeps into data/reference/bbmb/press_readings.csv
 python scripts/make_figures.py         # board figures from outputs/verification into outputs/figures
-python scripts/make_brief_figures.py   # the nine brief_*.png figures the presentation uses, same inputs
+python scripts/make_brief_figures.py   # the nine brief_*.png figures (four embedded in docs/presentation.md), same inputs
 ```
 
 HydroBASINS: `https://data.hydrosheds.org/file/HydroBASINS/standard/hybas_as_lev08_v1c.zip`
@@ -124,7 +124,7 @@ it without any calibration step.
 | `punjabflood/verify.py`, `report.py`, `forecast.py`, `cli.py` | verification, report, daily product, commands |
 | `data/reference/` | committed, sourced tables: WRD digitisation (with `VERIFICATION.md`), catchment GeoJSON, BBMB bulletins captured in 2026, CWC seed files, fitted parameters |
 | `docs/` | design, data sources, verification report, roadmap, and the presentation |
-| `outputs/figures/` | the three board figures (2025 event at Dhilwan, flood-scale ratios, error by lead) and the nine `brief_*` figures of `docs/presentation.md`, PNG and SVG, drawn by `scripts/make_figures.py` and `scripts/make_brief_figures.py` from `outputs/verification/` and the latest product |
+| `outputs/figures/` | the three board figures (2025 event at Dhilwan, flood-scale ratios, error by lead) and the nine `brief_*` figures (four of them embedded in `docs/presentation.md`), PNG and SVG, drawn by `scripts/make_figures.py` and `scripts/make_brief_figures.py` from `outputs/verification/` and the latest product |
 
 ## Attribution
 
