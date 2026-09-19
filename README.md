@@ -18,31 +18,58 @@ In August and September 2025 Punjab had its worst flood since 1988: all 23 distr
 | **Impact engine** | Crop-flooded hectares, the ₹351 to ₹523 crore paddy damage band (duration-weighted and at-risk, on DES district yields), population exposure (GHSL), the dam headroom counterfactual, and the rain, dams and releases causal chart |
 | **Forecaster** | XGBoost district flood-risk model trained on the pipeline's own 2,420 SAR-derived labels. Leave-one-year-out validation, SHAP attributions, conformal uncertainty, and an ablation stress test |
 | **Live monitor** | A 6-hourly secretless GitHub Action: new Sentinel-1 pass in, district flood km² out, written to `monitor/latest.json` with ਪੰਜਾਬੀ, हिन्दी and English alerts plus live model risk in `monitor/nowcast.json` |
+| **River watch** | A daily dam-release hazard forecast (`punjabflood/`): BBMB bulletin in, IMD real-time rain and four weather models in, the chance each spillway is forced over the next five days and the routed river class at five control points out, with a weather watch per catchment; verified on the 2025 flood with the forecasts issued at the time |
 
 The public site (built in React with Meta's Astryx design system, trilingual in Punjabi, Hindi and English) is interactive: the live district-risk forecast, the live satellite monitor, an every-district map you can scrub through any monsoon from 2015 to now with decade-recurrence and rupee-impact layers, per-district panels, auto-generated trilingual alerts, and the held-out 2025 validation. Every figure loads from version-controlled data in this repo.
 
-## 2026 rebuild: the physically grounded hazard tier (`punjabflood/`)
+## The river watch: a daily dam-release hazard forecast (`punjabflood/`)
 
-The forecaster above ranks districts on satellite flood labels, and its own audit trail
-(`docs/notes/forecaster.md`) records how much of that signal survives resampling. The 2026
-rebuild in [`punjabflood/`](punjabflood/) starts from the mechanism instead: Punjab's river
-floods are dam-release floods, so it forecasts the thing that causes them. It reads the
-BBMB bulletin (reservoir level, inflow, outflow), fits each dam's own level-storage relation
-on the CWC record, turns catchment rain forecasts (GFS, ECMWF IFS, ICON, the 51-member IFS
-ensemble) into inflow with a coefficient calibrated on measured storage changes, computes a
-headroom-exhaustion index per dam and horizon (how much of the forecast inflow a full
-reservoir cannot hold, so must spill), and routes the forced release to Ropar, Phillaur,
-Harike, Dhilwan and Ferozepur on the Water Resources Department's published travel times and
-thresholds. Every constant carries its source; the department's 38-year peak tables and
-travel times were digitised and checked page by page.
+Punjab's large river floods (1988, 1995, 2023, 2025) start upstream. Several days of
+Himalayan rain fill Bhakra and Pong when they are already near full in late August, the
+spillway gates open, and the wave reaches the plains on a published clock (Bhakra to
+Harike 52 hours, Pong to Harike 72 hours). The [`punjabflood/`](punjabflood/) package
+forecasts that chain each day and the live site prints the result in its
+[river watch](https://bakathefish.github.io/Flood/#rivers).
 
-It is verified three ways and the report is rendered from the outputs, never typed:
-[`punjabflood/docs/verification.md`](punjabflood/docs/verification.md). The 38-year annual
-peak class is where the skill is; the 2023 and 2025 event timing shows the model's known
-limit (the storage-change calibration undershoots extreme inflow); the 2026 season is the
-live test. A daily GitHub Action commits a dated prospective record to
-`punjabflood/outputs/forecast/`. Design and data sources: `punjabflood/docs/`. It is a hazard
-watch on physical quantities, not an official warning.
+Each morning it reads the BBMB bulletin (level, inflow, outflow at Bhakra and Pong), the
+rain that fell over the eight catchments from IMD's real-time grid, and the rain forecasts
+of four weather models with the 51-member ECMWF ensemble, all through keyless services. A
+runoff model calibrated on measured storage changes turns rain into inflow, with a
+degree-day snowmelt term at Bhakra for the half of its catchment above the rain grid. For
+each dam and each of the next five days it computes how much of the forecast inflow a full
+reservoir cannot hold, so must spill, and prints the chance the spillway is forced under
+three widening error budgets. The forced release is then routed to Ropar, Phillaur, Harike,
+Dhilwan and Ferozepur on the Water Resources Department's travel times and classed against
+its Low, Medium and High thresholds. A weather watch sits beside it: what fell, what the
+models say, where the next three days sit in 65 years of monsoon three-day totals, and a
+level (quiet, watch, alert) from rules fixed before any season was scored.
+
+**How it did on the 2025 flood, using only the forecasts issued at the time.** Run day by
+day over the archived as-issued forecasts, the watch first flagged a forced Pong spill on
+17 August 2025, ten days before the gates opened on 27 August and fourteen days before the
+Dhilwan peak of 31 August; the 23 issue days it flagged were all followed by a spill, none
+false. The weather watch reached watch level over the Bhakra catchment on 9 August, ten
+days before the 19 August gate opening, and alert on the 10th. Over 1,029 scored issue
+days across 2024 to 2026 the false alarms are counted too: over the Bhakra catchment
+23 of the 119 issue days of 2024 and 20 of the 105 of 2026 sat at watch or above with no
+dam event that year. At Bhakra, where BBMB opened the gates on 19 August at a level
+below its filling schedule, the watch's first flag came eleven days after the opening.
+
+**How it is doing live.** Against the 2026 bulletins the one-day Pong inflow prediction
+has a mean absolute error of 5,904 cusecs with r = 0.86, where carrying today's figure
+forward gives 12,135 cusecs and r = 0.37; at Bhakra the two are close (4,040 against
+4,148 cusecs). The known limit is at flood scale: the model's volumes over the 2025 flood
+periods came to 0.78 to 1.13 of what BBMB reported, but its largest day was 0.58 of the
+stated peak, because lag weights fitted on ordinary days spread a flood over more days
+than the river does.
+
+The whole record is rendered from the outputs, never typed:
+[`punjabflood/docs/verification.md`](punjabflood/docs/verification.md). A ten-minute
+read with the figures: [`punjabflood/docs/presentation.md`](punjabflood/docs/presentation.md).
+A daily GitHub Action commits a dated prospective record to `punjabflood/outputs/forecast/`
+and rewrites `latest.json` there for the site. It is a hazard watch on physical quantities,
+published with its verification, not an official warning; the Punjab WRD, CWC, BBMB and
+IMD issue those.
 
 ## Headline results
 
@@ -81,6 +108,7 @@ atlas/      output maps and figures (incl. atlas/web/ swipe + timelapse assets)
 briefs/     20 designed per-district A4 PDFs
 monitor/    live state written by CI every 6 h (latest.json, nowcast.json)
 webapp/     React + Astryx front-end source (built into docs/)
+punjabflood/ the river watch: its own package, tests, data/reference, docs/ and outputs/ (forecast records, figures)
 docs/       built site (index.html + assets/) · METHOD.md · DATA-SOURCES.md · VERIFICATION-LOG.md · SYNOPSIS.md ·
             SAILAAB-synopsis.pdf · SAILAAB-business-plan.pdf · notes/ (pre-declarations per component)
 ```
@@ -105,6 +133,8 @@ Training labels are bootstrapped from method agreement and labeled as such. Both
 ## Documents
 
 [Synopsis (PDF)](docs/SAILAAB-synopsis.pdf) · [Method paper](docs/METHOD.md) · [Data-source registry](docs/DATA-SOURCES.md) · [Verification log](docs/VERIFICATION-LOG.md) · [Sustainability & deployment plan (PDF)](docs/SAILAAB-business-plan.pdf) · [District briefs](briefs/)
+
+River watch: [presentation](punjabflood/docs/presentation.md) · [verification report](punjabflood/docs/verification.md) · [design](punjabflood/docs/design.md) · [data sources](punjabflood/docs/data-sources.md) · [roadmap](punjabflood/docs/roadmap.md)
 
 Built by a Punjab student during the 2026 monsoon. India AI Impact Festival 2026 entry.
 

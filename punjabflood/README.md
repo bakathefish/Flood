@@ -22,6 +22,9 @@ turns that mechanism into a daily hazard watch:
    a level (quiet, watch, alert) from rules written before any season was scored.
 3. **Inflow.** A runoff coefficient that rises with how wet the catchment already is, with
    lag weights, fitted on day-to-day changes of measured storage during filling season.
+   At Bhakra a degree-day snowmelt term (ERA5 snowfall stacked into a pack at every
+   archive point of the catchment, released at a fixed rate per degree-day) enters the
+   same fit as a lagged term, for the half of the catchment above the rain grid.
 4. **Headroom-exhaustion index.** Forecast inflow volume minus headroom minus what the
    turbines can pass, per dam and horizon (1 to 5 days). Positive means the spillway must
    open: a full reservoir passes its inflow. The probability that it opens is printed three
@@ -48,6 +51,11 @@ turns that mechanism into a daily hazard watch:
 
 Not an official warning. The Punjab WRD, CWC, BBMB and IMD issue those. This is a hazard
 watch on physical quantities, published with its verification.
+
+The live site prints the newest product in its river watch section
+(`https://bakathefish.github.io/Flood/#rivers`), read from `outputs/forecast/latest.json`.
+A ten-minute read of what the watch does and how it did, with the figures:
+`docs/presentation.md`.
 
 ## What this is not
 
@@ -88,6 +96,7 @@ punjabflood forecast                   # one live cycle: outputs/forecast/<date>
 python scripts/sync_bulletins.py       # new BBMB captures from the hourly task into data/reference
 python scripts/ingest_readings.py      # merge the press and bulletin sweeps into data/reference/bbmb/press_readings.csv
 python scripts/make_figures.py         # board figures from outputs/verification into outputs/figures
+python scripts/make_brief_figures.py   # the nine brief_*.png figures the presentation uses, same inputs
 ```
 
 HydroBASINS: `https://data.hydrosheds.org/file/HydroBASINS/standard/hybas_as_lev08_v1c.zip`
@@ -114,8 +123,8 @@ it without any calibration step.
 | `punjabflood/inflow.py`, `hei.py`, `routing.py` | the model |
 | `punjabflood/verify.py`, `report.py`, `forecast.py`, `cli.py` | verification, report, daily product, commands |
 | `data/reference/` | committed, sourced tables: WRD digitisation (with `VERIFICATION.md`), catchment GeoJSON, BBMB bulletins captured in 2026, CWC seed files, fitted parameters |
-| `docs/` | design, data sources, verification report, the implementation plan |
-| `outputs/figures/` | the three board figures (2025 event at Dhilwan, flood-scale ratios, error by lead), PNG and SVG, drawn by `scripts/make_figures.py` from `outputs/verification/` |
+| `docs/` | design, data sources, verification report, roadmap, and the presentation |
+| `outputs/figures/` | the three board figures (2025 event at Dhilwan, flood-scale ratios, error by lead) and the nine `brief_*` figures of `docs/presentation.md`, PNG and SVG, drawn by `scripts/make_figures.py` and `scripts/make_brief_figures.py` from `outputs/verification/` and the latest product |
 
 ## Attribution
 
