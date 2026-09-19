@@ -104,3 +104,17 @@ def test_no_null_score_coerced_to_zero_in_any_chunk():
     for name, body in _chunks():
         for pattern in ("p_event||0", "p_event || 0", "score||0", "score || 0"):
             assert pattern not in body, f"null-as-zero coercion {pattern!r} in {name}"
+
+
+def test_river_watch_ships_with_its_caveats():
+    """The hazard section's wording in the built chunks: the feed it reads,
+    the question it answers, the unreachable-is-not-an-all-clear line, the
+    fact that Ranjit Sagar has no dam row, and the two other languages. The
+    disclaimer itself comes from the feed at run time."""
+    joined = "\n".join(body for _, body in _chunks())
+    assert "punjabflood/outputs/forecast/latest.json" in joined, "river watch not wired to the feed"
+    assert "Chance the spillway is forced" in joined
+    assert "not an all-clear" in joined
+    assert "Ranjit Sagar has no public daily bulletin" in joined
+    assert "\u0928\u0926\u0940 \u0928\u093f\u0917\u0930\u093e\u0928\u0940" in joined  # Hindi title
+    assert "\u0a26\u0a30\u0a3f\u0a06 \u0a28\u0a3f\u0a17\u0a30\u0a3e\u0a28\u0a40" in joined  # Punjabi title

@@ -13,7 +13,7 @@ const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
 
 const A_T = {
   en: {
-    no: '03',
+    no: '04',
     title: 'Alerts in your language',
     intro: 'The last mile: every satellite pass turns into a plain-language alert, issued in Punjabi, Hindi, and English.',
     pickHint: 'Pick a district to read its current alert.',
@@ -29,7 +29,7 @@ const A_T = {
     warn: (d, km2, floor) => `${d}: about ${km2} km² is under water (satellite-detected), above the ${floor} km² alert floor and rising. Move people, livestock, and valuables to higher ground and follow district instructions. Helpline 1070.`,
   },
   hi: {
-    no: '03',
+    no: '04',
     title: 'आपकी भाषा में चेतावनियाँ',
     intro: 'आख़िरी कड़ी: हर सैटेलाइट पास एक सरल-भाषा चेतावनी बन जाता है, पंजाबी, हिन्दी व अंग्रेज़ी में जारी।',
     pickHint: 'किसी ज़िले की मौजूदा चेतावनी पढ़ने के लिए उसे चुनें।',
@@ -45,7 +45,7 @@ const A_T = {
     warn: (d, km2, floor) => `${d}: लगभग ${km2} km² क्षेत्र जलमग्न है (सैटेलाइट द्वारा पहचाना), ${floor} km² सीमा से ऊपर और बढ़ रहा। लोगों, पशुओं व क़ीमती सामान को ऊँचे स्थान पर ले जाएँ और ज़िला निर्देशों का पालन करें। हेल्पलाइन 1070।`,
   },
   pa: {
-    no: '03',
+    no: '04',
     title: 'ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਵਿੱਚ ਚੇਤਾਵਨੀਆਂ',
     intro: 'ਆਖ਼ਰੀ ਕੜੀ: ਹਰ ਸੈਟੇਲਾਈਟ ਪਾਸ ਇੱਕ ਸਰਲ-ਭਾਸ਼ਾ ਚੇਤਾਵਨੀ ਬਣ ਜਾਂਦਾ ਹੈ, ਪੰਜਾਬੀ, ਹਿੰਦੀ ਤੇ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਜਾਰੀ।',
     pickHint: 'ਕਿਸੇ ਜ਼ਿਲ੍ਹੇ ਦੀ ਮੌਜੂਦਾ ਚੇਤਾਵਨੀ ਪੜ੍ਹਨ ਲਈ ਉਸ ਨੂੰ ਚੁਣੋ।',

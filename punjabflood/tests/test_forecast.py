@@ -170,6 +170,11 @@ def test_write_outputs(tmp_path):
     assert jp.read_text(encoding="utf-8") == first
     jp3, _ = forecast.write_outputs(prod2, tmp_path)
     assert jp3.name == "2026-09-04_rerun_20260904T091500_2.json"
+    # latest.json follows the newest run and names the dated record it copies
+    latest = json.loads((tmp_path / "latest.json").read_text(encoding="utf-8"))
+    assert latest["record"] == jp3.name
+    assert latest["disclaimer"] == "changed"
+    assert latest["issue_date"] == "2026-09-04"
 
 
 def test_climatology_round_trip_and_missing_file(tmp_path):

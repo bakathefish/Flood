@@ -13,6 +13,7 @@ import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {SegmentedControl} from '@astryxdesign/core/SegmentedControl';
 import {SegmentedControlItem} from '@astryxdesign/core/SegmentedControl';
 import {MediaTheme} from '@astryxdesign/core/theme';
+import HazardSection from './HazardSection';
 import AlertSection from './AlertSection';
 import ForecastSection from './ForecastSection';
 // heavy, below-the-fold sections (Leaflet + Recharts + PapaParse) are code-split
@@ -321,7 +322,10 @@ export default function App() {
         </VStack>
       </Band>
 
-      {/* prediction leads, with its alert output; then the monitor and the record */}
+      {/* the river watch leads: the dams and the rain above them decide the
+          season; then the district prediction with its alert output, then
+          the monitor and the record */}
+      <HazardSection lang={lang} />
       <ForecastSection lang={lang} />
       <AlertSection lang={lang} />
       <LiveSection t={t} />
@@ -331,7 +335,7 @@ export default function App() {
           how a schedule in a report reads and not how a card grid reads */}
       <Band paddingBlock={8}>
         <VStack gap={6} width="100%">
-          <SectionHead no="04" title={t.sysTitle} />
+          <SectionHead no="06" title={t.sysTitle} />
           <VStack maxWidth={660}>
             <Text type="large" color="secondary">{t.sysIntro}</Text>
           </VStack>

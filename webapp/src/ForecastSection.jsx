@@ -16,7 +16,7 @@ const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
 
 const F_T = {
   en: {
-    no: '01', title: 'The forecast',
+    no: '02', title: 'The forecast',
     lead: 'A three-day flood forecast for every district in Punjab.',
     intro: 'Gradient boosting over a decade of daily satellite flood observations, with self-exciting features that carry recent flooding across neighbouring districts. Open, reproducible, running live this monsoon, in a state whose reviewed CWC station table listed no flood-forecast station.',
     explain: 'Every 6 hours it asks one question of each district: will the satellite see flooding here within the next three days? It uses only what is known on the day it runs.',
@@ -42,7 +42,7 @@ const F_T = {
     seeProof: 'See how it did in 2025, and the full validation →',
   },
   hi: {
-    no: '01', title: 'पूर्वानुमान',
+    no: '02', title: 'पूर्वानुमान',
     lead: 'पंजाब के हर ज़िले के लिए तीन दिन का बाढ़ पूर्वानुमान।',
     intro: 'एक दशक के दैनिक सैटेलाइट बाढ़ अवलोकनों पर ग्रेडिएंट बूस्टिंग, जिसमें ऐसी विशेषताएँ हैं जो हाल की बाढ़ को पड़ोसी ज़िलों तक ले जाती हैं। खुला, पुनरुत्पाद्य और इस मानसून लाइव — उस राज्य में जहाँ समीक्षित CWC तालिका में एक भी बाढ़-पूर्वानुमान स्टेशन दर्ज नहीं था।',
     explain: 'हर 6 घंटे यह हर ज़िले से एक सवाल पूछता है: क्या अगले तीन दिनों में सैटेलाइट यहाँ बाढ़ देखेगा? यह केवल उसी दिन तक की जानकारी का उपयोग करता है।',
@@ -68,7 +68,7 @@ const F_T = {
     seeProof: 'देखें 2025 में यह कैसा रहा, और पूरा सत्यापन →',
   },
   pa: {
-    no: '01', title: 'ਭਵਿੱਖਬਾਣੀ',
+    no: '02', title: 'ਭਵਿੱਖਬਾਣੀ',
     lead: 'ਪੰਜਾਬ ਦੇ ਹਰ ਜ਼ਿਲ੍ਹੇ ਲਈ ਤਿੰਨ ਦਿਨਾਂ ਦੀ ਹੜ੍ਹ ਭਵਿੱਖਬਾਣੀ।',
     intro: 'ਇੱਕ ਦਹਾਕੇ ਦੇ ਰੋਜ਼ਾਨਾ ਸੈਟੇਲਾਈਟ ਹੜ੍ਹ ਨਿਰੀਖਣਾਂ ਉੱਤੇ ਗ੍ਰੇਡੀਐਂਟ ਬੂਸਟਿੰਗ, ਜਿਸ ਵਿੱਚ ਅਜਿਹੀਆਂ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ ਹਨ ਜੋ ਹਾਲੀਆ ਹੜ੍ਹ ਨੂੰ ਗੁਆਂਢੀ ਜ਼ਿਲ੍ਹਿਆਂ ਤੱਕ ਲੈ ਜਾਂਦੀਆਂ ਹਨ। ਖੁੱਲ੍ਹਾ, ਮੁੜ-ਪੈਦਾ ਕਰਨਯੋਗ ਅਤੇ ਇਸ ਮਾਨਸੂਨ ਲਾਈਵ — ਉਸ ਸੂਬੇ ਵਿੱਚ ਜਿੱਥੇ ਸਮੀਖਿਆ ਕੀਤੀ CWC ਸੂਚੀ ਵਿੱਚ ਇੱਕ ਵੀ ਹੜ੍ਹ-ਭਵਿੱਖਬਾਣੀ ਸਟੇਸ਼ਨ ਦਰਜ ਨਹੀਂ ਸੀ।',
     explain: 'ਹਰ 6 ਘੰਟੇ ਇਹ ਹਰ ਜ਼ਿਲ੍ਹੇ ਤੋਂ ਇੱਕ ਸਵਾਲ ਪੁੱਛਦਾ ਹੈ: ਕੀ ਅਗਲੇ ਤਿੰਨ ਦਿਨਾਂ ਵਿੱਚ ਸੈਟੇਲਾਈਟ ਇੱਥੇ ਹੜ੍ਹ ਵੇਖੇਗਾ? ਇਹ ਸਿਰਫ਼ ਉਸੇ ਦਿਨ ਤੱਕ ਦੀ ਜਾਣਕਾਰੀ ਵਰਤਦਾ ਹੈ।',

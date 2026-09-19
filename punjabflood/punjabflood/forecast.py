@@ -710,7 +710,9 @@ def render_markdown(product: dict) -> str:
 def write_outputs(product: dict, out_dir: Path = Path("outputs/forecast")) -> tuple[Path, Path]:
     """Write the dated record. A prospective record is never rewritten: if a record for the
     issue date already exists, the new run is saved beside it with its generation time in
-    the name (``<date>_rerun_<UTC stamp>``), and the first record of the day stands."""
+    the name (``<date>_rerun_<UTC stamp>``), and the first record of the day stands.
+    ``latest.json`` is rewritten every run with the newest product and the name of its
+    dated record."""
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = str(product["issue_date"])
     if (out_dir / f"{stem}.json").exists():
@@ -724,6 +726,12 @@ def write_outputs(product: dict, out_dir: Path = Path("outputs/forecast")) -> tu
     mp = out_dir / f"{stem}.md"
     jp.write_text(json.dumps(product, indent=2, default=str), encoding="utf-8")
     mp.write_text(render_markdown(product), encoding="utf-8")
+    # the newest cycle, for readers that cannot list the directory (the public site); it
+    # names the dated record it copies, and it is the one file here that is rewritten
+    latest = dict(product, record=jp.name)
+    (out_dir / "latest.json").write_text(
+        json.dumps(latest, indent=2, default=str), encoding="utf-8"
+    )
     return jp, mp
 
 

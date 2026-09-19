@@ -17,7 +17,7 @@ import {dataColors} from './theme';
 
 const MAP_T = {
   en: {
-    no: '03', title: 'Explore the record',
+    no: '05', title: 'Explore the record',
     intro: 'Pull up any monsoon from 2015 to now and watch the water move, even the years the model was never trained on. Or switch to the decade of recurrence and the rupee impact. Hover to compare, click any district for the full breakdown.',
     year: 'Flood by year', freq: 'Decade recurrence', impact: 'Impact (₹)', now: 'Live now (2026)',
     hint: 'Click a district for its numbers.',
@@ -26,7 +26,7 @@ const MAP_T = {
     yr: 'flooded', crop: 'Cropland flooded 2025', val: 'Crop value at risk 2025', rec: 'Seasons flooded, 2015–25', obs: 'Water this window (live)',
   },
   hi: {
-    no: '03', title: 'रिकॉर्ड देखें',
+    no: '05', title: 'रिकॉर्ड देखें',
     intro: '2015 से अब तक का कोई भी मानसून चुनें और पानी को चलते देखें — वे साल भी जिन पर मॉडल कभी प्रशिक्षित नहीं हुआ। या दशक की पुनरावृत्ति और रुपये में प्रभाव पर जाएँ। तुलना के लिए होवर करें, पूरा विवरण देखने के लिए किसी ज़िले पर क्लिक करें।',
     year: 'साल दर साल बाढ़', freq: 'दशक पुनरावृत्ति', impact: 'प्रभाव (₹)', now: 'अभी लाइव (2026)',
     hint: 'ज़िले के आँकड़ों के लिए उस पर क्लिक करें।',
@@ -35,7 +35,7 @@ const MAP_T = {
     yr: 'जलमग्न', crop: '2025 जलमग्न फ़सली भूमि', val: '2025 फ़सल मूल्य जोखिम में', rec: 'जलमग्न मौसम, 2015–25', obs: 'इस विंडो में जल (लाइव)',
   },
   pa: {
-    no: '03', title: 'ਰਿਕਾਰਡ ਵੇਖੋ',
+    no: '05', title: 'ਰਿਕਾਰਡ ਵੇਖੋ',
     intro: '2015 ਤੋਂ ਹੁਣ ਤੱਕ ਕੋਈ ਵੀ ਮਾਨਸੂਨ ਚੁਣੋ ਅਤੇ ਪਾਣੀ ਨੂੰ ਚੱਲਦਾ ਵੇਖੋ — ਉਹ ਸਾਲ ਵੀ ਜਿਨ੍ਹਾਂ ਉੱਤੇ ਮਾਡਲ ਕਦੇ ਸਿਖਲਾਈ ਨਹੀਂ ਹੋਇਆ। ਜਾਂ ਦਹਾਕੇ ਦੀ ਮੁੜ-ਆਵਰਤੀ ਤੇ ਰੁਪਏ ਵਿੱਚ ਪ੍ਰਭਾਵ ਉੱਤੇ ਜਾਓ। ਤੁਲਨਾ ਲਈ ਹੋਵਰ ਕਰੋ, ਪੂਰਾ ਵੇਰਵਾ ਵੇਖਣ ਲਈ ਕਿਸੇ ਜ਼ਿਲ੍ਹੇ ਉੱਤੇ ਕਲਿੱਕ ਕਰੋ।',
     year: 'ਸਾਲ-ਦਰ-ਸਾਲ ਹੜ੍ਹ', freq: 'ਦਹਾਕਾ ਮੁੜ-ਆਵਰਤੀ', impact: 'ਪ੍ਰਭਾਵ (₹)', now: 'ਹੁਣ ਲਾਈਵ (2026)',
     hint: 'ਜ਼ਿਲ੍ਹੇ ਦੇ ਅੰਕੜਿਆਂ ਲਈ ਉਸ ਉੱਤੇ ਕਲਿੱਕ ਕਰੋ।',
