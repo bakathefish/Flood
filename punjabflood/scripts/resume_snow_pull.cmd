@@ -11,7 +11,7 @@ echo === attempt %tries% at %date% %time% >> %LOG%
 python scripts\pull_snow_bhakra.py >> %LOG% 2>&1
 if exist data\raw\rain\bhakra_melt_daily.csv goto done
 if %tries% geq 12 goto fail
-timeout /t 3600 /nobreak > nul
+ping -n 3601 127.0.0.1 > nul
 goto again
 :done
 echo === pull done at %date% %time%, running verify >> %LOG%

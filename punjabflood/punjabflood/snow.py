@@ -88,16 +88,19 @@ def point_series(
     end: str,
     years_per_chunk: int = 11,
     weight_col: str = WEIGHT_COL,
+    chunks: list[tuple[str, str]] | None = None,
 ) -> tuple[dict[str, pd.DataFrame], pd.Series]:
     """The per-point daily snowfall and temperature from the archive (cache hits when
     ``scripts/pull_snow_bhakra.py`` has run with the same span and chunking), and the
-    area weights."""
+    area weights. ``chunks`` (start, end pairs) replaces the year chunking when given, so
+    a span can be extended with new calls while the old ones stay cache hits."""
     frames: dict[str, pd.DataFrame] = {}
     weights = {}
+    spans = chunks if chunks is not None else _year_chunks(start, end, years_per_chunk)
     for pid, lat, lon, w in points_with_weights(catchment, weight_col):
         weights[pid] = w
         parts = []
-        for s, e in _year_chunks(start, end, years_per_chunk):
+        for s, e in spans:
             d = client.archive_daily(lat, lon, s, e, daily=ARCHIVE_DAILY).get("daily", {})
             idx = pd.to_datetime(d.get("time", []))
             parts.append(
@@ -115,12 +118,17 @@ def point_series(
 
 
 def catchment_melt(
-    client: OpenMeteo, catchment: Catchment, start: str, end: str, years_per_chunk: int = 11
+    client: OpenMeteo,
+    catchment: Catchment,
+    start: str,
+    end: str,
+    years_per_chunk: int = 11,
+    chunks: list[tuple[str, str]] | None = None,
 ) -> pd.DataFrame:
     """The catchment's daily snowfall, melt, pack and temperature over ``start`` to ``end``
     (the pack starts empty on ``start``), as ``catchment_melt_from_points`` returns it, with
-    ``catchment`` and ``date`` columns."""
-    frames, weights = point_series(client, catchment, start, end, years_per_chunk)
+    ``catchment`` and ``date`` columns. ``chunks`` is passed through to ``point_series``."""
+    frames, weights = point_series(client, catchment, start, end, years_per_chunk, chunks=chunks)
     out = catchment_melt_from_points(frames, weights)
     out["catchment"] = catchment.name
     return out.reset_index()

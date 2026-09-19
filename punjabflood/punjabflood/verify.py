@@ -137,18 +137,20 @@ _MELT_GAPS_LOGGED: set[tuple[str, str]] = set()
 
 def _melt_window(melt: pd.Series | None, index: pd.DatetimeIndex) -> np.ndarray:
     """The melt volumes over ``index`` (zeros without a series). A day the series lacks
-    melts nothing and is logged once per span: a parameter set that carries the term has
+    melts nothing and is logged once per gap (series span and the year the gap starts): a
+    parameter set that carries the term has
     handed part of its base to the melt, so a missing day silently lowers the prediction."""
     if melt is None:
         return np.zeros(len(index))
     w = melt.reindex(index)
     if w.isna().any() and len(index):
-        key = (str(index.min().date()), str(index.max().date()))
+        first = w[w.isna()].index.min()
+        key = (str(melt.index.min().date()), str(melt.index.max().date()), first.year)
         if key not in _MELT_GAPS_LOGGED:
             _MELT_GAPS_LOGGED.add(key)
             log.warning(
-                "melt series lacks %d of %d days over %s to %s; those days melt nothing",
-                int(w.isna().sum()), len(index), key[0], key[1],
+                "melt series (%s to %s) lacks days from %s; those days melt nothing",
+                key[0], key[1], first.date(),
             )
     return w.fillna(0.0).to_numpy(dtype=float)
 

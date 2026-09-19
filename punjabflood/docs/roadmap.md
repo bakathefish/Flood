@@ -209,7 +209,7 @@ numbers that motivate them are in `verification.md`, never repeated here.
   10 August, the level stood at alert on 10, 11 and 13 August and at watch on the 12th,
   the watch was quiet from 16 to 20 August (the 14th quiet, the 15th a watch), and alerts
   returned on 22 and 23 August; at Pong and Ranjit Sagar the window opened already at alert
-  (raised from 11 August), so their leads are bounded by the window at 14 days, not
+  (at alert from 11 August, watch from the 10th), so their leads are bounded by the window at 14 days, not
   measured. In the two seasons without a dam event between a tenth and a fifth of the
   issue days stood at watch or above (23, 19 and 14 days of 119 in 2024; 20, 13 and 10 of
   105 in 2026 at Bhakra, Pong and Ranjit Sagar) and between 3 and 8 days a season at alert
