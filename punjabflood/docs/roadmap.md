@@ -216,6 +216,32 @@ numbers that motivate them are in `verification.md`, never repeated here.
   (8, 7, 3 in 2024 and 5, 4, 4 in 2026). No level is changed on this: the ensemble half of the rule cannot be
   scored (no ensemble is archived), and a change would be a new plan with its own rule.
 
+- **The snowmelt term at Bhakra, fitted, adopted and in the product.** Under the rule written
+  before the fit (the same plan file), a degree-day snowpack at all 131 archive points of
+  the Bhakra catchment (ERA5 snowfall and 2 m temperature from a 2014 spin-up year) gave
+  a melt term fitted jointly with the rain response: `c_melt` 0.067, lag weights
+  0.00, 0.15, 0.00, 0.85. Leave-one-season-out over 11 seasons and 1,009 days the
+  held-out error is 0.043809 BCM/day against the no-melt refit's 0.043905, the
+  season-peak ratio 0.58 against 0.57 and the worst period-mean deviation 0.10 against
+  0.11; all three conditions pass and the verdict is recorded in
+  `outputs/verification/results.json` (`snowmelt_verdict`). The term is in the
+  parameters the product runs (`calibrate --melt`, plan
+  `docs/superpowers/plans/2026-09-19-snowmelt-in-the-product.md`): the daily product
+  runs the same bucket from the archive through the primary model's past and forecast
+  days at the same points, and every score that uses the file's parameters carries it
+  with the archive's melt over the horizon (perfect prognosis for melt; the previous-runs
+  archive holds no temperature). Over the 2025 monsoon (122 issue days) the melt
+  response over five days is 0.025 BCM on average and 0.069 BCM at most, the rain
+  response 0.180 and 0.749 BCM. What moved in the scores that run on the file's
+  parameters: the as-issued 2025 Bhakra run's false flags went from 1 to 0 under the two
+  ECMWF models and from 3 to 2 under GFS (hits unchanged at 3, 3 and 1; the earliest
+  possible flag under observed rain moved from 29 to 30 August), the 2026 fit against
+  measured inflow has bias +18% and MAE 8,119 cusecs (were +24% and 9,868), the live
+  one-day test MAE 4,040 cusecs at r +0.58 (were 4,006 and +0.57), and the five-day
+  horizon test under observed rain MAE 5,677 cusecs (was 5,792). The remaining step is
+  data-bound: a hindcast on forecast melt needs archived temperature and snowfall
+  forecasts, which the previous-runs archive does not hold.
+
 ## Next, in order
 
 1. **Flood-scale inflow truth.** The one thing that would settle the runoff response at the

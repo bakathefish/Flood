@@ -29,6 +29,17 @@ DDF_MM_PER_DEGREE_DAY = 4.0
 T0_C = 0.0
 ARCHIVE_DAILY = ("snowfall_sum", "temperature_2m_mean", "precipitation_sum")
 COLUMNS = ["snowfall_mm", "melt_mm", "pack_mm", "t2m_mean_c", "n_points"]
+# The archive spans of the fitted melt table, one call per point and span (the span is
+# part of the cache key, so the list is extended, never re-cut): a spin-up year before the
+# first fitted season, the fitted seasons, and the current year to the rain table's last
+# day. The live product adds a tail span after the last one (``live_spans``).
+MELT_SPANS = [
+    ("2014-01-01", "2014-12-31"),
+    ("2015-01-01", "2025-12-31"),
+    ("2026-01-01", "2026-09-15"),
+]
+ARCHIVE_LAG_DAYS = 2  # the tail span is asked for to this many days before the issue date
+PAST_DAYS = 10  # the model's past days pulled to bridge the archive's last day to the issue date
 
 
 def degree_day_melt(
@@ -132,3 +143,53 @@ def catchment_melt(
     out = catchment_melt_from_points(frames, weights)
     out["catchment"] = catchment.name
     return out.reset_index()
+
+
+def live_spans(
+    archive_end: str, spans: list[tuple[str, str]] | None = None
+) -> list[tuple[str, str]]:
+    """The fixed spans (``MELT_SPANS`` unless given) plus a tail from the day after the last
+    one to ``archive_end`` (no tail when ``archive_end`` is not later than the last span)."""
+    spans = MELT_SPANS if spans is None else spans
+    last = pd.Timestamp(spans[-1][1])
+    end = pd.Timestamp(archive_end)
+    out = list(spans)
+    if end > last:
+        out.append(((last + pd.Timedelta(days=1)).date().isoformat(), end.date().isoformat()))
+    return out
+
+
+def last_complete_day(
+    frames: dict[str, pd.DataFrame], col: str = "t2m_mean_c"
+) -> pd.Timestamp | None:
+    """The last day on which every frame has a value in ``col`` (None when there is none):
+    the archive answers a span with nulls on the days it does not hold yet."""
+    days: set | None = None
+    for df in frames.values():
+        ok = set(df.index[df[col].notna()])
+        days = ok if days is None else days & ok
+    return max(days) if days else None
+
+
+def extend_points(
+    archive: dict[str, pd.DataFrame], model: dict[str, pd.DataFrame], model_name: str
+) -> tuple[dict[str, pd.DataFrame], pd.Timestamp | None]:
+    """Per point, the archive's rows to its last complete day and then the model's rows
+    after that day (columns ``snowfall_cm, t2m_mean_c, source``), so one bucket runs across
+    the join; a point the model lacks keeps the archive alone. Returns the frames and the
+    archive's last complete day."""
+    end = last_complete_day(archive)
+    cols = ["snowfall_cm", "t2m_mean_c"]
+    out = {}
+    for pid, a in archive.items():
+        a2 = (a if end is None else a.loc[:end])[cols].copy()
+        a2["source"] = "archive"
+        m = model.get(pid)
+        if m is not None:
+            m2 = m[cols].copy()
+            if end is not None:
+                m2 = m2[m2.index > end]
+            m2["source"] = model_name
+            a2 = pd.concat([a2, m2])
+        out[pid] = a2.sort_index()
+    return out, end

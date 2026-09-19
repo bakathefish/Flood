@@ -655,8 +655,24 @@ def render_verification(
                 "",
                 f"Verdict on 'snowmelt', {'adopted' if sv['adopt'] else 'not adopted'}. "
                 f"Conditions: {said}. The held-out row is in the variants table above.",
-                "",
             ]
+            hc = sv.get("horizon_contribution_2025") or {}
+            if hc.get("n_days"):
+                yr = sv.get("horizon_contribution_year", 2025)
+                lines += [
+                    "",
+                    f"Over the {yr} monsoon ({int(hc['n_days'])} issue days) the melt response "
+                    f"over five days came to {_num(hc.get('melt_mean_bcm'), '.3f')} BCM on "
+                    f"average, {_num(hc.get('melt_max_bcm'), '.3f')} BCM at most; the rain "
+                    f"response {_num(hc.get('rain_mean_bcm'), '.3f')} BCM and "
+                    f"{_num(hc.get('rain_max_bcm'), '.3f')} BCM (each response alone, no base "
+                    "flow, the archive's melt over the horizon).",
+                ]
+            carry = sv.get("product_params_carry_melt") or {}
+            if carry:
+                at = ", ".join(sorted(d for d, ok in carry.items() if ok)) or "no dam"
+                lines += ["", f"The parameters in use carry the term at: {at}."]
+            lines.append("")
 
     ai = results.get("as_issued_events") or []
     if ai:

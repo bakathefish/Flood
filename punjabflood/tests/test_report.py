@@ -723,6 +723,14 @@ def test_snowmelt_and_weather_watch_sections_render(tmp_path):
                 "season_peak_ratio_min": 0.43,
                 "season_peak_ratio_max": 0.43,
             },
+            "horizon_contribution_2025": {
+                "n_days": 100,
+                "melt_mean_bcm": 0.0123,
+                "melt_max_bcm": 0.0341,
+                "rain_mean_bcm": 0.1504,
+                "rain_max_bcm": 1.2339,
+            },
+            "product_params_carry_melt": {"Bhakra": True},
             "params": {
                 "Bhakra": {
                     "c": 0.31,
@@ -797,6 +805,10 @@ def test_snowmelt_and_weather_watch_sections_render(tmp_path):
     assert "### The snowmelt term at Bhakra" in md
     assert "| Bhakra | 0.310 | 0.000 | 0.520 | 0.60 0.40 0.00 0.00 |" in md
     assert "not adopted" in md
+    assert "Over the 2025 monsoon (100 issue days) the melt response over five days" in md
+    assert "0.012 BCM on average, 0.034 BCM at most" in md
+    assert "the rain response 0.150 BCM and 1.234 BCM" in md
+    assert "The parameters in use carry the term at: Bhakra." in md
     assert "### The weather watch run over the archive" in md
     assert (
         "| Pong | 2025-08-26 | 14 | 2025-08-12 | 14 or more (raised before the window) | 2025-08-13 | 13 | 9 | 4 | 98 |"

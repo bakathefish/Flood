@@ -84,8 +84,55 @@ def test_point_series_uses_the_given_chunks(monkeypatch):
     chunks = [("2014-01-01", "2014-12-31"), ("2015-01-01", "2015-01-31")]
     monkeypatch.setattr(snow, "points_with_weights", lambda cat, col: [("p1", 31.0, 77.0, 2.0)])
     client = _Recorder()
-    frames, weights = snow.point_series(client, _OnePoint(), "2014-01-01", "2015-01-31", chunks=chunks)
+    frames, weights = snow.point_series(
+        client, _OnePoint(), "2014-01-01", "2015-01-31", chunks=chunks
+    )
     assert client.spans == chunks
     assert len(frames["p1"]) == 365 + 31
     assert frames["p1"].index.is_monotonic_increasing
     assert weights["p1"] == 2.0
+
+
+def test_live_spans_adds_a_tail_only_after_the_last_fixed_span():
+    spans = [("2014-01-01", "2014-12-31"), ("2015-01-01", "2015-06-30")]
+    assert snow.live_spans("2015-06-30", spans) == spans
+    assert snow.live_spans("2015-03-01", spans) == spans
+    assert snow.live_spans("2015-07-04", spans) == spans + [("2015-07-01", "2015-07-04")]
+
+
+def _frame(days, snow_cm, t):
+    return pd.DataFrame({"snowfall_cm": snow_cm, "t2m_mean_c": t}, index=days)
+
+
+def test_last_complete_day_is_the_last_day_every_point_has_a_temperature():
+    days = pd.date_range("2026-09-10", periods=4)
+    a = _frame(days, [0.0] * 4, [1.0, 1.0, 1.0, np.nan])
+    b = _frame(days, [0.0] * 4, [1.0, 1.0, np.nan, np.nan])
+    assert snow.last_complete_day({"a": a, "b": b}) == pd.Timestamp("2026-09-11")
+    assert snow.last_complete_day({"a": _frame(days, [0.0] * 4, [np.nan] * 4)}) is None
+
+
+def test_extend_points_joins_the_model_after_the_archive_and_the_pack_carries_across():
+    arch_days = pd.date_range("2026-09-10", periods=3)
+    # 7 cm of snow (10 mm of water) falls at -5 C on the first day and stays; the archive's
+    # last day has no temperature yet
+    archive = {"p": _frame(arch_days, [7.0, 0.0, 0.0], [-5.0, -5.0, np.nan])}
+    model_days = pd.date_range("2026-09-08", periods=7)  # past days overlap the archive
+    model = {"p": _frame(model_days, [0.0] * 7, [-5.0, -5.0, -5.0, -5.0, 5.0, 5.0, 5.0])}
+    joined, end = snow.extend_points(archive, model, "m")
+    assert end == pd.Timestamp("2026-09-11")
+    f = joined["p"]
+    assert f.index[0] == arch_days[0] and f.index[-1] == model_days[-1]
+    assert f["source"].tolist() == ["archive", "archive", "m", "m", "m"]
+    assert f.index.is_monotonic_increasing and f.index.is_unique
+    out = snow.catchment_melt_from_points(joined, pd.Series({"p": 1.0}))
+    # the pack built in the archive melts on the model's first warm day (capacity 20 mm)
+    assert out["pack_mm"].tolist()[:2] == [10.0, 10.0]
+    assert out.loc[pd.Timestamp("2026-09-12"), "melt_mm"] == 10.0
+    assert out.loc[pd.Timestamp("2026-09-12"), "pack_mm"] == 0.0
+
+
+def test_extend_points_keeps_the_archive_alone_for_a_point_the_model_lacks():
+    days = pd.date_range("2026-09-10", periods=2)
+    joined, end = snow.extend_points({"p": _frame(days, [0.0, 0.0], [1.0, 1.0])}, {}, "m")
+    assert end == days[-1] and joined["p"]["source"].tolist() == ["archive", "archive"]

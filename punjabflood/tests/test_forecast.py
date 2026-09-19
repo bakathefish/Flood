@@ -199,8 +199,17 @@ def test_climatology_round_trip_and_missing_file(tmp_path):
 def test_build_product_takes_the_soil_moisture_anomaly_and_records_it():
     states, det, ens, params = _inputs(storage_frac=0.8, qpf_mm=40.0)
     wet = inflow.InflowParams(
-        "Pong", 12560.0, c=0.6, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0,
-        rmse_bcm=0.03, resid_acf1=0.3, gamma=1.0, wetness="api+sm", sm_clim=tuple([0.3] * 366),
+        "Pong",
+        12560.0,
+        c=0.6,
+        w=(0.5, 0.3, 0.2, 0.0),
+        rho=0.9,
+        intercept_bcm_per_day=0.0,
+        rmse_bcm=0.03,
+        resid_acf1=0.3,
+        gamma=1.0,
+        wetness="api+sm",
+        sm_clim=tuple([0.3] * 366),
     )
     soil = {"Pong": {"date": "2026-09-01", "sm_0_7": 0.6}}
     dry = forecast.build_product("2026-09-04", states, det, ens, {"Pong": [0.0] * 6}, params)
@@ -209,7 +218,11 @@ def test_build_product_takes_the_soil_moisture_anomaly_and_records_it():
     )
     e = sm["dams"]["Pong"]
     assert e["soil_moisture"] == {
-        "date": "2026-09-01", "sm_0_7": 0.6, "anomaly": 1.0, "age_days": 3, "wetness": "api+sm"
+        "date": "2026-09-01",
+        "sm_0_7": 0.6,
+        "anomaly": 1.0,
+        "age_days": 3,
+        "wetness": "api+sm",
     }
     a = dry["dams"]["Pong"]["deterministic"]["ecmwf_ifs025"]["inflow_bcm_by_day"]
     b = e["deterministic"]["ecmwf_ifs025"]["inflow_bcm_by_day"]
@@ -229,7 +242,9 @@ def test_recent_rain_takes_imd_days_where_present_and_the_model_elsewhere(tmp_pa
 
     class Client:
         def forecast_daily(self, lat, lon, models, days, issue_date=None, past_days=0):
-            t = pd.date_range(pd.Timestamp(issue_date) - pd.Timedelta(days=past_days), periods=past_days + days)
+            t = pd.date_range(
+                pd.Timestamp(issue_date) - pd.Timedelta(days=past_days), periods=past_days + days
+            )
             return {
                 "time": [x.date().isoformat() for x in t],
                 "precipitation_sum": [1.0] * len(t),  # one model: the bare key
@@ -269,15 +284,31 @@ def test_recent_rain_takes_imd_days_where_present_and_the_model_elsewhere(tmp_pa
     # with the incumbent record the grid is not even consulted
     calls = []
     only_model, src_model = forecast.recent_rain(
-        C2(), {"Toy": cat}, issue.date().isoformat(), rt_dir=tmp_path,
-        fetch=lambda days, rt_dir: calls.append(1), record="best_match",
+        C2(),
+        {"Toy": cat},
+        issue.date().isoformat(),
+        rt_dir=tmp_path,
+        fetch=lambda days, rt_dir: calls.append(1),
+        record="best_match",
     )
     assert only_model["Toy"] == pytest.approx([1.0] * 6) and src_model["Toy"] == ["best_match"] * 6
     assert calls == []
     # a catchment without IMD weights is served by the model only
-    cat2 = cm.Catchment("Plain", 2, poly, cm.geodesic_area_km2(poly), frozenset({2}), pts.drop(columns=[imdrain.IMD_WEIGHT_COL]))
+    cat2 = cm.Catchment(
+        "Plain",
+        2,
+        poly,
+        cm.geodesic_area_km2(poly),
+        frozenset({2}),
+        pts.drop(columns=[imdrain.IMD_WEIGHT_COL]),
+    )
     recent2, sources2 = forecast.recent_rain(
-        C2(), {"Plain": cat2}, issue.date().isoformat(), rt_dir=tmp_path, fetch=fetch, record="imd_rt"
+        C2(),
+        {"Plain": cat2},
+        issue.date().isoformat(),
+        rt_dir=tmp_path,
+        fetch=fetch,
+        record="imd_rt",
     )
     assert sources2["Plain"] == ["best_match"] * 6
 
@@ -286,9 +317,7 @@ def test_markdown_names_the_source_of_each_recent_day():
     states, det, ens, params = _inputs()
     recent = {d: [0.0, 0.0, 0.0, 5.0, 12.5, 30.0] for d in states}
     prod = forecast.build_product("2026-09-04", states, det, ens, recent, params)
-    prod["recent_rain_source"] = {
-        d: ["best_match"] * 3 + ["imd_rt"] * 3 for d in states
-    }
+    prod["recent_rain_source"] = {d: ["best_match"] * 3 + ["imd_rt"] * 3 for d in states}
     md = forecast.render_markdown(prod)
     assert (
         "Observed rain of the previous 6 days: 3 from the IMD real-time grid, 3 from the "
@@ -384,7 +413,9 @@ def test_product_prints_the_rule_curve_scenario_for_bhakra_only_with_a_rating():
     e = prod["dams"]["Bhakra"]
     r = e["rule_curve"]
     assert "2019" in r["vintage"] and len(r["points"]) == 3
-    assert r["level_ft_by_day"][0] == 1670.0 and len(r["level_ft_by_day"]) == len(r["capacity_bcm_by_day"])
+    assert r["level_ft_by_day"][0] == 1670.0 and len(r["level_ft_by_day"]) == len(
+        r["capacity_bcm_by_day"]
+    )
     assert r["headroom_day1_bcm"] < 0  # the reservoir is above its schedule
     # the schedule bound fires on day one where the FRL bound does not
     assert r["ensemble"]["1"]["p_exhaustion"] == 1.0
@@ -393,12 +424,13 @@ def test_product_prints_the_rule_curve_scenario_for_bhakra_only_with_a_rating():
     md = forecast.render_markdown(prod)
     assert "Against the filling schedule" in md and "1,670 ft tomorrow" in md
     # without a rating, or for a dam without a schedule, no block and no line
-    prod2 = forecast.build_product("2026-08-10", states2, det2, ens2, {}, {"Bhakra": params["Pong"]})
+    prod2 = forecast.build_product(
+        "2026-08-10", states2, det2, ens2, {}, {"Bhakra": params["Pong"]}
+    )
     assert "rule_curve" not in prod2["dams"]["Bhakra"]
     prod3 = forecast.build_product("2026-08-10", states, det, ens, {}, params, ratings=ratings)
     assert "rule_curve" not in prod3["dams"]["Pong"]
     assert "filling schedule" not in forecast.render_markdown(prod3)
-
 
 
 def test_product_carries_the_weather_watch_and_prints_it():
@@ -421,7 +453,10 @@ def test_product_carries_the_weather_watch_and_prints_it():
         ens,
         {"Pong": [1.0, 2.0, 3.0]},
         params,
-        ghaggar_climatology={"Pong": np.arange(0, 400, 1.0), "Ghaggar Khanauri": np.arange(0, 200, 1.0)},
+        ghaggar_climatology={
+            "Pong": np.arange(0, 400, 1.0),
+            "Ghaggar Khanauri": np.arange(0, 200, 1.0),
+        },
         recent_sources={"Pong": ["imd_rt", "imd_rt", "best_match"]},
         weather_daily=wd,
     )
@@ -435,3 +470,180 @@ def test_product_carries_the_weather_watch_and_prints_it():
     md = forecast.render_markdown(prod)
     assert "## Weather watch" in md and "| Pong | alert |" in md
     json.dumps(prod, default=str)
+
+
+def _melt_params():
+    return inflow.InflowParams(
+        "Pong",
+        12560.0,
+        c=0.6,
+        w=(0.5, 0.3, 0.2, 0.0),
+        rho=0.9,
+        intercept_bcm_per_day=0.0,
+        rmse_bcm=0.03,
+        resid_acf1=0.3,
+        c_melt=0.5,
+        w_melt=(0.4, 0.3, 0.2, 0.1),
+    )
+
+
+def test_melt_from_series_picks_the_recent_and_horizon_days_and_converts_to_bcm():
+    days = pd.date_range("2026-09-01", periods=8)  # to 09-08: the horizon's last day missing
+    melt = pd.DataFrame(
+        {"melt_mm": np.arange(1.0, 9.0), "pack_mm": 100.0, "source": ["archive"] * 5 + ["m"] * 3},
+        index=days,
+    )
+    r = forecast.melt_from_series(melt, "2026-09-04", recent_days=3, horizon=5, area_km2=1000.0)
+    assert r["recent_dates"] == ["2026-09-01", "2026-09-02", "2026-09-03"]
+    assert r["forecast_dates"] == [f"2026-09-0{d}" for d in range(5, 10)]
+    assert r["melt_mm_recent"] == [1.0, 2.0, 3.0]
+    assert r["melt_mm_forecast"] == [5.0, 6.0, 7.0, 8.0, 0.0]
+    # mm over km2 to BCM: 1 mm over 1000 km2 is 0.001 BCM
+    assert abs(r["melt_bcm_recent"][0] - 0.001) < 1e-12
+    assert r["missing_days"] == 1
+    assert r["pack_mm_issue"] == 100.0
+    assert r["source_recent"] == ["archive"] * 3
+    assert r["source_forecast"] == ["archive", "m", "m", "m", None]
+
+
+def test_build_product_applies_the_melt_inputs_where_the_parameters_carry_the_term():
+    states, det, ens, _ = _inputs()
+    p = {"Pong": _melt_params()}
+    m = {
+        "Pong": {
+            "recent_dates": [],
+            "melt_bcm_recent": [0.02] * 6,
+            "melt_bcm_forecast": [0.02] * 5,
+            "melt_mm_recent": [1.6] * 6,
+            "melt_mm_forecast": [1.6] * 5,
+            "forecast_dates": [],
+            "missing_days": 0,
+            "archive_last_day": "2026-09-02",
+            "model": "m",
+            "pack_mm_issue": 50.0,
+        }
+    }
+    recent = {"Pong": [0.0] * 6}
+    without = forecast.build_product("2026-09-04", states, det, ens, recent, p)
+    with_melt = forecast.build_product("2026-09-04", states, det, ens, recent, p, melt=m)
+    e0, e1 = without["dams"]["Pong"], with_melt["dams"]["Pong"]
+    # the recent melt explains part of the observed inflow, so the base is lower
+    assert e1["base_inflow_cusecs"] < e0["base_inflow_cusecs"]
+    assert e1["snowmelt"]["applied"] is True and e1["snowmelt"]["melt_bcm_forecast"] == [0.02] * 5
+    assert e0["snowmelt"]["applied"] is False and "contributes nothing" in e0["snowmelt"]["note"]
+    d0 = e0["deterministic"]["gfs_seamless"]["inflow_bcm_by_day"]
+    d1 = e1["deterministic"]["gfs_seamless"]["inflow_bcm_by_day"]
+    assert d0 != d1
+    md = forecast.render_markdown(with_melt)
+    assert "Snowmelt (degree-day pack" in md and "pack 50 mm" in md
+    assert "contributes nothing" in forecast.render_markdown(without)
+
+
+def test_build_product_ignores_melt_inputs_without_the_term():
+    states, det, ens, params = _inputs()
+    m = {"Pong": {"melt_bcm_recent": [0.02] * 6, "melt_bcm_forecast": [0.02] * 5}}
+    a = forecast.build_product("2026-09-04", states, det, ens, {"Pong": [0.0] * 6}, params)
+    b = forecast.build_product("2026-09-04", states, det, ens, {"Pong": [0.0] * 6}, params, melt=m)
+    assert "snowmelt" not in b["dams"]["Pong"]
+    assert a["dams"]["Pong"]["base_inflow_cusecs"] == b["dams"]["Pong"]["base_inflow_cusecs"]
+    assert (
+        a["dams"]["Pong"]["deterministic"]["gfs_seamless"]["inflow_bcm_by_day"]
+        == b["dams"]["Pong"]["deterministic"]["gfs_seamless"]["inflow_bcm_by_day"]
+    )
+
+
+class _MeltClient:
+    """Archive spans from the cache-like fake (nulls after ``archive_have``), the model's
+    past and forecast days; the tail span raises when ``tail_fails``."""
+
+    def __init__(self, archive_have="2026-09-01", tail_fails=False):
+        self.archive_have = pd.Timestamp(archive_have)
+        self.tail_fails = tail_fails
+        self.calls = []
+
+    def archive_daily(self, lat, lon, start, end, daily=()):
+        self.calls.append(("archive", start, end))
+        if self.tail_fails and pd.Timestamp(start) > pd.Timestamp("2026-08-31"):
+            from punjabflood.openmeteo import QuotaExhausted
+
+            raise QuotaExhausted("Daily API request limit exceeded")
+        days = pd.date_range(start, end)
+        t = [(-5.0 if d.month < 9 else 5.0) if d <= self.archive_have else None for d in days]
+        s = [7.0 if d.month == 1 else 0.0 for d in days]
+        return {
+            "daily": {
+                "time": [d.date().isoformat() for d in days],
+                "snowfall_sum": s,
+                "temperature_2m_mean": t,
+            }
+        }
+
+    def forecast_daily_weather(self, lat, lon, model, days, issue_date=None, daily=(), past_days=0):
+        self.calls.append(("weather", model, days, past_days))
+        start = pd.Timestamp(issue_date) - pd.Timedelta(days=past_days)
+        t = pd.date_range(start, periods=past_days + days)
+        return {
+            "daily": {
+                "time": [d.date().isoformat() for d in t],
+                "precipitation_sum": [0.0] * len(t),
+                "snowfall_sum": [0.0] * len(t),
+                "temperature_2m_max": [8.0] * len(t),
+                "temperature_2m_mean": [5.0] * len(t),
+            }
+        }
+
+
+def _one_point_catchment(monkeypatch):
+    from punjabflood import snow
+
+    monkeypatch.setattr(snow, "points_with_weights", lambda cat, col: [("p1", 31.0, 77.0, 1.0)])
+    monkeypatch.setattr(
+        forecast.rain, "points_with_weights", lambda cat, col: [("p1", 31.0, 77.0, 1.0)]
+    )
+    monkeypatch.setattr(
+        snow, "MELT_SPANS", [("2026-01-01", "2026-01-31"), ("2026-02-01", "2026-08-31")]
+    )
+
+    class Cat:
+        name = "Pong"
+        area_km2 = 1000.0
+
+    return {"Pong": Cat()}
+
+
+def test_melt_inputs_runs_the_bucket_across_the_archive_and_the_model(monkeypatch):
+    cats = _one_point_catchment(monkeypatch)
+    client = _MeltClient(archive_have="2026-09-01")
+    out = forecast.melt_inputs(
+        client, cats, {"Pong": _melt_params()}, "2026-09-05", recent_days=3, horizon=2
+    )
+    r = out["Pong"]
+    # the tail span was asked for to two days before issue; the archive held it to 09-01
+    assert ("archive", "2026-09-01", "2026-09-03") in client.calls
+    assert r["archive_last_day"] == "2026-09-01" and r["model"] == "ecmwf_aifs025_single"
+    assert r["recent_dates"] == ["2026-09-02", "2026-09-03", "2026-09-04"]
+    assert r["source_recent"] == ["ecmwf_aifs025_single"] * 3
+    assert r["source_forecast"] == ["ecmwf_aifs025_single"] * 2
+    assert r["missing_days"] == 0 and r["n_points"] == 1
+    # January's snow (31 days of 7 cm, 10 mm of water each) sits in the pack through August
+    # and melts 20 mm a day from September; the model's days carry that on
+    assert r["melt_mm_recent"] == [20.0, 20.0, 20.0] and r["melt_mm_forecast"] == [20.0, 20.0]
+    assert abs(r["melt_bcm_recent"][0] - 0.02) < 1e-12
+    assert "note" not in r
+
+
+def test_melt_inputs_falls_back_to_the_fixed_spans_when_the_tail_cannot_be_pulled(monkeypatch):
+    cats = _one_point_catchment(monkeypatch)
+    client = _MeltClient(archive_have="2026-08-31", tail_fails=True)
+    out = forecast.melt_inputs(
+        client, cats, {"Pong": _melt_params()}, "2026-09-05", recent_days=3, horizon=2
+    )
+    r = out["Pong"]
+    assert r["archive_last_day"] == "2026-08-31" and "archive tail not pulled" in r["note"]
+    assert r["melt_mm_recent"] == [20.0, 20.0, 20.0]
+
+
+def test_melt_inputs_skips_parameters_without_the_term(monkeypatch):
+    cats = _one_point_catchment(monkeypatch)
+    _, _, _, params = _inputs()
+    assert forecast.melt_inputs(_MeltClient(), cats, params, "2026-09-05") == {}

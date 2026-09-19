@@ -918,10 +918,14 @@ def live_horizon_test(
     horizons=LIVE_HORIZONS,
     models=AS_ISSUED_MODELS,
     sm: pd.Series | None = None,
+    melt: pd.Series | None = None,
 ) -> pd.DataFrame:
     """The live season's inflow prediction by horizon, against persistence. ``sm`` is the
     soil-moisture anomaly by date (``sm_anomaly_series_for``); the issue day's anomaly
-    holds over the horizon.
+    holds over the horizon. ``melt`` is the catchment melt volume by date
+    (``melt_series_for``) for a parameter set that carries the snowmelt term: the recent
+    days' melt enters the base removal and the horizon days' melt the prediction (the
+    archive's melt, perfect prognosis for melt).
 
     ``bulletins``: one row per day (index date) with ``inflow_cusecs``, the season's BBMB
     figures. From every bulletin day d the base flow is the observed inflow less the quick
@@ -956,12 +960,22 @@ def live_horizon_test(
             if hist.isna().any():
                 continue
             a = _anom(sm, d)
-            base = inflow.base_from_observed(params, float(obs.loc[d]), hist.to_numpy(), a)
+            m_hist = _melt_window(melt, hist.index)
+            base = inflow.base_from_observed(
+                params, float(obs.loc[d]), hist.to_numpy(), a, melt_bcm_recent=m_hist
+            )
             preds["persistence"][target] = float(obs.loc[d])
             fut = rs.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=h))
+            m_fut = _melt_window(melt, fut.index)
             if not fut.isna().any():
                 vol = inflow.predict_daily_bcm(
-                    params, fut.to_numpy(), base, rain_mm_recent=hist.to_numpy(), sm_anom=a
+                    params,
+                    fut.to_numpy(),
+                    base,
+                    rain_mm_recent=hist.to_numpy(),
+                    sm_anom=a,
+                    melt_bcm_recent=m_hist,
+                    melt_bcm_forecast=m_fut,
                 )
                 preds["observed rain"][target] = C.bcm_to_cusec_days(float(vol[-1]))
             for m in models:
@@ -974,6 +988,8 @@ def live_horizon_test(
                     base,
                     rain_mm_recent=hist.to_numpy(),
                     sm_anom=a,
+                    melt_bcm_recent=m_hist,
+                    melt_bcm_forecast=m_fut,
                 )
                 preds[m][target] = C.bcm_to_cusec_days(float(vol[-1]))
         for source, p in preds.items():
@@ -982,6 +998,63 @@ def live_horizon_test(
             score = live_test(pd.Series(p), obs)
             rows.append({"dam": params.dam, "horizon_days": int(h), "rain": source, **score})
     return pd.DataFrame(rows)
+
+
+def horizon_contribution(
+    rain: pd.Series,
+    melt: pd.Series | None,
+    params: inflow.InflowParams,
+    issue_days: pd.DatetimeIndex,
+    horizon: int = 5,
+) -> dict:
+    """How much of a five-day (``horizon``) inflow forecast each response contributes, from
+    every issue day in ``issue_days``: the model's daily volumes (``predict_daily_bcm``)
+    summed over the horizon with no base flow and, for the melt response, no rain, and for
+    the rain response, no melt (the two enter the quick response additively, so each sum
+    is that response alone). ``rain`` is the observed catchment rain by date (mm), ``melt``
+    the catchment melt volume by date (BCM); a day the melt series lacks melts nothing.
+    An issue day whose history or horizon runs past the rain record is skipped. Returns
+    ``n_days``, the mean and the largest of each response (BCM over the horizon; None
+    with no days) and the per-day melt sums (``melt_by_day``)."""
+    rs = rain.sort_index()
+    n = inflow.history_days(params)
+    melt_by_day: dict[str, float] = {}
+    rain_sum: list[float] = []
+    for d in issue_days:
+        hist = rs.reindex(pd.date_range(d - pd.Timedelta(days=n - 1), d))
+        fut = rs.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=horizon))
+        if hist.isna().any() or fut.isna().any():
+            continue
+        m_hist = _melt_window(melt, hist.index)
+        m_fut = _melt_window(melt, fut.index)
+        m_vol = inflow.predict_daily_bcm(
+            params,
+            np.zeros(horizon),
+            0.0,
+            rain_mm_recent=np.zeros(n),
+            melt_bcm_recent=m_hist,
+            melt_bcm_forecast=m_fut,
+        )
+        r_vol = inflow.predict_daily_bcm(
+            params,
+            fut.to_numpy(),
+            0.0,
+            rain_mm_recent=hist.to_numpy(),
+            melt_bcm_recent=np.zeros(n),
+            melt_bcm_forecast=np.zeros(horizon),
+        )
+        melt_by_day[d.strftime("%Y-%m-%d")] = float(m_vol.sum())
+        rain_sum.append(float(r_vol.sum()))
+    ms = list(melt_by_day.values())
+    return {
+        "n_days": len(ms),
+        "horizon_days": int(horizon),
+        "melt_mean_bcm": float(np.mean(ms)) if ms else None,
+        "melt_max_bcm": float(np.max(ms)) if ms else None,
+        "rain_mean_bcm": float(np.mean(rain_sum)) if rain_sum else None,
+        "rain_max_bcm": float(np.max(rain_sum)) if rain_sum else None,
+        "melt_by_day": melt_by_day,
+    }
 
 
 def _qpf_merge(qpf_leads: pd.DataFrame, rain_daily: pd.DataFrame) -> pd.DataFrame:

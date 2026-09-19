@@ -20,11 +20,11 @@ import pandas as pd
 import requests
 
 from punjabflood import constants as C
-from punjabflood import hei, inflow, rain, reservoirs, routing
+from punjabflood import hei, inflow, rain, reservoirs, routing, snow
 from punjabflood import weather as wx
 from punjabflood.catchments import Catchment
 from punjabflood.imdrain import IMD_WEIGHT_COL, covered_area_km2
-from punjabflood.openmeteo import OpenMeteo
+from punjabflood.openmeteo import OpenMeteo, OpenMeteoError, QuotaExhausted
 
 log = logging.getLogger(__name__)
 
@@ -189,8 +189,13 @@ def build_product(
     ratings: dict | None = None,
     recent_sources: dict[str, list[str]] | None = None,
     weather_daily: pd.DataFrame | None = None,
+    melt: dict[str, dict] | None = None,
 ) -> dict:
     """Assemble the hazard product from already-pulled inputs (pure; tested with fakes).
+    ``melt``: per dam catchment the snowmelt inputs ``melt_inputs`` builds (the recent
+    and horizon melt volumes, BCM); a parameter set that carries the snowmelt term takes
+    them into the base split and the daily prediction and records them, and without them
+    the term contributes nothing that cycle, which the product says.
     ``ratings``: the level-to-storage curves; with them a dam that has a sourced filling
     schedule (``constants.rule_curve``) gets the schedule scenario beside the FRL bound.
     ``local_areas``: IMD-covered area (km2) per local catchment (``constants.LOCAL_CATCHMENTS``)
@@ -231,7 +236,12 @@ def build_product(
         sm_rec = (soil_moisture or {}).get(cat)
         if sm_rec and p.uses_sm and sm_rec.get("sm_0_7") == sm_rec.get("sm_0_7"):
             sm_anom = inflow.sm_anomaly(p, float(sm_rec["sm_0_7"]), sm_rec["date"])
-        base = inflow.base_from_observed(p, float(st["inflow_cusecs"] or 0.0), recent, sm_anom)
+        m_in = (melt or {}).get(cat) if p.has_melt else None
+        m_rec = m_in["melt_bcm_recent"] if m_in else ()
+        m_fut = m_in["melt_bcm_forecast"] if m_in else ()
+        base = inflow.base_from_observed(
+            p, float(st["inflow_cusecs"] or 0.0), recent, sm_anom, melt_bcm_recent=m_rec
+        )
         entry = {
             "state": st,
             "storage_fraction": st["storage_bcm"] / C.DAMS[dam].live_capacity_bcm.value,
@@ -250,13 +260,28 @@ def build_product(
                 "age_days": int((pd.Timestamp(issue_date) - pd.Timestamp(sm_rec["date"])).days),
                 "wetness": p.wetness,
             }
+        if p.has_melt:
+            entry["snowmelt"] = (
+                {"applied": True, **m_in}
+                if m_in
+                else {
+                    "applied": False,
+                    "note": "no melt inputs this cycle; the snowmelt term contributes nothing",
+                }
+            )
         det_daily = {}
         for model in DETERMINISTIC_MODELS:
             fc = _series_by_model(qpf_det, cat, model)
             if len(fc) == 0:
                 continue
             daily = inflow.predict_daily_bcm(
-                p, fc[: max(horizons)], base, rain_mm_recent=recent, sm_anom=sm_anom
+                p,
+                fc[: max(horizons)],
+                base,
+                rain_mm_recent=recent,
+                sm_anom=sm_anom,
+                melt_bcm_recent=m_rec,
+                melt_bcm_forecast=m_fut,
             )
             det_daily[model] = daily
             entry["deterministic"][model] = {
@@ -276,7 +301,13 @@ def build_product(
             # serves every shorter one by slicing
             member_daily = [
                 inflow.predict_daily_bcm(
-                    p, fc[:h_max], base, rain_mm_recent=recent, sm_anom=sm_anom
+                    p,
+                    fc[:h_max],
+                    base,
+                    rain_mm_recent=recent,
+                    sm_anom=sm_anom,
+                    melt_bcm_recent=m_rec,
+                    melt_bcm_forecast=m_fut,
                 )
                 for fc in members.values()
             ]
@@ -309,7 +340,9 @@ def build_product(
                 for H in horizons:
                     daily_h = [d[:H] for d in member_daily if len(d) >= H]
                     res_c = [
-                        hei.headroom_exhaustion(dam, st["storage_bcm"], d, absorb, capacity_bcm=cap_c)
+                        hei.headroom_exhaustion(
+                            dam, st["storage_bcm"], d, absorb, capacity_bcm=cap_c
+                        )
                         for d in daily_h
                     ]
                     summary_c = hei.ensemble_summary(res_c)
@@ -334,7 +367,11 @@ def build_product(
                         str(H): hei.headroom_exhaustion(
                             dam, st["storage_bcm"], det_daily[m][:H], absorb, capacity_bcm=cap_c
                         ).to_dict()
-                        for m in [PRIMARY_DETERMINISTIC if PRIMARY_DETERMINISTIC in det_daily else next(iter(det_daily))]
+                        for m in [
+                            PRIMARY_DETERMINISTIC
+                            if PRIMARY_DETERMINISTIC in det_daily
+                            else next(iter(det_daily))
+                        ]
                         for H in horizons
                     }
                     if det_daily
@@ -353,7 +390,12 @@ def build_product(
                     daily_h = [d[:H] for d in member_daily if len(d) >= H]
                     res_rc = [
                         hei.headroom_exhaustion(
-                            dam, st["storage_bcm"], d, absorb, capacity_bcm=caps_rc[:H], clamp_start=False
+                            dam,
+                            st["storage_bcm"],
+                            d,
+                            absorb,
+                            capacity_bcm=caps_rc[:H],
+                            clamp_start=False,
                         )
                         for d in daily_h
                     ]
@@ -373,7 +415,9 @@ def build_product(
                     )
                     ens_rc[str(H)] = summary_rc
                 det_model = (
-                    PRIMARY_DETERMINISTIC if PRIMARY_DETERMINISTIC in det_daily else next(iter(det_daily), None)
+                    PRIMARY_DETERMINISTIC
+                    if PRIMARY_DETERMINISTIC in det_daily
+                    else next(iter(det_daily), None)
                 )
                 entry["rule_curve"] = {
                     "vintage": C.RULE_CURVE_VINTAGE.get(dam, ""),
@@ -521,6 +565,19 @@ def render_markdown(product: dict) -> str:
                 f"({s['age_days']} days before issue); the rain response carries it "
                 f"(wetness carrier {s['wetness']})."
             )
+        if e.get("snowmelt"):
+            s = e["snowmelt"]
+            if s.get("applied"):
+                lines.append(
+                    f"Snowmelt (degree-day pack at the catchment's archive points to "
+                    f"{s['archive_last_day']}, the {s['model']} model from there): "
+                    f"{sum(s['melt_mm_recent']):.1f} mm over the previous "
+                    f"{len(s['melt_mm_recent'])} days, {sum(s['melt_mm_forecast']):.1f} mm "
+                    f"over the horizon, pack {s['pack_mm_issue']:.0f} mm; the inflow model "
+                    f"carries it."
+                )
+            else:
+                lines.append(f"Snowmelt: {s.get('note', 'not applied')}.")
         if e.get("cushion"):
             c = e["cushion"]
             lines.append(
@@ -800,9 +857,7 @@ def recent_rain(
     for name, cat in catchments.items():
         calibrated_index = name in DAM_CATCHMENT.values() or name in C.LOCAL_CATCHMENTS
         wc = (
-            IMD_WEIGHT_COL
-            if calibrated_index and IMD_WEIGHT_COL in cat.points
-            else rain.WEIGHT_COL
+            IMD_WEIGHT_COL if calibrated_index and IMD_WEIGHT_COL in cat.points else rain.WEIGHT_COL
         )
         past = rain.forecast_catchment(
             client,
@@ -856,6 +911,10 @@ def run(
     states = dam_state_from_bulletin(rec, ratings)
     det_frames, ens_frames, wx_frames = [], [], []
     recent, recent_sources = recent_rain(client, catchments, issue_date, rt_dir=rt_dir)
+    # a parameter set with the snowmelt term needs the model's past days at the points
+    # (the bucket's bridge); the watch's pull asks for the same days so the calls are shared
+    melt_needed = any(p.has_melt for p in params.values())
+    wx_past_days = snow.PAST_DAYS if melt_needed else 0
     for name, cat in catchments.items():
         calibrated_index = name in DAM_CATCHMENT.values() or name in C.LOCAL_CATCHMENTS
         wc = IMD_WEIGHT_COL if calibrated_index else rain.WEIGHT_COL
@@ -884,6 +943,7 @@ def run(
                         days=max(HORIZONS) + 1,
                         issue_date=issue_date,
                         weight_col=wc,
+                        past_days=wx_past_days,
                     )
                 )
             except Exception:  # noqa: BLE001 - temperature is a watch extra, never a blocker
@@ -905,6 +965,7 @@ def run(
         if name in C.LOCAL_CATCHMENTS and IMD_WEIGHT_COL in cat.points
     }
     soil = latest_soil_moisture(client, catchments, params, issue_date)
+    melt = melt_inputs(client, catchments, params, issue_date) if melt_needed else {}
     product = build_product(
         issue_date,
         states,
@@ -919,8 +980,127 @@ def run(
         ratings=ratings,
         recent_sources=recent_sources,
         weather_daily=weather_daily,
+        melt=melt or None,
     )
     product["bulletin"] = {k: v for k, v in rec.items() if k != "raw_text"}
     product["recent_rain_source"] = recent_sources
     write_outputs(product, out_dir)
     return product
+
+
+def melt_from_series(
+    melt: pd.DataFrame, issue_date: str, recent_days: int, horizon: int, area_km2: float
+) -> dict:
+    """The snowmelt inputs for one catchment from its daily melt table (indexed by day,
+    ``melt_mm`` and, when present, ``pack_mm`` and ``source``): the recent days (the same
+    days as the recent rain, ``recent_days`` before the issue date to the day before it)
+    and the horizon days (the day after the issue date to ``horizon`` days out) as volumes
+    over ``area_km2`` (BCM); a day the table lacks melts nothing and is counted in
+    ``missing_days``. ``pack_mm_issue`` is the pack on the day before issue."""
+    issue = pd.Timestamp(issue_date)
+    rec_days = pd.date_range(issue - pd.Timedelta(days=recent_days), periods=recent_days)
+    fut_days = pd.date_range(issue + pd.Timedelta(days=1), periods=horizon)
+    days = rec_days.append(fut_days)
+    mm = melt["melt_mm"].reindex(days)
+    missing = int(mm.isna().sum())
+    mm = mm.fillna(0.0)
+    vol = inflow.rain_volume_bcm(mm.to_numpy(), area_km2)
+    n = len(rec_days)
+    out = {
+        "recent_dates": [d.date().isoformat() for d in rec_days],
+        "melt_mm_recent": [float(x) for x in mm.iloc[:n]],
+        "melt_bcm_recent": [float(x) for x in vol[:n]],
+        "forecast_dates": [d.date().isoformat() for d in fut_days],
+        "melt_mm_forecast": [float(x) for x in mm.iloc[n:]],
+        "melt_bcm_forecast": [float(x) for x in vol[n:]],
+        "missing_days": missing,
+        "area_km2": float(area_km2),
+    }
+    if "pack_mm" in melt.columns:
+        pk = melt["pack_mm"].reindex([rec_days[-1]]).iloc[0]
+        out["pack_mm_issue"] = float(pk) if pk == pk else None
+    if "source" in melt.columns:
+        src = melt["source"].reindex(days)
+        out["source_recent"] = [None if s != s else str(s) for s in src.iloc[:n]]
+        out["source_forecast"] = [None if s != s else str(s) for s in src.iloc[n:]]
+    return out
+
+
+def melt_inputs(
+    client: OpenMeteo,
+    catchments: dict[str, Catchment],
+    params: dict[str, inflow.InflowParams],
+    issue_date: str,
+    recent_days: int = RECENT_DAYS,
+    horizon: int = max(HORIZONS),
+    model: str = PRIMARY_DETERMINISTIC,
+) -> dict[str, dict]:
+    """The snowmelt inputs per dam catchment whose parameters carry the term: the archive's
+    snowfall and temperature at every point over the fixed spans (``snow.MELT_SPANS``, on
+    disk) and a tail span to ``snow.ARCHIVE_LAG_DAYS`` before the issue date (one call per
+    point per issue day; when the tail cannot be pulled the fixed spans stand and the note
+    says so), the model's past and forecast days at the same points, one bucket run across
+    the join, and the catchment melt as ``melt_from_series`` returns it plus the archive's
+    last complete day, the model and the point count. A catchment whose inputs fail is left
+    out with a warning; the product then says the term contributes nothing that cycle."""
+    out: dict[str, dict] = {}
+    issue = pd.Timestamp(issue_date)
+    for dam, p in params.items():
+        if not p.has_melt:
+            continue
+        cat_name = DAM_CATCHMENT.get(dam, dam)
+        cat = catchments.get(cat_name)
+        if cat is None:
+            continue
+        try:
+            archive_end = (issue - pd.Timedelta(days=snow.ARCHIVE_LAG_DAYS)).date().isoformat()
+            note = None
+            try:
+                frames, weights = snow.point_series(
+                    client,
+                    cat,
+                    snow.MELT_SPANS[0][0],
+                    archive_end,
+                    chunks=snow.live_spans(archive_end),
+                )
+            except (QuotaExhausted, OpenMeteoError, requests.RequestException) as exc:
+                note = (
+                    f"archive tail not pulled ({type(exc).__name__}); the fixed spans stand and "
+                    f"the {model} model's past days bridge from their end"
+                )
+                log.warning("melt inputs for %s: %s", dam, note)
+                frames, weights = snow.point_series(
+                    client,
+                    cat,
+                    snow.MELT_SPANS[0][0],
+                    snow.MELT_SPANS[-1][1],
+                    chunks=snow.MELT_SPANS,
+                )
+            model_frames, _ = rain.weather_points(
+                client,
+                cat,
+                model=model,
+                days=horizon + 1,
+                issue_date=issue_date,
+                weight_col=rain.WEIGHT_COL,
+                past_days=snow.PAST_DAYS,
+            )
+            joined, end = snow.extend_points(frames, model_frames, model)
+            daily = snow.catchment_melt_from_points(joined, weights)
+            daily["source"] = [
+                "archive" if (end is not None and d <= end) else model for d in daily.index
+            ]
+            rec = melt_from_series(daily, issue_date, recent_days, horizon, cat.area_km2)
+            rec["archive_last_day"] = end.date().isoformat() if end is not None else None
+            rec["model"] = model
+            rec["n_points"] = int(len(weights))
+            if note:
+                rec["note"] = note
+            out[cat_name] = rec
+        except Exception:  # noqa: BLE001 - the melt is a term, never a blocker of the cycle
+            log.warning(
+                "melt inputs failed for %s; the snowmelt term contributes nothing this cycle",
+                dam,
+                exc_info=True,
+            )
+    return out

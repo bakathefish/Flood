@@ -94,13 +94,30 @@ leave-one-season-out beside the baseline at Bhakra alone under a rule written be
 fit (`docs/superpowers/plans/2026-09-19-snowmelt-and-watch-hindcast.md`): the held-out
 error may not rise, Bhakra's season-peak ratio in the flood-scale check must rise, and its
 period means may not move further from the reported means than the baseline's worst one.
-The outcome and the numbers are in `verification.md` (the snowmelt section). In that
-scoring the melt over the horizon is the observed ERA5 melt, perfect prognosis, and the
-as-issued hindcast and the daily product run the baseline parameters without the term;
-a term that passes would need the recent melt from the archive and the primary model's
-temperature and snowfall over the horizon in the daily product, and its as-issued score
-rerun on forecast melt, which is a plan of its own. The base component today is the observed BBMB inflow minus the
-quick response the recent rain explains, decaying at a fitted daily recession. The recession is estimated from the residuals as the lag-2 to lag-1
+The outcome and the numbers are in `verification.md` (the snowmelt section). The rule
+passed, and the term is in the parameters the product runs
+(`calibrate --melt`, the second plan
+`docs/superpowers/plans/2026-09-19-snowmelt-in-the-product.md`): Bhakra's parameter
+set carries `c_melt` and `w_melt`, the other dams' do not. In the daily product the
+recent melt comes from the archive at the same 131 points (the fixed spans plus a tail
+to the archive's latest day, two days behind the issue date; when the tail cannot be
+pulled, the fixed spans stand) and the primary model's past days and forecast days at
+the same points carry the bucket across the gap and over the horizon, one pack across
+the join. The recent melt over the same days as the recent rain enters the base
+removal, so the observed inflow is split between base, rain response and melt
+response; the horizon melt enters every deterministic model and every ensemble member.
+The product records the days, the melt, the pack at the issue date, the archive's last
+day and the source of every day; if the melt inputs cannot be built the cycle runs with
+the term contributing nothing and says so. In every score that runs on the parameters
+in use (the flood-scale check, the as-issued hindcast, the live one-day and horizon
+tests) the melt over the horizon is the archive's melt, perfect prognosis for melt: the
+previous-runs archive holds no temperature or snowfall, so a hindcast on forecast melt
+is not possible from the record on disk. The size of that assumption is bounded in
+`verification.md` by the term's horizon contribution (the melt response over five days
+at the fitted coefficient beside the rain response). The adoption verdict compares the
+snowmelt variant against a no-melt refit of the baseline, never against the parameters
+in use, so it reads the same whether or not the file carries the term. The base component today is the observed BBMB inflow minus the
+quick response the recent rain (and, at Bhakra, the recent melt) explains, decaying at a fitted daily recession. The recession is estimated from the residuals as the lag-2 to lag-1
 autocovariance ratio, which is unbiased under white measurement noise; where the residual
 drifts through the season instead of recessing the ratio exceeds one and the estimate sits
 at its 0.99 clip, and the parameter file keeps the raw ratio so the report can say so.

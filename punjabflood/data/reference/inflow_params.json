@@ -2,28 +2,36 @@
   "Bhakra": {
     "dam": "Bhakra",
     "area_km2": 25762.476999999995,
-    "c": 0.17033704612728234,
+    "c": 0.14486654098288027,
     "w": [
-      0.538336371131335,
-      0.26878359297665205,
-      0.09799100572805801,
-      0.09488903016395474
+      0.5409212214085053,
+      0.28092675840019193,
+      0.08398939042421959,
+      0.09416262976708321
     ],
     "rho": 0.99,
-    "intercept_bcm_per_day": 0.002259873152988775,
+    "intercept_bcm_per_day": -0.001384904653439245,
     "gamma": 0.0,
     "n_days": 1009,
-    "r2": 0.2120896250989508,
-    "rmse_bcm": 0.04337534845997248,
-    "rho_raw": 1.8560354837840056,
-    "c_wet": 0.24991984946245677,
+    "r2": 0.22058096948535277,
+    "rmse_bcm": 0.04314098630807664,
+    "rho_raw": 1.8881915328407237,
+    "c_wet": 0.2816522983353049,
     "api_days": 5,
-    "resid_acf1": 0.10292746419233867,
+    "resid_acf1": 0.10071677100847436,
     "c_excess": 0.0,
     "w_excess": [],
     "excess_threshold_mm": NaN,
     "wetness": "api",
-    "sm_clim": []
+    "sm_clim": [],
+    "basis": "storage",
+    "c_melt": 0.06713322023722082,
+    "w_melt": [
+      0.0,
+      0.15037536566734525,
+      0.0,
+      0.8496246343326548
+    ]
   },
   "Pong": {
     "dam": "Pong",
@@ -49,7 +57,10 @@
     "w_excess": [],
     "excess_threshold_mm": NaN,
     "wetness": "api",
-    "sm_clim": []
+    "sm_clim": [],
+    "basis": "storage",
+    "c_melt": 0.0,
+    "w_melt": []
   },
   "Ranjit Sagar": {
     "dam": "Ranjit Sagar",
@@ -75,6 +86,9 @@
     "w_excess": [],
     "excess_threshold_mm": NaN,
     "wetness": "api",
-    "sm_clim": []
+    "sm_clim": [],
+    "basis": "storage",
+    "c_melt": 0.0,
+    "w_melt": []
   }
 }

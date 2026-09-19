@@ -27,14 +27,9 @@ from punjabflood.openmeteo import OpenMeteo  # noqa: E402
 OUT = Path("data/raw/rain/snow_bhakra_daily.csv")
 MELT_OUT = Path("data/raw/rain/bhakra_melt_daily.csv")
 DAILY = snow.ARCHIVE_DAILY
-# The archive spans, each one call per point (the span is part of the cache key, so the
-# list is extended, never re-cut): a spin-up year before the first fitted season, the
-# fitted seasons, and the current year to the rain table's last day.
-MELT_SPANS = [("2014-01-01", "2014-12-31"), ("2015-01-01", "2025-12-31"), ("2026-01-01", "2026-09-15")]
-# The archive spans, each one call per point (the span is part of the cache key, so the
-# list is extended, never re-cut): a spin-up year before the first fitted season, the
-# fitted seasons, and the current year to the rain table's last day.
-MELT_SPANS = [("2014-01-01", "2014-12-31"), ("2015-01-01", "2025-12-31"), ("2026-01-01", "2026-09-15")]
+# The archive spans (``snow.MELT_SPANS``): a spin-up year before the first fitted season,
+# the fitted seasons, and the current year to the rain table's last day.
+MELT_SPANS = snow.MELT_SPANS
 
 
 def main(start: str = "2015-01-01", end: str = "2025-12-31") -> None:

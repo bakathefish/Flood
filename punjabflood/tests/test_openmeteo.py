@@ -127,3 +127,14 @@ def test_200_with_non_json_body_every_time_raises(tmp_cache):
     om, sess, slept = make([Resp(200, None, "<html>") for _ in range(10)], tmp_cache)
     with pytest.raises(openmeteo.OpenMeteoError, match="non-JSON"):
         om.get("archive", {"latitude": 1, "longitude": 2})
+
+
+def test_forecast_daily_weather_past_days_is_sent_and_keys_the_cache(tmp_cache):
+    om, sess, _ = make([Resp(200, {"a": 1}), Resp(200, {"a": 2})], tmp_cache)
+    r1 = om.forecast_daily_weather(31.9, 76.5, issue_date="2026-09-05")
+    r2 = om.forecast_daily_weather(31.9, 76.5, issue_date="2026-09-05", past_days=10)
+    r3 = om.forecast_daily_weather(31.9, 76.5, issue_date="2026-09-05", past_days=10)
+    assert (r1, r2, r3) == ({"a": 1}, {"a": 2}, {"a": 2})
+    assert len(sess.calls) == 2
+    assert "past_days" not in sess.calls[0][1]
+    assert sess.calls[1][1]["past_days"] == 10

@@ -1,9 +1,9 @@
 {
   "n_periods": 6,
-  "log_bias": -0.0029717545905371388,
-  "log_sd": 0.13951667092756717,
+  "log_bias": -0.008050712782835255,
+  "log_sd": 0.13872781109658971,
   "n_dated_days": 147,
-  "dated_log_sd": 0.5587631029954789,
+  "dated_log_sd": 0.5596994076733676,
   "min_period_days": 10,
   "basis": "log(model / reported) over the Public Action Committee period means covered on at least 10 days, 2025; the product samples the spread, not the bias"
 }

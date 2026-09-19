@@ -200,6 +200,39 @@ WEATHER_COLS = {
 }
 
 
+def weather_points(
+    client: OpenMeteo,
+    catchment: Catchment,
+    model: str = "ecmwf_aifs025_single",
+    days: int = 6,
+    issue_date: str | None = None,
+    weight_col: str = WEIGHT_COL,
+    past_days: int = 0,
+) -> tuple[dict[str, pd.DataFrame], pd.Series]:
+    """One model's daily precipitation (mm), snowfall (cm) and 2 m temperature (max and
+    mean, C) at every point of the catchment: frames indexed by ``target_date`` with the
+    ``WEATHER_COLS`` values, keyed by point id, and the area weights. ``past_days`` prepends
+    the model's recent days (the snowmelt bucket's bridge)."""
+    frames: dict[str, pd.DataFrame] = {}
+    weights = {}
+    for pid, lat, lon, w in points_with_weights(catchment, weight_col):
+        weights[pid] = w
+        j = client.forecast_daily_weather(
+            lat, lon, model=model, days=days, issue_date=issue_date, past_days=past_days
+        )
+        d = j.get("daily", {})
+        idx = pd.to_datetime(d.get("time", []))
+        f = pd.DataFrame(
+            {
+                name: pd.Series(d.get(k, [None] * len(idx)), index=idx, dtype=float)
+                for k, name in WEATHER_COLS.items()
+            }
+        )
+        f.index.name = "target_date"
+        frames[pid] = f
+    return frames, pd.Series(weights, dtype=float)
+
+
 def weather_catchment(
     client: OpenMeteo,
     catchment: Catchment,
@@ -207,24 +240,20 @@ def weather_catchment(
     days: int = 6,
     issue_date: str | None = None,
     weight_col: str = WEIGHT_COL,
+    past_days: int = 0,
 ) -> pd.DataFrame:
     """One model's daily precipitation (mm), snowfall (cm) and 2 m temperature (max and
     mean, C) as catchment means: columns ``target_date, model, catchment`` plus the
-    ``WEATHER_COLS`` values."""
-    per_var: dict[str, dict[str, pd.Series]] = {k: {} for k in WEATHER_COLS}
-    weights = {}
-    for pid, lat, lon, w in points_with_weights(catchment, weight_col):
-        weights[pid] = w
-        j = client.forecast_daily_weather(lat, lon, model=model, days=days, issue_date=issue_date)
-        d = j.get("daily", {})
-        idx = pd.to_datetime(d.get("time", []))
-        for k in WEATHER_COLS:
-            per_var[k][pid] = pd.Series(d.get(k, [None] * len(idx)), index=idx, dtype=float)
-    wser = pd.Series(weights)
+    ``WEATHER_COLS`` values (the area-weighted means of ``weather_points``)."""
+    frames, wser = weather_points(
+        client, catchment, model, days, issue_date, weight_col, past_days=past_days
+    )
     cols = {}
-    for k, name in WEATHER_COLS.items():
+    for name in WEATHER_COLS.values():
         cols[name] = (
-            weighted_mean(pd.DataFrame(per_var[k]), wser) if per_var[k] else pd.Series(dtype=float)
+            weighted_mean(pd.DataFrame({pid: f[name] for pid, f in frames.items()}), wser)
+            if frames
+            else pd.Series(dtype=float)
         )
     res = pd.DataFrame(cols)
     res.index.name = "target_date"
@@ -315,7 +344,5 @@ def merge_qpf_leads(old: pd.DataFrame, new: pd.DataFrame) -> pd.DataFrame:
     n = new.copy()
     n["target_date"] = pd.to_datetime(n["target_date"], format="ISO8601")
     pulled = set(zip(n["model"], n["target_date"].dt.year, strict=True))
-    drop = [
-        (m, y) in pulled for m, y in zip(o["model"], o["target_date"].dt.year, strict=True)
-    ]
+    drop = [(m, y) in pulled for m, y in zip(o["model"], o["target_date"].dt.year, strict=True)]
     return pd.concat([o[~pd.Series(drop, index=o.index)], n], ignore_index=True)

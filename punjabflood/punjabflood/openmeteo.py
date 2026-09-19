@@ -235,22 +235,25 @@ class OpenMeteo:
         days: int = 6,
         issue_date: str | None = None,
         daily: Iterable[str] = WEATHER_DAILY,
+        past_days: int = 0,
     ) -> dict:
         """One model's daily precipitation, snowfall and 2 m temperature (the weather
-        watch's temperature and snow share). Cached per issue date like ``forecast_daily``."""
+        watch's temperature and snow share). Cached per issue date like ``forecast_daily``;
+        ``past_days`` adds the model's recent days (the snowmelt bucket's bridge from the
+        archive's last day to the issue date) and is part of the cache key."""
         issue_date = issue_date or self.clock().date().isoformat()
-        return self.get(
-            "forecast",
-            {
-                "latitude": lat,
-                "longitude": lon,
-                "daily": list(daily),
-                "models": model,
-                "forecast_days": days,
-                "timezone": "UTC",
-                "_issue_date": issue_date,
-            },
-        )
+        params = {
+            "latitude": lat,
+            "longitude": lon,
+            "daily": list(daily),
+            "models": model,
+            "forecast_days": days,
+            "timezone": "UTC",
+            "_issue_date": issue_date,
+        }
+        if past_days:
+            params["past_days"] = int(past_days)
+        return self.get("forecast", params)
 
     def ensemble_daily(
         self,

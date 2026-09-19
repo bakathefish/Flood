@@ -1125,3 +1125,60 @@ def test_melt_window_warns_once_per_gap(caplog):
     msgs = [r.getMessage() for r in caplog.records if "melt series" in r.getMessage()]
     assert len(msgs) == 1, msgs
     assert "2016-01-01" in msgs[0]
+
+
+# --- the snowmelt term in the live tests and its horizon contribution ------------------
+def _live_melt_inputs():
+    from tests.test_inflow import _synthetic_melt
+
+    state, rain = _synthetic_melt(c_melt=0.6)
+    rain = rain.copy()
+    rain["catchment"] = "Pong"
+    p = inflow.calibrate(state, rain, "Pong", 12560.0, melt=True)
+    assert p.has_melt and p.c_melt > 0
+    rs = rain.set_index(pd.to_datetime(rain["date"]))["rain_mm"].sort_index()
+    melt = verify.melt_series_for(rain, "Pong", p)
+    assert melt is not None and (melt > 0).any()
+    return rain, rs, melt, p
+
+
+def test_live_horizon_test_takes_the_melt_series():
+    _, rs, melt, p = _live_melt_inputs()
+    days = pd.date_range("2010-07-05", "2010-08-31", freq="D")
+    b = pd.DataFrame({"inflow_cusecs": [50_000.0] * len(days)}, index=days)
+    without = verify.live_horizon_test(b, rs, p, None, None, horizons=(1, 3), models=())
+    with_melt = verify.live_horizon_test(
+        b, rs, p, None, None, horizons=(1, 3), models=(), melt=melt
+    )
+    for h in (1, 3):
+        a = without[without["horizon_days"] == h].set_index("rain")
+        m = with_melt[with_melt["horizon_days"] == h].set_index("rain")
+        assert a.loc["observed rain", "mean_pred_cusecs"] != m.loc["observed rain", "mean_pred_cusecs"]
+        assert a.loc["persistence", "mean_pred_cusecs"] == m.loc["persistence", "mean_pred_cusecs"]
+
+
+def test_horizon_contribution_is_each_response_alone():
+    _, rs, melt, p = _live_melt_inputs()
+    idx = pd.date_range("2010-06-01", "2010-09-25", freq="D")
+    hc = verify.horizon_contribution(rs, melt, p, idx, horizon=5)
+    assert hc["n_days"] == len(idx)
+    assert hc["melt_mean_bcm"] > 0 and hc["melt_max_bcm"] >= hc["melt_mean_bcm"]
+    assert hc["rain_mean_bcm"] > 0 and hc["rain_max_bcm"] >= hc["rain_mean_bcm"]
+    # the melt response over the horizon from one issue day, by hand: the model's daily
+    # volumes with no base and no rain, summed over the five days
+    d = idx[40]
+    n = inflow.history_days(p)
+    mh = melt.reindex(pd.date_range(d - pd.Timedelta(days=n - 1), d)).fillna(0.0).to_numpy()
+    mf = melt.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=5)).fillna(0.0).to_numpy()
+    by_hand = float(
+        inflow.predict_daily_bcm(
+            p, np.zeros(5), 0.0, rain_mm_recent=np.zeros(n), melt_bcm_recent=mh, melt_bcm_forecast=mf
+        ).sum()
+    )
+    assert hc["melt_by_day"][d.strftime("%Y-%m-%d")] == pytest.approx(by_hand)
+    zero = verify.horizon_contribution(rs, melt * 0.0, p, idx, horizon=5)
+    assert zero["melt_mean_bcm"] == 0.0 and zero["melt_max_bcm"] == 0.0
+    assert zero["rain_mean_bcm"] == pytest.approx(hc["rain_mean_bcm"])
+    # an issue day whose horizon runs past the rain record is skipped, not zeroed
+    late = verify.horizon_contribution(rs, melt, p, pd.date_range("2010-09-28", "2010-09-30"), horizon=5)
+    assert late["n_days"] == 0 and late["melt_mean_bcm"] is None

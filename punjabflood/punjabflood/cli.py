@@ -411,31 +411,72 @@ def _flood_scale_truth(
     return periods, points, peaks, record_days
 
 
+def fit_params(
+    state: pd.DataFrame,
+    rain_daily: pd.DataFrame,
+    cats: dict,
+    wetness: str = "api",
+    melt: bool = False,
+    dams=DAM_NAMES,
+    echo=None,
+) -> dict[str, inflow.InflowParams]:
+    """The inflow parameters per dam (``inflow.calibrate`` on the storage record and the
+    catchment rain over the IMD-covered area). With ``melt`` the dams in ``SNOWMELT_DAMS``
+    get the snowmelt block fitted from the rain table's ``melt_bcm`` column; the others are
+    fitted as without it. A dam the record cannot fit is reported through ``echo`` and left
+    out."""
+    params: dict[str, inflow.InflowParams] = {}
+    for dam in dams:
+        r = rain_daily[rain_daily["catchment"] == dam]
+        if dam not in cats or r.empty or not (state["dam"] == dam).any():
+            if echo:
+                echo(f"{dam}: no catchment or no record, not fitted")
+            continue
+        area = _covered_area(rain_daily, dam, cats[dam].area_km2)
+        with_melt = bool(melt and dam in SNOWMELT_DAMS)
+        try:
+            p = inflow.calibrate(state, r, dam, area, wetness=wetness, melt=with_melt)
+        except ValueError as exc:
+            if echo:
+                echo(f"{dam}: {exc}")
+            continue
+        params[dam] = p
+    return params
+
+
 @app.command("calibrate")
-def calibrate(wetness: str = "api"):
+def calibrate(wetness: str = "api", melt: bool = False):
     """Fit the inflow model per dam on storage changes and catchment rain. ``--wetness``
     picks the carrier of catchment wetness: api (the five-day rain index), api+sm (the index
-    and the ERA5-Land soil-moisture anomaly) or sm (the anomaly alone)."""
+    and the ERA5-Land soil-moisture anomaly) or sm (the anomaly alone). ``--melt`` adds the
+    degree-day snowmelt term at Bhakra from the melt table (``scripts/pull_snow_bhakra.py``);
+    the parameter file then carries ``c_melt`` and ``w_melt`` for Bhakra and the product and
+    every score run with the term."""
     _log()
     state, _, _ = _state()
     rain_daily = pd.read_csv(RAIN_CSV)
     cats = catchments_mod.load_geojson()
+    if melt:
+        if not MELT_CSV.exists():
+            raise typer.BadParameter(
+                f"--melt needs the melt table at {MELT_CSV.as_posix()}; "
+                "run scripts/pull_snow_bhakra.py first"
+            )
+        rain_daily = _with_melt(rain_daily, pd.read_csv(MELT_CSV), cats)
+    fitted = fit_params(state, rain_daily, cats, wetness=wetness, melt=melt, echo=typer.echo)
     params = {}
-    for dam in DAM_NAMES:
-        r = rain_daily[rain_daily["catchment"] == dam]
-        area = _covered_area(rain_daily, dam, cats[dam].area_km2)
-        try:
-            p = inflow.calibrate(state, r, dam, area, wetness=wetness)
-        except ValueError as exc:
-            typer.echo(f"{dam}: {exc}")
-            continue
+    for dam, p in fitted.items():
         params[dam] = p.to_dict()
-        typer.echo(
+        area = _covered_area(rain_daily, dam, cats[dam].area_km2)
+        line = (
             f"{dam}: c={p.c:.3f} w={tuple(round(x, 2) for x in p.w)} rho={p.rho:.3f} "
             f"wetness={p.wetness} gamma={p.gamma:.2f} r2={p.r2:.3f} rmse={p.rmse_bcm:.4f} "
             f"BCM/day n={p.n_days} "
             f"area={area:,.0f} km2"
         )
+        if p.has_melt:
+            line += f" c_melt={p.c_melt:.3f} w_melt={tuple(round(x, 2) for x in p.w_melt)}"
+        typer.echo(line)
     PARAMS_JSON.write_text(json.dumps(params, indent=2), encoding="utf-8")
     typer.echo(f"wrote {PARAMS_JSON}")
 
@@ -766,6 +807,18 @@ def run_verify(horizon_days: int = 5):
             if variant_rows:
                 loso_df = pd.DataFrame(variant_rows)
                 loso_df.to_csv(out / "inflow_variants.csv", index=False)
+                # every verdict compares against the baseline refit of the variant table
+                # (no melt, api wetness), not the parameters in use, so a term the file
+                # carries never judges itself; the in-use check stays under its own name
+                pp_baseline = {
+                    dam: verify.perfect_prog_hei(
+                        state_measured, rain_daily, dam, dam, p_b, horizon_days, "model"
+                    )
+                    for (dam, name), p_b in variant_params.items()
+                    if name == "baseline"
+                }
+                fs_baseline = verify.flood_scale_inflow_check(pp_baseline, *truth)
+                summaries["baseline"] = verify.flood_scale_summary(fs_baseline)
                 verdicts = []
                 for name, by_dam in pp_variant.items():
                     if not by_dam or name == SNOWMELT_VARIANT:
@@ -787,7 +840,9 @@ def run_verify(horizon_days: int = 5):
                 # the snowmelt variant is judged at the dams it touches only: the baseline's
                 # flood-scale summary over those dams against the variant's
                 if pp_variant.get(SNOWMELT_VARIANT):
-                    base_sub = verify.flood_scale_summary(fs[fs["dam"].isin(SNOWMELT_DAMS)])
+                    base_sub = verify.flood_scale_summary(
+                        fs_baseline[fs_baseline["dam"].isin(SNOWMELT_DAMS)]
+                    )
                     var_sub = verify.flood_scale_summary(
                         verify.flood_scale_inflow_check(pp_variant[SNOWMELT_VARIANT], *truth)
                     )
@@ -800,12 +855,34 @@ def run_verify(horizon_days: int = 5):
                         {d: p.to_dict() for d, p in p_melt.items()},
                         out / "inflow_params_snowmelt.json",
                     )
+                    # how much a five-day forecast owes to the term against the rain
+                    # response, over the last full monsoon in the melt table
+                    hc_year = pd.Timestamp.now(tz="UTC").year - 1
+                    hc = {}
+                    for d, p in p_melt.items():
+                        r_d = rain_daily[rain_daily["catchment"] == d].copy()
+                        r_d["date"] = pd.to_datetime(r_d["date"])
+                        rs_d = r_d.set_index("date")["rain_mm"].astype(float).sort_index()
+                        melt_d = verify.melt_series_for(rain_daily, d, p)
+                        if melt_d is not None and len(melt_d):
+                            last = melt_d.index.max()
+                            hc_year = last.year if last >= pd.Timestamp(f"{last.year}-09-30") else last.year - 1
+                        season = pd.date_range(f"{hc_year}-06-01", f"{hc_year}-09-30")
+                        hc[d] = verify.horizon_contribution(rs_d, melt_d, p, season, horizon_days)
+                        hc[d].pop("melt_by_day", None)
                     results["snowmelt_verdict"] = {
                         **verify.variant_verdict(
                             base_sub, var_sub, loso_df, SNOWMELT_VARIANT, dams=SNOWMELT_DAMS
                         ),
+                        "baseline_basis": "no-melt refit (variant table row baseline)",
                         "baseline_flood_scale": base_sub,
                         "variant_flood_scale": var_sub,
+                        "product_params_carry_melt": {
+                            d: bool(params[d].has_melt) for d in SNOWMELT_DAMS if d in params
+                        },
+                        "horizon_contribution_year": int(hc_year),
+                        "horizon_contribution_2025": hc.get("Bhakra", {}),
+                        "horizon_contribution": hc,
                         "params": {
                             d: {
                                 "c": p.c,
@@ -882,6 +959,7 @@ def run_verify(horizon_days: int = 5):
         preds, persist = {}, {}
         n_hist = inflow.history_days(params[dam])
         sm = verify.sm_anomaly_series_for(rain_daily, dam, params[dam])
+        melt_live = verify.melt_series_for(rain_daily, dam, params[dam])
         for d in b.index:
             prev = d - pd.Timedelta(days=1)
             if prev not in b.index:
@@ -891,11 +969,22 @@ def run_verify(horizon_days: int = 5):
             if hist.isna().any() or fut.isna().any():
                 continue
             a = float(sm.get(prev, 0.0)) if sm is not None else 0.0
+            m_hist = verify._melt_window(melt_live, hist.index)
             base = inflow.base_from_observed(
-                params[dam], float(b.loc[prev, "inflow_cusecs"]), hist.to_numpy(), a
+                params[dam],
+                float(b.loc[prev, "inflow_cusecs"]),
+                hist.to_numpy(),
+                a,
+                melt_bcm_recent=m_hist,
             )
             vol = inflow.predict_daily_bcm(
-                params[dam], fut.to_numpy(), base, rain_mm_recent=hist.to_numpy(), sm_anom=a
+                params[dam],
+                fut.to_numpy(),
+                base,
+                rain_mm_recent=hist.to_numpy(),
+                sm_anom=a,
+                melt_bcm_recent=m_hist,
+                melt_bcm_forecast=verify._melt_window(melt_live, fut.index),
             )
             preds[d] = C.bcm_to_cusec_days(float(vol[0]))
             persist[d] = float(b.loc[prev, "inflow_cusecs"])  # the naive baseline
@@ -908,7 +997,7 @@ def run_verify(horizon_days: int = 5):
         results["live_2026"][dam] = live
         # the same season one to five days ahead, with observed rain, with the rain forecast
         # issued that day, and by persistence
-        lh = verify.live_horizon_test(b, rs, params[dam], qpf_live, dam, sm=sm)
+        lh = verify.live_horizon_test(b, rs, params[dam], qpf_live, dam, sm=sm, melt=melt_live)
         results["live_horizons"] += lh.to_dict(orient="records")
     if results["live_horizons"]:
         pd.DataFrame(results["live_horizons"]).to_csv(out / "live_horizons.csv", index=False)

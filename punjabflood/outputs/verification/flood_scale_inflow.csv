@@ -1,6 +1,6 @@
 dam,kind,start,end,truth_cusecs,model_cusecs,ratio,n_days,source
-Bhakra,period mean,2025-08-01,2025-08-24,57430.0,55912.62185565367,0.9735786497589007,24,"PAC data via The Wire, 8 Sep 2025"
-Bhakra,period mean,2025-08-25,2025-09-04,73400.0,81542.01089425803,1.1109265789408451,11,"PAC data via The Wire, 8 Sep 2025"
+Bhakra,period mean,2025-08-01,2025-08-24,57430.0,54832.45657772381,0.9547702695058995,24,"PAC data via The Wire, 8 Sep 2025"
+Bhakra,period mean,2025-08-25,2025-09-04,73400.0,80652.71480676493,1.0988108284300397,11,"PAC data via The Wire, 8 Sep 2025"
 Pong,period mean,2025-08-01,2025-08-24,77000.0,83012.35258375655,1.0780825010877475,19,"PAC data via The Wire, 8 Sep 2025"
 Pong,period mean,2025-08-25,2025-09-04,121600.0,137282.72399077995,1.1289697696610193,11,"PAC data via The Wire, 8 Sep 2025"
 Ranjit Sagar,period mean,2025-08-01,2025-08-24,38700.0,30074.860729874035,0.7771281842344712,20,"PAC data via The Wire, 8 Sep 2025"
@@ -11,51 +11,51 @@ Bhakra,day,2016-03-31,2016-03-31,6750.0,,,0,bhakra water level plummets
 Bhakra,day,2016-05-27,2016-05-27,18560.0,,,0,dry spell leads to drop in water level in 3 dams
 Pong,day,2016-05-27,2016-05-27,2965.0,,,0,dry spell leads to drop in water level in 3 dams
 Ranjit Sagar,day,2016-05-27,2016-05-27,8888.0,,,0,dry spell leads to drop in water level in 3 dams
-Bhakra,day,2016-07-02,2016-07-02,35627.0,61037.685129487276,1.71324234792397,1,bhakra pong dams filling up quickly
+Bhakra,day,2016-07-02,2016-07-02,35627.0,61842.983914407625,1.7358459571226212,1,bhakra pong dams filling up quickly
 Bhakra,day,2017-03-31,2017-03-31,8800.0,,,0,bhakra water level plummets
-Bhakra,day,2017-07-02,2017-07-02,34802.0,52855.420182327696,1.518746628996256,1,bhakra pong dams filling up quickly
+Bhakra,day,2017-07-02,2017-07-02,34802.0,53298.01784007424,1.5314642215985932,1,bhakra pong dams filling up quickly
 Bhakra,day,2020-05-13,2020-05-13,19548.0,,,0,water storage down to 10 bhakra can meet only 30 demand for irrigation
 Pong,day,2020-05-13,2020-05-13,5266.0,,,0,water storage down to 10 bhakra can meet only 30 demand for irrigation
 Pong,day,2020-09-01,2020-09-01,74960.0,59434.62522574491,0.7928845414320292,1,Water level in Pong Dam rises over 5 feet above danger mark as rains l
 Bhakra,day,2021-05-13,2021-05-13,15661.0,,,0,water storage down to 10 bhakra can meet only 30 demand for irrigation
 Pong,day,2021-05-13,2021-05-13,3565.0,,,0,water storage down to 10 bhakra can meet only 30 demand for irrigation
-Bhakra,day,2021-08-19,2021-08-19,90000.0,37520.9154996087,0.41689906110676334,1,Bhakra water level flood update
+Bhakra,day,2021-08-19,2021-08-19,90000.0,35959.1940074626,0.3995466000829178,1,Bhakra water level flood update
 Pong,day,2022-08-11,2022-08-11,86897.0,76787.57588743044,0.8836619893371513,1,"Himachal: भारी बारिश से पौंग बांध का जलस्तर 1351.20 फीट तक पहुंचा, पंड"
 Pong,day,2022-08-22,2022-08-22,50592.0,89471.56893199492,1.7684924282889571,1,"Water Level Rise: खतरे के निशान के नजदीक पहुंचा पौंग बांध का जलस्तर, झ"
 Ranjit Sagar,day,2023-07-06,2023-07-06,18000.0,26023.611996324602,1.4457562220180333,1,Jalandhar News: एक दिन की बारिश से रणजीत सागर डैम में 36 सेंटीमीटर बढ़
 Ranjit Sagar,day,2023-07-18,2023-07-18,25660.0,37516.89296934063,1.462076888906494,1,rain a boon for pspcl generates 144 lakh units daily at ranjit sagar d
-Bhakra,day,2023-08-14,2023-08-14,193324.0,91025.18224153038,0.4708426384801182,1,"BBMB via Himachal Tonite, Aug 2023"
-Bhakra,day,2023-08-14,2023-08-14,109834.0,91025.18224153038,0.8287523193321774,1,"हिमाचल में भारी बारिश का असर: भाखड़ा बांध का जलस्तर 1675 फीट पहुंचा, ख"
+Bhakra,day,2023-08-14,2023-08-14,193324.0,90537.61466309623,0.4683206154595199,1,"BBMB via Himachal Tonite, Aug 2023"
+Bhakra,day,2023-08-14,2023-08-14,109834.0,90537.61466309623,0.8243131877478398,1,"हिमाचल में भारी बारिश का असर: भाखड़ा बांध का जलस्तर 1675 फीट पहुंचा, ख"
 Pong,day,2023-08-14,2023-08-14,700000.0,233281.27833468054,0.3332589690495436,1,"Punjab: पौंग डैम में सात लाख क्यूसेक पानी पहुंचा, पंजाब के पांच जिलों "
 Pong,day,2023-08-14,2023-08-14,381330.0,233281.27833468054,0.6117569515503122,1,"Kangra News: पौंग बांध का पानी खतरे के निशान से सात फीट ऊपर, निचले क्ष"
 Pong,day,2023-08-14,2023-08-14,513000.0,233281.27833468054,0.454739333985732,1,"Pong Dam Kangra: खतरे के निशान से ऊपर पौंग बांध का जलस्तर, आज शाम 4 बज"
-Bhakra,day,2023-08-15,2023-08-15,85899.0,86995.40116165922,1.0127638408090807,1,"The Tribune, 15 Aug 2023"
+Bhakra,day,2023-08-15,2023-08-15,85899.0,89047.78568920268,1.0366568375557652,1,"The Tribune, 15 Aug 2023"
 Pong,day,2023-08-15,2023-08-15,142000.0,374722.5232870807,2.6388910090639484,1,"Several villages in Punjab's Hoshiarpur, Rupnagar inundated after wate"
-Bhakra,day,2023-08-22,2023-08-22,72835.0,39111.56877709903,0.5369886562380591,1,"The Tribune, 24 Aug 2023 (yesterday)"
+Bhakra,day,2023-08-22,2023-08-22,72835.0,39276.475954802554,0.5392527762037833,1,"The Tribune, 24 Aug 2023 (yesterday)"
 Pong,day,2023-08-22,2023-08-22,58702.0,46947.81553619405,0.7997651789750614,1,"The Tribune, 24 Aug 2023 (yesterday)"
-Bhakra,day,2023-08-23,2023-08-23,128406.0,60147.31706735864,0.4684151602523141,1,"The Tribune, 24 Aug 2023"
+Bhakra,day,2023-08-23,2023-08-23,128406.0,58857.13562305851,0.4583674876801591,1,"The Tribune, 24 Aug 2023"
 Pong,day,2023-08-23,2023-08-23,138674.0,68465.11847773571,0.4937127253683871,1,"The Tribune, 24 Aug 2023"
-Bhakra,day,2023-08-25,2023-08-25,52810.0,57025.92299279967,1.0798319066994826,1,"Rozana Spokesman, 25 Aug 2023"
-Bhakra,day,2023-08-25,2023-08-25,52810.0,57025.92299279967,1.0798319066994826,1,Mounting Rainfall Elevates Flood Concerns: Bhakra Dam Water Level Reac
-Bhakra,day,2024-06-21,2024-06-21,34525.0,38789.60588882932,1.123522256012435,1,"Heavy rainfall in HP but water level low in Bhakra, Pong dams"
+Bhakra,day,2023-08-25,2023-08-25,52810.0,57106.360237156645,1.0813550508834813,1,"Rozana Spokesman, 25 Aug 2023"
+Bhakra,day,2023-08-25,2023-08-25,52810.0,57106.360237156645,1.0813550508834813,1,Mounting Rainfall Elevates Flood Concerns: Bhakra Dam Water Level Reac
+Bhakra,day,2024-06-21,2024-06-21,34525.0,40011.988518377126,1.1589279802571217,1,"Heavy rainfall in HP but water level low in Bhakra, Pong dams"
 Pong,day,2024-06-21,2024-06-21,5389.0,44523.723136570414,8.26196384052151,1,"Heavy rainfall in HP but water level low in Bhakra, Pong dams"
-Bhakra,day,2024-06-30,2024-06-30,34162.0,43798.68299864414,1.2820877875605683,1,ਭਾਖੜਾ ਡੈਮ 'ਚ ਪਾਣੀ ਦਾ ਪੱਧਰ 1585.83 ਫੁੱਟ 'ਤੇ ਪੁੱਜਾ
-Bhakra,day,2024-08-02,2024-08-02,56073.0,51931.14617550696,0.9261346133701953,1,"1610.41 ਫੁੱਟ ਤੇ ਪਹੁੰਚਿਆਂ ਭਾਖੜਾ ਡੈਮ 'ਚ ਪਾਣੀ ਦਾ ਪੱਧਰ, ਬੀਤੇ ਵਰ੍ਹੇ ਦੇ ਮੁਕਾ"
+Bhakra,day,2024-06-30,2024-06-30,34162.0,46609.05335944109,1.36435376615658,1,ਭਾਖੜਾ ਡੈਮ 'ਚ ਪਾਣੀ ਦਾ ਪੱਧਰ 1585.83 ਫੁੱਟ 'ਤੇ ਪੁੱਜਾ
+Bhakra,day,2024-08-02,2024-08-02,56073.0,52684.664335354595,0.9395727771896384,1,"1610.41 ਫੁੱਟ ਤੇ ਪਹੁੰਚਿਆਂ ਭਾਖੜਾ ਡੈਮ 'ਚ ਪਾਣੀ ਦਾ ਪੱਧਰ, ਬੀਤੇ ਵਰ੍ਹੇ ਦੇ ਮੁਕਾ"
 Pong,day,2024-08-12,2024-08-12,59830.0,100436.06945556184,1.678690781473539,1,"Kangra News: 1,346 फीट तक पहुंचा पौंग का जलस्तर, खतरे के निशान के महज "
 Bhakra,day,2024-11-20,2024-11-20,6000.0,,,0,water level low in dams bbmb cautions member states
 Bhakra,day,2025-01-03,2025-01-03,4700.0,,,0,water level low in dams bbmb sounds warning
 Pong,day,2025-01-03,2025-01-03,2600.0,,,0,water level low in dams bbmb sounds warning
-Bhakra,day,2025-06-09,2025-06-09,21792.0,35687.2032811806,1.6376286380864813,1,"Dam level up, BBMB tells Punjab, Haryana to draw more water"
-Bhakra,day,2025-06-12,2025-06-12,28015.0,39771.88628670389,1.4196639759665854,1,"Una News: भाखड़ा डैम का जलस्तर पहुंचा 1,576 फीट के पार"
-Bhakra,day,2025-06-21,2025-06-21,32699.0,40651.365290598784,1.2431990363802803,1,"Heavy rainfall in HP but water level low in Bhakra, Pong dams"
+Bhakra,day,2025-06-09,2025-06-09,21792.0,37166.57598292343,1.7055146835041957,1,"Dam level up, BBMB tells Punjab, Haryana to draw more water"
+Bhakra,day,2025-06-12,2025-06-12,28015.0,43052.811804511024,1.5367771481174737,1,"Una News: भाखड़ा डैम का जलस्तर पहुंचा 1,576 फीट के पार"
+Bhakra,day,2025-06-21,2025-06-21,32699.0,42197.35435220921,1.290478435187902,1,"Heavy rainfall in HP but water level low in Bhakra, Pong dams"
 Pong,day,2025-06-21,2025-06-21,16602.0,51987.66646414411,3.131409858098067,1,"Heavy rainfall in HP but water level low in Bhakra, Pong dams"
-Bhakra,day,2025-06-29,2025-06-29,46103.0,70537.51335231373,1.5299983374685755,1,Una News: बीते वर्ष के मुकाबले भाखड़ा बांध के जलस्तर में आई 16 फीट की 
-Bhakra,day,2025-07-05,2025-07-05,44295.0,47784.55246606001,1.0787798276568465,1,"Bhakra Dam Water level increased, level reached 1584.21 feet"
+Bhakra,day,2025-06-29,2025-06-29,46103.0,70803.64062137759,1.5357707876142028,1,Una News: बीते वर्ष के मुकाबले भाखड़ा बांध के जलस्तर में आई 16 फीट की 
+Bhakra,day,2025-07-05,2025-07-05,44295.0,48734.758921557004,1.1002316045051812,1,"Bhakra Dam Water level increased, level reached 1584.21 feet"
 Pong,day,2025-07-20,2025-07-20,22345.0,43202.43583278458,1.933427425946949,1,पौंग बांध में पिछले नौ दिन में चार फीट तक बढ़ा जलस्तर
-Bhakra,day,2025-07-21,2025-07-21,43671.0,59578.9896366966,1.3642689573560622,1,Una News: भाखड़ा बांध का जलस्तर 1600 फीट के ऊपर पहुंचा
-Bhakra,day,2025-07-22,2025-07-22,77741.0,62047.607367549244,0.7981323544532389,1,"Bhakra Dam Water Level: ਭਾਖੜਾ, ਪੌਂਗ ਅਤੇ ਪੰਡੋਹ ਡੈਮਾਂ ਵਿੱਚ ਪਾਣੀ ਦੀ ਆਮਦ ਘ"
-Bhakra,day,2025-07-28,2025-07-28,45857.0,42449.18110589101,0.9256859608323922,1,"Una News: भाखड़ा बांध का जलस्तर बढ़ा, खतरे के निशान के करीब"
-Bhakra,day,2025-08-01,2025-08-01,190000.0,54781.662895581176,0.2883245415556904,1,"Centre rejects Punjab's claim that lapses at Bhakra, Pong dams exacerb"
+Bhakra,day,2025-07-21,2025-07-21,43671.0,57479.275023147406,1.3161886611973026,1,Una News: भाखड़ा बांध का जलस्तर 1600 फीट के ऊपर पहुंचा
+Bhakra,day,2025-07-22,2025-07-22,77741.0,61831.314252319404,0.7953501273757657,1,"Bhakra Dam Water Level: ਭਾਖੜਾ, ਪੌਂਗ ਅਤੇ ਪੰਡੋਹ ਡੈਮਾਂ ਵਿੱਚ ਪਾਣੀ ਦੀ ਆਮਦ ਘ"
+Bhakra,day,2025-07-28,2025-07-28,45857.0,42073.77917373912,0.9174996003606674,1,"Una News: भाखड़ा बांध का जलस्तर बढ़ा, खतरे के निशान के करीब"
+Bhakra,day,2025-08-01,2025-08-01,190000.0,54183.0108910273,0.2851737415317226,1,"Centre rejects Punjab's claim that lapses at Bhakra, Pong dams exacerb"
 Pong,day,2025-08-01,2025-08-01,350000.0,99436.71940083327,0.2841049125738094,1,"Centre rejects Punjab's claim that lapses at Bhakra, Pong dams exacerb"
 Pong,day,2025-08-02,2025-08-02,87586.0,,,0,"The Tribune, 2 Aug 2025"
 Pong,day,2025-08-02,2025-08-02,87586.0,,,0,Water level in Pong dam rises sharply due to heavy rainfall; BBMB warn
@@ -63,88 +63,88 @@ Pong,day,2025-08-03,2025-08-03,87586.0,,,0,"पोंग बांध में 
 Pong,day,2025-08-03,2025-08-03,87586.0,,,0,Himachal: Water level near danger mark at Pong dam
 Pong,day,2025-08-03,2025-08-03,87586.0,,,0,water level in pong dam nears danger mark bbmb to release 18995 cusecs
 Pong,day,2025-08-05,2025-08-05,74370.0,,,0,Kangra News: पौंग बांध का जलस्तर खतरे के निशान से 21 फीट दूर
-Bhakra,day,2025-08-06,2025-08-06,59200.0,82042.67416797318,1.3858559825671144,1,"Babushahi, 6 Aug 2025"
-Bhakra,day,2025-08-06,2025-08-06,59200.0,82042.67416797318,1.3858559825671144,1,"Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy "
+Bhakra,day,2025-08-06,2025-08-06,59200.0,79844.88472054836,1.3487311608200736,1,"Babushahi, 6 Aug 2025"
+Bhakra,day,2025-08-06,2025-08-06,59200.0,79844.88472054836,1.3487311608200736,1,"Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy "
 Pong,day,2025-08-06,2025-08-06,93650.0,,,0,"Babushahi, 6 Aug 2025"
 Pong,day,2025-08-06,2025-08-06,93650.0,,,0,"Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy "
 Ranjit Sagar,day,2025-08-06,2025-08-06,24000.0,,,0,"Water levels surge at Bhakra, Pong, and Ranjit Sagar dams after heavy "
-Bhakra,day,2025-08-07,2025-08-07,70352.0,69513.04346038855,0.9880748729302443,1,Una News: भाखड़ा बांध का जलस्तर पहुंचा 1638 फीट के पार
+Bhakra,day,2025-08-07,2025-08-07,70352.0,68773.90352082519,0.977568562668086,1,Una News: भाखड़ा बांध का जलस्तर पहुंचा 1638 फीट के पार
 Pong,day,2025-08-07,2025-08-07,190000.0,121176.06168257145,0.6377687456977444,1,"Punjab: 23,000 cusecs of water released from Pong dam"
 Pong,day,2025-08-09,2025-08-09,52518.0,61410.26414556038,1.1693184078898735,1,"पंजाब में आज भारी बारिश का अलर्ट: पौंग बांध से फिर छोड़ा जाएगा पानी, ज"
-Bhakra,day,2025-08-16,2025-08-16,89361.0,65751.54718002923,0.7357969044664813,1,Una News: भाखड़ा बांध का जलस्तर पहुंचा 1658 फीट के पार
+Bhakra,day,2025-08-16,2025-08-16,89361.0,65342.13411415125,0.7312153413027076,1,Una News: भाखड़ा बांध का जलस्तर पहुंचा 1658 फीट के पार
 Pong,day,2025-08-17,2025-08-17,109789.0,116416.73599406586,1.060367942089516,1,"The Tribune, 17 Aug 2025"
 Pong,day,2025-08-17,2025-08-17,109789.0,116416.73599406586,1.060367942089516,1,"Water level in Pong Dam touches 1,379.98 feet, BBMB orders release of "
-Bhakra,day,2025-08-19,2025-08-19,65617.0,50860.344708711214,0.7751092660242196,1,"Babushahi, 19 Aug 2025"
-Bhakra,day,2025-08-19,2025-08-19,65617.0,50860.344708711214,0.7751092660242196,1,Breaking: All four floodgates of Bhakra dam opened
-Bhakra,day,2025-08-19,2025-08-19,70500.0,50860.344708711214,0.7214233292015775,1,"BBMB Releases Water From Pong & Bhakra Dams, Flood Alert Issued in Sev"
+Bhakra,day,2025-08-19,2025-08-19,65617.0,50104.8581868938,0.7635956868935458,1,"Babushahi, 19 Aug 2025"
+Bhakra,day,2025-08-19,2025-08-19,65617.0,50104.8581868938,0.7635956868935458,1,Breaking: All four floodgates of Bhakra dam opened
+Bhakra,day,2025-08-19,2025-08-19,70500.0,50104.8581868938,0.7107072083247348,1,"BBMB Releases Water From Pong & Bhakra Dams, Flood Alert Issued in Sev"
 Pong,day,2025-08-19,2025-08-19,84000.0,101774.94077406966,1.2116064377865436,1,"BBMB Releases Water From Pong & Bhakra Dams, Flood Alert Issued in Sev"
-Bhakra,day,2025-08-25,2025-08-25,48000.0,64419.948887883605,1.342082268497575,1,"Amid heavy rainfall in Himachal: BBMB keeps close watch, says Bhakra w"
+Bhakra,day,2025-08-25,2025-08-25,48000.0,62116.224147552784,1.2940880030740163,1,"Amid heavy rainfall in Himachal: BBMB keeps close watch, says Bhakra w"
 Pong,day,2025-08-25,2025-08-25,146174.0,104157.23941374957,0.7125565381924936,1,"Diary Times, 25 Aug 2025"
 Pong,day,2025-08-25,2025-08-25,151000.0,104157.23941374957,0.6897830424751628,1,"Kangra News: पौंग बांध का जलस्तर बढ़ा, घराट जलमग्न"
 Pong,day,2025-08-26,2025-08-26,233000.0,175209.70325120323,0.7519729753270525,1,"Water level in Pong dam reaches 1,390 feet"
-Bhakra,day,2025-08-27,2025-08-27,58997.0,62324.92986100058,1.05640845909115,1,"The Tribune, 28 Aug 2026 (same date last year)"
-Bhakra,day,2025-08-27,2025-08-27,58997.0,62324.92986100058,1.05640845909115,1,Bilaspur News: भाखड़ा बांध में पिछले साल से 37 फीट कम पानी
-Bhakra,day,2025-08-27,2025-08-27,59364.0,62324.92986100058,1.0498775328650458,1,"Punjab's power demand stays above 16,000 MW, but why is Bhakra inflow "
+Bhakra,day,2025-08-27,2025-08-27,58997.0,60632.92883336947,1.0277290172952773,1,"The Tribune, 28 Aug 2026 (same date last year)"
+Bhakra,day,2025-08-27,2025-08-27,58997.0,60632.92883336947,1.0277290172952773,1,Bilaspur News: भाखड़ा बांध में पिछले साल से 37 फीट कम पानी
+Bhakra,day,2025-08-27,2025-08-27,59364.0,60632.92883336947,1.0213753930558835,1,"Punjab's power demand stays above 16,000 MW, but why is Bhakra inflow "
 Pong,day,2025-08-27,2025-08-27,228091.0,203537.41298700517,0.8923517937446246,1,"The Tribune, 28 Aug 2026 (same date last year)"
 Ranjit Sagar,day,2025-08-27,2025-08-27,163037.0,109545.50435969727,0.6719057904628843,1,"The Tribune, 28 Aug 2026 (same date last year)"
 Ranjit Sagar,day,2025-08-27,2025-08-27,7073.0,109545.50435969727,15.487841702205184,1,Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i
-Bhakra,day,2025-08-28,2025-08-28,53856.0,57537.38781062122,1.0683561313618022,1,Water level drops in Punjab's Ranjit Sagar Dam
-Bhakra,day,2025-08-28,2025-08-28,54213.0,57537.38781062122,1.0613208605061741,1,water levels recede in punjab dams bringing relief to flood affected a
+Bhakra,day,2025-08-28,2025-08-28,53856.0,55806.00714782437,1.0362077976051762,1,Water level drops in Punjab's Ranjit Sagar Dam
+Bhakra,day,2025-08-28,2025-08-28,54213.0,55806.00714782437,1.029384227912574,1,water levels recede in punjab dams bringing relief to flood affected a
 Pong,day,2025-08-28,2025-08-28,110000.0,126932.69229166715,1.1539335662878831,1,Water level drops in Punjab's Ranjit Sagar Dam
 Pong,day,2025-08-28,2025-08-28,79780.0,126932.69229166715,1.5910339971379688,1,pong dam water level remains above danger mark high discharge continue
 Pong,day,2025-08-28,2025-08-28,144741.0,126932.69229166715,0.8769643175856678,1,water levels recede in punjab dams bringing relief to flood affected a
-Bhakra,day,2025-08-29,2025-08-29,49137.0,72173.15064395606,1.4688147555600883,1,"Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas"
-Bhakra,day,2025-08-29,2025-08-29,49137.0,72173.15064395606,1.4688147555600883,1,water levels recede in punjab dams bringing relief to flood affected a
+Bhakra,day,2025-08-29,2025-08-29,49137.0,70409.69692140148,1.4329262454240488,1,"Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas"
+Bhakra,day,2025-08-29,2025-08-29,49137.0,70409.69692140148,1.4329262454240488,1,water levels recede in punjab dams bringing relief to flood affected a
 Pong,day,2025-08-29,2025-08-29,61371.0,116118.9063998768,1.8920810545677405,1,"Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas"
 Pong,day,2025-08-29,2025-08-29,61371.0,116118.9063998768,1.8920810545677405,1,water levels recede in punjab dams bringing relief to flood affected a
 Ranjit Sagar,day,2025-08-29,2025-08-29,54623.0,52899.51001113673,0.9684475406172625,1,"Punjab Dams' Water Level Recede, Bring Relief To Flood-Hit Areas"
 Pong,day,2025-08-31,2025-08-31,160276.0,121294.22128070219,0.7567834315849047,1,"The Tribune, 31 Aug 2025"
 Pong,day,2025-08-31,2025-08-31,160276.0,121294.22128070219,0.7567834315849047,1,pong dam level remains above danger mark 84952 cusecs water discharged
-Bhakra,day,2025-09-01,2025-09-01,107565.0,103902.06506724423,0.9659467769929273,1,Una News: खतरे के निशान से मात्र तीन फीट की दूरी पर भाखड़ा डैम का जलस्
-Bhakra,day,2025-09-01,2025-09-01,107000.0,103902.06506724423,0.9710473370770488,1,"Amid Heavy Rain, Bhakra Dam Level Rises 3 ft In 24 Hours, Authorities "
-Bhakra,day,2025-09-02,2025-09-02,107000.0,108619.67158454008,1.0151371176125241,1,"Bhakra Dam level rises 3 ft in 24 hours, triggers flood alarm downstre"
+Bhakra,day,2025-09-01,2025-09-01,107565.0,102895.83889363294,0.9565921897795095,1,Una News: खतरे के निशान से मात्र तीन फीट की दूरी पर भाखड़ा डैम का जलस्
+Bhakra,day,2025-09-01,2025-09-01,107000.0,102895.83889363294,0.9616433541461022,1,"Amid Heavy Rain, Bhakra Dam Level Rises 3 ft In 24 Hours, Authorities "
+Bhakra,day,2025-09-02,2025-09-02,107000.0,110069.25909876594,1.028684664474448,1,"Bhakra Dam level rises 3 ft in 24 hours, triggers flood alarm downstre"
 Pong,day,2025-09-02,2025-09-02,96777.0,134699.9284947273,1.3918588972041632,1,"Bhakra Dam level rises 3 ft in 24 hours, triggers flood alarm downstre"
 Pong,day,2025-09-02,2025-09-02,96777.0,134699.9284947273,1.3918588972041632,1,"Amid Heavy Rain, Bhakra Dam Level Rises 3 ft In 24 Hours, Authorities "
-Bhakra,day,2025-09-03,2025-09-03,110000.0,102327.15265009609,0.9302468422736008,1,"Una News: भाखड़ा बांध का जलस्तर 1678 फीट पार, दो फीट रह गया खतरे का नि"
-Bhakra,day,2025-09-03,2025-09-03,86822.0,102327.15265009609,1.1785855272868178,1,record rain red alert in punjab himachal j&k chandigarh's sukhna gates
+Bhakra,day,2025-09-03,2025-09-03,110000.0,101981.88273971339,0.9271080249064854,1,"Una News: भाखड़ा बांध का जलस्तर 1678 फीट पार, दो फीट रह गया खतरे का नि"
+Bhakra,day,2025-09-03,2025-09-03,86822.0,101981.88273971339,1.1746087712758677,1,record rain red alert in punjab himachal j&k chandigarh's sukhna gates
 Pong,day,2025-09-03,2025-09-03,155261.0,151828.66315042417,0.9778931164324858,1,heavy rainfall swells pong dam water level above danger mark for 4th d
-Bhakra,day,2025-09-04,2025-09-04,95435.0,93306.83755831943,0.9777003987878601,1,BBMB Reservoir Data (data-reservoir.htm archived capture)
-Bhakra,day,2025-09-04,2025-09-04,95435.0,93306.83755831943,0.9777003987878601,1,bhakra to release more water into punjab as pong dam hits full capacit
+Bhakra,day,2025-09-04,2025-09-04,95435.0,93866.45344275408,0.9835642420784206,1,BBMB Reservoir Data (data-reservoir.htm archived capture)
+Bhakra,day,2025-09-04,2025-09-04,95435.0,93866.45344275408,0.9835642420784206,1,bhakra to release more water into punjab as pong dam hits full capacit
 Pong,day,2025-09-04,2025-09-04,107301.0,147004.2445032207,1.3700174695782956,1,"The Tribune, 4 Sep 2025 (actual inflow)"
 Pong,day,2025-09-04,2025-09-04,132595.0,147004.2445032207,1.1086710999903517,1,BBMB Reservoir Data (data-reservoir.htm archived capture)
 Pong,day,2025-09-04,2025-09-04,132595.0,147004.2445032207,1.1086710999903517,1,bhakra to release more water into punjab as pong dam hits full capacit
-Bhakra,day,2025-09-05,2025-09-05,76318.0,67119.76968114947,0.87947495585772,1,"SDO Nangal via Babushahi, 5 Sep 2025"
-Bhakra,day,2025-09-05,2025-09-05,76318.0,67119.76968114947,0.87947495585772,1,Bhakra reservoir water level data (SDO Nangal Dam office)
+Bhakra,day,2025-09-05,2025-09-05,76318.0,66699.40548163195,0.873966894856154,1,"SDO Nangal via Babushahi, 5 Sep 2025"
+Bhakra,day,2025-09-05,2025-09-05,76318.0,66699.40548163195,0.873966894856154,1,Bhakra reservoir water level data (SDO Nangal Dam office)
 Pong,day,2025-09-05,2025-09-05,105950.0,113008.45462518357,1.0666206193976742,1,"The Tribune, 6 Sep 2025 (yesterday)"
 Pong,day,2025-09-05,2025-09-05,99673.0,113008.45462518357,1.1337920462430504,1,"Kangra News: पौंग बांध का जलस्तर 1394.80 फीट पर स्थिर, खतरे से 4.80 फी"
 Pong,day,2025-09-05,2025-09-05,105950.0,113008.45462518357,1.0666206193976742,1,Punjab floods: Bhakra water level drops; Pong dam continues high outfl
-Bhakra,day,2025-09-06,2025-09-06,62481.0,56139.03293982175,0.898497670328928,1,"The Tribune, 6 Sep 2025"
-Bhakra,day,2025-09-06,2025-09-06,51332.0,56139.03293982175,1.0936459311895455,1,"Punjab: Pong releases 99,889 cusecs as water level exceeds limit"
-Bhakra,day,2025-09-06,2025-09-06,62481.0,56139.03293982175,0.898497670328928,1,"Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
-Bhakra,day,2025-09-06,2025-09-06,62481.0,56139.03293982175,0.898497670328928,1,Punjab floods: Bhakra water level drops; Pong dam continues high outfl
+Bhakra,day,2025-09-06,2025-09-06,62481.0,55269.599901573354,0.8845825115086723,1,"The Tribune, 6 Sep 2025"
+Bhakra,day,2025-09-06,2025-09-06,51332.0,55269.599901573354,1.0767084840172476,1,"Punjab: Pong releases 99,889 cusecs as water level exceeds limit"
+Bhakra,day,2025-09-06,2025-09-06,62481.0,55269.599901573354,0.8845825115086723,1,"Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
+Bhakra,day,2025-09-06,2025-09-06,62481.0,55269.599901573354,0.8845825115086723,1,Punjab floods: Bhakra water level drops; Pong dam continues high outfl
 Pong,day,2025-09-06,2025-09-06,98418.0,75537.47967487983,0.7675169143335551,1,"The Tribune, 6 Sep 2025"
 Pong,day,2025-09-06,2025-09-06,47162.0,75537.47967487983,1.60165980397099,1,"Punjab: Pong releases 99,889 cusecs as water level exceeds limit"
 Pong,day,2025-09-06,2025-09-06,47162.0,75537.47967487983,1.60165980397099,1,Punjab: Water level in Pong dam dips by 2 feet but outflow still high
 Pong,day,2025-09-06,2025-09-06,98418.0,75537.47967487983,0.7675169143335551,1,Punjab floods: Bhakra water level drops; Pong dam continues high outfl
 Ranjit Sagar,day,2025-09-06,2025-09-06,24947.0,22582.02442088607,0.9052000008372177,1,"Punjab: Pong releases 99,889 cusecs as water level exceeds limit"
-Bhakra,day,2025-09-07,2025-09-07,66900.0,47646.75420653801,0.7122085830573693,1,Punjab: Water level in Pong dam dips by 2 feet but outflow still high
+Bhakra,day,2025-09-07,2025-09-07,66900.0,46889.35201568695,0.700887175122376,1,Punjab: Water level in Pong dam dips by 2 feet but outflow still high
 Pong,day,2025-09-07,2025-09-07,36968.0,58397.63139715122,1.5796805723098686,1,Punjab: Water level in Pong dam dips by 2 feet but outflow still high
-Bhakra,day,2025-09-08,2025-09-08,55338.0,43703.67475221035,0.7897588411617757,1,"Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
+Bhakra,day,2025-09-08,2025-09-08,55338.0,43357.84871379756,0.7835095000505541,1,"Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
 Pong,day,2025-09-08,2025-09-08,46500.0,54953.54475152494,1.181796661323117,1,Punjab: Water level in Pong dam dips by 2 feet but outflow still high
 Pong,day,2025-09-08,2025-09-08,35439.0,54953.54475152494,1.5506516761625593,1,"Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
 Ranjit Sagar,day,2025-09-08,2025-09-08,30500.0,19140.620746148634,0.6275613359392994,1,Punjab: Water level in Pong dam dips by 2 feet but outflow still high
 Ranjit Sagar,day,2025-09-08,2025-09-08,19782.0,19140.620746148634,0.9675776335127203,1,"Water level in Bhakra, Pong & Ranjit Sagar dams recedes"
-Bhakra,day,2025-09-14,2025-09-14,46708.0,46128.51824710914,0.9875935224610161,1,"पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख"
+Bhakra,day,2025-09-14,2025-09-14,46708.0,46070.40830916274,0.9863494114319333,1,"पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख"
 Pong,day,2025-09-14,2025-09-14,34737.0,70783.79838298121,2.0377061456942513,1,"पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख"
-Bhakra,day,2025-09-15,2025-09-15,54667.0,44853.21639075868,0.8204806627537395,1,BBMB Reservoir Data res_data.pdf (archived capture)
-Bhakra,day,2025-09-15,2025-09-15,40999.0,44853.21639075868,1.0940075706909602,1,water level at pong dam rises amid surplus rain in parts of himachal p
+Bhakra,day,2025-09-15,2025-09-15,54667.0,44977.11631918764,0.8227471110393407,1,BBMB Reservoir Data res_data.pdf (archived capture)
+Bhakra,day,2025-09-15,2025-09-15,40999.0,44977.11631918764,1.09702959387272,1,water level at pong dam rises amid surplus rain in parts of himachal p
 Pong,day,2025-09-15,2025-09-15,76498.0,83123.73162950129,1.086613135369569,1,BBMB Reservoir Data res_data.pdf (archived capture)
 Pong,day,2025-09-15,2025-09-15,80000.0,83123.73162950129,1.0390466453687661,1,"पौंग डैम का जलस्तर घटा, निचले इलाकों के लिए राहत, जल्द पटरी पर लौटेगी "
 Pong,day,2025-09-15,2025-09-15,64964.0,83123.73162950129,1.2795353061618941,1,water level at pong dam rises amid surplus rain in parts of himachal p
 Pong,day,2025-09-16,2025-09-16,160369.0,74344.50021407582,0.46358398577078996,1,Kangra News: पौंग बांध का जलस्तर खतरे के निशान से पांच फीट ऊपर
 Pong,day,2025-09-20,2025-09-20,38773.0,49898.22723509414,1.2869323301032713,1,Pong Dam water level sees decline
 Pong,day,2025-09-21,2025-09-21,31540.0,45577.679211324714,1.4450754347281138,1,Pong Dam water level sees decline
-Bhakra,day,2025-09-24,2025-09-24,35666.0,35817.32995465823,1.0042429752329454,1,BBMB Reservoir Data res_data.pdf (archived capture)
+Bhakra,day,2025-09-24,2025-09-24,35666.0,34673.1328735945,0.97216208359767,1,BBMB Reservoir Data res_data.pdf (archived capture)
 Pong,day,2025-09-24,2025-09-24,17291.0,40090.15623207463,2.318556256553966,1,BBMB Reservoir Data res_data.pdf (archived capture)
 Pong,day,2025-10-05,2025-10-05,10084.0,,,0,50000 cusecs of water released from pong dam
 Bhakra,day,2025-11-20,2025-11-20,7811.0,,,0,Himachal: पंजाब में नहरों की मरम्मत से और बढ़ेगा भाखड़ा डैम में पानी
@@ -163,11 +163,11 @@ Bhakra,day,2026-06-13,2026-06-13,19074.0,,,0,Bhakra Dam Water Level: ਭਾਖ�
 Bhakra,day,2026-06-14,2026-06-14,22581.0,,,0,ਭਾਖੜਾ ਡੈਮ ਅਪਡੇਟ: ਮੰਗ ਵਧਣ ਕਾਰਨ 3 ਦਿਨਾਂ 'ਚ 0.81 ਫੁੱਟ ਘਟਿਆ ਪਾਣੀ ਦਾ ਪੱਧਰ
 Bhakra,day,2026-06-24,2026-06-24,18715.0,,,0,BBMB Reservoir Data res_data.pdf (archived capture)
 Pong,day,2026-06-24,2026-06-24,3527.0,,,0,BBMB Reservoir Data res_data.pdf (archived capture)
-Bhakra,day,2026-06-28,2026-06-28,22137.0,37581.25070454426,1.6976668340129313,1,"Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r"
+Bhakra,day,2026-06-28,2026-06-28,22137.0,37344.20616774249,1.6869587644099242,1,"Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r"
 Pong,day,2026-06-28,2026-06-28,5723.0,42117.89128628874,7.359407878086447,1,"Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r"
 Ranjit Sagar,day,2026-06-28,2026-06-28,2006.0,,,0,"Below-normal monsoon may impact water-levels at Bhakra, Ranjit Sagar r"
-Bhakra,day,2026-06-29,2026-06-29,22734.0,42916.067453822754,1.8877481945026284,1,Una News: बीते वर्ष के मुकाबले भाखड़ा बांध के जलस्तर में आई 16 फीट की 
-Bhakra,day,2026-07-15,2026-07-15,40426.0,40752.3688324431,1.0080732407965938,1,22 फीट बढ़ा भाखड़ा का जलस्तर: पिछले साल से फिर भी नीचे...
+Bhakra,day,2026-06-29,2026-06-29,22734.0,42517.56875405585,1.870219440224151,1,Una News: बीते वर्ष के मुकाबले भाखड़ा बांध के जलस्तर में आई 16 फीट की 
+Bhakra,day,2026-07-15,2026-07-15,40426.0,39763.285113910366,0.9836067163189622,1,22 फीट बढ़ा भाखड़ा का जलस्तर: पिछले साल से फिर भी नीचे...
 Ranjit Sagar,day,2026-07-21,2026-07-21,43898.0,,,0,"Water levels at Bhakra, Pong and Pandoh dams substantially lower due t"
 Bhakra,day,2026-07-22,2026-07-22,36866.0,,,0,"Water levels at Bhakra, Pong and Pandoh dams substantially lower due t"
 Bhakra,day,2026-07-22,2026-07-22,36866.0,,,0,"Bhakra Dam Water Level: ਭਾਖੜਾ, ਪੌਂਗ ਅਤੇ ਪੰਡੋਹ ਡੈਮਾਂ ਵਿੱਚ ਪਾਣੀ ਦੀ ਆਮਦ ਘ"
@@ -176,35 +176,35 @@ Ranjit Sagar,day,2026-07-24,2026-07-24,96674.0,,,0,"ਰਣਜੀਤ ਸਾਗਰ
 Bhakra,day,2026-07-26,2026-07-26,40363.0,,,0,BBMB Reservoir Data res_data.pdf (archived capture)
 Pong,day,2026-07-26,2026-07-26,37172.0,,,0,BBMB Reservoir Data res_data.pdf (archived capture)
 Pong,day,2026-07-29,2026-07-29,61210.0,107557.74542645254,1.757192377494732,1,Kangra News: पौंग बांध का जलस्तर 11 दिन में 12 फीट बढ़ा
-Bhakra,day,2026-08-08,2026-08-08,41501.0,58841.976292051746,1.4178447818619249,1,BBMB Reservoir Data res_data.pdf (archived capture)
+Bhakra,day,2026-08-08,2026-08-08,41501.0,57592.01942901046,1.3877260651312129,1,BBMB Reservoir Data res_data.pdf (archived capture)
 Pong,day,2026-08-08,2026-08-08,48054.0,94698.90837638473,1.9706769129809116,1,BBMB Reservoir Data res_data.pdf (archived capture)
-Bhakra,day,2026-08-09,2026-08-09,40137.0,54533.04096572807,1.3586725705889346,1,BBMB Reservoir Data res_data.pdf (archived capture)
+Bhakra,day,2026-08-09,2026-08-09,40137.0,52848.16274101936,1.3166943902389157,1,BBMB Reservoir Data res_data.pdf (archived capture)
 Pong,day,2026-08-09,2026-08-09,34263.0,70121.38017145613,2.0465627695022657,1,BBMB Reservoir Data res_data.pdf (archived capture)
-Bhakra,day,2026-08-10,2026-08-10,41000.0,57124.8525145617,1.3932890857210172,1,"Himachal rain takes Bhakra Dam level to 1,612 feet, still far from 1,6"
+Bhakra,day,2026-08-10,2026-08-10,41000.0,55778.17690654962,1.360443339184137,1,"Himachal rain takes Bhakra Dam level to 1,612 feet, still far from 1,6"
 Pong,day,2026-08-10,2026-08-10,48000.0,61781.294242797194,1.2871102967249415,1,"Himachal rain takes Bhakra Dam level to 1,612 feet, still far from 1,6"
 Ranjit Sagar,day,2026-08-12,2026-08-12,11645.0,,,0,Jalandhar News: रंजीत सागर बांध का जलस्तर 513.01 मीटर पहुंचा
-Bhakra,day,2026-08-21,2026-08-21,48309.0,46095.5587841811,0.9541815973044587,1,"Punjab, Haryana brace for rain on August 22; dam levels below normal a"
+Bhakra,day,2026-08-21,2026-08-21,48309.0,44883.60568886493,0.9290940754075832,1,"Punjab, Haryana brace for rain on August 22; dam levels below normal a"
 Pong,day,2026-08-21,2026-08-21,39639.0,62136.06677110037,1.5675487971719864,1,"Punjab, Haryana brace for rain on August 22; dam levels below normal a"
-Bhakra,day,2026-08-26,2026-08-26,42000.0,42434.31541369859,1.0103408431832999,1,"Punjab: Tighten taps, BBMB cautions partner states as weak monsoon str"
-Bhakra,day,2026-08-27,2026-08-27,30452.0,41230.85556057306,1.3539621555422652,1,Bilaspur News: भाखड़ा बांध में पिछले साल से 37 फीट कम पानी
-Bhakra,day,2026-08-27,2026-08-27,30452.0,41230.85556057306,1.3539621555422652,1,Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i
-Bhakra,day,2026-08-27,2026-08-27,30452.0,41230.85556057306,1.3539621555422652,1,"Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon"
-Bhakra,day,2026-08-27,2026-08-27,6163.0,41230.85556057306,6.690062560534327,1,"Punjab's power demand stays above 16,000 MW, but why is Bhakra inflow "
+Bhakra,day,2026-08-26,2026-08-26,42000.0,40840.43067644311,0.9723912065819788,1,"Punjab: Tighten taps, BBMB cautions partner states as weak monsoon str"
+Bhakra,day,2026-08-27,2026-08-27,30452.0,39685.51000179627,1.3032152240180044,1,Bilaspur News: भाखड़ा बांध में पिछले साल से 37 फीट कम पानी
+Bhakra,day,2026-08-27,2026-08-27,30452.0,39685.51000179627,1.3032152240180044,1,Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i
+Bhakra,day,2026-08-27,2026-08-27,30452.0,39685.51000179627,1.3032152240180044,1,"Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon"
+Bhakra,day,2026-08-27,2026-08-27,6163.0,39685.51000179627,6.4393168914159125,1,"Punjab's power demand stays above 16,000 MW, but why is Bhakra inflow "
 Pong,day,2026-08-27,2026-08-27,22202.0,51504.359533277406,2.3198072035527164,1,Punjab faces 34% monsoon deficit as key reservoirs record sharp drop i
 Pong,day,2026-08-27,2026-08-27,22202.0,51504.359533277406,2.3198072035527164,1,"Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon"
 Ranjit Sagar,day,2026-08-27,2026-08-27,7073.0,,,0,"Bhakra, Pong, Ranjit Sagar Dams see lower water levels this monsoon"
-Bhakra,day,2026-09-04,2026-09-04,42701.0,51184.26485669541,1.1986666555044474,1,BBMB Reservoir Data res_data.pdf (direct capture)
+Bhakra,day,2026-09-04,2026-09-04,42701.0,49078.64514136759,1.14935587319659,1,BBMB Reservoir Data res_data.pdf (direct capture)
 Pong,day,2026-09-04,2026-09-04,20102.0,64224.27994174548,3.194919905568873,1,BBMB Reservoir Data res_data.pdf (direct capture)
-Bhakra,day,2026-09-05,2026-09-05,41628.0,56443.490526605696,1.3559020497406962,1,BBMB Reservoir Data res_data.pdf (direct capture)
+Bhakra,day,2026-09-05,2026-09-05,41628.0,54222.39164050037,1.3025461622105403,1,BBMB Reservoir Data res_data.pdf (direct capture)
 Pong,day,2026-09-05,2026-09-05,22870.0,61254.096202213026,2.678360131272979,1,BBMB Reservoir Data res_data.pdf (direct capture)
 Bhakra,day,2026-09-14,2026-09-14,30199.0,,,0,"पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख"
 Pong,day,2026-09-14,2026-09-14,10751.0,,,0,"पंजाब में बढ़ी बिजली की मांग: 2173 मेगावाट उत्पादन ठप, मानसून की बेरुख"
 Bhakra,day,2026-09-17,2026-09-17,28368.0,,,0,BBMB Reservoir Data res_data.pdf (direct capture)
 Pong,day,2026-09-17,2026-09-17,11509.0,,,0,BBMB Reservoir Data res_data.pdf (direct capture)
-Bhakra,day,2025-09-15,2025-09-15,54667.0,44853.21639075868,0.8204806627537395,1,"BBMB daily sheet, Internet Archive"
-Bhakra,day,2025-09-24,2025-09-24,35666.0,35817.32995465823,1.0042429752329454,1,"BBMB daily sheet, Internet Archive"
+Bhakra,day,2025-09-15,2025-09-15,54667.0,44977.11631918764,0.8227471110393407,1,"BBMB daily sheet, Internet Archive"
+Bhakra,day,2025-09-24,2025-09-24,35666.0,34673.1328735945,0.97216208359767,1,"BBMB daily sheet, Internet Archive"
 Pong,day,2025-09-15,2025-09-15,76498.0,83123.73162950129,1.086613135369569,1,"BBMB daily sheet, Internet Archive"
 Pong,day,2025-09-24,2025-09-24,17291.0,40090.15623207463,2.318556256553966,1,"BBMB daily sheet, Internet Archive"
 Pong,record day,2023-08-14,2023-08-14,734000.0,233281.27833468054,0.31782190508812064,1,"BBMB Pong EAP, largest inflow recorded"
 Pong,season peak,2025-06-01,2025-09-30,349522.0,203537.41298700517,0.5823307631193606,112,"Rajya Sabha reply via PTI, 2 Dec 2025"
-Bhakra,season peak,2025-06-01,2025-09-30,190603.0,108619.67158454008,0.5698738822817063,121,"Rajya Sabha reply via PTI, 2 Dec 2025"
+Bhakra,season peak,2025-06-01,2025-09-30,190603.0,110069.25909876594,0.5774791535220638,121,"Rajya Sabha reply via PTI, 2 Dec 2025"

@@ -51,6 +51,20 @@ class FakeClient:
             d[f"precipitation_sum_{m}"] = [float(lon) if m == "gfs_seamless" else 1.0 for _ in t]
         return {"daily": d}
 
+    def forecast_daily_weather(self, lat, lon, model, days, issue_date=None, daily=(), past_days=0):
+        self.calls.append(("weather", lat, lon, model, days, past_days))
+        start = pd.Timestamp(issue_date or "2026-09-06") - pd.Timedelta(days=past_days)
+        t = pd.date_range(start, periods=past_days + days, freq="D")
+        return {
+            "daily": {
+                "time": [x.date().isoformat() for x in t],
+                "precipitation_sum": [1.0] * len(t),
+                "snowfall_sum": [0.7] * len(t),
+                "temperature_2m_max": [float(lat) + 5 for _ in t],
+                "temperature_2m_mean": [float(lat) for _ in t],
+            }
+        }
+
     def ensemble_daily(self, lat, lon, model, days, issue_date=None):
         t = pd.date_range("2026-09-06", periods=days, freq="D")
         d = {"time": [x.date().isoformat() for x in t], "precipitation_sum": [1.0] * days}
@@ -201,3 +215,20 @@ def test_merge_qpf_leads_replaces_only_the_pulled_model_seasons():
     assert sorted(g25["rain_mm"]) == [8.0, 9.0]  # the old 2025 GFS row is gone
     assert (out["model"] == "ecmwf_ifs025").sum() == 1  # other models untouched
     assert ((out["model"] == "gfs_seamless") & (year == 2024)).sum() == 1
+
+
+def test_weather_points_and_catchment_mean_with_past_days():
+    cat = _toy_catchment()
+    cli = FakeClient()
+    frames, w = rain.weather_points(
+        cli, cat, model="m", days=3, issue_date="2026-09-06", past_days=4
+    )
+    assert len(frames) == len(w) == (cat.points.weight_km2 > 0).sum()
+    f = next(iter(frames.values()))
+    assert list(f.columns) == ["precipitation_mm", "snowfall_cm", "t2m_max_c", "t2m_mean_c"]
+    assert f.index[0] == pd.Timestamp("2026-09-02") and len(f) == 7
+    assert all(c[5] == 4 for c in cli.calls if c[0] == "weather")
+    mean = rain.weather_catchment(cli, cat, model="m", days=3, issue_date="2026-09-06", past_days=4)
+    expected = (cat.points.lat * cat.points.weight_km2).sum() / cat.points.weight_km2.sum()
+    assert abs(mean["t2m_mean_c"].iloc[0] - expected) < 1e-9
+    assert len(mean) == 7 and (mean["model"] == "m").all() and (mean["catchment"] == "Toy").all()
