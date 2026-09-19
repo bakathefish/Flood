@@ -18,6 +18,11 @@ import {
   spillwayProbabilities,
   weatherRow,
   MAX_ISSUE_AGE_DAYS,
+  classLabel,
+  formatBulletinAsOn,
+  formatDate,
+  horizonLabels,
+  localName,
 } from './hazardSchema.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -132,4 +137,62 @@ test('the committed feed resolves to a watch', () => {
     assert.ok(d.p.every((x) => typeof x === 'number'));
   }
   assert.equal(r.snowmelt.applied, true);
+});
+
+test('dates are formatted once per language, and a non-ISO date is null', () => {
+  assert.equal(formatDate('2026-09-19', 'en'), '19 Sep 2026');
+  assert.equal(formatDate('2026-09-19', 'hi'), '19 सितंबर 2026');
+  assert.equal(formatDate('2026-09-19', 'pa'), '19 ਸਤੰਬਰ 2026');
+  assert.equal(formatDate('2026-01-05', 'en', {year: false, short: true}), '5 Jan');
+  assert.equal(formatDate('19-09-2026', 'en'), null);
+  assert.equal(formatDate('2026-13-01', 'en'), null);
+  assert.equal(formatDate(null, 'en'), null);
+});
+
+test('the bulletin as-on date takes the same form as the issue date', () => {
+  assert.equal(formatBulletinAsOn('19-09-2026', '06:00', 'en'), '19 Sep 2026 06:00');
+  assert.equal(formatBulletinAsOn('19-09-2026', '06:00', 'pa'), '19 ਸਤੰਬਰ 2026 06:00');
+  assert.equal(formatBulletinAsOn('19-09-2026', null, 'hi'), '19 सितंबर 2026');
+  assert.equal(formatBulletinAsOn('Sept 19', '06:00', 'en'), 'Sept 19 06:00');
+  assert.equal(formatBulletinAsOn(null, '06:00', 'en'), null);
+});
+
+test('horizon labels are the five calendar days after the issue date', () => {
+  assert.deepEqual(horizonLabels('2026-09-28', 'en'), ['29 Sep', '30 Sep', '1 Oct', '2 Oct', '3 Oct']);
+  assert.deepEqual(horizonLabels(null, 'en'), ['+1', '+2', '+3', '+4', '+5']);
+});
+
+test('names are shown in the reader’s script and fall back to the feed’s name', () => {
+  assert.equal(localName('Pong', 'hi'), 'पौंग');
+  assert.equal(localName('Ropar Head Works', 'pa'), 'ਰੋਪੜ ਹੈੱਡਵਰਕਸ');
+  assert.equal(localName('Pong', 'en'), 'Pong');
+  assert.equal(localName('New Station', 'hi'), 'New Station');
+  assert.equal(classLabel('High', 'hi'), 'उच्च (High)');
+  assert.equal(classLabel('Low', 'pa'), 'ਘੱਟ (Low)');
+  assert.equal(classLabel('Medium', 'en'), 'Medium');
+});
+
+test('the resolver carries the labels for the requested language', () => {
+  const r = resolveHazardState(feed({reaches: [{station: 'Dhilwan', river: 'Beas', peak_cusecs: 90000, peak_date: '2026-09-21', peak_class: 'High'}]}),
+    {nowMs: Date.parse('2026-09-19T12:00:00Z'), lang: 'pa'});
+  assert.equal(r.issue_label, '19 ਸਤੰਬਰ 2026');
+  assert.equal(r.bulletin_label, '19 ਸਤੰਬਰ 2026 06:00');
+  assert.deepEqual(r.horizon_labels, ['20 ਸਤੰ', '21 ਸਤੰ', '22 ਸਤੰ', '23 ਸਤੰ', '24 ਸਤੰ']);
+  assert.equal(r.dams[1].label, 'ਪੌਂਗ');
+  assert.equal(r.weather[0].label, 'ਭਾਖੜਾ');
+  assert.equal(r.reaches[0].label, 'ਧਿਲਵਾਂ');
+  assert.equal(r.reaches[0].river_label, 'ਬਿਆਸ');
+  assert.equal(r.reaches[0].peak_label, '21 ਸਤੰਬਰ 2026');
+  assert.equal(r.reaches[0].cls_label, 'ਉੱਚ (High)');
+  const en = resolveHazardState(feed(), {nowMs: Date.parse('2026-09-19T12:00:00Z')});
+  assert.equal(en.issue_label, '19 Sep 2026');
+  assert.equal(en.dams[0].label, 'Bhakra');
+  assert.equal(en.reaches[0].cls_label, null);
+});
+
+test('a malformed feed is unavailable for a named reason, a fetch failure for another', () => {
+  assert.equal(resolveHazardState(null, {fetchFailed: true}).reason, 'fetch');
+  assert.equal(resolveHazardState({issue_date: 'nope'}).reason, 'malformed');
+  assert.equal(resolveHazardState(feed({dams: {}})).reason, 'malformed');
+  assert.equal(resolveHazardState(feed()).reason, null);
 });

@@ -28,6 +28,96 @@ function isoDate(s) {
   return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null;
 }
 
+// ---- names and dates, one form per language --------------------------------
+// The feed carries Latin-script names; the page shows each in the reader's
+// script, falling back to the feed's own name when a translation is missing
+// (a new station must never vanish). The Water Resources Department's
+// Low / Medium / High classes keep their English word as a gloss because
+// that is the word on the department's own tables.
+export const NAMES = {
+  hi: {
+    'Bhakra': 'भाखड़ा', 'Pong': 'पौंग', 'Ranjit Sagar': 'रणजीत सागर',
+    'Beas local': 'ब्यास स्थानीय', 'Ghaggar Bhankarpur': 'घग्गर भानकरपुर',
+    'Ghaggar Khanauri': 'घग्गर खनौरी', 'Harike local': 'हरीके स्थानीय',
+    'Sutlej local': 'सतलुज स्थानीय',
+    'Dhilwan': 'धिलवान', 'Ferozepur Head Works': 'फ़िरोज़पुर हेडवर्क्स',
+    'Harike Head Works': 'हरीके हेडवर्क्स', 'Naushera Mirthal': 'नौशेरा मिर्थल',
+    'Railway Bridge Phillaur': 'रेलवे पुल फिल्लौर', 'Ropar Head Works': 'रोपड़ हेडवर्क्स',
+    'Beas': 'ब्यास', 'Sutlej': 'सतलुज', 'Sutlej+Beas': 'सतलुज+ब्यास',
+  },
+  pa: {
+    'Bhakra': 'ਭਾਖੜਾ', 'Pong': 'ਪੌਂਗ', 'Ranjit Sagar': 'ਰਣਜੀਤ ਸਾਗਰ',
+    'Beas local': 'ਬਿਆਸ ਸਥਾਨਕ', 'Ghaggar Bhankarpur': 'ਘੱਗਰ ਭਾਨਕਰਪੁਰ',
+    'Ghaggar Khanauri': 'ਘੱਗਰ ਖਨੌਰੀ', 'Harike local': 'ਹਰੀਕੇ ਸਥਾਨਕ',
+    'Sutlej local': 'ਸਤਲੁਜ ਸਥਾਨਕ',
+    'Dhilwan': 'ਧਿਲਵਾਂ', 'Ferozepur Head Works': 'ਫ਼ਿਰੋਜ਼ਪੁਰ ਹੈੱਡਵਰਕਸ',
+    'Harike Head Works': 'ਹਰੀਕੇ ਹੈੱਡਵਰਕਸ', 'Naushera Mirthal': 'ਨੌਸ਼ਹਿਰਾ ਮਿਰਥਲ',
+    'Railway Bridge Phillaur': 'ਰੇਲਵੇ ਪੁਲ ਫਿਲੌਰ', 'Ropar Head Works': 'ਰੋਪੜ ਹੈੱਡਵਰਕਸ',
+    'Beas': 'ਬਿਆਸ', 'Sutlej': 'ਸਤਲੁਜ', 'Sutlej+Beas': 'ਸਤਲੁਜ+ਬਿਆਸ',
+  },
+};
+
+export const CLASS_LABELS = {
+  en: {Low: 'Low', Medium: 'Medium', High: 'High'},
+  hi: {Low: 'निम्न (Low)', Medium: 'मध्यम (Medium)', High: 'उच्च (High)'},
+  pa: {Low: 'ਘੱਟ (Low)', Medium: 'ਦਰਮਿਆਨਾ (Medium)', High: 'ਉੱਚ (High)'},
+};
+
+export function localName(name, lang) {
+  const m = NAMES[lang];
+  return m && typeof name === 'string' && m[name] ? m[name] : name;
+}
+
+export function classLabel(cls, lang) {
+  const m = CLASS_LABELS[lang] || CLASS_LABELS.en;
+  return m[cls] || cls;
+}
+
+const MONTHS = {
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  hi: ['जनवरी', 'फ़रवरी', 'मार्च', 'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'],
+  pa: ['ਜਨਵਰੀ', 'ਫ਼ਰਵਰੀ', 'ਮਾਰਚ', 'ਅਪ੍ਰੈਲ', 'ਮਈ', 'ਜੂਨ', 'ਜੁਲਾਈ', 'ਅਗਸਤ', 'ਸਤੰਬਰ', 'ਅਕਤੂਬਰ', 'ਨਵੰਬਰ', 'ਦਸੰਬਰ'],
+};
+const MONTHS_SHORT = {
+  en: MONTHS.en,
+  hi: ['जन', 'फ़र', 'मार्च', 'अप्रै', 'मई', 'जून', 'जुल', 'अग', 'सित', 'अक्टू', 'नव', 'दिस'],
+  pa: ['ਜਨ', 'ਫ਼ਰ', 'ਮਾਰਚ', 'ਅਪ੍ਰੈ', 'ਮਈ', 'ਜੂਨ', 'ਜੁਲ', 'ਅਗ', 'ਸਤੰ', 'ਅਕਤੂ', 'ਨਵੰ', 'ਦਸੰ'],
+};
+
+// "19 Sep 2026" / "19 सितंबर 2026" / "19 ਸਤੰਬਰ 2026" from an ISO date; null otherwise.
+export function formatDate(iso, lang, {year = true, short = false} = {}) {
+  const d = isoDate(iso);
+  if (d === null) return null;
+  const [y, m, day] = d.split('-').map((x) => parseInt(x, 10));
+  if (m < 1 || m > 12 || day < 1 || day > 31) return null;
+  const names = (short ? MONTHS_SHORT : MONTHS)[lang] || (short ? MONTHS_SHORT : MONTHS).en;
+  return `${day} ${names[m - 1]}${year ? ` ${y}` : ''}`;
+}
+
+// The bulletin's own DD-MM-YYYY (BBMB's form) and HH:MM, shown in the same
+// form as every other date on the page. Anything else is shown as received
+// rather than guessed at.
+export function formatBulletinAsOn(as_on_date, as_on_time, lang) {
+  if (typeof as_on_date !== 'string') return null;
+  const m = /^(\d{2})-(\d{2})-(\d{4})$/.exec(as_on_date);
+  const iso = m ? `${m[3]}-${m[2]}-${m[1]}` : null;
+  const date = iso ? formatDate(iso, lang) : as_on_date;
+  const time = typeof as_on_time === 'string' && /^\d{2}:\d{2}$/.test(as_on_time) ? ` ${as_on_time}` : '';
+  return `${date}${time}`;
+}
+
+// The five horizon days as short calendar labels ("20 Sep"), so a wrapped
+// row of percentages still says which day each one is.
+export function horizonLabels(issueIso, lang) {
+  const d = isoDate(issueIso);
+  if (d === null) return HORIZONS.map((h) => `+${h}`);
+  const t0 = Date.parse(`${d}T00:00:00Z`);
+  return HORIZONS.map((h) => {
+    const iso = new Date(t0 + h * 86400000).toISOString().slice(0, 10);
+    return formatDate(iso, lang, {year: false, short: true});
+  });
+}
+
 // Days between the issue date (UTC midnight) and now; null when unknown.
 export function issueAgeDays(issueDate, nowMs) {
   const d = isoDate(issueDate);
@@ -125,26 +215,33 @@ export function snowmeltSummary(dam) {
  * shows, with the issue date beside it, because an old reading with its date
  * is information and a blank is not.
  */
-export function resolveHazardState(feed, {fetchFailed = false, nowMs = null} = {}) {
+export function resolveHazardState(feed, {fetchFailed = false, nowMs = null, lang = 'en'} = {}) {
   const out = {
-    state: 'unavailable', stale: false, ageDays: null, issue_date: null,
-    generated_utc: null, bulletin_as_on: null, record: null, disclaimer: null,
+    state: 'unavailable', reason: null, stale: false, ageDays: null, issue_date: null,
+    issue_label: null, horizon_labels: HORIZONS.map((h) => `+${h}`),
+    generated_utc: null, bulletin_as_on: null, bulletin_label: null, record: null, disclaimer: null,
     dams: [], weather: [], reaches: [], snowmelt: null,
   };
-  if (fetchFailed) return out;
+  if (fetchFailed) { out.reason = 'fetch'; return out; }
   if (!feed || typeof feed !== 'object') {
     out.state = 'loading';
     return out;
   }
+  // From here on the file arrived but is not a watch: a publishing fault,
+  // which the page names as such rather than as a connection problem.
+  out.reason = 'malformed';
   const issue = isoDate(feed.issue_date);
   if (issue === null) return out;
   if (!feed.dams || typeof feed.dams !== 'object') return out;
 
   const dams = DAMS.map((n) => damRow(n, feed.dams[n])).filter(Boolean);
   if (dams.length === 0) return out;
+  out.reason = null;
 
   out.state = 'watch';
   out.issue_date = issue;
+  out.issue_label = formatDate(issue, lang);
+  out.horizon_labels = horizonLabels(issue, lang);
   out.generated_utc = typeof feed.generated_utc === 'string' ? feed.generated_utc : null;
   out.record = typeof feed.record === 'string' ? feed.record : null;
   out.disclaimer = typeof feed.disclaimer === 'string' ? feed.disclaimer : null;
@@ -152,12 +249,21 @@ export function resolveHazardState(feed, {fetchFailed = false, nowMs = null} = {
   out.bulletin_as_on = typeof b.as_on_date === 'string'
     ? (typeof b.as_on_time === 'string' ? `${b.as_on_date} ${b.as_on_time}` : b.as_on_date)
     : null;
+  out.bulletin_label = formatBulletinAsOn(b.as_on_date, b.as_on_time, lang);
   out.ageDays = issueAgeDays(issue, nowMs);
   out.stale = out.ageDays !== null && out.ageDays > MAX_ISSUE_AGE_DAYS;
-  out.dams = dams;
+  out.dams = dams.map((d) => ({...d, label: localName(d.name, lang)}));
   const wx = feed.weather && typeof feed.weather === 'object' ? feed.weather : {};
-  out.weather = Object.keys(wx).sort().map((n) => weatherRow(n, wx[n])).filter(Boolean);
-  out.reaches = Array.isArray(feed.reaches) ? feed.reaches.map(reachRow).filter(Boolean) : [];
+  out.weather = Object.keys(wx).sort().map((n) => weatherRow(n, wx[n])).filter(Boolean)
+    .map((w) => ({...w, label: localName(w.name, lang)}));
+  out.reaches = (Array.isArray(feed.reaches) ? feed.reaches.map(reachRow).filter(Boolean) : [])
+    .map((r) => ({
+      ...r,
+      label: localName(r.station, lang),
+      river_label: r.river ? localName(r.river, lang) : null,
+      peak_label: r.peak_date ? formatDate(r.peak_date, lang) : null,
+      cls_label: WRD_CLASSES.includes(r.cls) ? classLabel(r.cls, lang) : null,
+    }));
   out.snowmelt = snowmeltSummary(feed.dams.Bhakra);
   return out;
 }

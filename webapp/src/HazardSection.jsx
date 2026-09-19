@@ -14,6 +14,7 @@ import {HORIZONS, resolveHazardState} from './hazardSchema';
 const RAW = 'https://raw.githubusercontent.com/bakathefish/Flood/master/';
 const FEED = RAW + 'punjabflood/outputs/forecast/latest.json';
 const VERIFY = 'https://github.com/bakathefish/Flood/blob/master/punjabflood/docs/verification.md';
+const RECORDS = 'https://github.com/bakathefish/Flood/blob/master/punjabflood/outputs/forecast/';
 
 // Every string the section shows, in the three languages of the page.
 const H_T = {
@@ -22,11 +23,13 @@ const H_T = {
     lead: 'Will Bhakra or Pong have to open its spillway in the next five days?',
     intro: 'Punjab floods when a dam is already near full and heavy rain falls on the hills above it. Every morning this watch reads the dam bulletin, the rain that fell over the last six days, four weather models and a 51-member ensemble for the next five, and at Bhakra the snow melting above the rain gauges. It then answers one question per dam: the chance the spillway has to open on each of the next five days.',
     issued: (d, b) => `Issued ${d}${b ? `, dam readings as on ${b}` : ''}. Updated once a day by the public pipeline.`,
-    live: 'live', stale: 'stale', off: 'unreachable',
+    live: 'live', stale: 'stale', off: 'unreachable', bad: 'unreadable',
     staleTitle: (n) => `This watch is ${n} days old.`,
     staleDesc: 'The daily run has not produced a newer one. The figures below are the last issued, shown with their date, not today’s state.',
     offTitle: 'The river watch is unreachable right now.',
     offDesc: 'This is a connection problem, not an all-clear. Retry shortly.',
+    badTitle: 'The river watch feed could not be read.',
+    badDesc: 'The file arrived but is not in the form the page expects. This is a publishing fault, not an all-clear.',
     loading: 'Reading the latest watch…',
     damsHead: 'Dams',
     colDam: 'Dam', colLevel: 'Level', colStore: 'Full', colFlow: 'In → out (cusecs)',
@@ -42,21 +45,23 @@ const H_T = {
     colStation: 'Station', colPeak: 'Peak (cusecs)', colDate: 'Date', colClass: 'Class',
     below: 'below Low',
     reachNote: 'Dam releases routed downstream with the Punjab Water Resources Department’s travel times and classed against its own Low, Medium and High thresholds.',
-    snow: (recent, days, fc, pack) => `Snowmelt at Bhakra: ${recent} mm of water over the last ${days} days, ${fc} mm expected over the horizon; pack ${pack} mm (a bookkeeping figure from a degree-day model, not a measured depth). The inflow model carries it.`,
+    snow: (recent, days, fc, pack) => `Snowmelt at Bhakra: ${recent} mm of water over the last ${days} days, ${fc} mm expected over the next five days; pack ${pack} mm (a bookkeeping figure from a degree-day model, not a measured depth). The inflow model carries it.`,
     snowOff: 'Snowmelt at Bhakra: the melt inputs could not be built for this run, so the term contributed nothing.',
     verify: 'How well it has done so far',
-    record: (r) => `Record ${r}`,
+    record: 'This run’s record',
   },
   hi: {
     no: '01', title: 'नदी निगरानी',
     lead: 'क्या अगले पाँच दिनों में भाखड़ा या पौंग को अपना स्पिलवे खोलना पड़ेगा?',
     intro: 'पंजाब में बाढ़ तब आती है जब बाँध पहले से लगभग भरा हो और उसके ऊपर की पहाड़ियों पर भारी बारिश हो। यह निगरानी हर सुबह बाँध का बुलेटिन, पिछले छह दिनों की बारिश, अगले पाँच दिनों के लिए चार मौसम मॉडल और 51 सदस्यों का एन्सेम्बल, और भाखड़ा पर वर्षामापी के ऊपर पिघलती बर्फ़ पढ़ती है। फिर हर बाँध के लिए एक सवाल का जवाब देती है: अगले पाँच दिनों में हर दिन स्पिलवे खुलने की संभावना।',
     issued: (d, b) => `जारी ${d}${b ? `, बाँध के आँकड़े ${b} तक` : ''}। सार्वजनिक पाइपलाइन द्वारा दिन में एक बार अपडेट।`,
-    live: 'लाइव', stale: 'पुराना', off: 'अनुपलब्ध',
+    live: 'लाइव', stale: 'पुराना', off: 'अनुपलब्ध', bad: 'अपठनीय',
     staleTitle: (n) => `यह निगरानी ${n} दिन पुरानी है।`,
     staleDesc: 'दैनिक रन ने नयी निगरानी नहीं बनाई। नीचे के आँकड़े अंतिम जारी हैं, अपनी तारीख़ के साथ, आज की स्थिति नहीं।',
     offTitle: 'नदी निगरानी अभी अनुपलब्ध है।',
     offDesc: 'यह कनेक्शन समस्या है, ऑल-क्लियर नहीं। थोड़ी देर बाद पुनः प्रयास करें।',
+    badTitle: 'नदी निगरानी की फ़ीड पढ़ी नहीं जा सकी।',
+    badDesc: 'फ़ाइल आई तो, पर उस रूप में नहीं जिसकी पेज को अपेक्षा है। यह प्रकाशन की गड़बड़ी है, ऑल-क्लियर नहीं।',
     loading: 'नवीनतम निगरानी पढ़ी जा रही है…',
     damsHead: 'बाँध',
     colDam: 'बाँध', colLevel: 'स्तर', colStore: 'भरा', colFlow: 'आवक → निकास (क्यूसेक)',
@@ -70,29 +75,31 @@ const H_T = {
     wxNote: 'हुई बारिश IMD रियल-टाइम ग्रिड से है जहाँ वह क्षेत्र को कवर करती है, अन्यथा मॉडल के पिछले दिनों से। अगले तीन दिन मुख्य मॉडल का योग हैं, इस तारीख़ के रिकॉर्ड के सापेक्ष रैंक के साथ (p90 यानी दस में से केवल एक तारीख़ पर इससे अधिक हुई)। निगरानी और अलर्ट स्तर इस मौसम से पहले तय किए गए थे और इस पर कभी ट्यून नहीं किए गए।',
     reachHead: 'पानी कहाँ पहुँचता है',
     colStation: 'स्टेशन', colPeak: 'शिखर (क्यूसेक)', colDate: 'तारीख़', colClass: 'वर्ग',
-    below: 'Low से नीचे',
-    reachNote: 'बाँधों का निकास पंजाब जल संसाधन विभाग के यात्रा-समय से नीचे पहुँचाया गया और उसी के Low, Medium और High सीमाओं से वर्गीकृत।',
+    below: 'निम्न (Low) से नीचे',
+    reachNote: 'बाँधों का निकास पंजाब जल संसाधन विभाग के यात्रा-समय से नीचे पहुँचाया गया और उसी की निम्न, मध्यम और उच्च (Low, Medium, High) सीमाओं से वर्गीकृत।',
     snow: (recent, days, fc, pack) => `भाखड़ा पर बर्फ़ पिघलाव: पिछले ${days} दिनों में ${recent} mm पानी, अगले पाँच दिनों में ${fc} mm अपेक्षित; पैक ${pack} mm (डिग्री-डे मॉडल का लेखा आँकड़ा, मापी गई गहराई नहीं)। आवक मॉडल इसे शामिल करता है।`,
     snowOff: 'भाखड़ा पर बर्फ़ पिघलाव: इस रन के लिए पिघलाव इनपुट नहीं बन सके, इसलिए इस पद का योगदान शून्य रहा।',
     verify: 'अब तक यह कितना सही रहा',
-    record: (r) => `रिकॉर्ड ${r}`,
+    record: 'इस रन का रिकॉर्ड',
   },
   pa: {
     no: '01', title: 'ਦਰਿਆ ਨਿਗਰਾਨੀ',
     lead: 'ਕੀ ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਵਿੱਚ ਭਾਖੜਾ ਜਾਂ ਪੌਂਗ ਨੂੰ ਆਪਣਾ ਸਪਿਲਵੇ ਖੋਲ੍ਹਣਾ ਪਵੇਗਾ?',
     intro: 'ਪੰਜਾਬ ਵਿੱਚ ਹੜ੍ਹ ਉਦੋਂ ਆਉਂਦਾ ਹੈ ਜਦੋਂ ਡੈਮ ਪਹਿਲਾਂ ਹੀ ਲਗਭਗ ਭਰਿਆ ਹੋਵੇ ਅਤੇ ਉਸ ਦੇ ਉੱਪਰਲੀਆਂ ਪਹਾੜੀਆਂ ਉੱਤੇ ਭਾਰੀ ਮੀਂਹ ਪਵੇ। ਇਹ ਨਿਗਰਾਨੀ ਹਰ ਸਵੇਰ ਡੈਮ ਦਾ ਬੁਲੇਟਿਨ, ਪਿਛਲੇ ਛੇ ਦਿਨਾਂ ਦਾ ਮੀਂਹ, ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਲਈ ਚਾਰ ਮੌਸਮ ਮਾਡਲ ਅਤੇ 51 ਮੈਂਬਰਾਂ ਦਾ ਐਨਸੈਂਬਲ, ਅਤੇ ਭਾਖੜਾ ਉੱਤੇ ਮੀਂਹ-ਮਾਪਕਾਂ ਤੋਂ ਉੱਪਰ ਪਿਘਲਦੀ ਬਰਫ਼ ਪੜ੍ਹਦੀ ਹੈ। ਫਿਰ ਹਰ ਡੈਮ ਲਈ ਇੱਕ ਸਵਾਲ ਦਾ ਜਵਾਬ ਦਿੰਦੀ ਹੈ: ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਵਿੱਚ ਹਰ ਦਿਨ ਸਪਿਲਵੇ ਖੁੱਲਣ ਦੀ ਸੰਭਾਵਨਾ।',
     issued: (d, b) => `ਜਾਰੀ ${d}${b ? `, ਡੈਮ ਦੇ ਅੰਕੜੇ ${b} ਤੱਕ` : ''}। ਜਨਤਕ ਪਾਈਪਲਾਈਨ ਵੱਲੋਂ ਦਿਨ ਵਿੱਚ ਇੱਕ ਵਾਰ ਅਪਡੇਟ।`,
-    live: 'ਲਾਈਵ', stale: 'ਪੁਰਾਣਾ', off: 'ਅਣਉਪਲਬਧ',
+    live: 'ਲਾਈਵ', stale: 'ਪੁਰਾਣਾ', off: 'ਅਣਉਪਲਬਧ', bad: 'ਅਪੜ੍ਹਨਯੋਗ',
     staleTitle: (n) => `ਇਹ ਨਿਗਰਾਨੀ ${n} ਦਿਨ ਪੁਰਾਣੀ ਹੈ।`,
-    staleDesc: 'ਰੋੜ਼ਾਨਾ ਰਨ ਨੇ ਨਵੀਂ ਨਿਗਰਾਨੀ ਨਹੀਂ ਬਣਾਈ। ਹੇਠਾਂ ਦੇ ਅੰਕੜੇ ਆਖਰੀ ਜਾਰੀ ਹਨ, ਆਪਣੀ ਤਾਰੀਖ਼ ਨਾਲ, ਅੱਜ ਦੀ ਹਾਲਤ ਨਹੀਂ।',
+    staleDesc: 'ਰੋਜ਼ਾਨਾ ਰਨ ਨੇ ਨਵੀਂ ਨਿਗਰਾਨੀ ਨਹੀਂ ਬਣਾਈ। ਹੇਠਾਂ ਦੇ ਅੰਕੜੇ ਆਖਰੀ ਜਾਰੀ ਹਨ, ਆਪਣੀ ਤਾਰੀਖ਼ ਨਾਲ, ਅੱਜ ਦੀ ਹਾਲਤ ਨਹੀਂ।',
     offTitle: 'ਦਰਿਆ ਨਿਗਰਾਨੀ ਹੁਣੇ ਅਣਉਪਲਬਧ ਹੈ।',
     offDesc: 'ਇਹ ਕਨੈਕਸ਼ਨ ਸਮੱਸਿਆ ਹੈ, ਆਲ-ਕਲੀਅਰ ਨਹੀਂ। ਥੋੜ੍ਹੀ ਦੇਰ ਬਾਅਦ ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+    badTitle: 'ਦਰਿਆ ਨਿਗਰਾਨੀ ਦੀ ਫ਼ੀਡ ਪੜ੍ਹੀ ਨਹੀਂ ਜਾ ਸਕੀ।',
+    badDesc: 'ਫ਼ਾਈਲ ਆਈ ਤਾਂ, ਪਰ ਉਸ ਰੂਪ ਵਿੱਚ ਨਹੀਂ ਜਿਸ ਦੀ ਪੰਨੇ ਨੂੰ ਉਮੀਦ ਹੈ। ਇਹ ਪ੍ਰਕਾਸ਼ਨ ਦੀ ਗੜਬੜ ਹੈ, ਆਲ-ਕਲੀਅਰ ਨਹੀਂ।',
     loading: 'ਨਵੀਨਤਮ ਨਿਗਰਾਨੀ ਪੜ੍ਹੀ ਜਾ ਰਹੀ ਹੈ…',
     damsHead: 'ਡੈਮ',
     colDam: 'ਡੈਮ', colLevel: 'ਪੱਧਰ', colStore: 'ਭਰਿਆ', colFlow: 'ਆਮਦ → ਨਿਕਾਸ (ਕਿਊਸੈਕ)',
     colChance: 'ਸਪਿਲਵੇ ਖੁੱਲਣ ਦੀ ਸੰਭਾਵਨਾ, ਦਿਨ 1 ਤੋਂ 5',
     chanceNote: 'ਹਰ ਖਾਨਾ ਐਨਸੈਂਬਲ ਦਾ ਉਹ ਹਿੱਸਾ ਹੈ ਜਿਸ ਵਿੱਚ ਜਲ ਭੰਡਾਰ ਦੀ ਥਾਂ ਉਸ ਦਿਨ ਤੱਕ ਮੁੱਕ ਜਾਂਦੀ ਹੈ, ਮਾਡਲ ਦੇ ਸਭ ਤੋਂ ਚੌੜੇ ਤਰੁਟੀ-ਬਜਟ ਹੇਠ (ਮੀਂਹ ਦਾ ਫੈਲਾਅ, ਆਮ ਆਮਦ ਤਰੁਟੀ ਅਤੇ ਹੜ੍ਹ-ਪੱਧਰ ਆਇਤਨ ਤਰੁਟੀ)। ਡੈਸ਼ ਦਾ ਮਤਲਬ ਹੈ ਕਿ ਫ਼ੀਡ ਵਿੱਚ ਉਹ ਅੰਕੜਾ ਨਹੀਂ ਸੀ।',
-    noRanjit: 'ਰਣਜੀਤ ਸਾਗਰ ਦਾ ਕੋਈ ਜਨਤਕ ਰੋੜ਼ਾਨਾ ਬੁਲੇਟਿਨ ਨਹੀਂ, ਇਸ ਲਈ ਉਸ ਦੀ ਡੈਮ ਕਤਾਰ ਨਹੀਂ; ਹੇਠਾਂ ਉਸ ਦੇ ਜਲ-ਗ੍ਰਹਿਣ ਖੇਤਰ ਦਾ ਮੀਂਹ ਦੇਖਿਆ ਜਾਂਦਾ ਹੈ।',
+    noRanjit: 'ਰਣਜੀਤ ਸਾਗਰ ਦਾ ਕੋਈ ਜਨਤਕ ਰੋਜ਼ਾਨਾ ਬੁਲੇਟਿਨ ਨਹੀਂ, ਇਸ ਲਈ ਉਸ ਦੀ ਡੈਮ ਕਤਾਰ ਨਹੀਂ; ਹੇਠਾਂ ਉਸ ਦੇ ਜਲ-ਗ੍ਰਹਿਣ ਖੇਤਰ ਦਾ ਮੀਂਹ ਦੇਖਿਆ ਜਾਂਦਾ ਹੈ।',
     wxHead: 'ਜਲ-ਗ੍ਰਹਿਣ ਖੇਤਰਾਂ ਉੱਤੇ ਮੀਂਹ',
     colCatch: 'ਖੇਤਰ', colFallen: 'ਪਿਆ', colNext: 'ਅਗਲੇ 3 ਦਿਨ',
     days: (n) => `${n} ਦਿਨ`,
@@ -100,12 +107,12 @@ const H_T = {
     wxNote: 'ਪਿਆ ਮੀਂਹ IMD ਰੀਅਲ-ਟਾਈਮ ਗਰਿਡ ਤੋਂ ਹੈ ਜਿੱਥੇ ਉਹ ਖੇਤਰ ਨੂੰ ਕਵਰ ਕਰਦੀ ਹੈ, ਨਹੀਂ ਤਾਂ ਮਾਡਲ ਦੇ ਪਿਛਲੇ ਦਿਨਾਂ ਤੋਂ। ਅਗਲੇ ਤਿੰਨ ਦਿਨ ਮੁੱਖ ਮਾਡਲ ਦਾ ਜੋੜ ਹਨ, ਇਸ ਤਾਰੀਖ਼ ਦੇ ਰਿਕਾਰਡ ਦੇ ਮੁਕਾਬਲੇ ਰੈਂਕ ਨਾਲ (p90 ਮਤਲਬ ਦਸ ਵਿੱਚੋਂ ਸਿਰਫ਼ ਇੱਕ ਤਾਰੀਖ਼ ਨੇ ਇਸ ਤੋਂ ਵੱਧ ਵੇਖਿਆ)। ਨਿਗਰਾਨੀ ਅਤੇ ਅਲਰਟ ਪੱਧਰ ਇਸ ਮੌਸਮ ਤੋਂ ਪਹਿਲਾਂ ਤੈਅ ਕੀਤੇ ਗਏ ਸਨ ਅਤੇ ਇਸ ਉੱਤੇ ਕਦੇ ਟਿਊਨ ਨਹੀਂ ਕੀਤੇ ਗਏ।',
     reachHead: 'ਪਾਣੀ ਕਿੱਥੇ ਪਹੁੰਚਦਾ ਹੈ',
     colStation: 'ਸਟੇਸ਼ਨ', colPeak: 'ਸਿਖਰ (ਕਿਊਸੈਕ)', colDate: 'ਤਾਰੀਖ਼', colClass: 'ਵਰਗ',
-    below: 'Low ਤੋਂ ਹੇਠਾਂ',
-    reachNote: 'ਡੈਮਾਂ ਦਾ ਨਿਕਾਸ ਪੰਜਾਬ ਜਲ ਸਰੋਤ ਵਿਭਾਗ ਦੇ ਸਫ਼ਰ-ਸਮੇਂ ਨਾਲ ਹੇਠਾਂ ਪਹੁੰਚਾਇਆ ਗਿਆ ਅਤੇ ਉਸੇ ਦੀਆਂ Low, Medium ਅਤੇ High ਹੱਦਾਂ ਨਾਲ ਵਰਗਿਆਇਆ।',
+    below: 'ਘੱਟ (Low) ਤੋਂ ਹੇਠਾਂ',
+    reachNote: 'ਡੈਮਾਂ ਦਾ ਨਿਕਾਸ ਪੰਜਾਬ ਜਲ ਸਰੋਤ ਵਿਭਾਗ ਦੇ ਸਫ਼ਰ-ਸਮੇਂ ਨਾਲ ਹੇਠਾਂ ਪਹੁੰਚਾਇਆ ਗਿਆ ਅਤੇ ਉਸੇ ਦੀਆਂ ਘੱਟ, ਦਰਮਿਆਨਾ ਅਤੇ ਉੱਚ (Low, Medium, High) ਹੱਦਾਂ ਨਾਲ ਵਰਗਿਆਇਆ।',
     snow: (recent, days, fc, pack) => `ਭਾਖੜਾ ਉੱਤੇ ਬਰਫ਼ ਪਿਘਲਾਅ: ਪਿਛਲੇ ${days} ਦਿਨਾਂ ਵਿੱਚ ${recent} mm ਪਾਣੀ, ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਵਿੱਚ ${fc} mm ਦੀ ਉਮੀਦ; ਪੈਕ ${pack} mm (ਡਿਗਰੀ-ਡੇ ਮਾਡਲ ਦਾ ਹਿਸਾਬੀ ਅੰਕੜਾ, ਮਾਪੀ ਹੋਈ ਡੂੰਘਾਈ ਨਹੀਂ)। ਆਮਦ ਮਾਡਲ ਇਸ ਨੂੰ ਸ਼ਾਮਲ ਕਰਦਾ ਹੈ।`,
     snowOff: 'ਭਾਖੜਾ ਉੱਤੇ ਬਰਫ਼ ਪਿਘਲਾਅ: ਇਸ ਰਨ ਲਈ ਪਿਘਲਾਅ ਇਨਪੁਟ ਨਹੀਂ ਬਣ ਸਕੇ, ਇਸ ਲਈ ਇਸ ਪਦ ਦਾ ਯੋਗਦਾਨ ਸਿਫ਼ਰ ਰਿਹਾ।',
     verify: 'ਹੁਣ ਤੱਕ ਇਹ ਕਿੰਨਾ ਸਹੀ ਰਿਹਾ',
-    record: (r) => `ਰਿਕਾਰਡ ${r}`,
+    record: 'ਇਸ ਰਨ ਦਾ ਰਿਕਾਰਡ',
   },
 };
 
@@ -167,10 +174,10 @@ export default function HazardSection({lang}) {
     return () => { on = false; };
   }, []);
 
-  const h = resolveHazardState(feed, {fetchFailed: failed, nowMs: Date.now()});
+  const h = resolveHazardState(feed, {fetchFailed: failed, nowMs: Date.now(), lang});
   const watch = h.state === 'watch';
   const dot = h.state === 'unavailable'
-    ? {variant: 'warning', label: t.off}
+    ? {variant: 'warning', label: h.reason === 'malformed' ? t.bad : t.off}
     : h.stale ? {variant: 'warning', label: t.stale} : {variant: 'accent', label: t.live};
 
   return (
@@ -193,7 +200,7 @@ export default function HazardSection({lang}) {
           </VStack>
           <VStack maxWidth={680} gap={4}>
             <Text type="large" color="secondary">{t.intro}</Text>
-            {watch && <Text color="secondary">{t.issued(h.issue_date, h.bulletin_as_on)}</Text>}
+            {watch && <Text color="secondary">{t.issued(h.issue_label, h.bulletin_label)}</Text>}
           </VStack>
 
           {h.state === 'loading' && (
@@ -202,7 +209,11 @@ export default function HazardSection({lang}) {
 
           {h.state === 'unavailable' && (
             <VStack width="100%" maxWidth={820}>
-              <Banner status="warning" title={t.offTitle} description={t.offDesc} />
+              <Banner
+                status="warning"
+                title={h.reason === 'malformed' ? t.badTitle : t.offTitle}
+                description={h.reason === 'malformed' ? t.badDesc : t.offDesc}
+              />
             </VStack>
           )}
 
@@ -225,13 +236,22 @@ export default function HazardSection({lang}) {
                     <ColHead width={110} justify="end">{t.colLevel}</ColHead>
                     <ColHead width={60} justify="end">{t.colStore}</ColHead>
                     <ColHead width={170} justify="end">{t.colFlow}</ColHead>
-                    <ColHead width={300} justify="end">{t.colChance}</ColHead>
+                    <VStack width={300} maxWidth="100%" hAlign="end" gap={1}>
+                      <Text type="label" color="secondary">{t.colChance}</Text>
+                      <HStack gap={0} width={300} maxWidth="100%" justify="end">
+                        {h.horizon_labels.map((lbl, i) => (
+                          <VStack key={HORIZONS[i]} width={60} hAlign="end">
+                            <Text type="supporting" color="secondary" hasTabularNumbers>{lbl}</Text>
+                          </VStack>
+                        ))}
+                      </HStack>
+                    </VStack>
                   </HStack>
                   {h.dams.map((d) => (
                     <React.Fragment key={d.name}>
                       <Divider />
                       <HStack gap={4} vAlign="center" paddingBlock={3} wrap="wrap" width="100%">
-                        <Cell width={130} type="body">{d.name}</Cell>
+                        <Cell width={130} type="body">{d.label}</Cell>
                         <Cell width={110} justify="end">{d.level_ft === null ? '—' : `${d.level_ft.toFixed(2)} ft`}</Cell>
                         <Cell width={60} justify="end">{d.storage_fraction === null ? '—' : `${Math.round(d.storage_fraction * 100)}%`}</Cell>
                         <Cell width={170} justify="end" color="secondary">{`${cusecs(d.inflow_cusecs)} → ${cusecs(d.outflow_cusecs)}`}</Cell>
@@ -288,7 +308,7 @@ export default function HazardSection({lang}) {
                       <React.Fragment key={w.name}>
                         <Divider />
                         <HStack gap={4} vAlign="center" paddingBlock={2} wrap="wrap" width="100%">
-                          <Cell width={190} type="body">{w.name}</Cell>
+                          <Cell width={190} type="body">{w.label}</Cell>
                           <VStack width={110} maxWidth="100%"><LevelChip level={w.level} t={t} /></VStack>
                           <Cell width={150} justify="end">
                             {w.observed_total_mm === null ? '—' : `${w.observed_total_mm.toFixed(1)} mm`}
@@ -325,19 +345,19 @@ export default function HazardSection({lang}) {
                         <HStack gap={4} vAlign="center" paddingBlock={2} wrap="wrap" width="100%">
                           <VStack width={300} maxWidth="100%">
                             <HStack gap={2} vAlign="baseline" wrap="wrap">
-                              <Text>{r.station}</Text>
-                              {r.river && <Text type="supporting" color="secondary">{r.river}</Text>}
+                              <Text>{r.label}</Text>
+                              {r.river_label && <Text type="supporting" color="secondary">{r.river_label}</Text>}
                             </HStack>
                           </VStack>
                           <Cell width={130} justify="end">{cusecs(r.peak_cusecs)}</Cell>
-                          <Cell width={110} justify="end" color="secondary">{r.peak_date || '—'}</Cell>
+                          <Cell width={110} justify="end" color="secondary">{r.peak_label || '—'}</Cell>
                           <VStack width={110} maxWidth="100%" hAlign="end">
                             {r.cls === 'High'
-                              ? <Badge variant="error" label="High" />
+                              ? <Badge variant="error" label={r.cls_label} />
                               : r.cls === 'Medium'
-                                ? <Badge variant="orange" label="Medium" />
+                                ? <Badge variant="orange" label={r.cls_label} />
                                 : r.cls === 'Low'
-                                  ? <Badge variant="blue" label="Low" />
+                                  ? <Badge variant="blue" label={r.cls_label} />
                                   : <Text type="supporting" color="secondary">{r.cls === 'below' ? t.below : t.unknown}</Text>}
                           </VStack>
                         </HStack>
@@ -355,7 +375,7 @@ export default function HazardSection({lang}) {
                 {h.disclaimer && <Text type="supporting" color="secondary">{h.disclaimer}</Text>}
                 <HStack gap={5} vAlign="baseline" wrap="wrap">
                   <Link href={VERIFY} isStandalone>{t.verify}</Link>
-                  {h.record && <Text type="code" color="secondary">{t.record(h.record)}</Text>}
+                  {h.record && <Link href={RECORDS + h.record} isStandalone>{t.record}</Link>}
                 </HStack>
               </VStack>
             </>

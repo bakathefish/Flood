@@ -243,7 +243,7 @@ function LiveSection({t}) {
               <Text type="label" color="secondary">{t.liveHead}</Text>
             </HStack>
             <HStack gap={4} vAlign="baseline" wrap="wrap">
-              <Text type="code" color="accent">02</Text>
+              <Text type="code" color="accent">04</Text>
               <Heading level={2}>{t.liveTitle}</Heading>
             </HStack>
             <Grid columns={{minWidth: 340, max: 2}} gap={6} align="stretch" width="100%">

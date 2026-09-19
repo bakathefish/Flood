@@ -46,4 +46,12 @@ jobs:
           git add data/sachet/
           git add atlas/web/timelapse_current.gif atlas/web/timelapse_current_still.png
           git diff --cached --quiet || git commit -m "monitor: update latest flood pass"
-          git push
+          # The job runs for minutes; a push that lands in between fails the
+          # plain push with "fetch first". Rebase this one commit onto whatever
+          # arrived and try again, a few times, before giving up.
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase --autostash origin master && git push && exit 0
+            echo "push attempt $attempt failed, retrying"
+            sleep $((attempt * 10))
+          done
+          exit 1
