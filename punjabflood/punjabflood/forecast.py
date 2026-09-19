@@ -573,8 +573,12 @@ def render_markdown(product: dict) -> str:
                     f"{s['archive_last_day']}, the {s['model']} model from there): "
                     f"{sum(s['melt_mm_recent']):.1f} mm over the previous "
                     f"{len(s['melt_mm_recent'])} days, {sum(s['melt_mm_forecast']):.1f} mm "
-                    f"over the horizon, pack {s['pack_mm_issue']:.0f} mm; the inflow model "
-                    f"carries it."
+                    f"over the horizon, pack {s['pack_mm_issue']:.0f} mm (a degree-day "
+                    f"bookkeeping quantity, not a measured depth); the inflow model "
+                    f"carries it"
+                    + (f"; {s['missing_days']} recent days missing" if s.get("missing_days") else "")
+                    + (f"; {s['note']}" if s.get("note") else "")
+                    + "."
                 )
             else:
                 lines.append(f"Snowmelt: {s.get('note', 'not applied')}.")
@@ -912,7 +916,10 @@ def run(
     det_frames, ens_frames, wx_frames = [], [], []
     recent, recent_sources = recent_rain(client, catchments, issue_date, rt_dir=rt_dir)
     # a parameter set with the snowmelt term needs the model's past days at the points
-    # (the bucket's bridge); the watch's pull asks for the same days so the calls are shared
+    # (the bucket's bridge). The watch pulls the IMD-coverage points; the melt inputs pull
+    # the full point set and the archive tail, so on a melt day the cycle makes extra
+    # forecast calls and one archive call per point (the archive quota is the one that
+    # refused on 2026-09-19, and the fixed spans stood in)
     melt_needed = any(p.has_melt for p in params.values())
     wx_past_days = snow.PAST_DAYS if melt_needed else 0
     for name, cat in catchments.items():

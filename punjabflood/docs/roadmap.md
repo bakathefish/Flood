@@ -233,14 +233,19 @@ numbers that motivate them are in `verification.md`, never repeated here.
   archive holds no temperature). Over the 2025 monsoon (122 issue days) the melt
   response over five days is 0.025 BCM on average and 0.069 BCM at most, the rain
   response 0.180 and 0.749 BCM. What moved in the scores that run on the file's
-  parameters: the as-issued 2025 Bhakra run's false flags went from 1 to 0 under the two
-  ECMWF models and from 3 to 2 under GFS (hits unchanged at 3, 3 and 1; the earliest
+  parameters: the as-issued 2025 Bhakra run's missed days went from 1 to 0 under the two
+  ECMWF models and from 3 to 2 under GFS (false flags 0 throughout; hits unchanged at 3,
+  3 and 1; the earliest
   possible flag under observed rain moved from 29 to 30 August), the 2026 fit against
   measured inflow has bias +18% and MAE 8,119 cusecs (were +24% and 9,868), the live
   one-day test MAE 4,040 cusecs at r +0.58 (were 4,006 and +0.57), and the five-day
   horizon test under observed rain MAE 5,677 cusecs (was 5,792). The remaining step is
   data-bound: a hindcast on forecast melt needs archived temperature and snowfall
-  forecasts, which the previous-runs archive does not hold.
+  forecasts, which the previous-runs archive does not hold. Two caveats: the held-out
+  gain is small (0.2% of the error) and rests on the heavy days, and, as `design.md`
+  states, the pack above the snowline is an accumulator the bucket never drains (near
+  zero in the 2014 spin-up year, a plateau of several hundred mm by 2020), so the printed
+  pack is a bookkeeping quantity, not a measured snow depth.
 
 ## Next, in order
 

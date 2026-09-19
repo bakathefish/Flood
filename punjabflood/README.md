@@ -81,7 +81,7 @@ punjabflood pull-era5-season --year 2025   # ERA5 over the dam catchments for on
 punjabflood pull-soil-moisture         # ERA5-Land soil moisture 2015-2025, dam catchments, into the rain table
 punjabflood pull-qpf-archive           # as-issued QPF leads 1..7, 2024 to date (merges by model and season)
 punjabflood digitise-guidebook         # needs the WRD guidebook PDF in data/raw/wrd/
-punjabflood calibrate
+punjabflood calibrate --melt          # --melt keeps the Bhakra snowmelt term; without it the product runs without the term
 punjabflood verify
 punjabflood report                     # renders docs/verification.md
 punjabflood forecast                   # one live cycle: outputs/forecast/<date>.{json,md}

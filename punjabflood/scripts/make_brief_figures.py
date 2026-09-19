@@ -18,6 +18,8 @@ a legend whenever there are two series).
 7. ``brief_weather_watch``: the weather watch of the latest product: what fell over each dam
    catchment, the ensemble's next days, and the level.
 8. ``brief_qpf_blend``: the deterministic models combined against the primary one.
+9. ``brief_snowmelt``: the degree-day melt at Bhakra over the last full season beside
+   the held-out error of every inflow variant, the adopted term marked.
 """
 
 from __future__ import annotations
@@ -40,6 +42,7 @@ from make_figures import (  # noqa: E402
     INK2,
     MUTED,
     OUT,
+    ROOT,
     REF,
     S1,
     S2,
@@ -459,6 +462,80 @@ def qpf_blend():
     _save(fig, "brief_qpf_blend")
 
 
+def snowmelt():
+    sv = RESULTS.get("snowmelt_verdict")
+    if not sv or "adopt" not in sv:
+        return
+    year = sv.get("horizon_contribution_year")
+    melt_path = (
+        ROOT / sv["melt_table"]
+        if not Path(sv["melt_table"]).is_absolute()
+        else Path(sv["melt_table"])
+    )
+    melt = pd.read_csv(melt_path, parse_dates=["date"]).set_index("date")
+    season = melt.loc[f"{year}-04-01" : f"{year}-10-31"]
+    var = pd.read_csv(VER / "inflow_variants.csv")
+    var = var[(var["dam"] == "Bhakra") & (var["variant"] != "press inflow fit")]
+    fig, axes = plt.subplots(1, 2, figsize=(7.6, 2.9), gridspec_kw={"width_ratios": [1.5, 1]})
+    ax = axes[0]
+    _style(ax)
+    ax.fill_between(season.index, 0, season["melt_mm"], color=S1, alpha=0.25, linewidth=0)
+    ax.plot(
+        season.index, season["melt_mm"], color=S1, linewidth=1.2, label="melt (mm of water a day)"
+    )
+    ax.plot(
+        season.index,
+        season["snowfall_mm"],
+        color=S3,
+        linewidth=1.0,
+        label="snowfall (mm of water a day)",
+    )
+    ax.set_ylim(0, max(season["melt_mm"].max(), season["snowfall_mm"].max()) * 1.2)
+    ax.set_ylabel("catchment mean, mm a day")
+    ax.set_title(
+        f"Bhakra catchment, {year}: pack {season['pack_mm'].iloc[0]:.0f} mm on 1 April, "
+        f"{season['pack_mm'].iloc[-1]:.0f} mm on 31 October",
+        fontsize=8.5,
+        loc="left",
+    )
+    ax.legend(fontsize=7.5, frameon=False, loc="upper right")
+    import matplotlib.dates as mdates
+
+    ax.xaxis.set_major_locator(mdates.MonthLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+    ax.tick_params(axis="x", labelsize=7.5)
+    ax = axes[1]
+    _style(ax)
+    order = ["baseline", "snowmelt", "sm", "api+sm", "excess above 30 mm"]
+    var = var.set_index("variant").loc[[v for v in order if v in var["variant"].values]]
+    vals = var["rmse_bcm"].tolist()
+    cols = [S1 if v == "snowmelt" else (BASELINE if v == "baseline" else S4) for v in var.index]
+    ax.barh(list(var.index), vals, color=cols, height=0.6)
+    for i, v in enumerate(vals):
+        ax.text(v, i, f" {v:.4f}", va="center", fontsize=7.5, color=INK2)
+    ax.invert_yaxis()
+    ax.set_xlim(0, max(vals) * 1.3)
+    ax.set_xlabel("held-out RMSE, BCM a day\n(leave one season out)", fontsize=8)
+    ax.set_title("Bhakra inflow variants", fontsize=9, loc="left")
+    ax.tick_params(axis="y", labelsize=7.5)
+    hc = sv.get(f"horizon_contribution_{year}") or {}
+    p_ = sv["params"]["Bhakra"]
+    fig.subplots_adjust(wspace=0.55)
+    fig.suptitle(
+        f"The snowmelt term at Bhakra: {'adopted' if sv['adopt'] else 'not adopted'} "
+        f"(c_melt {p_['c_melt']:.3f}, lags {' '.join(f'{w:.2f}' for w in p_['w_melt'])})\n"
+        f"over the {year} monsoon the melt response over five days averaged "
+        f"{hc.get('melt_mean_bcm', float('nan')):.3f} BCM, the rain response "
+        f"{hc.get('rain_mean_bcm', float('nan')):.3f} BCM",
+        fontsize=8.5,
+        y=1.12,
+        x=0.01,
+        ha="left",
+        color=INK,
+    )
+    _save(fig, "brief_snowmelt")
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     live_2026()
@@ -469,3 +546,4 @@ if __name__ == "__main__":
     readings_db()
     weather_watch()
     qpf_blend()
+    snowmelt()

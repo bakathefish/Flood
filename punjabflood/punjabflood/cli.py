@@ -881,7 +881,7 @@ def run_verify(horizon_days: int = 5):
                             d: bool(params[d].has_melt) for d in SNOWMELT_DAMS if d in params
                         },
                         "horizon_contribution_year": int(hc_year),
-                        "horizon_contribution_2025": hc.get("Bhakra", {}),
+                        f"horizon_contribution_{int(hc_year)}": hc.get("Bhakra", {}),
                         "horizon_contribution": hc,
                         "params": {
                             d: {
