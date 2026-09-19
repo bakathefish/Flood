@@ -698,3 +698,109 @@ def test_prospective_record_section(tmp_path):
     empty.mkdir()
     md2 = report.render_verification(tmp_path, None, era5_imd_path=None, forecast_dir=empty)
     assert "No record yet." in md2
+
+
+def test_snowmelt_and_weather_watch_sections_render(tmp_path):
+    results = {
+        "peak_tests": [],
+        "snowmelt_verdict": {
+            "variant": "snowmelt",
+            "dams": ["Bhakra"],
+            "adopt": False,
+            "loso_error_not_higher": True,
+            "season_peaks_higher": False,
+            "period_means_hold": True,
+            "loso": {"Bhakra": {"baseline": 0.0431, "variant": 0.0420}},
+            "baseline_flood_scale": {
+                "n_period_means": 2,
+                "period_mean_worst_deviation": 0.21,
+                "season_peak_ratio_min": 0.44,
+                "season_peak_ratio_max": 0.44,
+            },
+            "variant_flood_scale": {
+                "n_period_means": 2,
+                "period_mean_worst_deviation": 0.20,
+                "season_peak_ratio_min": 0.43,
+                "season_peak_ratio_max": 0.43,
+            },
+            "params": {
+                "Bhakra": {
+                    "c": 0.31,
+                    "c_wet": 0.0,
+                    "c_melt": 0.52,
+                    "w_melt": [0.6, 0.4, 0.0, 0.0],
+                    "intercept_bcm_per_day": 0.021,
+                    "in_sample_rmse_bcm": 0.041,
+                    "r2": 0.35,
+                }
+            },
+            "melt_table": "data/raw/rain/bhakra_melt_daily.csv",
+        },
+        "weather_watch_hindcast": {
+            "n_rows": 12,
+            "window_days_before": 14,
+            "window_days_after": 7,
+            "events": [
+                {
+                    "catchment": "Pong",
+                    "event_date": "2025-08-26",
+                    "n_issue_days_before": 14,
+                    "first_watch_issue_date": "2025-08-12",
+                    "watch_lead_days": 14,
+                    "watch_raised_before_window": True,
+                    "first_alert_issue_date": "2025-08-13",
+                    "alert_lead_days": 13,
+                    "alert_raised_before_window": False,
+                    "days_at_watch_before": 9,
+                    "days_at_alert_before": 4,
+                    "max_percentile_before": 97.7,
+                },
+                # a row written before the edge flags existed, and an event never raised
+                {
+                    "catchment": "Bhakra",
+                    "event_date": "2025-08-19",
+                    "n_issue_days_before": 14,
+                    "first_watch_issue_date": None,
+                    "watch_lead_days": None,
+                    "first_alert_issue_date": None,
+                    "alert_lead_days": None,
+                    "max_percentile_before": None,
+                },
+            ],
+            "seasons": [
+                {
+                    "catchment": "Pong",
+                    "year": 2024,
+                    "n_issue_days": 119,
+                    "watch_share": 0.1,
+                    "alert_share": 0.05,
+                    "n_outside_event_window": 119,
+                    "false_alarm_days": 12,
+                    "false_alert_days": 6,
+                }
+            ],
+        },
+    }
+    (tmp_path / "results.json").write_text(json.dumps(results), encoding="utf-8")
+    pd.DataFrame(
+        columns=[
+            "table",
+            "predictor",
+            "n_years",
+            "n_high",
+            "spearman_rho",
+            "auroc_high",
+            "brier_skill_score",
+        ]
+    ).to_csv(tmp_path / "peak_tests.csv", index=False)
+    md = report.render_verification(tmp_path, None, era5_imd_path=None, forecast_dir=None)
+    assert "### The snowmelt term at Bhakra" in md
+    assert "| Bhakra | 0.310 | 0.000 | 0.520 | 0.60 0.40 0.00 0.00 |" in md
+    assert "not adopted" in md
+    assert "### The weather watch run over the archive" in md
+    assert (
+        "| Pong | 2025-08-26 | 14 | 2025-08-12 | 14 or more (raised before the window) | 2025-08-13 | 13 | 9 | 4 | 98 |"
+        in md
+    )
+    assert "| Bhakra | 2025-08-19 | 14 | never |  | never |  |  |  | n/a |" in md
+    assert "| Pong | 2024 | 119 | 0.10 | 0.05 | 119 | 12 | 6 |" in md

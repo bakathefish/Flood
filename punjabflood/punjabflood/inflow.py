@@ -94,11 +94,17 @@ class InflowParams:
     # what the fit was made on: "storage" (day-to-day storage change, the intercept is base
     # minus passage) or "inflow" (measured daily inflow, the intercept is the base itself)
     basis: str = "storage"
+    # the snowmelt term: the lagged catchment melt volume (``melt_bcm`` on the rain frame,
+    # from ``snow.catchment_melt``) responds with coefficient ``c_melt`` and lag weights
+    # ``w_melt`` (empty: no such term)
+    c_melt: float = 0.0
+    w_melt: tuple[float, ...] = ()
 
     def to_dict(self) -> dict:
         d = asdict(self)
         d["w"] = list(self.w)
         d["w_excess"] = list(self.w_excess)
+        d["w_melt"] = list(self.w_melt)
         d["sm_clim"] = [round(float(x), 6) for x in self.sm_clim]
         return d
 
@@ -108,9 +114,15 @@ class InflowParams:
         d["w"] = tuple(d["w"])
         if "w_excess" in d:
             d["w_excess"] = tuple(d["w_excess"])
+        if "w_melt" in d:
+            d["w_melt"] = tuple(d["w_melt"])
         if "sm_clim" in d:
             d["sm_clim"] = tuple(float(x) for x in d["sm_clim"])
         return cls(**d)
+
+    @property
+    def has_melt(self) -> bool:
+        return bool(self.w_melt)
 
     @property
     def uses_sm(self) -> bool:
@@ -204,9 +216,11 @@ def design_matrix(
     """The calibration table, one row per usable consecutive-day pair: the storage change
     ``ds`` (BCM), the lagged rain volumes ``lag{k}`` (of the rain up to the threshold when
     one is given), the lagged excess volumes ``ex{k}`` (rain above the threshold; zeros
-    without one), the antecedent index ``api_mm``, the day's rain ``rain_mm`` and, when
-    ``sm_clim`` is given and ``rain`` carries ``sm_0_7``, the soil-moisture anomaly
-    ``sm_anom`` (zero otherwise, and on days the soil-moisture record lacks).
+    without one), the lagged melt volumes ``melt{k}`` (from a ``melt_bcm`` column of
+    ``rain``; zeros without one), the antecedent index ``api_mm``, the day's rain
+    ``rain_mm`` and, when ``sm_clim`` is given and ``rain`` carries ``sm_0_7``, the
+    soil-moisture anomaly ``sm_anom`` (zero otherwise, and on days the soil-moisture record
+    lacks).
 
     ``state``: columns date, dam, storage_bcm and, if present, basis (only rows whose basis
     is in ``MEASURED_BASES`` are used). ``rain``: columns date, rain_mm for this dam's
@@ -225,6 +239,14 @@ def design_matrix(
     ex = lagged_matrix(pd.Series(rain_volume_bcm(ex_mm, area_km2), index=r.index), lags)
     ex.columns = [f"ex{k}" for k in lags]
     X = X.join(ex)
+    melt = (
+        r["melt_bcm"].astype(float).fillna(0.0)
+        if "melt_bcm" in r.columns
+        else pd.Series(0.0, index=r.index)
+    )
+    M = lagged_matrix(melt, lags)
+    M.columns = [f"melt{k}" for k in lags]
+    X = X.join(M)
     X["api_mm"] = antecedent_mm(r["rain_mm"])
     X["rain_mm"] = r["rain_mm"]
     if sm_clim is not None and "sm_0_7" in r.columns:
@@ -254,6 +276,7 @@ def calibrate(
     excess_threshold_mm: float | None = None,
     wetness: str = "api",
     clim_exclude_year: int | None = None,
+    melt: bool = False,
 ) -> InflowParams:
     """Fit ``c``, ``w`` and the intercept on daily storage changes (``design_matrix``).
 
@@ -262,7 +285,11 @@ def calibrate(
     through ``c`` and ``w`` as before. ``wetness`` picks the carrier of catchment wetness
     (``WETNESS_CARRIERS``); with soil moisture in it the climatology is built from the
     ``sm_0_7`` column of ``rain`` (``clim_exclude_year`` keeps a held-out season out of it)
-    and ``gamma`` is fitted on the residual of the rain fit.
+    and ``gamma`` is fitted on the residual of the rain fit. With ``melt`` the lagged
+    catchment melt volume (the ``melt_bcm`` column of ``rain``) gets its own non-negative
+    coefficient and lag weights (``c_melt``, ``w_melt``), fitted in the same NNLS; the
+    intercept stays free, so the term wins only what a season-varying melt explains beyond
+    a constant base.
     """
     if wetness not in WETNESS_CARRIERS:
         raise ValueError(f"wetness must be one of {WETNESS_CARRIERS}, not {wetness!r}")
@@ -295,13 +322,16 @@ def calibrate(
     nl = len(lags)
     L = df[[f"lag{k}" for k in lags]].to_numpy()
     E = df[[f"ex{k}" for k in lags]].to_numpy()
+    Mm = df[[f"melt{k}" for k in lags]].to_numpy()
+    if melt and not (Mm != 0).any():
+        raise ValueError(f"{dam}: no melt series to fit the snowmelt term on")
     api = df["api_mm"].to_numpy()
     y = df["ds"].to_numpy()
     ones = np.ones(len(df))
     # the "sm" carrier drops the antecedent-rain block: its columns are zeroed, so NNLS
     # returns zero for them and the rest of the bookkeeping is unchanged
     api_block = L * (api / API_REF_MM)[:, None] if wetness != "sm" else np.zeros_like(L)
-    blocks = [L, api_block] + ([E] if with_excess else [])
+    blocks = [L, api_block] + ([E] if with_excess else []) + ([Mm] if melt else [])
     A = np.column_stack([*blocks, ones, -ones])
     use = np.ones(len(df), dtype=bool)
     for _ in range(6):
@@ -320,6 +350,13 @@ def calibrate(
         w_ex = tuple(float(x / c_ex) for x in eps) if c_ex > 0 else tuple(0.0 for _ in lags)
     else:
         c_ex, w_ex = 0.0, ()
+    if melt:
+        mu = coef[pos : pos + nl]
+        pos += nl
+        c_melt = float(mu.sum())
+        w_melt = tuple(float(x / c_melt) for x in mu) if c_melt > 0 else tuple(0.0 for _ in lags)
+    else:
+        c_melt, w_melt = 0.0, ()
     intercept = coef[pos] - coef[pos + 1]
     total = beta + delta
     w = (
@@ -342,6 +379,8 @@ def calibrate(
         excess_threshold_mm=float(excess_threshold_mm) if with_excess else float("nan"),
         wetness=wetness,
         sm_clim=tuple(float(x) for x in sm_clim) if sm_clim is not None else (),
+        c_melt=c_melt,
+        w_melt=w_melt,
     )
     if use_sm:
         # second stage: the residual of the rain fit against the response times the anomaly
@@ -380,7 +419,16 @@ def predict_storage_change(p: InflowParams, df: pd.DataFrame) -> np.ndarray:
     if p.has_excess:
         E = df[[f"ex{k}" for k in lags]].to_numpy()
         pred = pred + p.c_excess * (E @ np.asarray(p.w_excess))
+    pred = pred + _melt_from_design(p, df)
     return pred
+
+
+def _melt_from_design(p: InflowParams, df: pd.DataFrame) -> np.ndarray:
+    """The snowmelt term on the rows of a design matrix: zeros without one."""
+    if not p.has_melt:
+        return np.zeros(len(df))
+    Mm = df[[f"melt{k}" for k in range(len(p.w_melt))]].to_numpy()
+    return p.c_melt * (Mm @ np.asarray(p.w_melt))
 
 
 def loso_score(
@@ -391,6 +439,7 @@ def loso_score(
     excess_threshold_mm: float | None = None,
     heavy_mm: float = EXCESS_THRESHOLD_MM,
     wetness: str = "api",
+    melt: bool = False,
 ) -> dict:
     """Leave-one-season-out score of the calibration: for every season in the record the
     model is fitted on the other seasons and its storage-change prediction scored on the
@@ -414,6 +463,7 @@ def loso_score(
                 excess_threshold_mm=excess_threshold_mm,
                 wetness=wetness,
                 clim_exclude_year=y if wetness != "api" else None,
+                melt=melt,
             )
         except ValueError:
             continue
@@ -517,7 +567,7 @@ def _fit_gamma(df: pd.DataFrame, p: InflowParams) -> float:
         E = df[[f"ex{k}" for k in lags]].to_numpy()
         quick = quick + p.c_excess * (E @ np.asarray(p.w_excess))
     x = quick * df["sm_anom"].to_numpy(dtype=float)
-    resid = df["ds"].to_numpy() - (quick + p.intercept_bcm_per_day)
+    resid = df["ds"].to_numpy() - (quick + p.intercept_bcm_per_day + _melt_from_design(p, df))
     ok = ~(np.isnan(x) | np.isnan(resid))
     if ok.sum() < MIN_CALIBRATION_DAYS or float((x[ok] ** 2).sum()) == 0:
         return 0.0
@@ -531,10 +581,13 @@ def history_days(p: InflowParams) -> int:
     return max(len(p.w), p.api_days + 1)
 
 
-def quick_response_bcm(p: InflowParams, rain_mm_history: np.ndarray, sm_anom: float = 0.0) -> float:
+def quick_response_bcm(
+    p: InflowParams, rain_mm_history: np.ndarray, sm_anom: float = 0.0, melt_bcm_history=()
+) -> float:
     """Quick-flow volume today from the recent rain (index -1 = today). The coefficient in
     force is ``coefficient(p, api)`` with the antecedent index summed over the days before
-    today that the history holds (up to ``p.api_days``)."""
+    today that the history holds (up to ``p.api_days``). ``melt_bcm_history`` (index -1 =
+    today, BCM) feeds the snowmelt term where the parameters carry one."""
     hist = np.asarray(rain_mm_history, dtype=float)
     base_mm, ex_mm = split_excess(hist, p.excess_threshold_mm if p.has_excess else None)
     rv = rain_volume_bcm(base_mm, p.area_km2)
@@ -551,6 +604,9 @@ def quick_response_bcm(p: InflowParams, rain_mm_history: np.ndarray, sm_anom: fl
     if p.has_excess:
         ev = rain_volume_bcm(ex_mm, p.area_km2)
         quick += p.c_excess * sum(wk * ev[-1 - k] for k, wk in enumerate(p.w_excess) if k < len(ev))
+    if p.has_melt:
+        mv = np.asarray(list(melt_bcm_history), dtype=float)
+        quick += p.c_melt * sum(wk * mv[-1 - k] for k, wk in enumerate(p.w_melt) if k < len(mv))
     return float(quick)
 
 
@@ -560,20 +616,27 @@ def predict_daily_bcm(
     base_cusecs: float,
     rain_mm_recent=(),
     sm_anom: float = 0.0,
+    melt_bcm_recent=(),
+    melt_bcm_forecast=(),
 ) -> np.ndarray:
     """Daily inflow volumes (BCM) for the forecast days.
 
     ``base_cusecs`` is today's base flow (observed inflow minus today's quick response);
     it decays by ``rho`` per day. ``rain_mm_recent`` are the last days of observed rain
-    (oldest first) that still contribute through the lag weights.
+    (oldest first) that still contribute through the lag weights. ``melt_bcm_recent`` and
+    ``melt_bcm_forecast`` are the same for the catchment melt volume where the parameters
+    carry a snowmelt term (a forecast day without a melt value melts nothing).
     """
     hist = list(rain_mm_recent)
+    mhist = [float(x) for x in melt_bcm_recent]
+    mfut = [float(x) for x in melt_bcm_forecast]
     base = C.cusec_days_to_bcm(base_cusecs)
     out = []
     n = history_days(p)
     for d, rmm in enumerate(rain_mm_forecast, start=1):
         hist.append(float(rmm))
-        q = quick_response_bcm(p, np.asarray(hist[-n:]), sm_anom)
+        mhist.append(mfut[d - 1] if d - 1 < len(mfut) else 0.0)
+        q = quick_response_bcm(p, np.asarray(hist[-n:]), sm_anom, np.asarray(mhist[-n:]))
         out.append(base * (p.rho**d) + q)
     return np.asarray(out)
 
@@ -748,8 +811,12 @@ def score_on_inflow(
     obs = C.bcm_to_cusec_days(df["y"].to_numpy())
     out = {
         "n_days": int(len(df)),
-        "bias_pct": float((pred.mean() - obs.mean()) / obs.mean() * 100) if obs.mean() > 0 else float("nan"),
-        "pearson_r": float(np.corrcoef(pred, obs)[0, 1]) if pred.std() > 0 and obs.std() > 0 else float("nan"),
+        "bias_pct": float((pred.mean() - obs.mean()) / obs.mean() * 100)
+        if obs.mean() > 0
+        else float("nan"),
+        "pearson_r": float(np.corrcoef(pred, obs)[0, 1])
+        if pred.std() > 0 and obs.std() > 0
+        else float("nan"),
         "mae_cusecs": float(np.abs(pred - obs).mean()),
         "mean_obs_cusecs": float(obs.mean()),
         "mean_pred_cusecs": float(pred.mean()),
@@ -800,4 +867,3 @@ def storage_change_score(
         "heavy_rmse_bcm": float(np.sqrt(np.mean(r[h] ** 2))) if h.any() else float("nan"),
         "heavy_bias_bcm": float(np.mean(r[h])) if h.any() else float("nan"),
     }
-

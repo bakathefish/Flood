@@ -72,7 +72,30 @@ sensitivity came out negative), so the product's carrier is the rain index and t
 records the refusal with the numbers. Should a carrier
 ever pass (on a day-wise inflow record, say), the daily product already takes the anomaly
 from the latest ERA5-Land day on record, up to about six days before the issue date,
-labelled with its date, and holds it over the horizon. The base component today is the observed BBMB inflow minus the
+labelled with its date, and holds it over the horizon. Bhakra's base is snowmelt, and
+the record shows no wetness dependence there, so the one term the storage record could
+still carry at Bhakra is the melt itself: a degree-day snowpack (`snow.py`) run at every
+one of the catchment's 131 archive points, the IMD-uncovered half included, on ERA5's daily
+snowfall (cm of snow at 10 mm of water per 7 cm, the constant of the watch) and 2 m mean
+temperature, with the pack draining at 4 mm per degree-day above 0 C (the middle of the
+Himalayan range in Hock 2003, *J. Hydrol.* 282, 104; the factor sets how fast a pack
+drains, the fitted coefficient absorbs the scale) and never below empty, carried from an
+empty pack on 1 January 2015 through every day since. The catchment melt is the
+area-weighted mean over all the points, its volume over the whole catchment area of the
+catchment file, and it enters the storage-change relation as its own lagged block
+(`c_melt`, `w_melt`, lags 0 to 3) fitted jointly with the rain response by the same
+non-negative least squares, the intercept still free so the term wins only what a
+season-varying melt explains beyond a constant base. It is a variant, scored
+leave-one-season-out beside the baseline at Bhakra alone under a rule written before the
+fit (`docs/superpowers/plans/2026-09-19-snowmelt-and-watch-hindcast.md`): the held-out
+error may not rise, Bhakra's season-peak ratio in the flood-scale check must rise, and its
+period means may not move further from the reported means than the baseline's worst one.
+The outcome and the numbers are in `verification.md` (the snowmelt section). In that
+scoring the melt over the horizon is the observed ERA5 melt, perfect prognosis, and the
+as-issued hindcast and the daily product run the baseline parameters without the term;
+a term that passes would need the recent melt from the archive and the primary model's
+temperature and snowfall over the horizon in the daily product, and its as-issued score
+rerun on forecast melt, which is a plan of its own. The base component today is the observed BBMB inflow minus the
 quick response the recent rain explains, decaying at a fitted daily recession. The recession is estimated from the residuals as the lag-2 to lag-1
 autocovariance ratio, which is unbiased under white measurement noise; where the residual
 drifts through the season instead of recessing the ratio exceeds one and the estimate sits
@@ -158,7 +181,7 @@ where served), the next days from every deterministic model and the IFS ensemble
 percentile of the next three days against the monsoon three-day totals of the 1961-2025
 IMD record over the same catchment, and, for the dam catchments, the primary model's
 2 m temperature and the share of its precipitation falling as snow (Open-Meteo's snowfall
-at 7 mm of water per cm). The level is a fixed rule (`weather.py`): alert at the 90th
+at 10 mm of water per 7 cm of snow). The level is a fixed rule (`weather.py`): alert at the 90th
 percentile of the ensemble median or half the members with a 30 mm day; watch at the
 75th, a quarter of the members, or any model with a 30 mm day; quiet otherwise. It is a
 reading aid over the same inputs, never an input to the inflow model.

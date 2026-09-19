@@ -195,6 +195,27 @@ numbers that motivate them are in `verification.md`, never repeated here.
   fewer of the heavy days; the maximum catches more at a higher false-alarm ratio. None
   passes the switching rule; AIFS stays. The numbers are in `verification.md`.
 
+## Measured in the 2026-09-19 sprint
+
+- **The weather watch run over the as-issued archive.** The watch's levels were fixed
+  before any day was scored, and the score was written before the run (the plan file
+  `docs/superpowers/plans/2026-09-19-snowmelt-and-watch-hindcast.md`): the deterministic
+  branch of `weather.level` on every monsoon issue date of 2024 to 2026 the archive holds
+  all its models at leads 1 to 3, the truth the dated 2025 gate opening at Bhakra and the
+  largest dated inflow reading of 2025 at Pong and Ranjit Sagar, false alarms counted
+  outside a window of 14 days before to 7 after an event. What it showed
+  (`verification.md`, the weather watch section, 1,029 issue days): before the Bhakra
+  opening of 19 August 2025 the first watch was issued on 9 August and the first alert on
+  10 August, the level stood at alert on 10, 11 and 13 August and at watch on the 12th,
+  the watch was quiet from 16 to 20 August (the 14th quiet, the 15th a watch), and alerts
+  returned on 22 and 23 August; at Pong and Ranjit Sagar the window opened already at alert
+  (raised from 11 August), so their leads are bounded by the window at 14 days, not
+  measured. In the two seasons without a dam event between a tenth and a fifth of the
+  issue days stood at watch or above (23, 19 and 14 days of 119 in 2024; 20, 13 and 10 of
+  105 in 2026 at Bhakra, Pong and Ranjit Sagar) and between 3 and 8 days a season at alert
+  (8, 7, 3 in 2024 and 5, 4, 4 in 2026). No level is changed on this: the ensemble half of the rule cannot be
+  scored (no ensemble is archived), and a change would be a new plan with its own rule.
+
 ## Next, in order
 
 1. **Flood-scale inflow truth.** The one thing that would settle the runoff response at the
@@ -228,6 +249,13 @@ numbers that motivate them are in `verification.md`, never repeated here.
    capture provides so far. The day-wise BBMB data the Public Action Committee released on
    8 September 2025 remains the one known table; asking the committee for it is an owner
    action.
+   *Probe of 2026-09-19:* the two official daily-storage sources that could stand in for
+   inflow were tried again from this machine (`scripts` scratch probe, statuses as
+   returned): the data.gov.in CWC reservoir feed answered 429 (rate limit exceeded) to a
+   three-row query on the sample key, and every form of the India-WRIS reservoir dataset
+   endpoint, and its home page, timed out at the connection after 21 s. Neither is a
+   day-wise inflow record in any case (both carry storage), so the item stays a data hunt
+   for the committee's table or a BBMB archive.
 2. **Peak-day concentration.** The flood-scale check says the model's volumes over the 2025
    flood periods are close to the means BBMB reported while its largest days fall well short
    of the stated season peaks, and in both 2023 and 2025 the routed Dhilwan peak fell below

@@ -122,7 +122,17 @@ class OpenMeteo:
                 self.sleep(10)
                 continue
             if r.status_code == 200:
-                j = r.json()
+                try:
+                    j = r.json()
+                except ValueError:
+                    # a 200 with a body that is not JSON (the gateway's error page)
+                    if attempt >= self.max_retries:
+                        raise OpenMeteoError(
+                            f"non-JSON body from {host}: {r.text[:120]!r}"
+                        ) from None
+                    log.warning("open-meteo %s: 200 with a non-JSON body; retry in 15 s", host)
+                    self.sleep(15)
+                    continue
                 if j.get("error"):
                     raise OpenMeteoError(j.get("reason", "unknown error"))
                 if use_cache:

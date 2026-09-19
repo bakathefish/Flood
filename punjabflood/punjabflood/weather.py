@@ -35,7 +35,7 @@ WATCH_PCT = 75.0
 ALERT_MEMBER_SHARE = 0.5
 WATCH_MEMBER_SHARE = 0.25
 SEASON_MONTHS = (6, 7, 8, 9)
-SNOW_CM_TO_MM_WATER = 10.0 / 7.0  # Open-Meteo's snowfall is cm of snow at 7 mm water per cm
+SNOW_CM_TO_MM_WATER = 10.0 / 7.0  # Open-Meteo's snowfall is cm of snow, 7 cm of snow per 10 mm of water
 
 
 def season_3day_climatology(

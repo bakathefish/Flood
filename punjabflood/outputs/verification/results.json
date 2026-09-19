@@ -10881,7 +10881,9 @@
         "excess_threshold_mm": NaN,
         "wetness": "api",
         "sm_clim": [],
-        "basis": "inflow"
+        "basis": "inflow",
+        "c_melt": 0.0,
+        "w_melt": []
       },
       "in_sample": {
         "n_days": 48,
@@ -10922,7 +10924,9 @@
         "excess_threshold_mm": NaN,
         "wetness": "api",
         "sm_clim": [],
-        "basis": "inflow"
+        "basis": "inflow",
+        "c_melt": 0.0,
+        "w_melt": []
       },
       "in_sample": {
         "n_days": 45,
@@ -10959,7 +10963,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "api",
-        "gamma": 0.0
+        "gamma": 0.0,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": 0.002259873152988775
       },
       {
         "dam": "Bhakra",
@@ -10977,7 +10984,10 @@
         "c_excess": 0.3033218593002517,
         "w_excess": "0.00 1.00 0.00 0.00",
         "wetness": "api",
-        "gamma": 0.0
+        "gamma": 0.0,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": 0.0010755954687747397
       },
       {
         "dam": "Bhakra",
@@ -10995,7 +11005,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "api+sm",
-        "gamma": -0.1382374549813963
+        "gamma": -0.1382374549813963,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": 0.002259873152988775
       },
       {
         "dam": "Bhakra",
@@ -11013,7 +11026,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "sm",
-        "gamma": 0.1493512559830568
+        "gamma": 0.1493512559830568,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.0021154806711813955
       },
       {
         "dam": "Pong",
@@ -11031,7 +11047,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "api",
-        "gamma": 0.0
+        "gamma": 0.0,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.01313990452029291
       },
       {
         "dam": "Pong",
@@ -11049,7 +11068,10 @@
         "c_excess": 0.523263961684464,
         "w_excess": "0.20 0.65 0.09 0.06",
         "wetness": "api",
-        "gamma": 0.0
+        "gamma": 0.0,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.013127366963397882
       },
       {
         "dam": "Pong",
@@ -11067,7 +11089,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "api+sm",
-        "gamma": -0.3587901350266636
+        "gamma": -0.3587901350266636,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.01313990452029291
       },
       {
         "dam": "Pong",
@@ -11085,7 +11110,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "sm",
-        "gamma": -0.24778617215454007
+        "gamma": -0.24778617215454007,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.02536586955287048
       },
       {
         "dam": "Ranjit Sagar",
@@ -11103,7 +11131,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "api",
-        "gamma": 0.0
+        "gamma": 0.0,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.008649468861669495
       },
       {
         "dam": "Ranjit Sagar",
@@ -11121,7 +11152,10 @@
         "c_excess": 0.4686172859406195,
         "w_excess": "0.46 0.48 0.00 0.07",
         "wetness": "api",
-        "gamma": 0.0
+        "gamma": 0.0,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.008436556038546678
       },
       {
         "dam": "Ranjit Sagar",
@@ -11139,7 +11173,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "api+sm",
-        "gamma": 0.26186751874078934
+        "gamma": 0.26186751874078934,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.008649468861669495
       },
       {
         "dam": "Ranjit Sagar",
@@ -11157,7 +11194,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "sm",
-        "gamma": 1.298988503158571
+        "gamma": 1.298988503158571,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.012701586359455706
       },
       {
         "dam": "Bhakra",
@@ -11175,7 +11215,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "api",
-        "gamma": 0.0
+        "gamma": 0.0,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.02286190695805325
       },
       {
         "dam": "Pong",
@@ -11193,7 +11236,10 @@
         "c_excess": 0.0,
         "w_excess": "",
         "wetness": "api",
-        "gamma": 0.0
+        "gamma": 0.0,
+        "c_melt": 0.0,
+        "w_melt": "",
+        "intercept_bcm_per_day": -0.10615206097688915
       }
     ],
     "flood_scale": {
@@ -11299,6 +11345,11 @@
         "adopt": false
       }
     ]
+  },
+  "snowmelt_verdict": {
+    "variant": "snowmelt",
+    "adopt": false,
+    "note": "no melt table at data\\raw\\rain\\bhakra_melt_daily.csv; run scripts/pull_snow_bhakra.py"
   },
   "as_issued_events": [
     {
@@ -12362,7 +12413,9 @@
         "excess_threshold_mm": NaN,
         "wetness": "api",
         "sm_clim": [],
-        "basis": "inflow"
+        "basis": "inflow",
+        "c_melt": 0.0,
+        "w_melt": []
       },
       "inflow_fit_in_sample": {
         "n_days": 35,
@@ -12400,7 +12453,9 @@
         "excess_threshold_mm": NaN,
         "wetness": "api",
         "sm_clim": [],
-        "basis": "storage"
+        "basis": "storage",
+        "c_melt": 0.0,
+        "w_melt": []
       },
       "storage_fit_on_inflow": {
         "n_days": 35,
@@ -12452,7 +12507,9 @@
         "excess_threshold_mm": NaN,
         "wetness": "api",
         "sm_clim": [],
-        "basis": "inflow"
+        "basis": "inflow",
+        "c_melt": 0.0,
+        "w_melt": []
       },
       "inflow_fit_in_sample": {
         "n_days": 35,
@@ -12490,7 +12547,9 @@
         "excess_threshold_mm": NaN,
         "wetness": "api",
         "sm_clim": [],
-        "basis": "storage"
+        "basis": "storage",
+        "c_melt": 0.0,
+        "w_melt": []
       },
       "storage_fit_on_inflow": {
         "n_days": 35,
@@ -12662,6 +12721,135 @@
       "gfs_seamless": 0.31314676471652086
     },
     "adopt": null
+  },
+  "weather_watch_hindcast": {
+    "seasons": [
+      {
+        "catchment": "Bhakra",
+        "year": 2024,
+        "n_issue_days": 119,
+        "watch_share": 0.12605042016806722,
+        "alert_share": 0.06722689075630252,
+        "n_outside_event_window": 119,
+        "false_alarm_days": 23,
+        "false_alert_days": 8
+      },
+      {
+        "catchment": "Bhakra",
+        "year": 2025,
+        "n_issue_days": 119,
+        "watch_share": 0.23529411764705882,
+        "alert_share": 0.09243697478991597,
+        "n_outside_event_window": 97,
+        "false_alarm_days": 29,
+        "false_alert_days": 6
+      },
+      {
+        "catchment": "Bhakra",
+        "year": 2026,
+        "n_issue_days": 105,
+        "watch_share": 0.14285714285714285,
+        "alert_share": 0.047619047619047616,
+        "n_outside_event_window": 105,
+        "false_alarm_days": 20,
+        "false_alert_days": 5
+      },
+      {
+        "catchment": "Pong",
+        "year": 2024,
+        "n_issue_days": 119,
+        "watch_share": 0.10084033613445378,
+        "alert_share": 0.058823529411764705,
+        "n_outside_event_window": 119,
+        "false_alarm_days": 19,
+        "false_alert_days": 7
+      },
+      {
+        "catchment": "Pong",
+        "year": 2025,
+        "n_issue_days": 119,
+        "watch_share": 0.29411764705882354,
+        "alert_share": 0.15126050420168066,
+        "n_outside_event_window": 97,
+        "false_alarm_days": 36,
+        "false_alert_days": 9
+      },
+      {
+        "catchment": "Pong",
+        "year": 2026,
+        "n_issue_days": 105,
+        "watch_share": 0.08571428571428572,
+        "alert_share": 0.0380952380952381,
+        "n_outside_event_window": 105,
+        "false_alarm_days": 13,
+        "false_alert_days": 4
+      },
+      {
+        "catchment": "Ranjit Sagar",
+        "year": 2024,
+        "n_issue_days": 119,
+        "watch_share": 0.09243697478991597,
+        "alert_share": 0.025210084033613446,
+        "n_outside_event_window": 119,
+        "false_alarm_days": 14,
+        "false_alert_days": 3
+      },
+      {
+        "catchment": "Ranjit Sagar",
+        "year": 2025,
+        "n_issue_days": 119,
+        "watch_share": 0.19327731092436976,
+        "alert_share": 0.11764705882352941,
+        "n_outside_event_window": 97,
+        "false_alarm_days": 22,
+        "false_alert_days": 6
+      },
+      {
+        "catchment": "Ranjit Sagar",
+        "year": 2026,
+        "n_issue_days": 105,
+        "watch_share": 0.05714285714285714,
+        "alert_share": 0.0380952380952381,
+        "n_outside_event_window": 105,
+        "false_alarm_days": 10,
+        "false_alert_days": 4
+      }
+    ],
+    "events": [
+      {
+        "catchment": "Bhakra",
+        "event_date": "2025-08-19",
+        "n_issue_days_before": 14,
+        "first_watch_issue_date": "2025-08-09",
+        "watch_lead_days": 10,
+        "first_alert_issue_date": "2025-08-10",
+        "alert_lead_days": 9,
+        "max_percentile_before": 93.67923354485505
+      },
+      {
+        "catchment": "Pong",
+        "event_date": "2025-08-26",
+        "n_issue_days_before": 14,
+        "first_watch_issue_date": "2025-08-12",
+        "watch_lead_days": 14,
+        "first_alert_issue_date": "2025-08-12",
+        "alert_lead_days": 14,
+        "max_percentile_before": 97.73547343536146
+      },
+      {
+        "catchment": "Ranjit Sagar",
+        "event_date": "2025-08-27",
+        "n_issue_days_before": 14,
+        "first_watch_issue_date": "2025-08-13",
+        "watch_lead_days": 14,
+        "first_alert_issue_date": "2025-08-13",
+        "alert_lead_days": 14,
+        "max_percentile_before": 99.55207166853303
+      }
+    ],
+    "window_days_before": 14,
+    "window_days_after": 7,
+    "n_rows": 1029
   },
   "realtime_rain": {
     "rows": [

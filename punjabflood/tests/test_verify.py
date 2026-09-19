@@ -457,7 +457,17 @@ def test_flood_scale_summary_and_variant_verdict():
                 [
                     ["Pong", "day", "2025-08-31", "2025-08-31", 160276.0, 121294.0, 0.757, 1, "s"],
                     ["Bhakra", "day", "2023-08-23", "2023-08-23", 128406.0, 60147.0, 0.468, 1, "s"],
-                    ["Pong", "record day", "2023-08-14", "2023-08-14", 734000.0, np.nan, np.nan, 0, "s"],
+                    [
+                        "Pong",
+                        "record day",
+                        "2023-08-14",
+                        "2023-08-14",
+                        734000.0,
+                        np.nan,
+                        np.nan,
+                        0,
+                        "s",
+                    ],
                 ],
                 columns=cols,
             ),
@@ -465,7 +475,9 @@ def test_flood_scale_summary_and_variant_verdict():
         ignore_index=True,
     )
     d = verify.flood_scale_summary(with_days)
-    assert d["n_dated_days"] == 2 and d["dated_day_ratio_median"] == pytest.approx((0.757 + 0.468) / 2)
+    assert d["n_dated_days"] == 2 and d["dated_day_ratio_median"] == pytest.approx(
+        (0.757 + 0.468) / 2
+    )
     assert d["n_period_means"] == b["n_period_means"]
     better = base_fs.copy()
     better.loc[better["kind"] == "season peak", "ratio"] += 0.1
@@ -599,8 +611,15 @@ def _sm_inputs():
     rain = rain.copy()
     rain["sm_0_7"] = 0.6  # twice a flat climatology of 0.3: anomaly +1 every day
     wet = inflow.InflowParams(
-        "Pong", 12560.0, c=0.6, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0,
-        gamma=1.0, wetness="api+sm", sm_clim=tuple([0.3] * 366),
+        "Pong",
+        12560.0,
+        c=0.6,
+        w=(0.5, 0.3, 0.2, 0.0),
+        rho=0.9,
+        intercept_bcm_per_day=0.0,
+        gamma=1.0,
+        wetness="api+sm",
+        sm_clim=tuple([0.3] * 366),
     )
     return st, rain, p, wet
 
@@ -700,7 +719,9 @@ def test_realtime_vs_final_scores_both_records_and_applies_the_switch_rule():
     final = np.r_[np.full(30, 5.0), np.full(10, 40.0)]  # ten heavy days at the end
     frames = []
     for cat in ("Pong", "Bhakra"):
-        frames.append(pd.DataFrame({"date": days, "catchment": cat, "rain_mm": final, "source": "imd"}))
+        frames.append(
+            pd.DataFrame({"date": days, "catchment": cat, "rain_mm": final, "source": "imd"})
+        )
     final_df = pd.concat(frames, ignore_index=True)
     # real-time: close to final, catches every heavy day; ERA5: half of everything
     rt = final_df.copy()
@@ -731,16 +752,16 @@ def test_realtime_vs_final_scores_both_records_and_applies_the_switch_rule():
     cmp2 = verify.realtime_vs_final(final_df, bad, era5b, catchments=("Pong", "Bhakra"))
     assert cmp2["mae_lower_everywhere"] and not cmp2["hit_rate_not_lower"] and not cmp2["switch"]
     # a dam with no real-time rows cannot pass
-    cmp3 = verify.realtime_vs_final(final_df, rt[rt["catchment"] == "Pong"], era5, catchments=("Pong", "Bhakra"))
+    cmp3 = verify.realtime_vs_final(
+        final_df, rt[rt["catchment"] == "Pong"], era5, catchments=("Pong", "Bhakra")
+    )
     assert not cmp3["switch"] and cmp3["dams_missing"] == ["Bhakra"]
 
 
 def test_perfect_prog_hei_takes_a_capacity_and_a_full_reservoir_keeps_filling_into_it():
     cap = C.PONG.live_capacity_bcm.value
     days = pd.date_range("2025-08-20", periods=12)
-    state = pd.DataFrame(
-        {"date": days, "dam": "Pong", "storage_bcm": cap, "basis": "cwc"}
-    )
+    state = pd.DataFrame({"date": days, "dam": "Pong", "storage_bcm": cap, "basis": "cwc"})
     rain_days = pd.date_range(days[0] - pd.Timedelta(days=10), days[-1])
     rain = pd.DataFrame({"date": rain_days, "catchment": "Pong", "rain_mm": 25.0})
     p = inflow.InflowParams(
@@ -758,8 +779,11 @@ def test_perfect_prog_hei_takes_a_capacity_and_a_full_reservoir_keeps_filling_in
     )
     # the model carry clamps at the capacity it is given
     s, basis, gaps = verify.carry_storage(
-        pd.Series([cap], index=[days[0]]), {days[0]: "cwc"},
-        rain.set_index("date")["rain_mm"], "Pong", p,
+        pd.Series([cap], index=[days[0]]),
+        {days[0]: "cwc"},
+        rain.set_index("date")["rain_mm"],
+        "Pong",
+        p,
         capacity_bcm=C.cushion_capacity_bcm("Pong"),
     )
     assert s.max() > cap and s.max() <= C.cushion_capacity_bcm("Pong") + 1e-9
@@ -769,8 +793,22 @@ def test_flood_scale_error_from_the_period_means():
     cols = verify.FLOOD_SCALE_COLS
     rows = []
     for i, ratio in enumerate((0.8, 1.0, 1.25, 1.1)):
-        rows.append(["Pong", "period mean", "2025-08-01", "2025-08-24", 100.0, 100.0 * ratio, ratio, 20, "s"])
-    rows.append(["Pong", "period mean", "2025-09-01", "2025-09-04", 100.0, 300.0, 3.0, 4, "s"])  # too short
+        rows.append(
+            [
+                "Pong",
+                "period mean",
+                "2025-08-01",
+                "2025-08-24",
+                100.0,
+                100.0 * ratio,
+                ratio,
+                20,
+                "s",
+            ]
+        )
+    rows.append(
+        ["Pong", "period mean", "2025-09-01", "2025-09-04", 100.0, 300.0, 3.0, 4, "s"]
+    )  # too short
     rows.append(["Pong", "day", "2025-08-31", "2025-08-31", 100.0, 50.0, 0.5, 1, "s"])
     rows.append(["Pong", "day", "2025-09-04", "2025-09-04", 100.0, 200.0, 2.0, 1, "s"])
     rows.append(["Pong", "day", "2025-09-05", "2025-09-05", 100.0, 100.0, 1.0, 1, "s"])
@@ -805,14 +843,18 @@ def test_rule_curve_run_fires_before_the_frl_bound_and_the_timing_test_reads_the
         "Bhakra", 56000.0, c=0.5, w=(0.5, 0.3, 0.2, 0.0), rho=0.9, intercept_bcm_per_day=0.0
     )
     pp_frl = verify.perfect_prog_hei(state, rain, "Bhakra", "Bhakra", p, 3)
-    pp_rule = verify.perfect_prog_hei(state, rain, "Bhakra", "Bhakra", p, 3, rule_curve_rating=rating)
+    pp_rule = verify.perfect_prog_hei(
+        state, rain, "Bhakra", "Bhakra", p, 3, rule_curve_rating=rating
+    )
     assert (pp_frl["forced_release_bcm"] == 0).all()
     # 1,672 ft is above the schedule (1,670 up to 15 August): the drawdown is owed at once,
     # and stops being owed once the line to FRL passes the reservoir in the third week
     before = pd.to_datetime(pp_rule["date"]) <= "2023-08-15"
     assert (pp_rule.loc[before, "release_day1_cusecs"] > 0).all()
     assert (pp_rule.loc[~before, "release_day1_cusecs"] == 0).any()
-    assert pp_rule["inflow_day1_cusecs"].tolist() == pytest.approx(pp_frl["inflow_day1_cusecs"].tolist())
+    assert pp_rule["inflow_day1_cusecs"].tolist() == pytest.approx(
+        pp_frl["inflow_day1_cusecs"].tolist()
+    )
     openings = pd.DataFrame({"dam": ["Bhakra"], "date": ["2023-08-13"], "level_ft": [1672.0]})
     t = verify.rule_curve_timing_test(pp_frl, pp_rule, openings, "Bhakra")
     r = t.iloc[0]
@@ -822,7 +864,10 @@ def test_rule_curve_run_fires_before_the_frl_bound_and_the_timing_test_reads_the
     assert r["first_forced_rule"] == "2023-08-06" and r["lag_rule_days"] == -7
     # an opening with no run in its year gets no forced day either way
     t2 = verify.rule_curve_timing_test(
-        pp_frl, pp_rule, pd.DataFrame({"dam": ["Bhakra"], "date": ["2015-08-10"], "level_ft": [1661.1]}), "Bhakra"
+        pp_frl,
+        pp_rule,
+        pd.DataFrame({"dam": ["Bhakra"], "date": ["2015-08-10"], "level_ft": [1661.1]}),
+        "Bhakra",
     )
     assert t2.iloc[0]["n_days_rule"] == 0 and t2.iloc[0]["first_forced_rule"] is None
 
@@ -849,8 +894,9 @@ def test_routed_vs_gauge_readings_pairs_by_station_and_day():
     d = t[t["station"] == "Dhilwan"].set_index("date")
     assert d.loc["2023-08-17", "ratio"] == pytest.approx(120_000 / 234_000)
     assert np.isnan(d.loc["2023-08-19", "routed_cusecs"]) and np.isnan(d.loc["2023-08-19", "ratio"])
-    assert t[t["station"] == "Harike Head Works"]["ratio"].iloc[0] == pytest.approx(140_000 / 284_987)
-
+    assert t[t["station"] == "Harike Head Works"]["ratio"].iloc[0] == pytest.approx(
+        140_000 / 284_987
+    )
 
 
 def test_qpf_blend_test_scores_the_blends_on_common_rows_and_applies_the_rule():
@@ -862,11 +908,21 @@ def test_qpf_blend_test_scores_the_blends_on_common_rows_and_applies_the_rule():
     for k in (1, 2, 3):
         # AIFS hits every heavy day at 40; IFS and GFS miss them all at 5, and are dry
         # otherwise: the mean of the three is 16.7 on a heavy day, below the threshold
-        for m, val in (("ecmwf_aifs025_single", 40.0), ("ecmwf_ifs025", 5.0), ("gfs_seamless", 5.0)):
+        for m, val in (
+            ("ecmwf_aifs025_single", 40.0),
+            ("ecmwf_ifs025", 5.0),
+            ("gfs_seamless", 5.0),
+        ):
             f = np.where(obs >= 30, val, 0.0)
             rows.append(
                 pd.DataFrame(
-                    {"target_date": days, "lead_days": k, "model": m, "rain_mm": f, "catchment": "Pong"}
+                    {
+                        "target_date": days,
+                        "lead_days": k,
+                        "model": m,
+                        "rain_mm": f,
+                        "catchment": "Pong",
+                    }
                 )
             )
     # a second season so the leave-one-season-out weights exist
@@ -888,8 +944,170 @@ def test_qpf_blend_test_scores_the_blends_on_common_rows_and_applies_the_rule():
 def test_qpf_blend_test_with_no_common_rows_is_empty():
     days = pd.date_range("2025-07-01", "2025-07-31")
     q = pd.DataFrame(
-        {"target_date": days, "lead_days": 1, "model": "ecmwf_aifs025_single", "rain_mm": 1.0, "catchment": "Pong"}
+        {
+            "target_date": days,
+            "lead_days": 1,
+            "model": "ecmwf_aifs025_single",
+            "rain_mm": 1.0,
+            "catchment": "Pong",
+        }
     )
     obs = pd.DataFrame({"date": days, "catchment": "Pong", "rain_mm": 0.0})
     res = verify.qpf_blend_test(q, obs)
     assert res["n_common_days"] == 0 and res["adopt"] is None and res["scores"] == {}
+
+
+def _toy_archive(days, model_vals, catchment="Pong"):
+    rows = []
+    for k in (1, 2, 3):
+        for m, series in model_vals.items():
+            rows.append(
+                pd.DataFrame(
+                    {
+                        "target_date": days,
+                        "lead_days": k,
+                        "model": m,
+                        "rain_mm": series,
+                        "catchment": catchment,
+                    }
+                )
+            )
+    return pd.concat(rows, ignore_index=True)
+
+
+def test_weather_watch_hindcast_quiet_season_has_no_watch_days():
+    days = pd.date_range("2024-06-01", "2024-09-30")
+    q = _toy_archive(
+        days, {"ecmwf_ifs025": np.full(len(days), 1.0), "gfs_seamless": np.full(len(days), 1.0)}
+    )
+    clim = {"Pong": np.linspace(0, 100, 1001)}
+    res = verify.weather_watch_hindcast(q, clim, events={}, models=("ecmwf_ifs025", "gfs_seamless"))
+    rows = res["rows"]
+    assert len(rows) > 0
+    assert set(rows["level"]) == {"quiet"}
+    s = res["seasons"]
+    assert s[0]["catchment"] == "Pong" and s[0]["year"] == 2024
+    assert s[0]["watch_share"] == 0.0 and s[0]["alert_share"] == 0.0
+    assert res["events"] == []
+
+
+def test_weather_watch_hindcast_heavy_day_in_one_model_is_a_watch_and_alert_has_a_lead():
+    days = pd.date_range("2025-06-01", "2025-09-30")
+    ifs = np.full(len(days), 1.0)
+    gfs = np.full(len(days), 1.0)
+    # one model sees 40 mm on 10 July: a watch on the issue dates whose leads 1-3 cover it
+    gfs[days.get_loc("2025-07-10")] = 40.0
+    # the primary sees 70, 70, 70 on 20-22 August: a three-day total of 210 above the 90th pct
+    for d in ("2025-08-20", "2025-08-21", "2025-08-22"):
+        ifs[days.get_loc(d)] = 70.0
+    q = _toy_archive(days, {"ecmwf_ifs025": ifs, "gfs_seamless": gfs})
+    clim = {"Pong": np.linspace(0, 100, 1001)}  # 90th pct is 90 mm
+    events = {"Pong": "2025-08-24"}
+    res = verify.weather_watch_hindcast(
+        q, clim, events=events, models=("ecmwf_ifs025", "gfs_seamless"), primary="ecmwf_ifs025"
+    )
+    rows = res["rows"].set_index("issue_date")
+    assert rows.loc["2025-07-09", "level"] == "watch"  # lead 1 covers the 10th
+    assert rows.loc["2025-07-07", "level"] == "watch"  # lead 3 covers the 10th
+    assert rows.loc["2025-07-06", "level"] == "quiet"
+    assert rows.loc["2025-08-19", "level"] == "alert"  # leads 1-3 are 20, 21, 22
+    ev = res["events"][0]
+    assert ev["catchment"] == "Pong" and ev["event_date"] == "2025-08-24"
+    # issued on the 18th the leads cover 19, 20, 21: a total of 141 mm, above the 90th pct
+    assert ev["first_alert_issue_date"] == "2025-08-18" and ev["alert_lead_days"] == 6
+    # issued on the 17th the leads cover 18, 19, 20: one heavy day, a watch
+    assert ev["first_watch_issue_date"] == "2025-08-17" and ev["watch_lead_days"] == 7
+    s = res["seasons"][0]
+    # the July watch days lie outside the event window, so they count as false alarms
+    assert s["false_alarm_days"] == 3 and s["n_issue_days"] > 100
+    # the watch rose inside the window, so the lead is a measurement, not a bound
+    assert ev["watch_raised_before_window"] is False
+    assert ev["alert_raised_before_window"] is False
+    # issue dates 17 to 21 August are raised (the 22nd covers 23 to 25, one heavy day and
+    # a low total, the 23rd nothing); 18 to 20 are alerts
+    assert ev["days_at_watch_before"] == 5 and ev["days_at_alert_before"] == 3
+
+
+def test_weather_watch_hindcast_marks_a_lead_bounded_by_the_window():
+    days = pd.date_range("2025-06-01", "2025-09-30")
+    ifs = np.full(len(days), 1.0)
+    # the primary sees 70 mm a day from 1 August to 23 August: an alert on every issue
+    # date from 29 July onward, so the window of 14 days before the 24th opens already raised
+    for d in pd.date_range("2025-08-01", "2025-08-23"):
+        ifs[days.get_loc(d)] = 70.0
+    q = _toy_archive(days, {"ecmwf_ifs025": ifs, "gfs_seamless": np.full(len(days), 1.0)})
+    clim = {"Pong": np.linspace(0, 100, 1001)}
+    res = verify.weather_watch_hindcast(
+        q,
+        clim,
+        events={"Pong": "2025-08-24"},
+        models=("ecmwf_ifs025", "gfs_seamless"),
+        primary="ecmwf_ifs025",
+    )
+    ev = res["events"][0]
+    assert ev["first_alert_issue_date"] == "2025-08-10" and ev["alert_lead_days"] == 14
+    assert ev["alert_raised_before_window"] is True
+    assert ev["watch_raised_before_window"] is True
+    # issued on the 22nd the leads cover 23 to 25: one heavy day, a watch; the 23rd is quiet
+    assert ev["days_at_alert_before"] == 12 and ev["days_at_watch_before"] == 13
+
+
+# --- the snowmelt term through the verification runs --------------------------------
+def _melt_inputs():
+    st, rain, p = _event_inputs()
+    rain = rain.copy()
+    rain["melt_bcm"] = 0.01  # a flat melt volume every day
+    withm = inflow.InflowParams(
+        "Pong",
+        12560.0,
+        c=p.c,
+        w=p.w,
+        rho=p.rho,
+        intercept_bcm_per_day=p.intercept_bcm_per_day,
+        c_melt=0.5,
+        w_melt=(0.6, 0.4, 0.0, 0.0),
+    )
+    return st, rain, p, withm
+
+
+def test_perfect_prog_and_carry_add_the_melt_term_where_the_parameters_carry_one():
+    st, rain, p, withm = _melt_inputs()
+    plain = verify.perfect_prog_hei(st, rain, "Pong", "Pong", p, horizon_days=5)
+    melt = verify.perfect_prog_hei(st, rain, "Pong", "Pong", withm, horizon_days=5)
+    m = plain.merge(melt, on="date", suffixes=("_plain", "_melt"))
+    # a flat 0.01 BCM melt through 0.5 * (0.6 + 0.4) adds 0.005 BCM a day
+    extra = m["inflow_day1_cusecs_melt"] - m["inflow_day1_cusecs_plain"]
+    assert extra.to_numpy() == pytest.approx(C.bcm_to_cusec_days(0.005), rel=1e-6)
+    # a parameter set without the term ignores the column, and the term without a column
+    # melts nothing
+    assert verify.melt_series_for(rain, "Pong", p) is None
+    assert verify.melt_series_for(rain.drop(columns="melt_bcm"), "Pong", withm) is None
+    none = verify.perfect_prog_hei(st, rain.drop(columns="melt_bcm"), "Pong", "Pong", withm, 5)
+    assert none["inflow_day1_cusecs"].to_numpy() == pytest.approx(
+        plain["inflow_day1_cusecs"].to_numpy()
+    )
+    # the model carry between measurements gains the same volume each day
+    rs = rain.set_index("date")["rain_mm"]
+    ms = verify.melt_series_for(rain, "Pong", withm)
+    two = pd.Series([3.0, 3.5], index=pd.to_datetime(["2025-08-10", "2025-08-28"]))
+    s0, _, _ = verify.carry_storage(two, {}, rs, "Pong", p)
+    s1, _, _ = verify.carry_storage(two, {}, rs, "Pong", withm, melt=ms)
+    assert s1.loc["2025-08-15"] - s0.loc["2025-08-15"] == pytest.approx(5 * 0.005, abs=1e-9)
+
+
+def test_variant_verdict_can_be_restricted_to_the_dams_a_variant_touches():
+    loso = pd.DataFrame(
+        {
+            "dam": ["Pong", "Bhakra", "Bhakra"],
+            "variant": ["baseline", "baseline", "snowmelt"],
+            "rmse_bcm": [0.030, 0.043, 0.042],
+        }
+    )
+    b = {"season_peak_ratio_min": 0.5, "period_mean_worst_deviation": 0.3}
+    v = {"season_peak_ratio_min": 0.6, "period_mean_worst_deviation": 0.3}
+    verdict = verify.variant_verdict(b, v, loso, "snowmelt", dams=("Bhakra",))
+    assert verdict["dams"] == ["Bhakra"] and verdict["adopt"]
+    # without the filter the same table gives the same dams (the variant has only Bhakra)
+    assert verify.variant_verdict(b, v, loso, "snowmelt")["dams"] == ["Bhakra"]
+    # a dam the variant has no row for is not scored
+    assert verify.variant_verdict(b, v, loso, "snowmelt", dams=("Pong",))["adopt"] is False

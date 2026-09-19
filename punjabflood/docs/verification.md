@@ -402,22 +402,22 @@ Where the run covers at least 10 of a period's days, the model's mean is 0.78 to
 
 Each variant is fitted on the same storage record beside the response in use and scored leave-one-season-out (each season by a fit on the others). Rain above the heavy-day threshold in a catchment day gets its own coefficient and lag weights (the threshold-excess variant). The soil-moisture variants change the carrier of catchment wetness: `api+sm` keeps the five-day rain index and adds the ERA5-Land 0-7 cm soil-moisture anomaly through gamma; `sm` drops the rain index and keeps the anomaly alone (each fold's climatology leaves the held-out season out). The press inflow fit is the same response fitted on every dated press reading of inflow the sweeps found (moment readings, all seasons before the current one), expressed in the storage-change convention and scored on the storage record, where every season is out of sample for it (`seasons` counts them). The rule before any variant can replace the response the product uses: the held-out error may not rise at any dam, the season-peak ratios of the flood-scale table must rise, and the period means may not move further from the reported means than the baseline's worst one does. Heavy-day bias is observed minus predicted storage change, positive when heavy days are under-predicted.
 
-| dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess | wetness | gamma |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Bhakra | baseline | 11 | 1009 | 0.0439 | 2 | 0.1013 | -0.0908 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api | 0.00 |
-| Bhakra | excess above 30 mm | 11 | 1009 | 0.0668 | 2 | 0.0923 | -0.0773 | 0.194 | 0.207 | 0.55 0.21 0.12 0.12 | 0.303 | 0.00 1.00 0.00 0.00 | api | 0.00 |
-| Bhakra | api+sm | 11 | 1009 | 0.0440 | 2 | 0.0961 | -0.0866 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api+sm | -0.14 |
-| Bhakra | sm | 11 | 1009 | 0.0436 | 2 | 0.0691 | -0.0530 | 0.278 | 0.000 | 0.27 0.36 0.18 0.19 | 0.000 | none | sm | 0.15 |
-| Pong | baseline | 8 | 733 | 0.0302 | 28 | 0.0782 | -0.0158 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api | 0.00 |
-| Pong | excess above 30 mm | 8 | 733 | 0.0304 | 28 | 0.0773 | -0.0129 | 0.200 | 0.332 | 0.40 0.39 0.11 0.10 | 0.523 | 0.20 0.65 0.09 0.06 | api | 0.00 |
-| Pong | api+sm | 8 | 733 | 0.0300 | 28 | 0.0772 | -0.0059 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api+sm | -0.36 |
-| Pong | sm | 8 | 733 | 0.0334 | 28 | 0.0860 | +0.0101 | 0.509 | 0.000 | 0.21 0.52 0.15 0.13 | 0.000 | none | sm | -0.25 |
-| Ranjit Sagar | baseline | 11 | 1184 | 0.0229 | 29 | 0.0442 | -0.0113 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api | 0.00 |
-| Ranjit Sagar | excess above 30 mm | 11 | 1184 | 0.0229 | 29 | 0.0469 | -0.0074 | 0.156 | 0.166 | 0.47 0.27 0.15 0.11 | 0.469 | 0.46 0.48 0.00 0.07 | api | 0.00 |
-| Ranjit Sagar | api+sm | 11 | 1184 | 0.0230 | 29 | 0.0384 | -0.0168 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api+sm | 0.26 |
-| Ranjit Sagar | sm | 11 | 1184 | 0.0230 | 29 | 0.0471 | -0.0101 | 0.341 | 0.000 | 0.34 0.45 0.11 0.10 | 0.000 | none | sm | 1.30 |
-| Bhakra | press inflow fit | 11 | 1009 | 0.0460 | 2 | 0.1520 | -0.1497 | 0.433 | 0.000 | 0.47 0.21 0.11 0.21 | 0.000 | none | api | 0.00 |
-| Pong | press inflow fit | 8 | 733 | 0.0714 | 28 | 0.1157 | -0.0589 | 0.710 | 0.278 | 0.35 0.15 0.22 0.28 | 0.000 | none | api | 0.00 |
+| dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess | wetness | gamma | c_melt |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Bhakra | baseline | 11 | 1009 | 0.0439 | 2 | 0.1013 | -0.0908 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api | 0.00 | 0.000 |
+| Bhakra | excess above 30 mm | 11 | 1009 | 0.0668 | 2 | 0.0923 | -0.0773 | 0.194 | 0.207 | 0.55 0.21 0.12 0.12 | 0.303 | 0.00 1.00 0.00 0.00 | api | 0.00 | 0.000 |
+| Bhakra | api+sm | 11 | 1009 | 0.0440 | 2 | 0.0961 | -0.0866 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api+sm | -0.14 | 0.000 |
+| Bhakra | sm | 11 | 1009 | 0.0436 | 2 | 0.0691 | -0.0530 | 0.278 | 0.000 | 0.27 0.36 0.18 0.19 | 0.000 | none | sm | 0.15 | 0.000 |
+| Pong | baseline | 8 | 733 | 0.0302 | 28 | 0.0782 | -0.0158 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api | 0.00 | 0.000 |
+| Pong | excess above 30 mm | 8 | 733 | 0.0304 | 28 | 0.0773 | -0.0129 | 0.200 | 0.332 | 0.40 0.39 0.11 0.10 | 0.523 | 0.20 0.65 0.09 0.06 | api | 0.00 | 0.000 |
+| Pong | api+sm | 8 | 733 | 0.0300 | 28 | 0.0772 | -0.0059 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api+sm | -0.36 | 0.000 |
+| Pong | sm | 8 | 733 | 0.0334 | 28 | 0.0860 | +0.0101 | 0.509 | 0.000 | 0.21 0.52 0.15 0.13 | 0.000 | none | sm | -0.25 | 0.000 |
+| Ranjit Sagar | baseline | 11 | 1184 | 0.0229 | 29 | 0.0442 | -0.0113 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api | 0.00 | 0.000 |
+| Ranjit Sagar | excess above 30 mm | 11 | 1184 | 0.0229 | 29 | 0.0469 | -0.0074 | 0.156 | 0.166 | 0.47 0.27 0.15 0.11 | 0.469 | 0.46 0.48 0.00 0.07 | api | 0.00 | 0.000 |
+| Ranjit Sagar | api+sm | 11 | 1184 | 0.0230 | 29 | 0.0384 | -0.0168 | 0.131 | 0.263 | 0.62 0.24 0.08 0.05 | 0.000 | none | api+sm | 0.26 | 0.000 |
+| Ranjit Sagar | sm | 11 | 1184 | 0.0230 | 29 | 0.0471 | -0.0101 | 0.341 | 0.000 | 0.34 0.45 0.11 0.10 | 0.000 | none | sm | 1.30 | 0.000 |
+| Bhakra | press inflow fit | 11 | 1009 | 0.0460 | 2 | 0.1520 | -0.1497 | 0.433 | 0.000 | 0.47 0.21 0.11 0.21 | 0.000 | none | api | 0.00 | 0.000 |
+| Pong | press inflow fit | 8 | 733 | 0.0714 | 28 | 0.1157 | -0.0589 | 0.710 | 0.278 | 0.35 0.15 0.22 0.28 | 0.000 | none | api | 0.00 | 0.000 |
 
 | variant | period means covered | worst deviation of a period mean from 1 | season-peak ratio, smallest | season-peak ratio, largest |
 |---|---|---|---|---|
@@ -434,6 +434,10 @@ Verdict on 'api+sm', not adopted. Conditions: the held-out error does not rise a
 Verdict on 'sm', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (fails); the period means hold (fails).
 
 Verdict on 'press inflow fit', not adopted. Conditions: the held-out error does not rise at any dam (fails); the season peaks rise (passes); the period means hold (passes).
+
+### The snowmelt term at Bhakra
+
+Not run: no melt table at data\raw\rain\bhakra_melt_daily.csv; run scripts/pull_snow_bhakra.py.
 
 ## As-issued hindcast: what the product would have said, each dam, 2024 to 2026
 
@@ -808,6 +812,30 @@ Three ways of combining `ecmwf_aifs025_single`, `ecmwf_ifs025`, `gfs_seamless` s
 | max_of_models | +9% | 0.55 | 5.41 | 105 | 0.35 | 0.55 | no |
 
 Weights fitted on every season: ecmwf_aifs025_single 0.35, ecmwf_ifs025 0.34, gfs_seamless 0.31. Verdict: no blend passes; the primary stays `ecmwf_aifs025_single`. The means lower the MAE and raise the correlation but miss more of the heavy days (the models disagree on their timing, so averaging smears them); the maximum catches more heavy days at a higher false-alarm ratio.
+
+### The weather watch run over the archive
+
+The watch's levels were fixed before any day was scored (`weather.py`). Here they are run day by day over the as-issued archive for every monsoon issue date the archive holds every model at leads 1 to 3, deterministic branch only (no ensemble is archived): the primary model's next-three-day total placed in the monsoon three-day totals of every year of the rain table (1961 to the latest day on disk, the scored seasons included) and the share of models with a 30 mm day. Truth, fixed in advance: at Bhakra the dated floodgate opening of 2025, at Pong and Ranjit Sagar the day of the largest dated inflow reading of 2025. A watch or alert day outside the window from 14 days before an event to 7 after it counts as a false alarm; 2024 and 2026 had no dam event, so every raised day there counts. 1,029 issue days scored.
+
+| catchment | event | issue days before | first watch | lead (d) | first alert | lead (d) | days at watch or above | days at alert | highest percentile before |
+|---|---|---|---|---|---|---|---|---|---|
+| Bhakra | 2025-08-19 | 14 | 2025-08-09 | 10 | 2025-08-10 | 9 |  |  | 94 |
+| Pong | 2025-08-26 | 14 | 2025-08-12 | 14 | 2025-08-12 | 14 |  |  | 98 |
+| Ranjit Sagar | 2025-08-27 | 14 | 2025-08-13 | 14 | 2025-08-13 | 14 |  |  | 100 |
+
+| catchment | season | issue days | watch share | alert share | days outside event windows | false alarms (watch or above) | false alerts |
+|---|---|---|---|---|---|---|---|
+| Bhakra | 2024 | 119 | 0.13 | 0.07 | 119 | 23 | 8 |
+| Bhakra | 2025 | 119 | 0.24 | 0.09 | 97 | 29 | 6 |
+| Bhakra | 2026 | 105 | 0.14 | 0.05 | 105 | 20 | 5 |
+| Pong | 2024 | 119 | 0.10 | 0.06 | 119 | 19 | 7 |
+| Pong | 2025 | 119 | 0.29 | 0.15 | 97 | 36 | 9 |
+| Pong | 2026 | 105 | 0.09 | 0.04 | 105 | 13 | 4 |
+| Ranjit Sagar | 2024 | 119 | 0.09 | 0.03 | 119 | 14 | 3 |
+| Ranjit Sagar | 2025 | 119 | 0.19 | 0.12 | 97 | 22 | 6 |
+| Ranjit Sagar | 2026 | 105 | 0.06 | 0.04 | 105 | 10 | 4 |
+
+No level is changed on this result; a change would be a new plan with its own rule.
 
 ### The in-season observed rain: IMD real-time grid and ERA5 against the final grid
 

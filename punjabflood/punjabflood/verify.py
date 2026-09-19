@@ -20,6 +20,7 @@ rendered from those files so no number is typed by hand.
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 import numpy as np
@@ -27,6 +28,8 @@ import pandas as pd
 from scipy.stats import spearmanr
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
+
+log = logging.getLogger(__name__)
 
 from punjabflood import constants as C
 from punjabflood import hei, inflow, reservoirs, routing
@@ -116,6 +119,40 @@ def _anom(sm: pd.Series | None, d) -> float:
     return float(sm.get(d, 0.0)) if sm is not None else 0.0
 
 
+def melt_series_for(
+    rain_daily: pd.DataFrame, catchment: str, params: inflow.InflowParams
+) -> pd.Series | None:
+    """The catchment melt volume (BCM) by date for a catchment, from the ``melt_bcm`` column
+    of the rain table; None when the parameters carry no snowmelt term or the table has no
+    such column. Days without a value melt nothing (zero) so a gap never stops a run."""
+    if not params.has_melt or "melt_bcm" not in rain_daily.columns:
+        return None
+    r = rain_daily[rain_daily["catchment"] == catchment].copy()
+    r["date"] = pd.to_datetime(r["date"])
+    return r.set_index("date")["melt_bcm"].astype(float).fillna(0.0).sort_index()
+
+
+_MELT_GAPS_LOGGED: set[tuple[str, str]] = set()
+
+
+def _melt_window(melt: pd.Series | None, index: pd.DatetimeIndex) -> np.ndarray:
+    """The melt volumes over ``index`` (zeros without a series). A day the series lacks
+    melts nothing and is logged once per span: a parameter set that carries the term has
+    handed part of its base to the melt, so a missing day silently lowers the prediction."""
+    if melt is None:
+        return np.zeros(len(index))
+    w = melt.reindex(index)
+    if w.isna().any() and len(index):
+        key = (str(index.min().date()), str(index.max().date()))
+        if key not in _MELT_GAPS_LOGGED:
+            _MELT_GAPS_LOGGED.add(key)
+            log.warning(
+                "melt series lacks %d of %d days over %s to %s; those days melt nothing",
+                int(w.isna().sum()), len(index), key[0], key[1],
+            )
+    return w.fillna(0.0).to_numpy(dtype=float)
+
+
 def carry_storage(
     measured: pd.Series,
     basis: dict,
@@ -125,6 +162,7 @@ def carry_storage(
     max_carry_days: int = MAX_CARRY_DAYS,
     sm: pd.Series | None = None,
     capacity_bcm: float | None = None,
+    melt: pd.Series | None = None,
 ) -> tuple[pd.Series, dict, dict]:
     """Daily storage between measurements from the model's own water balance.
 
@@ -159,9 +197,11 @@ def carry_storage(
     n_hist = inflow.history_days(params)
 
     def step(prev_value: float, d: pd.Timestamp) -> float:
-        hist = rain.reindex(pd.date_range(d - pd.Timedelta(days=n_hist - 1), d))
+        window = pd.date_range(d - pd.Timedelta(days=n_hist - 1), d)
+        hist = rain.reindex(window)
         if hist.isna().any():
             return float("nan")
+        mh = _melt_window(melt, window)
         inflow_bcm = float(
             inflow.predict_daily_bcm(
                 params,
@@ -169,6 +209,8 @@ def carry_storage(
                 base_cusecs,
                 rain_mm_recent=hist.iloc[:-1].to_numpy(),
                 sm_anom=_anom(sm, d),
+                melt_bcm_recent=mh[:-1],
+                melt_bcm_forecast=mh[-1:],
             )[0]
         )
         return float(min(max(prev_value + inflow_bcm - a_bcm, 0.0), cap))
@@ -221,7 +263,7 @@ def perfect_prog_hei(
     schedule instead: the ceiling on each day of the horizon is the storage at that day's
     permissible level, and a reservoir above the schedule owes the drawdown on day one; the
     carry between measurements stays at FRL (the record's own bound)."""
-    s, basis, rain, gaps, sm = _event_series(
+    s, basis, rain, gaps, sm, melt = _event_series(
         state, rain_daily, dam, catchment, params, carry, capacity_bcm
     )
     absorb = hei.absorption_cusecs(dam)
@@ -250,6 +292,8 @@ def perfect_prog_hei(
             _anom(sm, d),
             capacity_bcm=cap_d,
             clamp_start=clamp,
+            melt_past=_melt_window(melt, past.index),
+            melt_fut=_melt_window(melt, fut.index),
         )
         row["storage_basis"] = basis.get(d, "")
         row["reanchor_gap_bcm"] = gaps.get(d, float("nan"))
@@ -265,10 +309,11 @@ def _event_series(
     params: inflow.InflowParams,
     carry: str,
     capacity_bcm: float | None = None,
-) -> tuple[pd.Series, dict, pd.Series, dict, pd.Series | None]:
+) -> tuple[pd.Series, dict, pd.Series, dict, pd.Series | None, pd.Series | None]:
     """The storage series (measured, or measured and model-carried), its basis per day, the
     observed catchment rain series, the re-anchor gaps of ``carry_storage`` (empty without
-    the model carry), and the soil-moisture anomaly series (None when unused)."""
+    the model carry), the soil-moisture anomaly series (None when unused) and the catchment
+    melt series (None when the parameters carry no snowmelt term)."""
     s = state[(state["dam"] == dam) & state["storage_bcm"].notna()].copy()
     s["date"] = pd.to_datetime(s["date"])
     if carry == "model" and "basis" in s:
@@ -279,12 +324,13 @@ def _event_series(
     r["date"] = pd.to_datetime(r["date"])
     rain = r.set_index("date")["rain_mm"].sort_index()
     sm = sm_anomaly_series_for(rain_daily, catchment, params)
+    melt = melt_series_for(rain_daily, catchment, params)
     gaps: dict = {}
     if carry == "model" and len(s):
         s, basis, gaps = carry_storage(
-            s, basis, rain, dam, params, sm=sm, capacity_bcm=capacity_bcm
+            s, basis, rain, dam, params, sm=sm, capacity_bcm=capacity_bcm, melt=melt
         )
-    return s, basis, rain, gaps, sm
+    return s, basis, rain, gaps, sm, melt
 
 
 def _hei_row(
@@ -298,10 +344,13 @@ def _hei_row(
     sm_anom: float = 0.0,
     capacity_bcm=None,
     clamp_start: bool = True,
+    melt_past=(),
+    melt_fut=(),
 ) -> dict:
     """One day's index from a storage, a rain path over the horizon (``fut``, mm per day),
-    the recent observed rain (``past``) and the day's soil-moisture anomaly. The base flow
-    the product takes from the bulletin is unknown historically, so the calibration
+    the recent observed rain (``past``), the day's soil-moisture anomaly and, for a
+    parameter set with a snowmelt term, the recent and horizon melt volumes (BCM). The base
+    flow the product takes from the bulletin is unknown historically, so the calibration
     intercept plus the non-spill passage stands in for it (the storage-change relation the
     model was fitted on)."""
     base_bcm = max(params.intercept_bcm_per_day + C.cusec_days_to_bcm(absorb), 0.0)
@@ -311,6 +360,8 @@ def _hei_row(
         C.bcm_to_cusec_days(base_bcm),
         rain_mm_recent=past,
         sm_anom=sm_anom,
+        melt_bcm_recent=melt_past,
+        melt_bcm_forecast=melt_fut,
     )
     res = hei.headroom_exhaustion(
         dam, float(storage), daily, absorb, capacity_bcm=capacity_bcm, clamp_start=clamp_start
@@ -347,7 +398,7 @@ def as_issued_hei(
     archived lead 1 to ``horizon_days`` QPF of ``model``) and the recorded or model-carried
     storage: what the product would have said, day by day, with the base flow stand-in of
     ``_hei_row``. Rows carry the forecast and the observed rain over the horizon."""
-    s, basis, rain, _, sm = _event_series(state, rain_daily, dam, catchment, params, carry)
+    s, basis, rain, _, sm, melt = _event_series(state, rain_daily, dam, catchment, params, carry)
     q = qpf_leads[(qpf_leads["catchment"] == catchment) & (qpf_leads["model"] == model)]
     fc = {
         (pd.Timestamp(t), int(k)): float(v)
@@ -365,7 +416,18 @@ def as_issued_hei(
         if any(v is None or v != v for v in fut) or past.isna().any():
             continue
         obs_fut = rain.reindex(pd.date_range(d + pd.Timedelta(days=1), periods=horizon_days))
-        row = _hei_row(dam, d, storage, fut, past.to_numpy(), params, absorb, _anom(sm, d))
+        row = _hei_row(
+            dam,
+            d,
+            storage,
+            fut,
+            past.to_numpy(),
+            params,
+            absorb,
+            _anom(sm, d),
+            melt_past=_melt_window(melt, past.index),
+            melt_fut=_melt_window(melt, obs_fut.index),
+        )
         row.update(
             {
                 "model": model,
@@ -606,16 +668,24 @@ def flood_scale_error(fs: pd.DataFrame, min_period_days: int = 10) -> dict:
     }
 
 
-def variant_verdict(base: dict, variant: dict, loso: pd.DataFrame, variant_name: str) -> dict:
+def variant_verdict(
+    base: dict,
+    variant: dict,
+    loso: pd.DataFrame,
+    variant_name: str,
+    dams: tuple[str, ...] | None = None,
+) -> dict:
     """The adoption rule for an inflow-response variant, each condition on its own: the
     leave-one-season-out error may not rise at any dam, the season-peak ratios of the
     flood-scale check must rise, and the period means may not move further from the reported
     means than the baseline's worst one does. ``base`` and ``variant`` are
     ``flood_scale_summary`` results; ``loso`` has one row per dam and variant with
-    ``rmse_bcm`` (``variant == 'baseline'`` for the response in use)."""
+    ``rmse_bcm`` (``variant == 'baseline'`` for the response in use). ``dams`` restricts the
+    rule to the dams a variant touches (the caller then passes summaries over those dams
+    only); every dam both have otherwise."""
     b = loso[loso["variant"] == "baseline"].set_index("dam")["rmse_bcm"]
     v = loso[loso["variant"] == variant_name].set_index("dam")["rmse_bcm"]
-    dams = sorted(set(b.index) & set(v.index))
+    dams = sorted(set(b.index) & set(v.index) & (set(dams) if dams is not None else set(b.index)))
     rmse_ok = bool(dams) and all(float(v[d]) <= float(b[d]) * (1 + 1e-9) for d in dams)
     peaks_ok = bool(variant["season_peak_ratio_min"] > base["season_peak_ratio_min"])
     periods_ok = bool(
@@ -1183,6 +1253,8 @@ def qpf_model_comparison(
     out["false_alarm_not_higher"] = bool(far_ok)
     out["switch"] = bool(hit_better and far_ok)
     return out
+
+
 def realtime_vs_final(
     final: pd.DataFrame,
     realtime: pd.DataFrame,
@@ -1334,3 +1406,154 @@ def qpf_blend_test(
             passing.append((s["mae_mm"], name))
     out["adopt"] = min(passing)[1] if passing else None
     return out
+
+
+WATCH_EVENT_BEFORE_DAYS = 14
+WATCH_EVENT_AFTER_DAYS = 7
+
+
+def weather_watch_hindcast(
+    qpf_leads: pd.DataFrame,
+    climatology: dict[str, np.ndarray],
+    events: dict[str, str] | None,
+    models: tuple[str, ...] = AS_ISSUED_MODELS,
+    primary: str = "ecmwf_aifs025_single",
+    months=(6, 7, 8, 9),
+    watch_days: int = 3,
+    heavy_mm: float = 30.0,
+    catchments: tuple[str, ...] | None = None,
+) -> dict:
+    """The weather watch run day by day over the as-issued archive, deterministic branch
+    only (no ensemble is archived): for every issue date whose leads 1 to ``watch_days``
+    every model in ``models`` present that season holds, the primary model's three-day
+    total placed in ``climatology`` and the share of models with a day at or above
+    ``heavy_mm``, through ``weather.level`` with ``has_ensemble`` False. The primary is
+    ``primary`` where the issue date has it, else the first model it has.
+
+    ``events`` maps a catchment to the date of its dam event (ISO). Returns the rows, one
+    summary per catchment and season (the share of issue days at each level, and the days
+    at watch or above outside the event window, ``WATCH_EVENT_BEFORE_DAYS`` before to
+    ``WATCH_EVENT_AFTER_DAYS`` after an event, as false alarms), and one summary per event
+    (the first issue date at watch and at alert within the window before it, and the
+    lead)."""
+    from punjabflood import weather as wx
+
+    q = qpf_leads.copy()
+    q["target_date"] = pd.to_datetime(q["target_date"])
+    q = q[q["model"].isin(list(models)) & q["lead_days"].between(1, watch_days)]
+    q["issue_date"] = q["target_date"] - pd.to_timedelta(q["lead_days"], unit="D")
+    q = q[q["issue_date"].dt.month.isin(list(months))]
+    cats = list(catchments) if catchments is not None else sorted(q["catchment"].unique())
+    events = events or {}
+    rows: list[dict] = []
+    for cat in cats:
+        g = q[q["catchment"] == cat]
+        # the models the archive holds for this catchment in each season
+        season_models = g.groupby(g["issue_date"].dt.year)["model"].agg(lambda s: set(s))
+        for issue, gi in g.groupby("issue_date"):
+            by_model = {}
+            for m, gm in gi.groupby("model"):
+                s = gm.set_index("lead_days")["rain_mm"].reindex(range(1, watch_days + 1))
+                if s.isna().any():
+                    continue
+                by_model[m] = s.to_numpy(dtype=float)
+            if set(by_model) != season_models.get(issue.year, set()):
+                continue  # an issue date short of a model at some lead is not scored
+            model = primary if primary in by_model else next(iter(by_model))
+            three = float(by_model[model].sum())
+            pct = wx.percentile_of(climatology.get(cat), three)
+            heavy = {m: bool((v >= heavy_mm).any()) for m, v in by_model.items()}
+            share = sum(heavy.values()) / len(heavy)
+            rows.append(
+                {
+                    "issue_date": issue.date().isoformat(),
+                    "year": int(issue.year),
+                    "catchment": cat,
+                    "primary_model": model,
+                    "n_models": int(len(by_model)),
+                    "three_day_mm": three,
+                    "three_day_percentile": pct,
+                    "models_with_heavy_day": float(share),
+                    "level": wx.level(pct, None, share, False),
+                }
+            )
+    df = pd.DataFrame(rows)
+    if df.empty:
+        return {"rows": df, "seasons": [], "events": []}
+    rank = {"quiet": 0, "watch": 1, "alert": 2}
+    df["level_rank"] = df["level"].map(rank)
+    d = pd.to_datetime(df["issue_date"])
+    df["in_event_window"] = False
+    for cat, ev in events.items():
+        e = pd.Timestamp(ev)
+        m = (
+            (df["catchment"] == cat)
+            & (d >= e - pd.Timedelta(days=WATCH_EVENT_BEFORE_DAYS))
+            & (d <= e + pd.Timedelta(days=WATCH_EVENT_AFTER_DAYS))
+        )
+        df.loc[m, "in_event_window"] = True
+    seasons = []
+    for (cat, y), g in df.groupby(["catchment", "year"]):
+        outside = g[~g["in_event_window"]]
+        seasons.append(
+            {
+                "catchment": cat,
+                "year": int(y),
+                "n_issue_days": int(len(g)),
+                "watch_share": float((g["level"] == "watch").mean()),
+                "alert_share": float((g["level"] == "alert").mean()),
+                "n_outside_event_window": int(len(outside)),
+                "false_alarm_days": int((outside["level_rank"] >= 1).sum()),
+                "false_alert_days": int((outside["level_rank"] >= 2).sum()),
+            }
+        )
+    ev_rows = []
+    for cat, ev in events.items():
+        e = pd.Timestamp(ev)
+        before = (
+            (df["catchment"] == cat)
+            & (d < e)
+            & (d >= e - pd.Timedelta(days=WATCH_EVENT_BEFORE_DAYS))
+        )
+        g = df[before].sort_values("issue_date")
+        first_w = g[g["level_rank"] >= 1].head(1)
+        first_a = g[g["level_rank"] >= 2].head(1)
+        # the issue day just before the window opened: a level already raised there means
+        # the lead is bounded by the window, not measured by it
+        eve = df[
+            (df["catchment"] == cat) & (d == e - pd.Timedelta(days=WATCH_EVENT_BEFORE_DAYS + 1))
+        ]
+        eve_rank = int(eve["level_rank"].iloc[0]) if len(eve) else 0
+
+        def _first(r):
+            return str(r["issue_date"].iloc[0]) if len(r) else None
+
+        def _lead(r):
+            return int((e - pd.Timestamp(r["issue_date"].iloc[0])).days) if len(r) else None
+
+        def _at_edge(r, rank):
+            return bool(len(r) and len(g) and r.index[0] == g.index[0] and eve_rank >= rank)
+
+        ev_rows.append(
+            {
+                "catchment": cat,
+                "event_date": e.date().isoformat(),
+                "n_issue_days_before": int(len(g)),
+                "first_watch_issue_date": _first(first_w),
+                "watch_lead_days": _lead(first_w),
+                "watch_raised_before_window": _at_edge(first_w, 1),
+                "first_alert_issue_date": _first(first_a),
+                "alert_lead_days": _lead(first_a),
+                "alert_raised_before_window": _at_edge(first_a, 2),
+                "days_at_watch_before": int((g["level_rank"] >= 1).sum()),
+                "days_at_alert_before": int((g["level_rank"] >= 2).sum()),
+                "max_percentile_before": float(g["three_day_percentile"].max()) if len(g) else None,
+            }
+        )
+    return {
+        "rows": df.drop(columns=["level_rank"]),
+        "seasons": seasons,
+        "events": ev_rows,
+        "window_days_before": WATCH_EVENT_BEFORE_DAYS,
+        "window_days_after": WATCH_EVENT_AFTER_DAYS,
+    }

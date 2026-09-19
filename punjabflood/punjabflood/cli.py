@@ -40,6 +40,10 @@ ERA5_SEASON_CSV = RAW / "rain" / "era5_dams_{year}_season.csv"  # ERA5 over the 
 PARAMS_JSON = REF / "inflow_params.json"
 FLOOD_SCALE_ERROR_JSON = REF / "flood_scale_error.json"  # committed; the flood-scale
 # spread verify measured, for the product's third spill probability
+# the dated 2025 dam events the weather watch is scored against: Bhakra's floodgate
+# opening (data/reference/bbmb/gate_openings.csv) and the day of the largest dated inflow
+# reading at Pong and Ranjit Sagar (data/reference/bbmb/inflow_points.csv)
+WATCH_EVENTS_2025 = {"Bhakra": "2025-08-19", "Pong": "2025-08-26", "Ranjit Sagar": "2025-08-27"}
 GHAGGAR_CLIM_JSON = REF / "ghaggar_season_3day_totals.json"  # committed; lets a runner without
 # the raw rain archive place the Ghaggar forecast in the record's percentiles
 DAM_NAMES = ("Bhakra", "Pong", "Ranjit Sagar")
@@ -55,6 +59,13 @@ PRESS_VARIANT = "press inflow fit"
 SEASON_PEAKS_CSV = REF / "bbmb" / "season_peak_inflows_2025.csv"
 # the inflow-response variant the verification fits and scores beside the response in use
 EXCESS_VARIANT = f"excess above {inflow.EXCESS_THRESHOLD_MM:.0f} mm"
+# the snowmelt variant: the degree-day melt over the whole Bhakra catchment
+# (scripts/pull_snow_bhakra.py writes the table) as a lagged term beside the rain response,
+# fitted and judged at Bhakra only under the rule in
+# docs/superpowers/plans/2026-09-19-snowmelt-and-watch-hindcast.md
+SNOWMELT_VARIANT = "snowmelt"
+SNOWMELT_DAMS = ("Bhakra",)
+MELT_CSV = RAW / "rain" / "bhakra_melt_daily.csv"
 
 
 def _log():
@@ -196,8 +207,8 @@ def merge_recent_rain(old: pd.DataFrame | None, frames: list[pd.DataFrame]) -> p
             df[c] = df[c].to_numpy() if c in df else float("nan")
             df[c] = pd.Series(df[c].to_numpy(), index=key).fillna(carried[c]).to_numpy()
     df["date"] = df["date"].dt.strftime("%Y-%m-%d")
-    return df.drop(columns=["_rank", "_old"]).sort_values(["catchment", "date"]).reset_index(
-        drop=True
+    return (
+        df.drop(columns=["_rank", "_old"]).sort_values(["catchment", "date"]).reset_index(drop=True)
     )
 
 
@@ -306,6 +317,27 @@ def _state(cwc_path: Path = CWC_CSV) -> tuple[pd.DataFrame, dict, pd.DataFrame]:
     bulletins = reservoirs.load_bulletins()
     state = reservoirs.daily_state(cw, bulletins, ratings, supplement=reservoirs.load_supplement())
     return state, ratings, bulletins
+
+
+def _with_melt(rain_daily: pd.DataFrame, melt: pd.DataFrame, cats: dict) -> pd.DataFrame:
+    """The rain table with a ``melt_bcm`` column: the catchment melt (mm, from
+    ``snow.catchment_melt``) as a volume over the whole catchment area of the catchment
+    file (not the IMD-covered part the rain volume uses: the melt comes from every archive
+    point). Rows of catchments the melt table lacks get no value."""
+    m = melt.copy()
+    m["date"] = pd.to_datetime(m["date"]).dt.strftime("%Y-%m-%d")
+    m["melt_bcm"] = [
+        float(inflow.rain_volume_bcm(v, cats[c].area_km2))
+        for v, c in zip(m["melt_mm"], m["catchment"], strict=True)
+    ]
+    r = rain_daily.copy()
+    r["_date"] = pd.to_datetime(r["date"]).dt.strftime("%Y-%m-%d")
+    r = r.merge(
+        m[["date", "catchment", "melt_bcm"]].rename(columns={"date": "_date"}),
+        on=["_date", "catchment"],
+        how="left",
+    )
+    return r.drop(columns="_date")
 
 
 def _covered_area(rain_daily: pd.DataFrame, name: str, fallback: float) -> float:
@@ -423,6 +455,8 @@ def run_verify(horizon_days: int = 5):
     state = reservoirs.fill_gaps(state_measured)
     rain_daily = pd.read_csv(RAIN_CSV)
     cats = catchments_mod.load_geojson()
+    if MELT_CSV.exists():
+        rain_daily = _with_melt(rain_daily, pd.read_csv(MELT_CSV), cats)
     params = load_params()
     peaks_h = guidebook.load_peaks("harike_hussainiwala")
     peaks_r = guidebook.load_peaks("ropar")
@@ -497,9 +531,9 @@ def run_verify(horizon_days: int = 5):
                 pp_cushion.to_csv(out / "perfect_prog_event_pong_cushion.csv", index=False)
                 arr_c = verify.routed_next_day_release(pp_cushion, "Pong", passage=True)
                 arr_c.to_csv(out / "routed_pong_perfect_prog_cushion.csv", index=False)
-                results["event_timing_cushion"] = verify.event_timing_test(
-                    arr_c, peaks_d
-                ).to_dict(orient="records")
+                results["event_timing_cushion"] = verify.event_timing_test(arr_c, peaks_d).to_dict(
+                    orient="records"
+                )
                 results["flood_cushion"] = {
                     "dam": "Pong",
                     "top_level_ft": C.flood_cushion("Pong")[0] / C.FOOT_M,
@@ -522,7 +556,13 @@ def run_verify(horizon_days: int = 5):
             # the operator's schedule: the day the schedule bound first forces a release in
             # each event season against the dated gate opening, beside the FRL bound
             pp_b = verify.perfect_prog_hei(
-                state_measured, rain_daily, "Bhakra", "Bhakra", params["Bhakra"], horizon_days, "model"
+                state_measured,
+                rain_daily,
+                "Bhakra",
+                "Bhakra",
+                params["Bhakra"],
+                horizon_days,
+                "model",
             )
             pp_b.to_csv(out / "perfect_prog_event_bhakra.csv", index=False)
             pp_rc = verify.perfect_prog_hei(
@@ -543,7 +583,9 @@ def run_verify(horizon_days: int = 5):
             results["rule_curve"] = {
                 "dam": "Bhakra",
                 "vintage": C.RULE_CURVE_VINTAGE["Bhakra"],
-                "points": [{"month": m, "day": d, "level_ft": lv} for m, d, lv in C.rule_curve("Bhakra")],
+                "points": [
+                    {"month": m, "day": d, "level_ft": lv} for m, d, lv in C.rule_curve("Bhakra")
+                ],
                 "guideline_2025_08_19_ft": float(
                     C.BHAKRA.extra["rule_curve_guideline_ft_19_aug_2025"].value
                 ),
@@ -609,8 +651,10 @@ def run_verify(horizon_days: int = 5):
                 (EXCESS_VARIANT, {"excess_threshold_mm": inflow.EXCESS_THRESHOLD_MM}),
                 ("api+sm", {"wetness": "api+sm"}),
                 ("sm", {"wetness": "sm"}),
+                (SNOWMELT_VARIANT, {"melt": True}),
             ]
             variant_rows: list[dict] = []
+            variant_params: dict[tuple[str, str], inflow.InflowParams] = {}
             pp_variant: dict[str, dict] = {n: {} for n, _ in variants if n != "baseline"}
             summaries = {"baseline": verify.flood_scale_summary(fs)}
             fse = verify.flood_scale_error(fs)
@@ -630,11 +674,16 @@ def run_verify(horizon_days: int = 5):
                 r = rain_daily[rain_daily["catchment"] == dam]
                 area = _covered_area(rain_daily, dam, cats[dam].area_km2)
                 for name, kw in variants:
+                    if name == SNOWMELT_VARIANT and (
+                        dam not in SNOWMELT_DAMS or "melt_bcm" not in r.columns
+                    ):
+                        continue
                     try:
                         p_v = inflow.calibrate(state_measured, r, dam, area, **kw)
                     except ValueError as exc:
                         typer.echo(f"{dam} {name}: {exc}")
                         continue
+                    variant_params[(dam, name)] = p_v
                     variant_rows.append(
                         {
                             "dam": dam,
@@ -646,6 +695,7 @@ def run_verify(horizon_days: int = 5):
                                 area,
                                 kw.get("excess_threshold_mm"),
                                 wetness=kw.get("wetness", "api"),
+                                melt=kw.get("melt", False),
                             ),
                             "in_sample_rmse_bcm": p_v.rmse_bcm,
                             "c": p_v.c,
@@ -655,6 +705,9 @@ def run_verify(horizon_days: int = 5):
                             "w_excess": " ".join(f"{x:.2f}" for x in p_v.w_excess),
                             "wetness": p_v.wetness,
                             "gamma": p_v.gamma,
+                            "c_melt": p_v.c_melt,
+                            "w_melt": " ".join(f"{x:.2f}" for x in p_v.w_melt),
+                            "intercept_bcm_per_day": p_v.intercept_bcm_per_day,
                         }
                     )
                     if name != "baseline":
@@ -676,7 +729,10 @@ def run_verify(horizon_days: int = 5):
                 try:
                     p_press = inflow.calibrate_on_inflow(daily, r, dam, area, min_days=30)
                 except ValueError as exc:
-                    results["press_inflow_fit"][dam] = {"note": str(exc), "n_readings": int(len(daily))}
+                    results["press_inflow_fit"][dam] = {
+                        "note": str(exc),
+                        "n_readings": int(len(daily)),
+                    }
                     continue
                 p_use = inflow.as_storage_basis(p_press, absorb)
                 results["press_inflow_fit"][dam] = {
@@ -699,6 +755,9 @@ def run_verify(horizon_days: int = 5):
                         "w_excess": "",
                         "wetness": p_press.wetness,
                         "gamma": 0.0,
+                        "c_melt": 0.0,
+                        "w_melt": "",
+                        "intercept_bcm_per_day": p_use.intercept_bcm_per_day,
                     }
                 )
                 pp_variant[PRESS_VARIANT][dam] = verify.perfect_prog_hei(
@@ -709,7 +768,7 @@ def run_verify(horizon_days: int = 5):
                 loso_df.to_csv(out / "inflow_variants.csv", index=False)
                 verdicts = []
                 for name, by_dam in pp_variant.items():
-                    if not by_dam:
+                    if not by_dam or name == SNOWMELT_VARIANT:
                         continue
                     summaries[name] = verify.flood_scale_summary(
                         verify.flood_scale_inflow_check(by_dam, *truth)
@@ -725,6 +784,48 @@ def run_verify(horizon_days: int = 5):
                     "verdict": next((v for v in verdicts if v["variant"] == EXCESS_VARIANT), None),
                     "verdicts": verdicts,
                 }
+                # the snowmelt variant is judged at the dams it touches only: the baseline's
+                # flood-scale summary over those dams against the variant's
+                if pp_variant.get(SNOWMELT_VARIANT):
+                    base_sub = verify.flood_scale_summary(fs[fs["dam"].isin(SNOWMELT_DAMS)])
+                    var_sub = verify.flood_scale_summary(
+                        verify.flood_scale_inflow_check(pp_variant[SNOWMELT_VARIANT], *truth)
+                    )
+                    p_melt = {
+                        d: variant_params[(d, SNOWMELT_VARIANT)]
+                        for d in SNOWMELT_DAMS
+                        if (d, SNOWMELT_VARIANT) in variant_params
+                    }
+                    verify.write_json(
+                        {d: p.to_dict() for d, p in p_melt.items()},
+                        out / "inflow_params_snowmelt.json",
+                    )
+                    results["snowmelt_verdict"] = {
+                        **verify.variant_verdict(
+                            base_sub, var_sub, loso_df, SNOWMELT_VARIANT, dams=SNOWMELT_DAMS
+                        ),
+                        "baseline_flood_scale": base_sub,
+                        "variant_flood_scale": var_sub,
+                        "params": {
+                            d: {
+                                "c": p.c,
+                                "c_wet": p.c_wet,
+                                "c_melt": p.c_melt,
+                                "w_melt": list(p.w_melt),
+                                "intercept_bcm_per_day": p.intercept_bcm_per_day,
+                                "in_sample_rmse_bcm": p.rmse_bcm,
+                                "r2": p.r2,
+                            }
+                            for d, p in p_melt.items()
+                        },
+                        "melt_table": MELT_CSV.as_posix(),
+                    }
+                else:
+                    results["snowmelt_verdict"] = {
+                        "variant": SNOWMELT_VARIANT,
+                        "adopt": False,
+                        "note": f"no melt table at {MELT_CSV.as_posix()}; run scripts/pull_snow_bhakra.py",
+                    }
             if QPF_CSV.exists():
                 # what the product would have said: the archived as-issued QPF through the
                 # same water balance, one row per issue date, dam and model. The Dhilwan peak
@@ -844,9 +945,7 @@ def run_verify(horizon_days: int = 5):
         results["inflow_calibration_2026"][dam] = entry
         df = inflow.inflow_design(daily, r, area)
         if len(df):
-            base_s = max(
-                params[dam].intercept_bcm_per_day + C.cusec_days_to_bcm(absorb), 0.0
-            )
+            base_s = max(params[dam].intercept_bcm_per_day + C.cusec_days_to_bcm(absorb), 0.0)
             ic = pd.DataFrame(
                 {
                     "date": df.index,
@@ -863,7 +962,9 @@ def run_verify(horizon_days: int = 5):
                 )
             ic_rows.append(ic)
     if ic_rows:
-        pd.concat(ic_rows, ignore_index=True).to_csv(out / "inflow_calibration_2026.csv", index=False)
+        pd.concat(ic_rows, ignore_index=True).to_csv(
+            out / "inflow_calibration_2026.csv", index=False
+        )
 
     if QPF_CSV.exists():
         qpf_leads = pd.read_csv(QPF_CSV)
@@ -886,6 +987,20 @@ def run_verify(horizon_days: int = 5):
         results["qpf_blend_test"] = verify.qpf_blend_test(
             qpf_leads, rain_daily, incumbent=fc.PRIMARY_DETERMINISTIC
         )
+        # the weather watch run day by day over the archive, deterministic branch, against
+        # the dated 2025 dam events (the score is pre-registered in the plan of 2026-09-19)
+        from punjabflood import weather as wx
+
+        wh = verify.weather_watch_hindcast(
+            qpf_leads,
+            wx.season_3day_climatology(rain_daily, DAM_NAMES),
+            events=WATCH_EVENTS_2025,
+            primary=fc.PRIMARY_DETERMINISTIC,
+            catchments=tuple(DAM_NAMES),
+        )
+        wh["rows"].to_csv(out / "weather_watch_hindcast.csv", index=False)
+        results["weather_watch_hindcast"] = {k: v for k, v in wh.items() if k != "rows"}
+        results["weather_watch_hindcast"]["n_rows"] = int(len(wh["rows"]))
 
     # the in-season observed-rain records against the final IMD grid (the rule for the
     # product's observed record is in the function); the season is the latest one with a

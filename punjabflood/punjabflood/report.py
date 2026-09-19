@@ -561,8 +561,8 @@ def render_verification(
             "than the baseline's worst one does. Heavy-day bias is observed minus predicted "
             "storage change, positive when heavy days are under-predicted.",
             "",
-            "| dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess | wetness | gamma |",
-            "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+            "| dam | variant | seasons | days | held-out RMSE (BCM/day) | heavy days | heavy-day RMSE (BCM/day) | heavy-day bias (BCM/day) | c | c_wet | w | c_excess | w_excess | wetness | gamma | c_melt |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for r in iv["loso"]:
             lines.append(
@@ -570,7 +570,8 @@ def render_verification(
                 f"{_num(r.get('rmse_bcm'), '.4f')} | {int(r['n_heavy_days'])} | "
                 f"{_num(r.get('heavy_rmse_bcm'), '.4f')} | {_num(r.get('heavy_bias_bcm'), '+.4f')} | "
                 f"{r['c']:.3f} | {r['c_wet']:.3f} | {r['w']} | {r['c_excess']:.3f} | {r['w_excess'] or 'none'} | "
-                f"{r.get('wetness', 'api')} | {_num(r.get('gamma', 0.0), '.2f')} |"
+                f"{r.get('wetness', 'api')} | {_num(r.get('gamma', 0.0), '.2f')} | "
+                f"{_num(r.get('c_melt', 0.0), '.3f')} |"
             )
         lines += [
             "",
@@ -598,6 +599,64 @@ def render_verification(
                 f"Conditions: {said}.",
             ]
         lines.append("")
+
+    sv = results.get("snowmelt_verdict")
+    if sv:
+        lines += ["### The snowmelt term at Bhakra", ""]
+        if sv.get("note"):
+            lines += [f"Not run: {sv['note']}.", ""]
+        else:
+            lines += [
+                "Bhakra's base flow is snowmelt from the half of the catchment outside the "
+                "IMD grid, which the response carries as a constant intercept. The variant "
+                "runs a temperature-index snowpack at every archive point of the catchment "
+                "(ERA5 snowfall stacked into a pack, released at 4 mm per degree-day above "
+                "0 C, the factor fixed, not fitted) and adds the area-weighted melt, as a "
+                "volume over the whole catchment, as a lagged term with its own non-negative "
+                "coefficient and lag weights in the same fit; the intercept stays free, so "
+                "the term wins only what a season-varying melt explains beyond a constant "
+                "base. It touches Bhakra alone, so the rule is read at Bhakra alone: the "
+                "held-out error there may not rise, Bhakra's season-peak ratio must rise, and "
+                "Bhakra's period means may not move further from the reported means than the "
+                "baseline's worst one does. The rule was written before the fit.",
+                "",
+                "| dam | c | c_wet | c_melt | w_melt | intercept (BCM/day) | in-sample RMSE (BCM/day) | R2 |",
+                "|---|---|---|---|---|---|---|---|",
+            ]
+            for d, p in (sv.get("params") or {}).items():
+                lines.append(
+                    f"| {d} | {p['c']:.3f} | {p['c_wet']:.3f} | {p['c_melt']:.3f} | "
+                    f"{' '.join(f'{x:.2f}' for x in p['w_melt'])} | "
+                    f"{p['intercept_bcm_per_day']:+.4f} | {_num(p.get('in_sample_rmse_bcm'), '.4f')} | "
+                    f"{_num(p.get('r2'), '.3f')} |"
+                )
+            lines += [
+                "",
+                "| run | period means covered | worst deviation of a period mean from 1 | season-peak ratio, smallest | season-peak ratio, largest |",
+                "|---|---|---|---|---|",
+            ]
+            for name, s in (
+                ("baseline, Bhakra", sv.get("baseline_flood_scale") or {}),
+                ("snowmelt, Bhakra", sv.get("variant_flood_scale") or {}),
+            ):
+                lines.append(
+                    f"| {name} | {int(s['n_period_means'])} | "
+                    f"{_num(s.get('period_mean_worst_deviation'), '.2f')} | "
+                    f"{_num(s.get('season_peak_ratio_min'), '.2f')} | "
+                    f"{_num(s.get('season_peak_ratio_max'), '.2f')} |"
+                )
+            conds = [
+                ("the held-out error does not rise at Bhakra", sv["loso_error_not_higher"]),
+                ("Bhakra's season peak rises", sv["season_peaks_higher"]),
+                ("Bhakra's period means hold", sv["period_means_hold"]),
+            ]
+            said = "; ".join(f"{c} ({'passes' if ok else 'fails'})" for c, ok in conds)
+            lines += [
+                "",
+                f"Verdict on 'snowmelt', {'adopted' if sv['adopt'] else 'not adopted'}. "
+                f"Conditions: {said}. The held-out row is in the variants table above.",
+                "",
+            ]
 
     ai = results.get("as_issued_events") or []
     if ai:
@@ -835,6 +894,61 @@ def render_verification(
             "",
         ]
 
+    wh = results.get("weather_watch_hindcast")
+    if wh and wh.get("seasons"):
+        lines += [
+            "### The weather watch run over the archive",
+            "",
+            f"The watch's levels were fixed before any day was scored (`weather.py`). Here they "
+            f"are run day by day over the as-issued archive for every monsoon issue date the "
+            f"archive holds every model at leads 1 to 3, deterministic branch only (no ensemble "
+            f"is archived): the primary model's next-three-day total placed in the monsoon "
+            f"three-day totals of every year of the rain table (1961 to the latest day on "
+            f"disk, the scored seasons included) and the share of models with a 30 mm day. Truth, fixed in advance: at "
+            f"Bhakra the dated floodgate opening of 2025, at Pong and Ranjit Sagar the day of the "
+            f"largest dated inflow reading of 2025. A watch or alert day outside the window from "
+            f"{wh['window_days_before']} days before an event to {wh['window_days_after']} after "
+            f"it counts as a false alarm; 2024 and 2026 had no dam event, so every raised day "
+            f"there counts. {wh['n_rows']:,} issue days scored.",
+            "",
+            "| catchment | event | issue days before | first watch | lead (d) | first alert "
+            "| lead (d) | days at watch or above | days at alert | highest percentile before |",
+            "|---|---|---|---|---|---|---|---|---|---|",
+        ]
+
+        def _lead_cell(days, at_edge):
+            if days is None:
+                return ""
+            return f"{int(days)} or more (raised before the window)" if at_edge else str(int(days))
+
+        for e in wh["events"]:
+            lines.append(
+                f"| {e['catchment']} | {e['event_date']} | {e['n_issue_days_before']} | "
+                f"{e['first_watch_issue_date'] or 'never'} | "
+                f"{_lead_cell(e['watch_lead_days'], e.get('watch_raised_before_window'))} | "
+                f"{e['first_alert_issue_date'] or 'never'} | "
+                f"{_lead_cell(e['alert_lead_days'], e.get('alert_raised_before_window'))} | "
+                f"{e.get('days_at_watch_before', '')} | {e.get('days_at_alert_before', '')} | "
+                f"{_num(e['max_percentile_before'], '.0f')} |"
+            )
+        lines += [
+            "",
+            "| catchment | season | issue days | watch share | alert share | days outside event "
+            "windows | false alarms (watch or above) | false alerts |",
+            "|---|---|---|---|---|---|---|---|",
+        ]
+        for s_ in wh["seasons"]:
+            lines.append(
+                f"| {s_['catchment']} | {s_['year']} | {s_['n_issue_days']} | "
+                f"{_rate(s_['watch_share'])} | {_rate(s_['alert_share'])} | "
+                f"{s_['n_outside_event_window']} | {s_['false_alarm_days']} | {s_['false_alert_days']} |"
+            )
+        lines += [
+            "",
+            "No level is changed on this result; a change would be a new plan with its own rule.",
+            "",
+        ]
+
     rr = results.get("realtime_rain")
     if rr and rr.get("rows"):
         lines += [
@@ -870,7 +984,11 @@ def render_verification(
             "",
             f"MAE lower at every dam: {'yes' if rr.get('mae_lower_everywhere') else 'no'}; "
             f"hit rate not lower at any: {'yes' if rr.get('hit_rate_not_lower') else 'no'}"
-            + (f"; dams without real-time days: {', '.join(rr['dams_missing'])}" if rr.get("dams_missing") else "")
+            + (
+                f"; dams without real-time days: {', '.join(rr['dams_missing'])}"
+                if rr.get("dams_missing")
+                else ""
+            )
             + f". Verdict: {verdict}."
             + (
                 f" The product's observed record is `{rr['record_in_product']}`."
@@ -966,7 +1084,9 @@ def render_verification(
                     f"{_num(i_sc.get('mae_cusecs'), ',.0f')} | |"
                 )
             elif e.get("note"):
-                lines.append(f"| {dam} | {e.get('n_bulletin_days', 0)} | measured inflow | {e['note']} | | | | | | | | |")
+                lines.append(
+                    f"| {dam} | {e.get('n_bulletin_days', 0)} | measured inflow | {e['note']} | | | | | | | | |"
+                )
         lines.append("")
 
     lh = results.get("live_horizons") or []

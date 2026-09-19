@@ -311,7 +311,11 @@ def test_residual_acf1_recovers_ar1_persistence():
 # --- soil moisture as the wetness carrier ------------------------------------------
 def _params(**kw):
     base = dict(
-        dam="Pong", area_km2=12560.0, c=0.5, w=(1.0, 0.0, 0.0, 0.0), rho=0.9,
+        dam="Pong",
+        area_km2=12560.0,
+        c=0.5,
+        w=(1.0, 0.0, 0.0, 0.0),
+        rho=0.9,
         intercept_bcm_per_day=0.0,
     )
     base.update(kw)
@@ -394,9 +398,7 @@ def test_calibration_recovers_soil_moisture_sensitivity_under_each_wetness_carri
 
 def test_predict_storage_change_and_quick_response_apply_gamma():
     p = _params(gamma=1.0, sm_clim=tuple([0.3] * 366))
-    df = pd.DataFrame(
-        {"lag0": [0.1], "lag1": [0.0], "lag2": [0.0], "lag3": [0.0], "api_mm": [0.0]}
-    )
+    df = pd.DataFrame({"lag0": [0.1], "lag1": [0.0], "lag2": [0.0], "lag3": [0.0], "api_mm": [0.0]})
     df["sm_anom"] = 0.5
     assert inflow.predict_storage_change(p, df)[0] == pytest.approx(0.5 * 0.1 * 1.5)
     df["sm_anom"] = 0.0
@@ -446,8 +448,13 @@ def test_calibrate_on_inflow_recovers_the_response_and_scores_the_storage_fit():
     # the storage-change convention: a fit with half the coefficient and base minus passage
     absorb = 45_600.0
     half = inflow.InflowParams(
-        "Pong", area, c=0.2, w=(0.5, 0.3, 0.15, 0.05), rho=0.9,
-        intercept_bcm_per_day=0.06 - C.cusec_days_to_bcm(absorb), c_wet=0.1,
+        "Pong",
+        area,
+        c=0.2,
+        w=(0.5, 0.3, 0.15, 0.05),
+        rho=0.9,
+        intercept_bcm_per_day=0.06 - C.cusec_days_to_bcm(absorb),
+        c_wet=0.1,
     )
     s = inflow.score_on_inflow(half, obs, rain, area, absorb)
     assert s["n_days"] == 60 and s["bias_pct"] < -5 and s["pearson_r"] > 0.9
@@ -471,8 +478,13 @@ def test_inflow_fit_in_storage_convention_scores_the_storage_record_out_of_sampl
     p_store = inflow.calibrate(state, rain, "Pong", 12560.0)
     # an inflow-basis set with the true response and the true base
     p_in = inflow.InflowParams(
-        "Pong", 12560.0, c=0.55, w=(0.5, 0.3, 0.15, 0.05), rho=0.9,
-        intercept_bcm_per_day=0.05, basis="inflow",
+        "Pong",
+        12560.0,
+        c=0.55,
+        w=(0.5, 0.3, 0.15, 0.05),
+        rho=0.9,
+        intercept_bcm_per_day=0.05,
+        basis="inflow",
     )
     q = inflow.as_storage_basis(p_in, absorb)
     assert q.basis == "storage" and q.intercept_bcm_per_day == pytest.approx(0.05 - 0.03)
@@ -483,9 +495,13 @@ def test_inflow_fit_in_storage_convention_scores_the_storage_record_out_of_sampl
     # the true response scores about as well as the fit on its own record
     assert s_true["rmse_bcm"] < s_fit["rmse_bcm"] * 1.2
     # a wrong response scores worse
-    bad = inflow.InflowParams("Pong", 12560.0, c=0.2, w=(0.25,) * 4, rho=0.9, intercept_bcm_per_day=0.02)
-    assert inflow.storage_change_score(bad, state, rain, "Pong", 12560.0)["rmse_bcm"] > s_true["rmse_bcm"] * 1.5
-
+    bad = inflow.InflowParams(
+        "Pong", 12560.0, c=0.2, w=(0.25,) * 4, rho=0.9, intercept_bcm_per_day=0.02
+    )
+    assert (
+        inflow.storage_change_score(bad, state, rain, "Pong", 12560.0)["rmse_bcm"]
+        > s_true["rmse_bcm"] * 1.5
+    )
 
 
 def test_sm_climatology_fills_the_leap_day_when_the_record_has_none():
@@ -495,3 +511,107 @@ def test_sm_climatology_fills_the_leap_day_when_the_record_has_none():
     clim = inflow.sm_climatology(sm)
     assert clim.shape == (366,)
     assert np.isfinite(clim).all()
+
+
+# --- the snowmelt term ------------------------------------------------------------------
+
+
+def _synthetic_melt(c_melt=0.6, w_melt=(0.5, 0.3, 0.2, 0.0), seed=21, years=range(2001, 2011)):
+    """The plain synthetic record with a daily melt volume on the rain frame and, when
+    ``c_melt`` is above zero, its lagged response added to the storage change. The melt is a
+    smooth seasonal hump with noise, so it is not collinear with the rain."""
+    state, rain = _synthetic(seed=seed, years=years)
+    rng = np.random.default_rng(seed + 1)
+    d = pd.to_datetime(rain["date"])
+    doy = d.dt.dayofyear.to_numpy()
+    melt_bcm = 0.02 * np.exp(-(((doy - 190) / 40.0) ** 2)) * (1 + 0.5 * rng.random(len(doy)))
+    rain = rain.copy()
+    rain["melt_bcm"] = melt_bcm
+    if c_melt > 0:
+        s = state.set_index("date")
+        add = pd.Series(0.0, index=s.index)
+        m = pd.Series(melt_bcm, index=d)
+        for k, wk in enumerate(w_melt):
+            add = add + c_melt * wk * m.shift(k).fillna(0.0).reindex(s.index).fillna(0.0)
+        # the storage is a running sum of inflow, so the response accumulates within a season
+        for y in years:
+            sel = s.index.year == y
+            s.loc[sel, "storage_bcm"] += add[sel].cumsum().to_numpy()
+        state = s.reset_index()
+    return state, rain
+
+
+def test_design_matrix_carries_zero_melt_columns_without_a_melt_series():
+    state, rain = _synthetic()
+    df = inflow.design_matrix(state, rain, "Pong", 12560.0)
+    assert [f"melt{k}" for k in inflow.LAGS] == [c for c in df.columns if c.startswith("melt")]
+    assert (df[[f"melt{k}" for k in inflow.LAGS]] == 0).all().all()
+
+
+def test_melt_fit_without_a_melt_mechanism_leaves_the_response_alone():
+    state, rain = _synthetic_melt(c_melt=0.0)
+    p0 = inflow.calibrate(state, rain, "Pong", 12560.0)
+    p1 = inflow.calibrate(state, rain, "Pong", 12560.0, melt=True)
+    assert not p0.has_melt and p0.w_melt == () and p0.c_melt == 0.0
+    assert p1.has_melt and len(p1.w_melt) == len(inflow.LAGS)
+    assert abs(p1.c - p0.c) < 0.05, (p0.c, p1.c)
+    # nothing to explain, so the term stays near zero
+    assert p1.c_melt < 0.15, p1.c_melt
+
+
+def test_melt_fit_recovers_a_planted_coefficient():
+    state, rain = _synthetic_melt(c_melt=0.6, w_melt=(0.5, 0.3, 0.2, 0.0))
+    p = inflow.calibrate(state, rain, "Pong", 12560.0, melt=True)
+    assert abs(p.c_melt - 0.6) < 0.15, p.c_melt
+    assert abs(sum(p.w_melt) - 1.0) < 1e-9
+    assert abs(p.c - 0.55) < 0.08, p.c
+    # the fitted relation reproduces its own calibration residuals
+    df = inflow.design_matrix(state, rain, "Pong", 12560.0)
+    resid = df["ds"].to_numpy() - inflow.predict_storage_change(p, df)
+    assert float(np.sqrt(np.mean(resid**2))) == pytest.approx(p.rmse_bcm)
+    # without the term the fit is worse, in sample and held out
+    p0 = inflow.calibrate(state, rain, "Pong", 12560.0)
+    assert p0.rmse_bcm > p.rmse_bcm
+    a = inflow.loso_score(state, rain, "Pong", 12560.0)
+    b = inflow.loso_score(state, rain, "Pong", 12560.0, melt=True)
+    assert a["n_days"] == b["n_days"] and b["rmse_bcm"] < a["rmse_bcm"]
+
+
+def test_quick_response_adds_the_melt_history():
+    common = dict(c=0.4, w=(1.0, 0.0, 0.0, 0.0), rho=0.9, intercept_bcm_per_day=0.0)
+    plain = inflow.InflowParams("Bhakra", 56980.0, **common)
+    withm = inflow.InflowParams(
+        "Bhakra", 56980.0, **common, c_melt=0.5, w_melt=(0.6, 0.4, 0.0, 0.0)
+    )
+    hist = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 10.0])
+    melt = np.array([0.01, 0.02])  # BCM, oldest first, index -1 = today
+    base = inflow.quick_response_bcm(plain, hist)
+    assert inflow.quick_response_bcm(plain, hist, melt_bcm_history=melt) == pytest.approx(base)
+    assert inflow.quick_response_bcm(withm, hist, melt_bcm_history=melt) == pytest.approx(
+        base + 0.5 * (0.6 * 0.02 + 0.4 * 0.01)
+    )
+    assert inflow.quick_response_bcm(withm, hist) == pytest.approx(base)
+
+
+def test_melt_params_round_trip_and_old_files_load():
+    p = inflow.InflowParams(
+        "Bhakra",
+        56980.0,
+        0.4,
+        (0.6, 0.3, 0.1, 0.0),
+        0.9,
+        0.0,
+        r2=0.5,
+        rmse_bcm=0.01,
+        rho_raw=0.9,
+        resid_acf1=0.2,
+        excess_threshold_mm=30.0,
+        c_melt=0.3,
+        w_melt=(0.5, 0.5, 0.0, 0.0),
+    )
+    assert inflow.InflowParams.from_dict(p.to_dict()) == p and p.has_melt
+    d = p.to_dict()
+    del d["c_melt"]
+    del d["w_melt"]
+    old = inflow.InflowParams.from_dict(d)
+    assert old.c_melt == 0.0 and old.w_melt == () and not old.has_melt

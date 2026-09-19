@@ -111,3 +111,19 @@ def test_previous_runs_builds_the_hourly_variable_list(tmp_cache):
     q = sess.calls[0][1]
     assert q["hourly"] == "precipitation,precipitation_previous_day1,precipitation_previous_day3"
     assert q["models"] == "gfs_seamless"
+
+
+def test_200_with_non_json_body_is_retried(tmp_cache):
+    om, sess, slept = make(
+        [Resp(200, None, "<html>gateway</html>"), Resp(200, {"daily": {"time": []}})], tmp_cache
+    )
+    out = om.get("archive", {"latitude": 1, "longitude": 2})
+    assert out == {"daily": {"time": []}}
+    assert len(sess.calls) == 2
+    assert 15 in slept
+
+
+def test_200_with_non_json_body_every_time_raises(tmp_cache):
+    om, sess, slept = make([Resp(200, None, "<html>") for _ in range(10)], tmp_cache)
+    with pytest.raises(openmeteo.OpenMeteoError, match="non-JSON"):
+        om.get("archive", {"latitude": 1, "longitude": 2})
