@@ -193,6 +193,7 @@ test('the resolver carries the labels for the requested language', () => {
 test('a malformed feed is unavailable for a named reason, a fetch failure for another', () => {
   assert.equal(resolveHazardState(null, {fetchFailed: true}).reason, 'fetch');
   assert.equal(resolveHazardState({issue_date: 'nope'}).reason, 'malformed');
+  assert.equal(resolveHazardState({}).reason, 'malformed');
   assert.equal(resolveHazardState(feed({dams: {}})).reason, 'malformed');
   assert.equal(resolveHazardState(feed()).reason, null);
 });

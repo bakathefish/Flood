@@ -21,9 +21,10 @@ const H_T = {
   en: {
     no: '01', title: 'River watch',
     lead: 'Will Bhakra or Pong have to open its spillway in the next five days?',
-    intro: 'Punjab floods when a dam is already near full and heavy rain falls on the hills above it. Every morning this watch reads the dam bulletin, the rain that fell over the last six days, four weather models and a 51-member ensemble for the next five, and at Bhakra the snow melting above the rain gauges. It then answers one question per dam: the chance the spillway has to open on each of the next five days.',
+    intro: 'Punjab floods when a dam is already near full and heavy rain falls on the hills above it. Every morning this watch reads the dam bulletin, the rain that fell over the last six days, four weather models and a 51-member ensemble for the next five, and at Bhakra the snow melting above the rain gauges. It then answers one question per dam: the chance the spillway has to open within one, two, three, four or five days.',
     issued: (d, b) => `Issued ${d}${b ? `, dam readings as on ${b}` : ''}. Updated once a day by the public pipeline.`,
-    live: 'live', stale: 'stale', off: 'unreachable', bad: 'unreadable',
+    live: 'live', loading: 'loading', stale: 'stale', off: 'unreachable', bad: 'unreadable',
+    disclaimer: null,
     staleTitle: (n) => `This watch is ${n} days old.`,
     staleDesc: 'The daily run has not produced a newer one. The figures below are the last issued, shown with their date, not today’s state.',
     offTitle: 'The river watch is unreachable right now.',
@@ -40,7 +41,7 @@ const H_T = {
     colCatch: 'Catchment', colFallen: 'Fallen', colNext: 'Next 3 days',
     days: (n) => `${n} d`,
     quiet: 'quiet', watch: 'watch', alert: 'alert', unknown: 'unknown',
-    wxNote: 'Fallen rain is the IMD real-time grid where it covers the catchment and a model’s past days where it does not. The next three days are the primary model’s total, with its rank against the record for this date (p90 means only one date in ten has seen more). Watch and alert levels were fixed before this season and never tuned to it.',
+    wxNote: 'Fallen rain is the IMD real-time grid for the days it has published and the primary model’s past days for the rest. The next three days are the primary model’s total, with its rank among all monsoon three-day totals in the 1961–2025 record (p90 means only one in ten has been wetter). Watch and alert levels were fixed before this season and never tuned to it.',
     reachHead: 'Where the water arrives',
     colStation: 'Station', colPeak: 'Peak (cusecs)', colDate: 'Date', colClass: 'Class',
     below: 'below Low',
@@ -53,9 +54,10 @@ const H_T = {
   hi: {
     no: '01', title: 'नदी निगरानी',
     lead: 'क्या अगले पाँच दिनों में भाखड़ा या पौंग को अपना स्पिलवे खोलना पड़ेगा?',
-    intro: 'पंजाब में बाढ़ तब आती है जब बाँध पहले से लगभग भरा हो और उसके ऊपर की पहाड़ियों पर भारी बारिश हो। यह निगरानी हर सुबह बाँध का बुलेटिन, पिछले छह दिनों की बारिश, अगले पाँच दिनों के लिए चार मौसम मॉडल और 51 सदस्यों का एन्सेम्बल, और भाखड़ा पर वर्षामापी के ऊपर पिघलती बर्फ़ पढ़ती है। फिर हर बाँध के लिए एक सवाल का जवाब देती है: अगले पाँच दिनों में हर दिन स्पिलवे खुलने की संभावना।',
+    intro: 'पंजाब में बाढ़ तब आती है जब बाँध पहले से लगभग भरा हो और उसके ऊपर की पहाड़ियों पर भारी बारिश हो। यह निगरानी हर सुबह बाँध का बुलेटिन, पिछले छह दिनों की बारिश, अगले पाँच दिनों के लिए चार मौसम मॉडल और 51 सदस्यों का एन्सेम्बल, और भाखड़ा पर वर्षामापी के ऊपर पिघलती बर्फ़ पढ़ती है। फिर हर बाँध के लिए एक सवाल का जवाब देती है: एक, दो, तीन, चार या पाँच दिनों के भीतर स्पिलवे खुलने की संभावना।',
     issued: (d, b) => `जारी ${d}${b ? `, बाँध के आँकड़े ${b} तक` : ''}। सार्वजनिक पाइपलाइन द्वारा दिन में एक बार अपडेट।`,
-    live: 'लाइव', stale: 'पुराना', off: 'अनुपलब्ध', bad: 'अपठनीय',
+    live: 'लाइव', loading: 'लोड हो रही', stale: 'पुरानी', off: 'अनुपलब्ध', bad: 'अपठनीय',
+    disclaimer: 'सार्वजनिक आँकड़ों (BBMB बुलेटिन, CWC भंडारण, Open-Meteo वर्षा पूर्वानुमान, पंजाब WRD यात्रा-समय और सीमाएँ) से गणित खतरा-निगरानी। आधिकारिक चेतावनी नहीं: वे पंजाब जल संसाधन विभाग, CWC, BBMB और IMD जारी करते हैं।',
     staleTitle: (n) => `यह निगरानी ${n} दिन पुरानी है।`,
     staleDesc: 'दैनिक रन ने नयी निगरानी नहीं बनाई। नीचे के आँकड़े अंतिम जारी हैं, अपनी तारीख़ के साथ, आज की स्थिति नहीं।',
     offTitle: 'नदी निगरानी अभी अनुपलब्ध है।',
@@ -72,7 +74,7 @@ const H_T = {
     colCatch: 'क्षेत्र', colFallen: 'हुई', colNext: 'अगले 3 दिन',
     days: (n) => `${n} दिन`,
     quiet: 'शांत', watch: 'निगरानी', alert: 'अलर्ट', unknown: 'अज्ञात',
-    wxNote: 'हुई बारिश IMD रियल-टाइम ग्रिड से है जहाँ वह क्षेत्र को कवर करती है, अन्यथा मॉडल के पिछले दिनों से। अगले तीन दिन मुख्य मॉडल का योग हैं, इस तारीख़ के रिकॉर्ड के सापेक्ष रैंक के साथ (p90 यानी दस में से केवल एक तारीख़ पर इससे अधिक हुई)। निगरानी और अलर्ट स्तर इस मौसम से पहले तय किए गए थे और इस पर कभी ट्यून नहीं किए गए।',
+    wxNote: 'हुई बारिश उन दिनों के लिए IMD रियल-टाइम ग्रिड से है जो उसने प्रकाशित किए हैं, बाकी के लिए मुख्य मॉडल के पिछले दिनों से। अगले तीन दिन मुख्य मॉडल का योग हैं, 1961–2025 के रिकॉर्ड के सभी मानसूनी तीन-दिवसीय योगों में उसकी रैंक के साथ (p90 यानी दस में से केवल एक इससे अधिक रहा)। निगरानी और अलर्ट स्तर इस मौसम से पहले तय किए गए थे और इस पर कभी ट्यून नहीं किए गए।',
     reachHead: 'पानी कहाँ पहुँचता है',
     colStation: 'स्टेशन', colPeak: 'शिखर (क्यूसेक)', colDate: 'तारीख़', colClass: 'वर्ग',
     below: 'निम्न (Low) से नीचे',
@@ -85,9 +87,10 @@ const H_T = {
   pa: {
     no: '01', title: 'ਦਰਿਆ ਨਿਗਰਾਨੀ',
     lead: 'ਕੀ ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਵਿੱਚ ਭਾਖੜਾ ਜਾਂ ਪੌਂਗ ਨੂੰ ਆਪਣਾ ਸਪਿਲਵੇ ਖੋਲ੍ਹਣਾ ਪਵੇਗਾ?',
-    intro: 'ਪੰਜਾਬ ਵਿੱਚ ਹੜ੍ਹ ਉਦੋਂ ਆਉਂਦਾ ਹੈ ਜਦੋਂ ਡੈਮ ਪਹਿਲਾਂ ਹੀ ਲਗਭਗ ਭਰਿਆ ਹੋਵੇ ਅਤੇ ਉਸ ਦੇ ਉੱਪਰਲੀਆਂ ਪਹਾੜੀਆਂ ਉੱਤੇ ਭਾਰੀ ਮੀਂਹ ਪਵੇ। ਇਹ ਨਿਗਰਾਨੀ ਹਰ ਸਵੇਰ ਡੈਮ ਦਾ ਬੁਲੇਟਿਨ, ਪਿਛਲੇ ਛੇ ਦਿਨਾਂ ਦਾ ਮੀਂਹ, ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਲਈ ਚਾਰ ਮੌਸਮ ਮਾਡਲ ਅਤੇ 51 ਮੈਂਬਰਾਂ ਦਾ ਐਨਸੈਂਬਲ, ਅਤੇ ਭਾਖੜਾ ਉੱਤੇ ਮੀਂਹ-ਮਾਪਕਾਂ ਤੋਂ ਉੱਪਰ ਪਿਘਲਦੀ ਬਰਫ਼ ਪੜ੍ਹਦੀ ਹੈ। ਫਿਰ ਹਰ ਡੈਮ ਲਈ ਇੱਕ ਸਵਾਲ ਦਾ ਜਵਾਬ ਦਿੰਦੀ ਹੈ: ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਵਿੱਚ ਹਰ ਦਿਨ ਸਪਿਲਵੇ ਖੁੱਲਣ ਦੀ ਸੰਭਾਵਨਾ।',
+    intro: 'ਪੰਜਾਬ ਵਿੱਚ ਹੜ੍ਹ ਉਦੋਂ ਆਉਂਦਾ ਹੈ ਜਦੋਂ ਡੈਮ ਪਹਿਲਾਂ ਹੀ ਲਗਭਗ ਭਰਿਆ ਹੋਵੇ ਅਤੇ ਉਸ ਦੇ ਉੱਪਰਲੀਆਂ ਪਹਾੜੀਆਂ ਉੱਤੇ ਭਾਰੀ ਮੀਂਹ ਪਵੇ। ਇਹ ਨਿਗਰਾਨੀ ਹਰ ਸਵੇਰ ਡੈਮ ਦਾ ਬੁਲੇਟਿਨ, ਪਿਛਲੇ ਛੇ ਦਿਨਾਂ ਦਾ ਮੀਂਹ, ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਲਈ ਚਾਰ ਮੌਸਮ ਮਾਡਲ ਅਤੇ 51 ਮੈਂਬਰਾਂ ਦਾ ਐਨਸੈਂਬਲ, ਅਤੇ ਭਾਖੜਾ ਉੱਤੇ ਮੀਂਹ-ਮਾਪਕਾਂ ਤੋਂ ਉੱਪਰ ਪਿਘਲਦੀ ਬਰਫ਼ ਪੜ੍ਹਦੀ ਹੈ। ਫਿਰ ਹਰ ਡੈਮ ਲਈ ਇੱਕ ਸਵਾਲ ਦਾ ਜਵਾਬ ਦਿੰਦੀ ਹੈ: ਇੱਕ, ਦੋ, ਤਿੰਨ, ਚਾਰ ਜਾਂ ਪੰਜ ਦਿਨਾਂ ਦੇ ਅੰਦਰ ਸਪਿਲਵੇ ਖੁੱਲ੍ਹਣ ਦੀ ਸੰਭਾਵਨਾ।',
     issued: (d, b) => `ਜਾਰੀ ${d}${b ? `, ਡੈਮ ਦੇ ਅੰਕੜੇ ${b} ਤੱਕ` : ''}। ਜਨਤਕ ਪਾਈਪਲਾਈਨ ਵੱਲੋਂ ਦਿਨ ਵਿੱਚ ਇੱਕ ਵਾਰ ਅਪਡੇਟ।`,
-    live: 'ਲਾਈਵ', stale: 'ਪੁਰਾਣਾ', off: 'ਅਣਉਪਲਬਧ', bad: 'ਅਪੜ੍ਹਨਯੋਗ',
+    live: 'ਲਾਈਵ', loading: 'ਲੋਡ ਹੋ ਰਹੀ', stale: 'ਪੁਰਾਣੀ', off: 'ਅਣਉਪਲਬਧ', bad: 'ਅਪੜ੍ਹਨਯੋਗ',
+    disclaimer: 'ਜਨਤਕ ਅੰਕੜਿਆਂ (BBMB ਬੁਲੇਟਿਨ, CWC ਭੰਡਾਰ, Open-Meteo ਮੀਂਹ ਭਵਿੱਖਬਾਣੀ, ਪੰਜਾਬ WRD ਸਫ਼ਰ-ਸਮੇਂ ਅਤੇ ਹੱਦਾਂ) ਤੋਂ ਗਿਣੀ ਖ਼ਤਰਾ-ਨਿਗਰਾਨੀ। ਅਧਿਕਾਰਤ ਚੇਤਾਵਨੀ ਨਹੀਂ: ਉਹ ਪੰਜਾਬ ਜਲ ਸਰੋਤ ਵਿਭਾਗ, CWC, BBMB ਅਤੇ IMD ਜਾਰੀ ਕਰਦੇ ਹਨ।',
     staleTitle: (n) => `ਇਹ ਨਿਗਰਾਨੀ ${n} ਦਿਨ ਪੁਰਾਣੀ ਹੈ।`,
     staleDesc: 'ਰੋਜ਼ਾਨਾ ਰਨ ਨੇ ਨਵੀਂ ਨਿਗਰਾਨੀ ਨਹੀਂ ਬਣਾਈ। ਹੇਠਾਂ ਦੇ ਅੰਕੜੇ ਆਖਰੀ ਜਾਰੀ ਹਨ, ਆਪਣੀ ਤਾਰੀਖ਼ ਨਾਲ, ਅੱਜ ਦੀ ਹਾਲਤ ਨਹੀਂ।',
     offTitle: 'ਦਰਿਆ ਨਿਗਰਾਨੀ ਹੁਣੇ ਅਣਉਪਲਬਧ ਹੈ।',
@@ -97,18 +100,18 @@ const H_T = {
     loading: 'ਨਵੀਨਤਮ ਨਿਗਰਾਨੀ ਪੜ੍ਹੀ ਜਾ ਰਹੀ ਹੈ…',
     damsHead: 'ਡੈਮ',
     colDam: 'ਡੈਮ', colLevel: 'ਪੱਧਰ', colStore: 'ਭਰਿਆ', colFlow: 'ਆਮਦ → ਨਿਕਾਸ (ਕਿਊਸੈਕ)',
-    colChance: 'ਸਪਿਲਵੇ ਖੁੱਲਣ ਦੀ ਸੰਭਾਵਨਾ, ਦਿਨ 1 ਤੋਂ 5',
+    colChance: 'ਸਪਿਲਵੇ ਖੁੱਲ੍ਹਣ ਦੀ ਸੰਭਾਵਨਾ, ਦਿਨ 1 ਤੋਂ 5',
     chanceNote: 'ਹਰ ਖਾਨਾ ਐਨਸੈਂਬਲ ਦਾ ਉਹ ਹਿੱਸਾ ਹੈ ਜਿਸ ਵਿੱਚ ਜਲ ਭੰਡਾਰ ਦੀ ਥਾਂ ਉਸ ਦਿਨ ਤੱਕ ਮੁੱਕ ਜਾਂਦੀ ਹੈ, ਮਾਡਲ ਦੇ ਸਭ ਤੋਂ ਚੌੜੇ ਤਰੁਟੀ-ਬਜਟ ਹੇਠ (ਮੀਂਹ ਦਾ ਫੈਲਾਅ, ਆਮ ਆਮਦ ਤਰੁਟੀ ਅਤੇ ਹੜ੍ਹ-ਪੱਧਰ ਆਇਤਨ ਤਰੁਟੀ)। ਡੈਸ਼ ਦਾ ਮਤਲਬ ਹੈ ਕਿ ਫ਼ੀਡ ਵਿੱਚ ਉਹ ਅੰਕੜਾ ਨਹੀਂ ਸੀ।',
     noRanjit: 'ਰਣਜੀਤ ਸਾਗਰ ਦਾ ਕੋਈ ਜਨਤਕ ਰੋਜ਼ਾਨਾ ਬੁਲੇਟਿਨ ਨਹੀਂ, ਇਸ ਲਈ ਉਸ ਦੀ ਡੈਮ ਕਤਾਰ ਨਹੀਂ; ਹੇਠਾਂ ਉਸ ਦੇ ਜਲ-ਗ੍ਰਹਿਣ ਖੇਤਰ ਦਾ ਮੀਂਹ ਦੇਖਿਆ ਜਾਂਦਾ ਹੈ।',
     wxHead: 'ਜਲ-ਗ੍ਰਹਿਣ ਖੇਤਰਾਂ ਉੱਤੇ ਮੀਂਹ',
     colCatch: 'ਖੇਤਰ', colFallen: 'ਪਿਆ', colNext: 'ਅਗਲੇ 3 ਦਿਨ',
     days: (n) => `${n} ਦਿਨ`,
     quiet: 'ਸ਼ਾਂਤ', watch: 'ਨਿਗਰਾਨੀ', alert: 'ਅਲਰਟ', unknown: 'ਅਣਜਾਣ',
-    wxNote: 'ਪਿਆ ਮੀਂਹ IMD ਰੀਅਲ-ਟਾਈਮ ਗਰਿਡ ਤੋਂ ਹੈ ਜਿੱਥੇ ਉਹ ਖੇਤਰ ਨੂੰ ਕਵਰ ਕਰਦੀ ਹੈ, ਨਹੀਂ ਤਾਂ ਮਾਡਲ ਦੇ ਪਿਛਲੇ ਦਿਨਾਂ ਤੋਂ। ਅਗਲੇ ਤਿੰਨ ਦਿਨ ਮੁੱਖ ਮਾਡਲ ਦਾ ਜੋੜ ਹਨ, ਇਸ ਤਾਰੀਖ਼ ਦੇ ਰਿਕਾਰਡ ਦੇ ਮੁਕਾਬਲੇ ਰੈਂਕ ਨਾਲ (p90 ਮਤਲਬ ਦਸ ਵਿੱਚੋਂ ਸਿਰਫ਼ ਇੱਕ ਤਾਰੀਖ਼ ਨੇ ਇਸ ਤੋਂ ਵੱਧ ਵੇਖਿਆ)। ਨਿਗਰਾਨੀ ਅਤੇ ਅਲਰਟ ਪੱਧਰ ਇਸ ਮੌਸਮ ਤੋਂ ਪਹਿਲਾਂ ਤੈਅ ਕੀਤੇ ਗਏ ਸਨ ਅਤੇ ਇਸ ਉੱਤੇ ਕਦੇ ਟਿਊਨ ਨਹੀਂ ਕੀਤੇ ਗਏ।',
+    wxNote: 'ਪਿਆ ਮੀਂਹ ਉਨ੍ਹਾਂ ਦਿਨਾਂ ਲਈ IMD ਰੀਅਲ-ਟਾਈਮ ਗਰਿਡ ਤੋਂ ਹੈ ਜੋ ਉਸ ਨੇ ਪ੍ਰਕਾਸ਼ਿਤ ਕੀਤੇ ਹਨ, ਬਾਕੀ ਲਈ ਮੁੱਖ ਮਾਡਲ ਦੇ ਪਿਛਲੇ ਦਿਨਾਂ ਤੋਂ। ਅਗਲੇ ਤਿੰਨ ਦਿਨ ਮੁੱਖ ਮਾਡਲ ਦਾ ਜੋੜ ਹਨ, 1961–2025 ਦੇ ਰਿਕਾਰਡ ਦੇ ਸਾਰੇ ਮਾਨਸੂਨੀ ਤਿੰਨ-ਦਿਨਾ ਜੋੜਾਂ ਵਿੱਚ ਉਸ ਦੇ ਰੈਂਕ ਨਾਲ (p90 ਮਤਲਬ ਦਸ ਵਿੱਚੋਂ ਸਿਰਫ਼ ਇੱਕ ਇਸ ਤੋਂ ਵੱਧ ਰਿਹਾ)। ਨਿਗਰਾਨੀ ਅਤੇ ਅਲਰਟ ਪੱਧਰ ਇਸ ਮੌਸਮ ਤੋਂ ਪਹਿਲਾਂ ਤੈਅ ਕੀਤੇ ਗਏ ਸਨ ਅਤੇ ਇਸ ਉੱਤੇ ਕਦੇ ਟਿਊਨ ਨਹੀਂ ਕੀਤੇ ਗਏ।',
     reachHead: 'ਪਾਣੀ ਕਿੱਥੇ ਪਹੁੰਚਦਾ ਹੈ',
     colStation: 'ਸਟੇਸ਼ਨ', colPeak: 'ਸਿਖਰ (ਕਿਊਸੈਕ)', colDate: 'ਤਾਰੀਖ਼', colClass: 'ਵਰਗ',
     below: 'ਘੱਟ (Low) ਤੋਂ ਹੇਠਾਂ',
-    reachNote: 'ਡੈਮਾਂ ਦਾ ਨਿਕਾਸ ਪੰਜਾਬ ਜਲ ਸਰੋਤ ਵਿਭਾਗ ਦੇ ਸਫ਼ਰ-ਸਮੇਂ ਨਾਲ ਹੇਠਾਂ ਪਹੁੰਚਾਇਆ ਗਿਆ ਅਤੇ ਉਸੇ ਦੀਆਂ ਘੱਟ, ਦਰਮਿਆਨਾ ਅਤੇ ਉੱਚ (Low, Medium, High) ਹੱਦਾਂ ਨਾਲ ਵਰਗਿਆਇਆ।',
+    reachNote: 'ਡੈਮਾਂ ਦਾ ਨਿਕਾਸ ਪੰਜਾਬ ਜਲ ਸਰੋਤ ਵਿਭਾਗ ਦੇ ਸਫ਼ਰ-ਸਮੇਂ ਨਾਲ ਹੇਠਾਂ ਪਹੁੰਚਾਇਆ ਗਿਆ ਅਤੇ ਉਸੇ ਦੀਆਂ ਘੱਟ, ਦਰਮਿਆਨਾ ਅਤੇ ਉੱਚ (Low, Medium, High) ਹੱਦਾਂ ਨਾਲ ਵਰਗੀਕ੍ਰਿਤ ਕੀਤਾ।',
     snow: (recent, days, fc, pack) => `ਭਾਖੜਾ ਉੱਤੇ ਬਰਫ਼ ਪਿਘਲਾਅ: ਪਿਛਲੇ ${days} ਦਿਨਾਂ ਵਿੱਚ ${recent} mm ਪਾਣੀ, ਅਗਲੇ ਪੰਜ ਦਿਨਾਂ ਵਿੱਚ ${fc} mm ਦੀ ਉਮੀਦ; ਪੈਕ ${pack} mm (ਡਿਗਰੀ-ਡੇ ਮਾਡਲ ਦਾ ਹਿਸਾਬੀ ਅੰਕੜਾ, ਮਾਪੀ ਹੋਈ ਡੂੰਘਾਈ ਨਹੀਂ)। ਆਮਦ ਮਾਡਲ ਇਸ ਨੂੰ ਸ਼ਾਮਲ ਕਰਦਾ ਹੈ।`,
     snowOff: 'ਭਾਖੜਾ ਉੱਤੇ ਬਰਫ਼ ਪਿਘਲਾਅ: ਇਸ ਰਨ ਲਈ ਪਿਘਲਾਅ ਇਨਪੁਟ ਨਹੀਂ ਬਣ ਸਕੇ, ਇਸ ਲਈ ਇਸ ਪਦ ਦਾ ਯੋਗਦਾਨ ਸਿਫ਼ਰ ਰਿਹਾ।',
     verify: 'ਹੁਣ ਤੱਕ ਇਹ ਕਿੰਨਾ ਸਹੀ ਰਿਹਾ',
@@ -165,9 +168,17 @@ export default function HazardSection({lang}) {
     fetch(FEED)
       .then((r) => {
         if (!r.ok) throw new Error(String(r.status));
-        return r.json();
+        return r.text();
       })
-      .then((j) => { if (on) { setFeed(j); setFailed(false); } })
+      .then((txt) => {
+        if (!on) return;
+        let j;
+        try { j = JSON.parse(txt); } catch { j = {}; }
+        // A body that is not a watch is a publishing fault, not a connection
+        // problem; the resolver names it as malformed.
+        setFeed(j && typeof j === 'object' ? j : {});
+        setFailed(false);
+      })
       // A swallowed failure leaves the section blank, and blank reads as
       // nothing to report. The page has to say it does not know.
       .catch(() => { if (on) { setFeed(null); setFailed(true); } });
@@ -178,6 +189,7 @@ export default function HazardSection({lang}) {
   const watch = h.state === 'watch';
   const dot = h.state === 'unavailable'
     ? {variant: 'warning', label: h.reason === 'malformed' ? t.bad : t.off}
+    : h.state === 'loading' ? {variant: 'neutral', label: t.loading}
     : h.stale ? {variant: 'warning', label: t.stale} : {variant: 'accent', label: t.live};
 
   return (
@@ -372,7 +384,7 @@ export default function HazardSection({lang}) {
               )}
 
               <VStack maxWidth={780} gap={2}>
-                {h.disclaimer && <Text type="supporting" color="secondary">{h.disclaimer}</Text>}
+                {(t.disclaimer || h.disclaimer) && <Text type="supporting" color="secondary">{t.disclaimer || h.disclaimer}</Text>}
                 <HStack gap={5} vAlign="baseline" wrap="wrap">
                   <Link href={VERIFY} isStandalone>{t.verify}</Link>
                   {h.record && <Link href={RECORDS + h.record} isStandalone>{t.record}</Link>}

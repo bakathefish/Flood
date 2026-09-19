@@ -19,8 +19,9 @@ reservoir, can say so.
 - The BBMB daily bulletin: level, inflow and outflow at Bhakra and Pong, fetched every
   morning. Storage comes from each dam's own level-storage relation fitted on the CWC
   record.
-- Rain over eight catchments (the three dams, three local catchments between the dams
-  and the head works, the Ghaggar and Sutlej reaches), area-weighted over HydroBASINS
+- Rain over eight catchments (the three dams, the three local catchments between the
+  dams and the head works, and the Ghaggar at Bhankarpur and at Khanauri), area-weighted
+  over HydroBASINS
   polygons. The observed record is IMD's real-time 0.25 degree grid; the forecasts come
   from four weather models (ECMWF AIFS as the primary, ECMWF IFS, GFS, ICON) and the
   51-member ECMWF ensemble, all keyless.
@@ -61,9 +62,10 @@ the watch would have said this before the event:
 | Pong (IFS) | 15 Aug 2025 | 27 Aug 2025 | 12 days | 31 Aug 2025 | 16 days | 25 | 0 |
 | Bhakra (AIFS and IFS) | 30 Aug 2025 | none in the window | n/a | n/a | n/a | 3 | 0 |
 
-The press readings on file put Pong's floodgates open from 19 August (66,000 cusecs
-released that day), earlier than the reference run spills, so the ten-day lead is
-against the model's spill date, not a logged gate opening. At Bhakra BBMB opened the
+The press readings on file have Pong releasing through its spillway gates from 7 August
+(about 4,000 cusecs through the gates that morning; 66,000 cusecs total discharge on
+19 August), well before the reference run spills, so the ten-day lead is against the
+model's spill date, not a logged gate opening. At Bhakra BBMB opened the
 gates on 19 August at 1,665 ft, below the 1,672.5 ft the 2019 filling schedule in the
 package allows for that day (the press quoted a lower 1,662 ft guideline for 2025), so
 the watch, which forecasts the spillway's bound, first flagged on 30 August, eleven
