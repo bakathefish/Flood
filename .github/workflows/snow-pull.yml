@@ -12,6 +12,11 @@ on:
         description: 'JSON list of comma-separated point index lists, e.g. ["112,113","114,115"]'
         required: true
         type: string
+      span:
+        description: 'archive span: 2014, main or 2026 (see scripts/pull_snow_points.py)'
+        required: false
+        default: main
+        type: string
 
 permissions:
   contents: read
@@ -33,7 +38,7 @@ jobs:
         with: { python-version: "3.13" }
       - run: pip install -e .
       - name: pull the shard's points
-        run: python scripts/pull_snow_points.py --points "${{ matrix.shard }}"
+        run: python scripts/pull_snow_points.py --points "${{ matrix.shard }}" --span "${{ inputs.span }}"
       - uses: actions/upload-artifact@v4
         with:
           name: snow-cache-${{ strategy.job-index }}
