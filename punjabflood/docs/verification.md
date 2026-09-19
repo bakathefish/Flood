@@ -408,6 +408,7 @@ Each variant is fitted on the same storage record beside the response in use and
 | Bhakra | excess above 30 mm | 11 | 1009 | 0.0668 | 2 | 0.0923 | -0.0773 | 0.194 | 0.207 | 0.55 0.21 0.12 0.12 | 0.303 | 0.00 1.00 0.00 0.00 | api | 0.00 | 0.000 |
 | Bhakra | api+sm | 11 | 1009 | 0.0440 | 2 | 0.0961 | -0.0866 | 0.170 | 0.250 | 0.54 0.27 0.10 0.09 | 0.000 | none | api+sm | -0.14 | 0.000 |
 | Bhakra | sm | 11 | 1009 | 0.0436 | 2 | 0.0691 | -0.0530 | 0.278 | 0.000 | 0.27 0.36 0.18 0.19 | 0.000 | none | sm | 0.15 | 0.000 |
+| Bhakra | snowmelt | 11 | 1009 | 0.0438 | 2 | 0.0948 | -0.0846 | 0.145 | 0.282 | 0.54 0.28 0.08 0.09 | 0.000 | none | api | 0.00 | 0.067 |
 | Pong | baseline | 8 | 733 | 0.0302 | 28 | 0.0782 | -0.0158 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api | 0.00 | 0.000 |
 | Pong | excess above 30 mm | 8 | 733 | 0.0304 | 28 | 0.0773 | -0.0129 | 0.200 | 0.332 | 0.40 0.39 0.11 0.10 | 0.523 | 0.20 0.65 0.09 0.06 | api | 0.00 | 0.000 |
 | Pong | api+sm | 8 | 733 | 0.0300 | 28 | 0.0772 | -0.0059 | 0.203 | 0.328 | 0.35 0.48 0.09 0.08 | 0.000 | none | api+sm | -0.36 | 0.000 |
@@ -437,7 +438,18 @@ Verdict on 'press inflow fit', not adopted. Conditions: the held-out error does 
 
 ### The snowmelt term at Bhakra
 
-Not run: no melt table at data\raw\rain\bhakra_melt_daily.csv; run scripts/pull_snow_bhakra.py.
+Bhakra's base flow is snowmelt from the half of the catchment outside the IMD grid, which the response carries as a constant intercept. The variant runs a temperature-index snowpack at every archive point of the catchment (ERA5 snowfall stacked into a pack, released at 4 mm per degree-day above 0 C, the factor fixed, not fitted) and adds the area-weighted melt, as a volume over the whole catchment, as a lagged term with its own non-negative coefficient and lag weights in the same fit; the intercept stays free, so the term wins only what a season-varying melt explains beyond a constant base. It touches Bhakra alone, so the rule is read at Bhakra alone: the held-out error there may not rise, Bhakra's season-peak ratio must rise, and Bhakra's period means may not move further from the reported means than the baseline's worst one does. The rule was written before the fit.
+
+| dam | c | c_wet | c_melt | w_melt | intercept (BCM/day) | in-sample RMSE (BCM/day) | R2 |
+|---|---|---|---|---|---|---|---|
+| Bhakra | 0.145 | 0.282 | 0.067 | 0.00 0.15 0.00 0.85 | -0.0014 | 0.0431 | 0.221 |
+
+| run | period means covered | worst deviation of a period mean from 1 | season-peak ratio, smallest | season-peak ratio, largest |
+|---|---|---|---|---|
+| baseline, Bhakra | 2 | 0.11 | 0.57 | 0.57 |
+| snowmelt, Bhakra | 2 | 0.10 | 0.58 | 0.58 |
+
+Verdict on 'snowmelt', adopted. Conditions: the held-out error does not rise at Bhakra (passes); Bhakra's season peak rises (passes); Bhakra's period means hold (passes). The held-out row is in the variants table above.
 
 ## As-issued hindcast: what the product would have said, each dam, 2024 to 2026
 
@@ -819,9 +831,9 @@ The watch's levels were fixed before any day was scored (`weather.py`). Here the
 
 | catchment | event | issue days before | first watch | lead (d) | first alert | lead (d) | days at watch or above | days at alert | highest percentile before |
 |---|---|---|---|---|---|---|---|---|---|
-| Bhakra | 2025-08-19 | 14 | 2025-08-09 | 10 | 2025-08-10 | 9 |  |  | 94 |
-| Pong | 2025-08-26 | 14 | 2025-08-12 | 14 | 2025-08-12 | 14 |  |  | 98 |
-| Ranjit Sagar | 2025-08-27 | 14 | 2025-08-13 | 14 | 2025-08-13 | 14 |  |  | 100 |
+| Bhakra | 2025-08-19 | 14 | 2025-08-09 | 10 | 2025-08-10 | 9 | 6 | 3 | 94 |
+| Pong | 2025-08-26 | 14 | 2025-08-12 | 14 or more (raised before the window) | 2025-08-12 | 14 or more (raised before the window) | 10 | 5 | 98 |
+| Ranjit Sagar | 2025-08-27 | 14 | 2025-08-13 | 14 or more (raised before the window) | 2025-08-13 | 14 or more (raised before the window) | 9 | 5 | 100 |
 
 | catchment | season | issue days | watch share | alert share | days outside event windows | false alarms (watch or above) | false alerts |
 |---|---|---|---|---|---|---|---|
@@ -935,6 +947,6 @@ From each bulletin day, the inflow one to five days ahead: predicted with the ob
 
 Issued daily from the committed inputs and the live BBMB bulletin; a record is never rewritten (`outputs/forecast/`). P(spillway forced) is at the five-day horizon.
 
-14 issue dates from 2026-09-05 to 2026-09-18. Bhakra: P(spillway forced) above zero on 0 of 14 days. Pong: P(spillway forced) above zero on 0 of 14 days. Days with any control point at or above the WRD low band: 0.
+15 issue dates from 2026-09-05 to 2026-09-19. Bhakra: P(spillway forced) above zero on 0 of 15 days. Pong: P(spillway forced) above zero on 0 of 15 days. Days with any control point at or above the WRD low band: 0.
 
 No day so far has put a forced spill or a classed arrival on the record.

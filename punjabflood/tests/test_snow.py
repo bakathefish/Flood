@@ -56,3 +56,36 @@ def test_catchment_melt_weights_points_by_area():
     assert out.loc[days[0], "t2m_mean_c"] == 5.0
     assert list(out.columns) == ["snowfall_mm", "melt_mm", "pack_mm", "t2m_mean_c", "n_points"]
     assert out["n_points"].tolist() == [2, 2, 2]
+
+
+class _Recorder:
+    """A stand-in client that records the archive spans asked for."""
+
+    def __init__(self):
+        self.spans = []
+
+    def archive_daily(self, lat, lon, start, end, daily=()):
+        self.spans.append((start, end))
+        days = pd.date_range(start, end)
+        return {
+            "daily": {
+                "time": [d.strftime("%Y-%m-%d") for d in days],
+                "snowfall_sum": [0.0] * len(days),
+                "temperature_2m_mean": [1.0] * len(days),
+            }
+        }
+
+
+class _OnePoint:
+    name = "X"
+
+
+def test_point_series_uses_the_given_chunks(monkeypatch):
+    chunks = [("2014-01-01", "2014-12-31"), ("2015-01-01", "2015-01-31")]
+    monkeypatch.setattr(snow, "points_with_weights", lambda cat, col: [("p1", 31.0, 77.0, 2.0)])
+    client = _Recorder()
+    frames, weights = snow.point_series(client, _OnePoint(), "2014-01-01", "2015-01-31", chunks=chunks)
+    assert client.spans == chunks
+    assert len(frames["p1"]) == 365 + 31
+    assert frames["p1"].index.is_monotonic_increasing
+    assert weights["p1"] == 2.0

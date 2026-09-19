@@ -1111,3 +1111,17 @@ def test_variant_verdict_can_be_restricted_to_the_dams_a_variant_touches():
     assert verify.variant_verdict(b, v, loso, "snowmelt")["dams"] == ["Bhakra"]
     # a dam the variant has no row for is not scored
     assert verify.variant_verdict(b, v, loso, "snowmelt", dams=("Pong",))["adopt"] is False
+
+
+def test_melt_window_warns_once_per_gap(caplog):
+    melt = pd.Series(1.0, index=pd.date_range("2015-01-01", "2015-12-31"))
+    verify._MELT_GAPS_LOGGED.clear()
+    with caplog.at_level("WARNING", logger="punjabflood.verify"):
+        a = verify._melt_window(melt, pd.date_range("2015-12-28", "2016-01-03"))
+        b = verify._melt_window(melt, pd.date_range("2015-12-29", "2016-01-04"))
+        c = verify._melt_window(melt, pd.date_range("2016-06-01", "2016-06-04"))
+    assert a.tolist() == [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]
+    assert b[-1] == 0.0 and c.tolist() == [0.0] * 4
+    msgs = [r.getMessage() for r in caplog.records if "melt series" in r.getMessage()]
+    assert len(msgs) == 1, msgs
+    assert "2016-01-01" in msgs[0]

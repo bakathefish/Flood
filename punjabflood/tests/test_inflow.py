@@ -615,3 +615,26 @@ def test_melt_params_round_trip_and_old_files_load():
     del d["w_melt"]
     old = inflow.InflowParams.from_dict(d)
     assert old.c_melt == 0.0 and old.w_melt == () and not old.has_melt
+
+
+def test_baseline_is_unchanged_by_a_melt_column_it_does_not_use():
+    state, rain = _synthetic_melt(c_melt=0.6)
+    with_col = inflow.calibrate(state, rain, "Pong", 12560.0)
+    without = inflow.calibrate(state, rain.drop(columns="melt_bcm"), "Pong", 12560.0)
+    assert not with_col.has_melt and not without.has_melt
+    assert with_col.c == without.c and with_col.w == without.w
+    assert with_col.intercept_bcm_per_day == without.intercept_bcm_per_day
+    d1 = inflow.design_matrix(state, rain, "Pong", 12560.0)
+    d2 = inflow.design_matrix(state, rain.drop(columns="melt_bcm"), "Pong", 12560.0)
+    pd.testing.assert_frame_equal(d1.drop(columns=[c for c in d1 if c.startswith("melt")]),
+                                  d2.drop(columns=[c for c in d2 if c.startswith("melt")]))
+
+
+def test_base_from_observed_subtracts_the_melt_response_when_the_term_is_carried():
+    state, rain = _synthetic_melt(c_melt=0.6)
+    p = inflow.calibrate(state, rain, "Pong", 12560.0, melt=True)
+    assert p.c_melt > 0
+    recent = np.zeros(8)
+    without = inflow.base_from_observed(p, 20000.0, recent)
+    with_melt = inflow.base_from_observed(p, 20000.0, recent, melt_bcm_recent=[0.02] * 8)
+    assert with_melt < without

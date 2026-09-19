@@ -80,7 +80,11 @@ snowfall (cm of snow at 10 mm of water per 7 cm, the constant of the watch) and 
 temperature, with the pack draining at 4 mm per degree-day above 0 C (the middle of the
 Himalayan range in Hock 2003, *J. Hydrol.* 282, 104; the factor sets how fast a pack
 drains, the fitted coefficient absorbs the scale) and never below empty, carried from an
-empty pack on 1 January 2015 through every day since. The catchment melt is the
+empty pack on 1 January 2014 (a spin-up year before the first fitted season) through
+every day to the rain table's last day. At the points above the snowline the pack never
+empties and grows across the years (the bucket has no glacier flow), so the pack there is
+not a physical depth; the melt, the only quantity the fit sees, is bounded at such points
+by the degree-days alone. The catchment melt is the
 area-weighted mean over all the points, its volume over the whole catchment area of the
 catchment file, and it enters the storage-change relation as its own lagged block
 (`c_melt`, `w_melt`, lags 0 to 3) fitted jointly with the rain response by the same

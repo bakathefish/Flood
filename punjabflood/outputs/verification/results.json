@@ -11032,6 +11032,27 @@
         "intercept_bcm_per_day": -0.0021154806711813955
       },
       {
+        "dam": "Bhakra",
+        "variant": "snowmelt",
+        "n_seasons": 11,
+        "n_days": 1009,
+        "rmse_bcm": 0.04380943558542522,
+        "n_heavy_days": 2,
+        "heavy_rmse_bcm": 0.09479435286249963,
+        "heavy_bias_bcm": -0.08457066676660242,
+        "in_sample_rmse_bcm": 0.04314098630807664,
+        "c": 0.14486654098288027,
+        "c_wet": 0.2816522983353049,
+        "w": "0.54 0.28 0.08 0.09",
+        "c_excess": 0.0,
+        "w_excess": "",
+        "wetness": "api",
+        "gamma": 0.0,
+        "c_melt": 0.06713322023722082,
+        "w_melt": "0.00 0.15 0.00 0.85",
+        "intercept_bcm_per_day": -0.001384904653439245
+      },
+      {
         "dam": "Pong",
         "variant": "baseline",
         "n_seasons": 8,
@@ -11348,8 +11369,46 @@
   },
   "snowmelt_verdict": {
     "variant": "snowmelt",
-    "adopt": false,
-    "note": "no melt table at data\\raw\\rain\\bhakra_melt_daily.csv; run scripts/pull_snow_bhakra.py"
+    "dams": [
+      "Bhakra"
+    ],
+    "loso_error_not_higher": true,
+    "season_peaks_higher": true,
+    "period_means_hold": true,
+    "adopt": true,
+    "baseline_flood_scale": {
+      "n_period_means": 2,
+      "n_dated_days": 72,
+      "dated_day_ratio_median": 1.032507325238785,
+      "period_mean_worst_deviation": 0.11092657894084512,
+      "season_peak_ratio_min": 0.5698738822817063,
+      "season_peak_ratio_max": 0.5698738822817063
+    },
+    "variant_flood_scale": {
+      "n_period_means": 2,
+      "n_dated_days": 72,
+      "dated_day_ratio_median": 1.0277290172952773,
+      "period_mean_worst_deviation": 0.09881082843003974,
+      "season_peak_ratio_min": 0.5774791535220638,
+      "season_peak_ratio_max": 0.5774791535220638
+    },
+    "params": {
+      "Bhakra": {
+        "c": 0.14486654098288027,
+        "c_wet": 0.2816522983353049,
+        "c_melt": 0.06713322023722082,
+        "w_melt": [
+          0.0,
+          0.15037536566734525,
+          0.0,
+          0.8496246343326548
+        ],
+        "intercept_bcm_per_day": -0.001384904653439245,
+        "in_sample_rmse_bcm": 0.04314098630807664,
+        "r2": 0.22058096948535277
+      }
+    },
+    "melt_table": "data/raw/rain/bhakra_melt_daily.csv"
   },
   "as_issued_events": [
     {
@@ -12822,8 +12881,12 @@
         "n_issue_days_before": 14,
         "first_watch_issue_date": "2025-08-09",
         "watch_lead_days": 10,
+        "watch_raised_before_window": false,
         "first_alert_issue_date": "2025-08-10",
         "alert_lead_days": 9,
+        "alert_raised_before_window": false,
+        "days_at_watch_before": 6,
+        "days_at_alert_before": 3,
         "max_percentile_before": 93.67923354485505
       },
       {
@@ -12832,8 +12895,12 @@
         "n_issue_days_before": 14,
         "first_watch_issue_date": "2025-08-12",
         "watch_lead_days": 14,
+        "watch_raised_before_window": true,
         "first_alert_issue_date": "2025-08-12",
         "alert_lead_days": 14,
+        "alert_raised_before_window": true,
+        "days_at_watch_before": 10,
+        "days_at_alert_before": 5,
         "max_percentile_before": 97.73547343536146
       },
       {
@@ -12842,8 +12909,12 @@
         "n_issue_days_before": 14,
         "first_watch_issue_date": "2025-08-13",
         "watch_lead_days": 14,
+        "watch_raised_before_window": true,
         "first_alert_issue_date": "2025-08-13",
         "alert_lead_days": 14,
+        "alert_raised_before_window": true,
+        "days_at_watch_before": 9,
+        "days_at_alert_before": 5,
         "max_percentile_before": 99.55207166853303
       }
     ],

@@ -680,11 +680,18 @@ def local_inflow_forecast_cusecs(
 
 
 def base_from_observed(
-    p: InflowParams, observed_inflow_cusecs: float, rain_mm_recent, sm_anom=0.0
+    p: InflowParams,
+    observed_inflow_cusecs: float,
+    rain_mm_recent,
+    sm_anom=0.0,
+    melt_bcm_recent=(),
 ) -> float:
     """Today's base flow in cusecs: observed inflow minus the quick response the recent rain
-    explains, floored at zero."""
-    q_bcm = quick_response_bcm(p, np.asarray(list(rain_mm_recent)), sm_anom)
+    (and, for a parameter set that carries the melt term, the recent melt) explains,
+    floored at zero."""
+    q_bcm = quick_response_bcm(
+        p, np.asarray(list(rain_mm_recent)), sm_anom, melt_bcm_history=melt_bcm_recent
+    )
     return max(observed_inflow_cusecs - C.bcm_to_cusec_days(q_bcm), 0.0)
 
 

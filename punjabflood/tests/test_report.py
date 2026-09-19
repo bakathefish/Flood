@@ -804,3 +804,14 @@ def test_snowmelt_and_weather_watch_sections_render(tmp_path):
     )
     assert "| Bhakra | 2025-08-19 | 14 | never |  | never |  |  |  | n/a |" in md
     assert "| Pong | 2024 | 119 | 0.10 | 0.05 | 119 | 12 | 6 |" in md
+
+
+def test_snowmelt_section_note_form(tmp_path):
+    results = {"peak_tests": [], "snowmelt_verdict": {"note": "no melt table at data/raw/rain/x.csv"}}
+    (tmp_path / "results.json").write_text(json.dumps(results), encoding="utf-8")
+    pd.DataFrame(
+        columns=["table", "predictor", "n_years", "n_high", "spearman_rho", "auroc_high", "brier_skill_score"]
+    ).to_csv(tmp_path / "peak_tests.csv", index=False)
+    md = report.render_verification(tmp_path, None, era5_imd_path=None, forecast_dir=None)
+    assert "### The snowmelt term at Bhakra" in md
+    assert "Not run: no melt table at data/raw/rain/x.csv." in md
