@@ -700,6 +700,85 @@ def test_prospective_record_section(tmp_path):
     assert "No record yet." in md2
 
 
+def _write_report_fixture(tmp_path, results):
+    (tmp_path / "results.json").write_text(json.dumps(results), encoding="utf-8")
+    pd.DataFrame(
+        columns=[
+            "dam", "gauge", "table", "predictor", "n_years", "n_high",
+            "spearman_rho", "auroc_high", "brier_skill_score",
+        ]
+    ).to_csv(tmp_path / "peak_tests.csv", index=False)
+
+
+def test_snowmelt_horizon_paragraph_reads_the_year_the_verifier_wrote(tmp_path):
+    """The verifier keys the horizon contribution by the season it scored; the report
+    follows the key, and falls back to the per-dam block when the keyed one is absent."""
+    base = {
+        "variant": "snowmelt",
+        "dams": ["Bhakra"],
+        "adopt": True,
+        "loso_error_not_higher": True,
+        "season_peaks_higher": True,
+        "period_means_hold": True,
+        "loso": {"Bhakra": {"baseline": 0.0431, "variant": 0.0420}},
+        "baseline_flood_scale": {
+            "n_period_means": 2,
+            "period_mean_worst_deviation": 0.21,
+            "season_peak_ratio_min": 0.44,
+            "season_peak_ratio_max": 0.44,
+        },
+        "variant_flood_scale": {
+            "n_period_means": 2,
+            "period_mean_worst_deviation": 0.20,
+            "season_peak_ratio_min": 0.45,
+            "season_peak_ratio_max": 0.45,
+        },
+        "product_params_carry_melt": {"Bhakra": True},
+        "params": {
+            "Bhakra": {
+                "c": 0.31,
+                "c_wet": 0.0,
+                "c_melt": 0.52,
+                "w_melt": [0.6, 0.4, 0.0, 0.0],
+                "intercept_bcm_per_day": 0.021,
+                "in_sample_rmse_bcm": 0.041,
+                "r2": 0.35,
+            }
+        },
+        "melt_table": "data/raw/rain/bhakra_melt_daily.csv",
+    }
+    hc = {
+        "n_days": 90,
+        "melt_mean_bcm": 0.0111,
+        "melt_max_bcm": 0.0222,
+        "rain_mean_bcm": 0.1,
+        "rain_max_bcm": 0.2,
+    }
+    keyed = {
+        "peak_tests": [],
+        "snowmelt_verdict": {
+            **base,
+            "horizon_contribution_year": 2024,
+            "horizon_contribution_2024": hc,
+        },
+    }
+    _write_report_fixture(tmp_path, keyed)
+    md = report.render_verification(tmp_path, None, era5_imd_path=None, forecast_dir=None)
+    assert "Over the 2024 monsoon (90 issue days) the melt response over five days" in md
+    assert "0.011 BCM on average, 0.022 BCM at most" in md
+    per_dam = {
+        "peak_tests": [],
+        "snowmelt_verdict": {
+            **base,
+            "horizon_contribution_year": 2024,
+            "horizon_contribution": {"Bhakra": hc},
+        },
+    }
+    _write_report_fixture(tmp_path, per_dam)
+    md2 = report.render_verification(tmp_path, None, era5_imd_path=None, forecast_dir=None)
+    assert "Over the 2024 monsoon (90 issue days)" in md2
+
+
 def test_snowmelt_and_weather_watch_sections_render(tmp_path):
     results = {
         "peak_tests": [],

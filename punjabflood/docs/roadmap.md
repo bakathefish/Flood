@@ -245,7 +245,16 @@ numbers that motivate them are in `verification.md`, never repeated here.
   gain is small (0.2% of the error) and rests on the heavy days, and, as `design.md`
   states, the pack above the snowline is an accumulator the bucket never drains (near
   zero in the 2014 spin-up year, a plateau of several hundred mm by 2020), so the printed
-  pack is a bookkeeping quantity, not a measured snow depth.
+  pack is a bookkeeping quantity, not a measured snow depth. Read beside the in-sample
+  R2 of 0.22 on storage changes, and beside the 2026 bulletin fit, whose MAE of 8,119
+  cusecs is still above the 5,115 of the fit with its base taken from the 2026 bulletins
+  themselves, the term is a small correction to a model whose error is mostly elsewhere
+  (`design.md` lists the four readings of the fitted term: the lag pattern, the
+  intercept, the double count over the IMD-covered points and the peak ratio).
+  A bookkeeping note on the 2026-09-19 record: the dated markdown
+  `2026-09-19_rerun_20260919T092231.md` was rendered by the renderer of that morning and
+  lacks the pack caveat and the archive-tail note its JSON carries; dated records are
+  never rewritten, so the next day's record is the first with both.
 
 ## Next, in order
 

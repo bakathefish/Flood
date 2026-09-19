@@ -949,7 +949,7 @@ From each bulletin day, the inflow one to five days ahead: predicted with the ob
 
 ## Prospective record, 2026 season
 
-Issued daily from the committed inputs and the live BBMB bulletin; a record is never rewritten (`outputs/forecast/`). P(spillway forced) is at the five-day horizon.
+Issued daily from the committed inputs and the live BBMB bulletin; a record is never rewritten (`outputs/forecast/`; `latest.json` there is the one file rewritten every run, a copy of the newest product naming its dated record). P(spillway forced) is at the five-day horizon.
 
 15 issue dates from 2026-09-05 to 2026-09-19. Bhakra: P(spillway forced) above zero on 0 of 15 days. Pong: P(spillway forced) above zero on 0 of 15 days. Days with any control point at or above the WRD low band: 0.
 

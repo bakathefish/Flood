@@ -1041,6 +1041,21 @@ def melt_from_series(
     return out
 
 
+def bucket_gap_days(end, model_frames: dict[str, pd.DataFrame]) -> int:
+    """Days between the archive's last complete day and the model's first past day that
+    neither source covers (0 when the two meet or overlap, or when either is absent). The
+    fixed spans end on a date on disk and the model reaches back ``snow.PAST_DAYS``; once
+    the issue date is further out than that from the archive's end the bucket would skip
+    the days between, so the count is recorded and warned about."""
+    if end is None:
+        return 0
+    firsts = [m.index.min() for m in model_frames.values() if len(m)]
+    if not firsts:
+        return 0
+    first = min(firsts)
+    return max(0, int((pd.Timestamp(first) - pd.Timestamp(end)).days) - 1)
+
+
 def melt_inputs(
     client: OpenMeteo,
     catchments: dict[str, Catchment],
@@ -1054,7 +1069,9 @@ def melt_inputs(
     snowfall and temperature at every point over the fixed spans (``snow.MELT_SPANS``, on
     disk) and a tail span to ``snow.ARCHIVE_LAG_DAYS`` before the issue date (one call per
     point per issue day; when the tail cannot be pulled the fixed spans stand and the note
-    says so), the model's past and forecast days at the same points, one bucket run across
+    says so; days that neither the archive nor the model's past days cover are counted in
+    ``bucket_gap_days`` and named in the note), the model's past and forecast days at the
+    same points, one bucket run across
     the join, and the catchment melt as ``melt_from_series`` returns it plus the archive's
     last complete day, the model and the point count. A catchment whose inputs fail is left
     out with a warning; the product then says the term contributes nothing that cycle."""
@@ -1101,6 +1118,17 @@ def melt_inputs(
                 past_days=snow.PAST_DAYS,
             )
             joined, end = snow.extend_points(frames, model_frames, model)
+            gap = bucket_gap_days(end, model_frames)
+            if gap:
+                first = end + pd.Timedelta(days=1)
+                last = end + pd.Timedelta(days=gap)
+                gap_note = (
+                    f"the bucket has no inputs from {first.date().isoformat()} to "
+                    f"{last.date().isoformat()} ({gap} days skipped, the pack carried "
+                    f"unchanged across them)"
+                )
+                log.warning("melt inputs for %s: %s", dam, gap_note)
+                note = f"{note}; {gap_note}" if note else gap_note
             daily = snow.catchment_melt_from_points(joined, weights)
             daily["source"] = [
                 "archive" if (end is not None and d <= end) else model for d in daily.index
@@ -1109,6 +1137,7 @@ def melt_inputs(
             rec["archive_last_day"] = end.date().isoformat() if end is not None else None
             rec["model"] = model
             rec["n_points"] = int(len(weights))
+            rec["bucket_gap_days"] = int(gap)
             if note:
                 rec["note"] = note
             out[cat_name] = rec

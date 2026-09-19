@@ -703,6 +703,10 @@ def volume_bcm(
     rain_mm_recent=(),
     sm_anom: float = 0.0,
 ) -> float:
+    """The horizon total of ``predict_daily_bcm`` under rain alone: no melt series is
+    passed, so at a dam whose parameters carry the melt term this is the base plus the
+    rain response only. The product and the scores call ``predict_daily_bcm`` with the
+    melt series; this helper serves the tests."""
     daily = predict_daily_bcm(
         p, list(rain_mm_forecast)[:horizon_days], base_cusecs, rain_mm_recent, sm_anom
     )

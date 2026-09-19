@@ -89,7 +89,21 @@ area-weighted mean over all the points, its volume over the whole catchment area
 catchment file, and it enters the storage-change relation as its own lagged block
 (`c_melt`, `w_melt`, lags 0 to 3) fitted jointly with the rain response by the same
 non-negative least squares, the intercept still free so the term wins only what a
-season-varying melt explains beyond a constant base. It is a variant, scored
+season-varying melt explains beyond a constant base. Four things to read the fitted
+term by. The lag weights came out 0.00, 0.15, 0.00, 0.85: the lagged melt columns are
+close to collinear (melt changes slowly from one day to the next), and non-negative
+least squares resolves that by putting the weight on two of the four, so the pattern is
+a fitting artefact and not a travel time through the catchment. The intercept moved
+from +0.00226 BCM/day without the term to -0.00139 BCM/day with it, while the melt
+response over five days averages 0.025 BCM in the 2025 monsoon (about 2,000 cusecs a
+day at the fitted coefficient) against bulletin inflows in the tens of thousands of
+cusecs, so the term is a seasonal modulation of the base, not the base flow itself,
+and the base still comes from the observed inflow. Over the IMD-covered half of the
+points the fit sees both the IMD precipitation and the ERA5 snowfall the bucket stacks,
+so precipitation that falls as snow there is counted twice, once as rain that runs
+off and once as pack that melts later; the fitted coefficients absorb the overlap and
+the held-out score is read with that in mind. The season-peak ratio the adoption rule
+reads rose from 0.5699 to 0.5775, unchanged to two decimals. It is a variant, scored
 leave-one-season-out beside the baseline at Bhakra alone under a rule written before the
 fit (`docs/superpowers/plans/2026-09-19-snowmelt-and-watch-hindcast.md`): the held-out
 error may not rise, Bhakra's season-peak ratio in the flood-scale check must rise, and its
@@ -107,8 +121,11 @@ the join. The recent melt over the same days as the recent rain enters the base
 removal, so the observed inflow is split between base, rain response and melt
 response; the horizon melt enters every deterministic model and every ensemble member.
 The product records the days, the melt, the pack at the issue date, the archive's last
-day and the source of every day; if the melt inputs cannot be built the cycle runs with
-the term contributing nothing and says so. In every score that runs on the parameters
+day, the source of every day and the count of days neither source covered (the fixed
+spans end on a date on disk and the model reaches back ten days, so an issue date far
+enough past the archive's end leaves a hole the bucket skips; the count and the dates
+are in the record and a warning is logged); if the melt inputs cannot be built the
+cycle runs with the term contributing nothing and says so. In every score that runs on the parameters
 in use (the flood-scale check, the as-issued hindcast, the live one-day and horizon
 tests) the melt over the horizon is the archive's melt, perfect prognosis for melt: the
 previous-runs archive holds no temperature or snowfall, so a hindcast on forecast melt

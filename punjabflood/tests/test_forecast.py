@@ -646,6 +646,26 @@ def test_melt_inputs_falls_back_to_the_fixed_spans_when_the_tail_cannot_be_pulle
     r = out["Pong"]
     assert r["archive_last_day"] == "2026-08-31" and "archive tail not pulled" in r["note"]
     assert r["melt_mm_recent"] == [20.0, 20.0, 20.0]
+    # the model's past days reach back to 08-26, before the archive's end: no hole
+    assert r["bucket_gap_days"] == 0 and "skipped" not in r["note"]
+
+
+def test_melt_inputs_reports_the_hole_when_the_model_no_longer_reaches_the_archive(monkeypatch):
+    """The fixed spans end on a date on disk; once the issue date is further out than the
+    model's past days reach, the days between are neither source's. They are counted and
+    named, not skipped in silence."""
+    cats = _one_point_catchment(monkeypatch)
+    client = _MeltClient(archive_have="2026-08-20", tail_fails=True)
+    out = forecast.melt_inputs(
+        client, cats, {"Pong": _melt_params()}, "2026-09-20", recent_days=3, horizon=2
+    )
+    r = out["Pong"]
+    # archive complete to 08-20, model past days from 09-10: 08-21 to 09-09 is the hole
+    assert r["archive_last_day"] == "2026-08-20"
+    assert r["bucket_gap_days"] == 20
+    assert "from 2026-08-21 to 2026-09-09 (20 days skipped" in r["note"]
+    assert "archive tail not pulled" in r["note"]
+    assert forecast.bucket_gap_days(None, {}) == 0
 
 
 def test_melt_inputs_skips_parameters_without_the_term(monkeypatch):

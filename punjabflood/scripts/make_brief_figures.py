@@ -66,7 +66,7 @@ def live_2026():
     before = json.load(open(BEFORE_PATH, encoding="utf-8"))["live_2026"] if BEFORE_PATH else None
     dams = ["Bhakra", "Pong"]
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9), sharey=False)
-    for ax, dam in zip(axes, dams):
+    for ax, dam in zip(axes, dams, strict=True):
         _style(ax)
         labels, vals, cols = [], [], []
         labels.append("persistence\n(yesterday's inflow)")
@@ -110,6 +110,7 @@ def realtime_rain():
             ("pearson_r", "correlation with the final IMD grid"),
             ("bias_pct", "bias against the final grid (%)"),
         ),
+        strict=True,
     ):
         _style(ax)
         w = 0.36
@@ -119,7 +120,7 @@ def realtime_rain():
             sub = rows[rows["record"] == rec].set_index("catchment").reindex(cats)
             xs = [i + (j - 0.5) * w for i in range(len(cats))]
             ax.bar(xs, sub[metric], width=w, color=col, label=name)
-            for x, v in zip(xs, sub[metric]):
+            for x, v in zip(xs, sub[metric], strict=True):
                 ax.text(
                     x,
                     v,
@@ -159,7 +160,7 @@ def qpf_models():
         ("bias_pct", "bias (%)"),
     ]
     fig, axes = plt.subplots(1, 4, figsize=(7.4, 2.5))
-    for ax, (m, label) in zip(axes, metrics):
+    for ax, (m, label) in zip(axes, metrics, strict=True):
         _style(ax)
         vals = [q["incumbent"][m], q["challenger"][m]]
         ax.bar([0, 1], vals, color=[S2, S1], width=0.6)
@@ -263,7 +264,7 @@ def gauge_ratios():
     g["date"] = pd.to_datetime(g["date"])
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.9), sharey=True)
     cols = {"Dhilwan": S1, "Harike Head Works": S2, "Ferozepur Head Works": S3}
-    for ax, yr in zip(axes, (2023, 2025)):
+    for ax, yr in zip(axes, (2023, 2025), strict=True):
         _style(ax)
         sub = g[g["date"].dt.year == yr]
         for st, col in cols.items():
@@ -321,7 +322,8 @@ def readings_db():
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.8), sharey=False)
     cols = {"Bhakra": S1, "Pong": S2, "Ranjit Sagar": S3}
     for ax, (frame, label) in zip(
-        axes, ((lvl, "dated level readings"), (inf, "dated inflow readings"))
+        axes, ((lvl, "dated level readings"), (inf, "dated inflow readings")),
+        strict=True,
     ):
         _style(ax)
         bottom = pd.Series(0, index=frame.index, dtype=float)
@@ -363,7 +365,7 @@ def weather_watch():
     watch = prod.get("weather") or {}
     dams = [d for d in ("Bhakra", "Pong", "Ranjit Sagar") if d in watch]
     fig, axes = plt.subplots(1, len(dams), figsize=(7.2, 2.9), sharey=True)
-    for ax, dam in zip(axes, dams):
+    for ax, dam in zip(axes, dams, strict=True):
         _style(ax)
         e = watch[dam]
         obs_days = pd.to_datetime(e["observed"]["days"])
@@ -434,7 +436,8 @@ def qpf_blend():
     }
     fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.6))
     for ax, (key, lab) in zip(
-        axes, (("hit_rate", "heavy-day hit rate"), ("mae_mm", "MAE (mm/day)"))
+        axes, (("hit_rate", "heavy-day hit rate"), ("mae_mm", "MAE (mm/day)")),
+        strict=True,
     ):
         _style(ax)
         vals = [sc[n][key] for n in names]

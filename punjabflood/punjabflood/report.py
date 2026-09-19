@@ -112,7 +112,9 @@ def _prospective_lines(forecast_dir: Path) -> list[str]:
         "## Prospective record, 2026 season",
         "",
         "Issued daily from the committed inputs and the live BBMB bulletin; a record is never "
-        "rewritten (`outputs/forecast/`). P(spillway forced) is at the five-day horizon.",
+        "rewritten (`outputs/forecast/`; `latest.json` there is the one file rewritten every "
+        "run, a copy of the newest product naming its dated record). P(spillway forced) is "
+        "at the five-day horizon.",
         "",
     ]
     if pr.empty:
@@ -656,9 +658,13 @@ def render_verification(
                 f"Verdict on 'snowmelt', {'adopted' if sv['adopt'] else 'not adopted'}. "
                 f"Conditions: {said}. The held-out row is in the variants table above.",
             ]
-            hc = sv.get("horizon_contribution_2025") or {}
+            yr = sv.get("horizon_contribution_year", 2025)
+            hc = (
+                sv.get(f"horizon_contribution_{int(yr)}")
+                or (sv.get("horizon_contribution") or {}).get("Bhakra")
+                or {}
+            )
             if hc.get("n_days"):
-                yr = sv.get("horizon_contribution_year", 2025)
                 lines += [
                     "",
                     f"Over the {yr} monsoon ({int(hc['n_days'])} issue days) the melt response "

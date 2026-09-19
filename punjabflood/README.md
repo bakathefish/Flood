@@ -98,7 +98,11 @@ The daily prospective forecast runs in GitHub Actions
 (`.github/workflows/hazard-forecast.yml` at the repository root) from committed data only:
 the CWC seed record, the fitted parameters, the catchment files and the saved Ghaggar
 climatology, plus the live BBMB bulletin and keyless Open-Meteo forecasts. Each cycle commits
-`outputs/forecast/<date>.{json,md}`; earlier days are never rewritten.
+`outputs/forecast/<date>.{json,md}`; earlier days are never rewritten. The one file the
+cycle does rewrite is `outputs/forecast/latest.json`, a copy of the newest product with
+the name of its dated record, which the live site reads. The committed parameters
+(`data/reference/inflow_params.json`) carry the Bhakra snowmelt term, so a cycle applies
+it without any calibration step.
 
 ## Layout
 
