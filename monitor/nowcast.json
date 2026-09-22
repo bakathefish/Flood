@@ -2,10 +2,10 @@
  "forecast": {
   "kind": "district flood onset",
   "status": "unavailable",
-  "reason": "newest observation is stale: 4 days old (2026-09-18), limit 3",
+  "reason": "only 9 of 20 districts have a recent observation, below the 50% floor",
   "note": "No forecast was produced this cycle. This is not an all-clear: absence of a forecast is absence of information, not evidence of calm."
  },
- "generated_utc": "2026-09-22T16:18:18Z",
+ "generated_utc": "2026-09-22T20:54:37Z",
  "window_start": "2026-09-13",
  "window_end": "2026-09-23",
  "core_season": true,
@@ -26,10 +26,10 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
-   "observed_fraction_window": 0.001,
-   "observed_km2": 5.2
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
+   "observed_fraction_window": 0.0014,
+   "observed_km2": 7.1
   },
   {
    "district": "Gurdaspur",
@@ -42,8 +42,8 @@
    "transparent_score": null,
    "latest_input": "2026-09-18",
    "input_age_days": 4,
-   "observed_fraction_window": 0.0014,
-   "observed_km2": 5.0
+   "observed_fraction_window": 0.0013,
+   "observed_km2": 4.8
   },
   {
    "district": "Tarn Taran",
@@ -54,10 +54,10 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
-   "observed_fraction_window": 0.0012,
-   "observed_km2": 2.9
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
+   "observed_fraction_window": 0.0014,
+   "observed_km2": 3.4
   },
   {
    "district": "Nawanshahr",
@@ -70,8 +70,8 @@
    "transparent_score": null,
    "latest_input": "2026-09-17",
    "input_age_days": 5,
-   "observed_fraction_window": 0.002,
-   "observed_km2": 2.6
+   "observed_fraction_window": 0.0019,
+   "observed_km2": 2.5
   },
   {
    "district": "Amritsar",
@@ -82,10 +82,10 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
-   "observed_fraction_window": 0.0007,
-   "observed_km2": 2.0
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
+   "observed_fraction_window": 0.0008,
+   "observed_km2": 2.1
   },
   {
    "district": "Kapurthala",
@@ -98,8 +98,8 @@
    "transparent_score": null,
    "latest_input": "2026-09-18",
    "input_age_days": 4,
-   "observed_fraction_window": 0.0009,
-   "observed_km2": 1.5
+   "observed_fraction_window": 0.0011,
+   "observed_km2": 1.9
   },
   {
    "district": "Jalandhar",
@@ -113,7 +113,7 @@
    "latest_input": "2026-09-18",
    "input_age_days": 4,
    "observed_fraction_window": 0.0004,
-   "observed_km2": 1.0
+   "observed_km2": 1.1
   },
   {
    "district": "Ludhiana",
@@ -130,6 +130,20 @@
    "observed_km2": 0.9
   },
   {
+   "district": "Bathinda",
+   "p_event": null,
+   "covered": true,
+   "acquisition_state": "observed",
+   "acquisition_fraction": 1.0,
+   "rank": null,
+   "tier": null,
+   "transparent_score": null,
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
+   "observed_fraction_window": 0.0002,
+   "observed_km2": 0.6
+  },
+  {
    "district": "Hoshiarpur",
    "p_event": null,
    "covered": true,
@@ -142,20 +156,6 @@
    "input_age_days": 4,
    "observed_fraction_window": 0.0002,
    "observed_km2": 0.6
-  },
-  {
-   "district": "Bathinda",
-   "p_event": null,
-   "covered": true,
-   "acquisition_state": "observed",
-   "acquisition_fraction": 1.0,
-   "rank": null,
-   "tier": null,
-   "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
-   "observed_fraction_window": 0.0001,
-   "observed_km2": 0.4
   },
   {
    "district": "Rupnagar",
@@ -180,8 +180,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.1
   },
@@ -208,8 +208,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -222,8 +222,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -250,8 +250,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -264,8 +264,8 @@
    "rank": null,
    "tier": null,
    "transparent_score": null,
-   "latest_input": "2026-09-18",
-   "input_age_days": 4,
+   "latest_input": "2026-09-22",
+   "input_age_days": 0,
    "observed_fraction_window": 0.0,
    "observed_km2": 0.0
   },
@@ -298,5 +298,5 @@
    "observed_km2": 0.0
   }
  ],
- "notes": "Forecast unavailable for this cycle: newest observation is stale: 4 days old (2026-09-18), limit 3. No district-level risk is published, and this is NOT an all-clear. Absence of satellite imagery is absence of information."
+ "notes": "Forecast unavailable for this cycle: only 9 of 20 districts have a recent observation, below the 50% floor. No district-level risk is published, and this is NOT an all-clear. Absence of satellite imagery is absence of information."
 }
