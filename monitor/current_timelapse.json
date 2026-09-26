@@ -1,9 +1,9 @@
 {
- "generated_utc": "2026-09-25T21:14:13Z",
+ "generated_utc": "2026-09-26T03:39:52Z",
  "season_start": "2026-06-01",
- "last_day": "2026-09-26",
- "days_with_coverage": 71,
- "latest_km2": 0.0,
+ "last_day": "2026-09-25",
+ "days_with_coverage": 70,
+ "latest_km2": 3.3,
  "peak_km2": 2804.2,
  "peak_day": "2026-06-26"
 }
