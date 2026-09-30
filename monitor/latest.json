@@ -1,26 +1,31 @@
 {
- "generated_utc": "2026-09-28T03:42:06Z",
+ "generated_utc": "2026-09-30T04:01:10Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-09-27",
- "latest_pass_utc": "2026-09-27T13:11:59.287344Z",
- "new_scenes": 1,
+ "latest_pass": "2026-09-29",
+ "latest_pass_utc": "2026-09-29T12:56:11.554871Z",
+ "new_scenes": 4,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.0,
- "total_flooded_km2": 0.0,
+ "coverage_fraction": 0.592,
+ "total_flooded_km2": 0.1,
  "passes": [
   {
-   "date": "2026-09-27",
-   "scenes": 1,
-   "total_flooded_km2": 0.0,
+   "date": "2026-09-29",
+   "scenes": 4,
+   "total_flooded_km2": 0.1,
    "flagged": 0,
-   "coverage_fraction": 0.0
+   "coverage_fraction": 0.592
   }
  ],
  "districts": [
+  {
+   "district": "Gurdaspur",
+   "flooded_km2": 0.1,
+   "flooded_fraction": 0.0
+  },
   {
    "district": "Amritsar",
    "flooded_km2": 0.0,
@@ -48,11 +53,6 @@
   },
   {
    "district": "Firozpur",
-   "flooded_km2": 0.0,
-   "flooded_fraction": 0.0
-  },
-  {
-   "district": "Gurdaspur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
