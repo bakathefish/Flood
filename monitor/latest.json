@@ -1,31 +1,26 @@
 {
- "generated_utc": "2026-10-17T03:01:46Z",
+ "generated_utc": "2026-10-17T14:58:44Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-10-16",
- "latest_pass_utc": "2026-10-16T13:04:17.672483Z",
+ "latest_pass": "2026-10-17",
+ "latest_pass_utc": "2026-10-17T01:07:59.934984Z",
  "new_scenes": 3,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.71,
- "total_flooded_km2": 0.3,
+ "coverage_fraction": 0.018,
+ "total_flooded_km2": 0.0,
  "passes": [
   {
-   "date": "2026-10-16",
+   "date": "2026-10-17",
    "scenes": 3,
-   "total_flooded_km2": 0.3,
+   "total_flooded_km2": 0.0,
    "flagged": 0,
-   "coverage_fraction": 0.71
+   "coverage_fraction": 0.018
   }
  ],
  "districts": [
-  {
-   "district": "Firozpur",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0001
-  },
   {
    "district": "Amritsar",
    "flooded_km2": 0.0,
@@ -48,6 +43,11 @@
   },
   {
    "district": "Fatehgarh Sahib",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Firozpur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
