@@ -1,41 +1,26 @@
 {
- "generated_utc": "2026-10-29T04:25:18Z",
+ "generated_utc": "2026-10-31T11:42:12Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-10-28",
- "latest_pass_utc": "2026-10-28T13:04:17.472776Z",
- "new_scenes": 3,
+ "latest_pass": "2026-10-30",
+ "latest_pass_utc": "2026-10-30T12:47:55.839139Z",
+ "new_scenes": 1,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.71,
- "total_flooded_km2": 0.9,
+ "coverage_fraction": 0.0,
+ "total_flooded_km2": 0.0,
  "passes": [
   {
-   "date": "2026-10-28",
-   "scenes": 3,
-   "total_flooded_km2": 0.9,
+   "date": "2026-10-30",
+   "scenes": 1,
+   "total_flooded_km2": 0.0,
    "flagged": 0,
-   "coverage_fraction": 0.71
+   "coverage_fraction": 0.0
   }
  ],
  "districts": [
-  {
-   "district": "Jalandhar",
-   "flooded_km2": 0.4,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Firozpur",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Ludhiana",
-   "flooded_km2": 0.2,
-   "flooded_fraction": 0.0
-  },
   {
    "district": "Amritsar",
    "flooded_km2": 0.0,
@@ -62,6 +47,11 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Firozpur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Gurdaspur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
@@ -72,7 +62,17 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Jalandhar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Kapurthala",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Ludhiana",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
