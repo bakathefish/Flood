@@ -1,51 +1,36 @@
 {
- "generated_utc": "2026-11-05T23:16:53Z",
+ "generated_utc": "2026-11-10T14:21:18Z",
  "source": "Sentinel-1 RTC via Microsoft Planetary Computer (anonymous STAC)",
  "reference": "pre-monsoon VV dry-season median, 150 m (see monitor/reference)",
  "lookback_days": 12,
  "alert_floor_km2": 25.0,
- "latest_pass": "2026-11-05",
- "latest_pass_utc": "2026-11-05T00:59:55.739530Z",
- "new_scenes": 7,
+ "latest_pass": "2026-11-10",
+ "latest_pass_utc": "2026-11-10T01:07:59.465289Z",
+ "new_scenes": 6,
  "backlog_skipped": false,
  "skipped_dates": [],
- "coverage_fraction": 0.867,
- "total_flooded_km2": 0.7,
+ "coverage_fraction": 0.018,
+ "total_flooded_km2": 0.0,
  "passes": [
   {
-   "date": "2026-11-04",
-   "scenes": 4,
-   "total_flooded_km2": 0.4,
+   "date": "2026-11-09",
+   "scenes": 3,
+   "total_flooded_km2": 0.5,
    "flagged": 0,
-   "coverage_fraction": 0.593
+   "coverage_fraction": 0.71
   },
   {
-   "date": "2026-11-05",
+   "date": "2026-11-10",
    "scenes": 3,
-   "total_flooded_km2": 0.7,
+   "total_flooded_km2": 0.0,
    "flagged": 0,
-   "coverage_fraction": 0.867
+   "coverage_fraction": 0.018
   }
  ],
  "districts": [
   {
-   "district": "Firozpur",
-   "flooded_km2": 0.3,
-   "flooded_fraction": 0.0001
-  },
-  {
    "district": "Amritsar",
-   "flooded_km2": 0.2,
-   "flooded_fraction": 0.0001
-  },
-  {
-   "district": "Gurdaspur",
-   "flooded_km2": 0.1,
-   "flooded_fraction": 0.0
-  },
-  {
-   "district": "Kapurthala",
-   "flooded_km2": 0.1,
+   "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
   {
@@ -69,12 +54,27 @@
    "flooded_fraction": 0.0
   },
   {
+   "district": "Firozpur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Gurdaspur",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
    "district": "Hoshiarpur",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
   {
    "district": "Jalandhar",
+   "flooded_km2": 0.0,
+   "flooded_fraction": 0.0
+  },
+  {
+   "district": "Kapurthala",
    "flooded_km2": 0.0,
    "flooded_fraction": 0.0
   },
